@@ -1,0 +1,1698 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Induction Card</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="description" content="Personal offline memory aid for ETT size/depth, spinal doses and obstetric anaesthesia reference cards.">
+<meta name="theme-color" content="#0f766e">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Induction Card">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" href="icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: one phone-width column; home = list of section tiles, each section has its own hue. */
+:root{
+  /* type scale (6 steps) */
+  --fs-xs:.8125rem; --fs-sm:.875rem; --fs-base:1rem; --fs-md:1.0625rem; --fs-lg:1.25rem; --fs-xl:1.5rem; --big:clamp(2rem,9vw,2.75rem);
+  /* spacing & radius */
+  --font-sans:"IBM Plex Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif; --font-mono:"IBM Plex Mono",ui-monospace,"SF Mono",Menlo,monospace;
+  --mon-bg:#0b1517; --mon-ink:#e6f1ef; --mon-muted:#8fa7a3; --mon-grid:rgba(255,255,255,.06); --etco2:#facc15;
+  --s1:4px; --s2:8px; --s3:12px; --s4:16px; --s5:24px; --r-sm:10px; --r:14px;
+  /* neutrals (slight teal bias) */
+  --bg:#f3f6f6; --card:#ffffff; --ink:#14201f; --muted:#5a6866; --line:#dbe3e2; --field:#f3f6f6;
+  --accent:#0f766e; --accent-ink:#ffffff; --accent-soft:#e3f3f1; --on:#ffffff;
+  --warn-bg:#fff6dc; --warn-ink:#7a4b00; --warn-line:#efc35a;
+  --danger-bg:#fde9e9; --danger-ink:#9b1c1c; --danger-line:#f0a3a3;
+  --unv-bg:#edf0f2; --unv-ink:#4b5563;
+  --emerg-solid:#b42318;
+  /* section hues */
+  --g-emerg:#b42318; --g-emerg-soft:#fde9e9;
+  --g-obs:#be185d;   --g-obs-soft:#fce7f3;
+  --g-paeds:#15803d; --g-paeds-soft:#dcfce7;
+  --g-spinal:#0e7490; --g-spinal-soft:#cffafe;
+  --g-airway:#b45309; --g-airway-soft:#fef3c7;
+  --g-values:#5a6866; --g-values-soft:#eceff0;
+  --gc:var(--accent); --gc-soft:var(--accent-soft);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0e1514; --card:#162120; --ink:#e4eeec; --muted:#9db0ad; --line:#2a3836; --field:#0e1514;
+    --accent:#2dd4bf; --accent-ink:#04201c; --accent-soft:#11302c; --on:#0e1514;
+    --warn-bg:#2e2410; --warn-ink:#f5cf7a; --warn-line:#6b5420;
+    --danger-bg:#3a1414; --danger-ink:#ffb4b4; --danger-line:#7a2a2a;
+    --unv-bg:#1f2a29; --unv-ink:#a8b8b5;
+    --g-emerg:#ff9b93; --g-emerg-soft:#3a1414;
+    --g-obs:#f472b6;   --g-obs-soft:#3a1028;
+    --g-paeds:#4ade80; --g-paeds-soft:#0c2e1a;
+    --g-spinal:#22d3ee; --g-spinal-soft:#08303a;
+    --g-airway:#fbbf24; --g-airway-soft:#3a2a06;
+    --g-values:#9db0ad; --g-values-soft:#1f2a29;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0e1514; --card:#162120; --ink:#e4eeec; --muted:#9db0ad; --line:#2a3836; --field:#0e1514;
+  --accent:#2dd4bf; --accent-ink:#04201c; --accent-soft:#11302c; --on:#0e1514;
+  --warn-bg:#2e2410; --warn-ink:#f5cf7a; --warn-line:#6b5420;
+  --danger-bg:#3a1414; --danger-ink:#ffb4b4; --danger-line:#7a2a2a;
+  --unv-bg:#1f2a29; --unv-ink:#a8b8b5;
+  --g-emerg:#ff9b93; --g-emerg-soft:#3a1414;
+  --g-obs:#f472b6;   --g-obs-soft:#3a1028;
+  --g-paeds:#4ade80; --g-paeds-soft:#0c2e1a;
+  --g-spinal:#22d3ee; --g-spinal-soft:#08303a;
+  --g-airway:#fbbf24; --g-airway-soft:#3a2a06;
+  --g-values:#9db0ad; --g-values-soft:#1f2a29;
+  color-scheme:dark;
+}
+[data-group="emerg"]{--gc:var(--g-emerg);--gc-soft:var(--g-emerg-soft)}
+[data-group="obs"]{--gc:var(--g-obs);--gc-soft:var(--g-obs-soft)}
+[data-group="paeds"]{--gc:var(--g-paeds);--gc-soft:var(--g-paeds-soft)}
+[data-group="spinal"]{--gc:var(--g-spinal);--gc-soft:var(--g-spinal-soft)}
+[data-group="airway"],[data-group="ga"]{--gc:var(--g-airway);--gc-soft:var(--g-airway-soft)}
+[data-group="regional"]{--gc:var(--g-spinal);--gc-soft:var(--g-spinal-soft)}
+
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);
+  font:400 var(--fs-base)/1.5 var(--font-sans);-webkit-text-size-adjust:100%}
+body{padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom)}
+main{max-width:640px;margin:0 auto;padding-block:0 var(--s5);padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+button{font:inherit;color:inherit}
+p{margin:var(--s2) 0}
+h1,h2,h3{text-wrap:balance}
+:focus-visible{outline:3px solid var(--gc);outline-offset:2px}
+
+/* header */
+header{display:flex;align-items:center;gap:var(--s2);padding:var(--s3) 0}
+header h1{font-size:var(--fs-lg);font-weight:700;margin:0;flex:1;display:flex;align-items:center;gap:var(--s2);line-height:1.2;min-width:0}
+.hico{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;background:var(--gc-soft);color:var(--gc);flex:none}
+.hico svg{width:22px;height:22px}
+.iconbtn{background:var(--card);border:1px solid var(--line);border-radius:var(--r-sm);min-width:44px;height:44px;padding:0 var(--s3);cursor:pointer;font-size:var(--fs-sm);font-weight:600;white-space:nowrap}
+.draft,.checked{border-radius:var(--r-sm);padding:var(--s2) var(--s3);font-size:var(--fs-xs);text-align:center;margin-bottom:var(--s3);line-height:1.35}
+.draft{background:var(--danger-bg);color:var(--danger-ink);border:1px solid var(--danger-line);font-weight:700}
+.checked{background:var(--accent-soft);color:var(--ink)}
+
+/* home tiles */
+.label{font-size:var(--fs-xs);font-weight:700;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;margin:var(--s4) 2px var(--s2)}
+.tiles{display:grid;gap:var(--s2)}
+.tile{--t:var(--accent);--t-soft:var(--accent-soft);display:flex;align-items:center;gap:var(--s3);width:100%;text-align:left;background:var(--card);
+  border:1px solid var(--line);border-radius:var(--r);padding:var(--s3);cursor:pointer;color:var(--ink)}
+.tile .ico{width:52px;height:52px;border-radius:var(--r);display:grid;place-items:center;background:var(--t-soft);color:var(--t);flex:none}
+.tile .ico svg{width:30px;height:30px}
+.tile .txt{flex:1;min-width:0}
+.tile .tt{display:block;font-size:var(--fs-lg);font-weight:700;line-height:1.2}
+.tile .ts{display:block;font-size:var(--fs-sm);color:var(--muted);margin-top:2px;line-height:1.35}
+.tile .chev{color:var(--muted);font-size:var(--fs-xl);line-height:1}
+.t-obs{--t:var(--g-obs);--t-soft:var(--g-obs-soft)} .t-paeds{--t:var(--g-paeds);--t-soft:var(--g-paeds-soft)}
+.t-spinal,.t-regional{--t:var(--g-spinal);--t-soft:var(--g-spinal-soft)} .t-airway,.t-ga{--t:var(--g-airway);--t-soft:var(--g-airway-soft)}
+.t-values{--t:var(--g-values);--t-soft:var(--g-values-soft)}
+.qbtn.t-obs,.sq.t-obs{--t:var(--g-obs);--t-soft:var(--g-obs-soft)} .qbtn.t-paeds,.sq.t-paeds{--t:var(--g-paeds);--t-soft:var(--g-paeds-soft)}
+.qbtn.t-ga,.sq.t-ga{--t:var(--g-airway);--t-soft:var(--g-airway-soft)} .sq.t-regional{--t:var(--g-spinal);--t-soft:var(--g-spinal-soft)}
+.tile.t-emerg{background:var(--emerg-solid);border-color:var(--emerg-solid);color:#fff}
+.tile.t-emerg .ico{background:rgba(255,255,255,.16);color:#fff}
+.tile.t-emerg .ts,.tile.t-emerg .chev{color:rgba(255,255,255,.88)}
+
+/* search */
+.searchbox{position:relative}
+.searchbox svg{position:absolute;left:12px;top:14px;width:20px;height:20px;color:var(--muted)}
+.search{width:100%;height:48px;border-radius:var(--r-sm);border:1px solid var(--line);background:var(--card);color:var(--ink);font-size:var(--fs-base);padding:0 var(--s3) 0 40px}
+#results:not(:empty){margin-top:var(--s2);background:var(--card);border:1px solid var(--line);border-radius:var(--r-sm);padding:0 var(--s3)}
+.hit{display:block;width:100%;text-align:left;background:none;border:0;border-bottom:1px solid var(--line);padding:var(--s3) 0;font-weight:600;font-size:var(--fs-base);cursor:pointer}
+.hit:last-child{border-bottom:0}
+.hit small{display:block;color:var(--muted);font-weight:400;font-size:var(--fs-xs);margin-top:2px}
+.chips{display:flex;flex-wrap:wrap;gap:var(--s2)}
+.chip{padding:var(--s2) var(--s3);border-radius:999px;border:1px solid var(--line);background:var(--card);cursor:pointer;font-size:var(--fs-sm);font-weight:600;text-align:left}
+
+/* generic buttons kept for in-card links */
+.homebtn{display:block;box-sizing:border-box;text-align:left;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:var(--r-sm);
+  padding:var(--s3);font-size:var(--fs-base);font-weight:700;cursor:pointer;margin:var(--s2) 0}
+
+/* cards */
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:var(--s4);margin:var(--s3) 0}
+.card h2{font-size:var(--fs-md);font-weight:700;margin:0 0 var(--s2);line-height:1.3}
+.card h3{font-size:var(--fs-sm);font-weight:700;color:var(--gc);margin:var(--s4) 0 var(--s1);letter-spacing:.01em}
+.hint{font-size:var(--fs-sm);color:var(--muted);margin:var(--s4) 2px var(--s1)}
+
+/* controls */
+.seg{display:flex;gap:var(--s2);flex-wrap:wrap;margin:var(--s2) 0 var(--s3)}
+.seg button{flex:1 1 auto;min-height:44px;border-radius:var(--r-sm);border:1px solid var(--line);background:var(--card);cursor:pointer;padding:0 var(--s3);font-size:var(--fs-sm);font-weight:600}
+.seg button[aria-pressed="true"]{background:var(--gc);color:var(--on);border-color:var(--gc);font-weight:700}
+.emtabs{margin-top:0;flex-wrap:nowrap}
+.emtabs button{flex:1 1 0;padding:0 var(--s1);min-width:0}
+.emtabs button{min-height:48px;font-size:var(--fs-base)}
+.emtabs.five{gap:4px}.emtabs.five button{font-size:var(--fs-xs);padding:0 2px;letter-spacing:-.01em}
+.step{display:flex;align-items:center;gap:var(--s2);margin:var(--s2) 0}
+.step label{flex:1;font-weight:600;font-size:var(--fs-base);min-width:0}
+.step button{width:48px;height:48px;border-radius:var(--r-sm);border:1px solid var(--line);background:var(--card);font-size:var(--fs-xl);line-height:1;cursor:pointer}
+.step input{font-family:var(--font-mono);width:80px;height:48px;text-align:center;font-size:var(--fs-lg);font-weight:700;border-radius:var(--r-sm);border:1px solid var(--line);background:var(--field);color:var(--ink);font-variant-numeric:tabular-nums}
+.step .unit{width:30px;color:var(--muted);font-size:var(--fs-sm)}
+
+/* results */
+.result{background:var(--gc-soft);border-radius:var(--r);padding:var(--s4);margin:var(--s3) 0}
+.big{font-family:var(--font-mono);font-size:var(--big);font-weight:600;line-height:1.1;font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+.sub{color:var(--muted);font-size:var(--fs-sm);line-height:1.4}
+.row{display:flex;gap:var(--s4);flex-wrap:wrap}
+.row>div{flex:1 1 140px;min-width:0}
+.trio{display:flex;gap:var(--s2);margin-top:var(--s2)}
+.trio span{flex:1;text-align:center;border:1px solid var(--line);border-radius:var(--r-sm);padding:var(--s1) 0;background:var(--card);color:var(--muted);font-size:var(--fs-sm);font-variant-numeric:tabular-nums}
+.trio span.main{border:2px solid var(--gc);color:var(--ink);font-weight:800}
+.src{color:var(--muted);font-size:var(--fs-xs);margin-top:var(--s3);line-height:1.4}
+.warn,.danger,.unv{border-radius:var(--r-sm);padding:var(--s2) var(--s3);margin:var(--s2) 0;font-size:var(--fs-sm);line-height:1.45}
+.warn{background:var(--warn-bg);color:var(--warn-ink);border:1px solid var(--warn-line)}
+.danger{background:var(--danger-bg);color:var(--danger-ink);border:1px solid var(--danger-line);font-weight:700}
+.unv{background:var(--unv-bg);color:var(--unv-ink);border:1px dashed var(--line)}
+.unv b{letter-spacing:.03em}
+
+/* tables & lists */
+table{width:100%;border-collapse:collapse;font-size:var(--fs-sm);line-height:1.4}
+th,td{border-bottom:1px solid var(--line);padding:var(--s2) var(--s1);text-align:left;vertical-align:top;font-variant-numeric:tabular-nums}
+th{color:var(--muted);font-weight:600}
+td.hl{font-weight:700}
+.mono,b.dose,.trio span{font-family:var(--font-mono)}
+tr.hl td{background:var(--gc-soft);font-weight:700}
+ol,ul{margin:var(--s1) 0;padding-left:22px}
+li{margin:var(--s1) 0}
+
+/* accordion */
+details.acc{padding:0;margin:var(--s2) 0}
+details.acc>summary{list-style:none;cursor:pointer;padding:var(--s3) var(--s4);font-weight:700;font-size:var(--fs-md);display:flex;align-items:center;gap:var(--s3);min-height:52px;line-height:1.3}
+details.acc>summary::-webkit-details-marker{display:none}
+details.acc>summary .st{flex:1;min-width:0}
+details.acc>summary::after{content:"›";color:var(--muted);font-size:var(--fs-xl);line-height:1;transition:transform .15s}
+details.acc[open]>summary::after{transform:rotate(90deg)}
+details.acc[open]>summary{border-bottom:1px solid var(--line)}
+details.acc>:not(summary){margin-left:var(--s4);margin-right:var(--s4)}
+details.acc[open]{padding-bottom:var(--s3)}
+.stepno{min-width:34px;height:28px;padding:0 var(--s2);border-radius:8px;background:var(--gc-soft);color:var(--gc);font-weight:800;font-size:var(--fs-sm);display:inline-grid;place-items:center;flex:none;font-variant-numeric:tabular-nums}
+@media (prefers-reduced-motion: reduce){details.acc>summary::after{transition:none}}
+
+/* crisis */
+ol.crisis{padding-left:26px;margin:var(--s2) 0}
+ol.crisis li{margin:var(--s2) 0;font-size:var(--fs-md);line-height:1.45;padding-left:2px}
+ol.crisis li::marker{font-weight:800;color:var(--g-emerg)}
+b.dose{font-weight:800}
+.emlinks{padding:var(--s3) var(--s4)}
+.emlink{display:block;box-sizing:border-box;text-align:left;margin:var(--s2) 0;padding:var(--s3);border-radius:var(--r-sm);border:1px solid var(--danger-line);background:var(--danger-bg);color:var(--danger-ink);font-weight:700;font-size:var(--fs-sm);cursor:pointer}
+
+.themebtn{min-width:44px;width:44px;padding:0;font-size:var(--fs-lg)}
+.quick{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--s2)}
+.qbtn,.sq{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:var(--s1);background:var(--card);border:1px solid var(--line);border-radius:var(--r);cursor:pointer;color:var(--ink);text-align:center}
+.qbtn{padding:var(--s3) var(--s1);font-size:var(--fs-sm);font-weight:700;min-height:88px}
+.qi{width:44px;height:44px;border-radius:12px;display:grid;place-items:center;background:var(--t-soft);color:var(--t)}
+.qi svg{width:26px;height:26px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:var(--s2)}
+.sq{padding:var(--s4) var(--s2);min-height:120px}
+.sq .qi{width:52px;height:52px}.sq .qi svg{width:30px;height:30px}
+.sqt{font-size:var(--fs-md);font-weight:700;line-height:1.2}
+.sqs{font-size:var(--fs-xs);color:var(--muted);line-height:1.2}
+.t-emerg{margin-top:var(--s3)}
+.linkbtn{display:flex;align-items:center;justify-content:center;gap:var(--s2);width:100%;margin-top:var(--s4);background:none;border:0;color:var(--muted);font-size:var(--fs-sm);font-weight:600;cursor:pointer;min-height:44px}
+.linkbtn svg{width:18px;height:18px}
+.lamax{background:var(--gc-soft);border-radius:var(--r-sm);padding:var(--s2) var(--s3);font-size:var(--fs-sm);margin:var(--s2) 0;line-height:1.45}
+tr.over td{background:var(--danger-bg)}
+/* home hero (monitor) */
+.hero{position:relative;overflow:hidden;background:var(--mon-bg);color:var(--mon-ink);border-radius:var(--r);padding:var(--s3) var(--s4) var(--s4);margin:var(--s3) 0 var(--s3)}
+.hero::before{content:"";position:absolute;inset:0;background-image:linear-gradient(var(--mon-grid) 1px,transparent 1px),linear-gradient(90deg,var(--mon-grid) 1px,transparent 1px);background-size:16px 16px;pointer-events:none}
+.capno{position:absolute;left:0;right:0;bottom:8px;width:100%;height:44px;opacity:.85}
+.capno .trace{animation:sweep 6s linear infinite}
+.capno path{fill:none;stroke:var(--etco2);stroke-width:2;vector-effect:non-scaling-stroke;stroke-linejoin:round}
+@keyframes sweep{from{transform:translateX(0)}to{transform:translateX(-100px)}}
+@media (prefers-reduced-motion: reduce){.capno .trace{animation:none}}
+.hero-top{position:relative;display:flex;align-items:center;justify-content:space-between;gap:var(--s2)}
+.brand{display:flex;align-items:center;gap:6px;font-size:var(--fs-xs);font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--mon-muted)}
+.brand svg{width:18px;height:18px;color:var(--etco2)}
+.hero-r{display:flex;align-items:center;gap:var(--s2)}
+.clock{font-family:var(--font-mono);font-size:var(--fs-sm);color:var(--etco2);font-weight:600}
+.herobtn{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.14);color:var(--mon-ink);height:36px;min-width:36px;width:36px}
+.hello{position:relative;font-size:var(--fs-xl);font-weight:600;line-height:1.2;margin:var(--s3) 0 2px}
+.date{position:relative;font-size:var(--fs-sm);color:var(--mon-muted);margin-bottom:40px}
+/* live quick tiles */
+.quick .qbtn{align-items:flex-start;justify-content:flex-start;text-align:left;padding:var(--s3);gap:2px;min-height:0}
+.quick .qbtn{position:relative}
+.quick .qmini{position:absolute;top:8px;right:8px;width:24px;height:24px;border-radius:7px}.quick .qmini svg{width:16px;height:16px}
+.qlab{font-size:var(--fs-xs);font-weight:700;color:var(--t);letter-spacing:.02em;padding-right:26px;line-height:1.2;min-height:2.4em}
+.qin{font-size:var(--fs-xs);color:var(--muted)}
+.qans{font-family:var(--font-mono);font-size:var(--fs-lg);font-weight:600;line-height:1.15;margin-top:2px}
+.qans small{display:block;font-family:var(--font-sans);font-size:var(--fs-xs);font-weight:500;color:var(--muted);margin-top:2px}
+/* pearl */
+.pearl{display:block;width:100%;text-align:left;margin-top:var(--s3);background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:var(--s3) var(--s4);cursor:pointer;color:var(--ink);position:relative}
+.pearl::before{content:"";position:absolute;left:var(--s4);top:0;width:28px;height:3px;border-radius:0 0 3px 3px;background:var(--etco2)}
+.plab{display:block;font-size:var(--fs-xs);font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:2px 0 4px}
+.ptxt{display:block;font-size:var(--fs-base);line-height:1.45}
+.pgo{display:block;font-size:var(--fs-xs);color:var(--accent);font-weight:600;margin-top:6px}
+/* compact section tiles */
+.sq{min-height:0;padding:var(--s3);align-items:flex-start;text-align:left;gap:var(--s1)}
+.sq .qi{width:40px;height:40px}.sq .qi svg{width:24px;height:24px}
+.sqt{font-size:var(--fs-base);margin-top:var(--s1)}
+.sqs{font-size:var(--fs-xs);color:var(--muted);line-height:1.35}
+.meter{height:10px;border-radius:999px;background:var(--line);overflow:hidden;margin-top:var(--s3)}
+.meter span{display:block;height:100%;background:var(--g-paeds);transition:width .2s}
+.meter.near span{background:var(--warn-line)} .meter.over span{background:var(--danger-ink)}
+.addla{display:block;box-sizing:border-box;margin:var(--s3) 0 0;padding:var(--s2) var(--s3);border-radius:var(--r-sm);border:1px dashed var(--gc);background:var(--gc-soft);color:var(--ink);font-weight:600;font-size:var(--fs-sm);cursor:pointer;text-align:left}
+.addla.mini{display:inline-block;width:auto;margin:4px 0 0;padding:2px 8px;font-size:var(--fs-xs)}
+.rmla{width:32px;height:32px;border-radius:8px;border:1px solid var(--line);background:var(--card);cursor:pointer;font-size:var(--fs-lg);line-height:1}
+table.blk th{width:32%;font-size:var(--fs-xs);text-transform:uppercase;letter-spacing:.04em}
+.bad{color:var(--danger-ink);font-weight:700}
+.chip.on{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.chip.add{border-style:dashed;color:var(--accent)} .chip.ghost{background:none;color:var(--muted)}
+.activebar{display:flex;justify-content:space-between;align-items:center;gap:var(--s2);box-sizing:border-box;width:100%;text-align:left;margin:0 0 var(--s3);padding:var(--s2) var(--s3);border-radius:var(--r-sm);border:1px solid var(--accent);background:var(--accent-soft);color:var(--ink);font-size:var(--fs-sm);cursor:pointer}
+.casecard{display:flex;justify-content:space-between;align-items:center;gap:var(--s2);flex-wrap:wrap}
+.casecard.on{border-color:var(--accent)}
+.caseact{display:flex;gap:var(--s2)}
+.pill{display:inline-block;padding:1px 8px;border-radius:999px;background:var(--accent);color:var(--accent-ink);font-size:var(--fs-xs);font-weight:700}
+.homebtn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent);text-align:center}
+.disc{color:var(--muted);font-size:var(--fs-xs);text-align:center;margin-top:var(--s5);line-height:1.5}
+a{color:var(--accent)}
+.vs label{display:flex;gap:var(--s3);align-items:flex-start;padding:var(--s2) 0;border-bottom:1px solid var(--line);font-size:var(--fs-sm)}
+.vs input{width:22px;height:22px;flex:none;margin-top:1px}
+</style>
+</head>
+<body>
+<main id="app"></main>
+<script>
+"use strict";
+/* ================= CONFIG ================= */
+// Set to e.g. "2026-11-20" after the values sheet has been signed off.
+const VALUES_CHECKED = "14 Nov 2026";
+const APP_VERSION = "2.3.1";
+const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
+
+/* ================= HELPERS ================= */
+const $ = s => document.querySelector(s);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const r05 = x => Math.round(x*2)/2;               // nearest 0.5
+const floor05 = x => Math.floor(x*2+1e-9)/2;      // round down to 0.5
+const f1 = x => (Math.round(x*10)/10).toFixed(1);
+const fmt = x => { const v = Math.round(x*100)/100; return String(v); };
+const store = {
+  get(k,d){ try{ const v = localStorage.getItem("ic."+k); return v===null?d:JSON.parse(v);}catch(e){return d;} },
+  set(k,v){ try{ localStorage.setItem("ic."+k, JSON.stringify(v)); }catch(e){} }
+};
+// Inputs are not remembered between uses (per plan): state lives in memory only.
+const S = { ettMode:"adult", sex:"F", height:158, ageY:4, ageM:0, wt:3.0,
+            spOp:"lscs", spHt:155, morWt:60, pw:10, pY:1, pM:0, pHt:75, pBE:-5, aw:70, emTab:"adult", obTab:"labour", pTab:"pre", gaTab:"pre", raTab:"safety", laA:[], laP:[], cSex:"F", cY:40, cM:0, cH:160, cW:60, cNick:"", laD:"bupi", laC:"0.5", laMl:15, laBi:"1", age:45, apfel:0, pump:"pcea_cse", topup:"lig" };
+
+function src(text){ return `<div class="src">Source: ${text}</div>`; }
+function protoSrc(){
+  const past = new Date() > new Date(PROTO.review+"T00:00:00");
+  return src(esc(PROTO.name)+" · review due 1 Sep 2026") +
+    (past ? `<div class="warn">⚠ Protocol review date (1 Sep 2026) has passed — check for a newer version.</div>` : "");
+}
+function unv(what, why){ return `<div class="unv"><b>UNVERIFIED — HIDDEN.</b> ${what}<br><span>${why}</span></div>`; }
+function seg(key, opts){
+  return `<div class="seg">` + opts.map(([v,l]) =>
+    `<button aria-pressed="${S[key]===v}" data-seg="${key}" data-val="${v}">${l}</button>`).join("") + `</div>`;
+}
+function step(key, label, unit, min, max, stp){
+  return `<div class="step"><label for="in-${key}">${label}</label>
+    <button aria-label="decrease" data-step="${key}" data-d="${-stp}" data-min="${min}" data-max="${max}">−</button>
+    <input id="in-${key}" inputmode="decimal" data-in="${key}" data-min="${min}" data-max="${max}" value="${S[key]}">
+    <button aria-label="increase" data-step="${key}" data-d="${stp}" data-min="${min}" data-max="${max}">+</button>
+    <span class="unit">${unit}</span></div>`;
+}
+function trio(a,b,c){ return `<div class="trio"><span>${a}</span><span class="main">${b}</span><span>${c}</span></div>`; }
+const disc = `<div class="disc">${VALUES_CHECKED ? `Values checked ${VALUES_CHECKED}` : `<b>DRAFT – values not checked</b>`}<br>Memory aid only — clinical judgement decides. Cases are anonymous, kept on this phone only, auto-deleted after 36 h. v${APP_VERSION}</div>`;
+
+/* ================= SCREENS ================= */
+function banner(){
+  return VALUES_CHECKED
+    ? `<div class="checked">Values checked: ${esc(VALUES_CHECKED)} · items marked UNVERIFIED stay hidden</div>`
+    : `<div class="draft">DRAFT – not checked. Do not rely on these values yet.</div>`;
+}
+const ICONS = {
+  emerg:'<path d="M12 3.5 2.8 19.5h18.4z"/><path d="M12 9.5v4.5"/><circle cx="12" cy="16.8" r=".9" fill="currentColor" stroke="none"/>',
+  obs:'<circle cx="11" cy="3.8" r="2.3" fill="currentColor" stroke="none"/><path fill="currentColor" stroke="none" d="M9.4 7.2h2.6c1 0 1.7.7 1.8 1.6l.2 1.3c2.5.9 4 2.9 4 5.1 0 2-1.5 3.5-3.8 3.8l-.4 3.5h-2.3l-.2-3.4h-.5l-.4 3.4H8.1l.4-6.6-.8-4.5c-.2-1.2.5-2.2 1.7-2.2z"/>',
+  paeds:'<circle cx="12" cy="13" r="7.5"/><path d="M12 5.5c0-1.7 1.3-2.7 2.8-2.2"/><circle cx="9.3" cy="12.5" r=".9" fill="currentColor" stroke="none"/><circle cx="14.7" cy="12.5" r=".9" fill="currentColor" stroke="none"/><path d="M9.8 16c1.3 1.1 3.1 1.1 4.4 0"/>',
+  spinal:'<rect x="8.5" y="2" width="7" height="3.6" rx="1.4"/><rect x="8.5" y="7.2" width="7" height="3.6" rx="1.4"/><rect x="8.5" y="12.4" width="7" height="3.6" rx="1.4"/><rect x="8.5" y="17.6" width="7" height="3.6" rx="1.4"/><path d="M5.5 3.8h3M15.5 3.8h3M5.5 9h3M15.5 9h3M5.5 14.2h3M15.5 14.2h3M5.5 19.4h3M15.5 19.4h3"/>',
+  airway:'<path d="M12 3v7"/><path d="M12 10c-1-.8-2.4-1-3.4 0C6.9 11.8 5.5 15.5 5.5 18.5c0 1.6 1.3 2.2 2.8 1.6 1.9-.8 3.2-2.6 3.7-5.6V10"/><path d="M12 10c1-.8 2.4-1 3.4 0 1.7 1.8 3.1 5.5 3.1 8.5 0 1.6-1.3 2.2-2.8 1.6-1.9-.8-3.2-2.6-3.7-5.6"/>',
+  values:'<rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4V3h6v1"/><path d="m8.5 13 2.5 2.5 4.5-5"/>',
+  capno:'<path d="M2 16h4l1.5-9c3 0 6-.6 8.5-1.2L17.5 16H22"/>',
+  search:'<circle cx="11" cy="11" r="6.5"/><path d="m16 16 4.5 4.5"/>'};
+ICONS.ga = ICONS.airway; ICONS.regional = ICONS.spinal;
+const svg = k => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS[k]}</svg>`;
+function head(title, back, icon){
+  const th = store.get("theme","auto");
+  const thLabel = th==="auto" ? "◐" : th==="dark" ? "☾" : "☀";
+  return `<header>${back?`<button class="iconbtn" data-go="${back}" aria-label="Back">‹ Back</button>`:""}
+    <h1>${icon?`<span class="hico">${svg(icon)}</span>`:""}<span>${title}</span></h1><button class="iconbtn themebtn" data-theme-toggle aria-label="Theme: ${th}" title="Theme: ${th}">${thLabel}</button></header>` + (VALUES_CHECKED ? "" : banner());
+}
+
+const screens = {};
+
+const tile = (cls, icon, title, sub, attrs) => `<button class="tile ${cls}" ${attrs}><span class="ico">${svg(icon)}</span><span class="txt"><span class="tt">${title}</span><span class="ts">${sub}</span></span><span class="chev">›</span></button>`;
+const DOCTOR = "Dr X";
+const PEARLS = [
+  ["Exactly 150 cm → 1.8 mL heavy bupivacaine for LSCS.","A1. Spinal: dose by height","obs","lscs"],
+  ["IT morphine is 1 mg/mL diluted: 0.1 mL = 0.1 mg. Never straight from the 10 mg/mL ampoule.","A2. Spinal: IT morphine & fentanyl","obs","lscs"],
+  ["Sugammadex 16 mg/kg (total weight) for immediate reversal after RSI rocuronium.","2. RSI","ga","ind"],
+  ["Rocuronium is dosed on ideal weight; suxamethonium on total weight.","3. Muscle relaxants","ga","ind"],
+  ["Chula formula: oral ETT depth = 4 + height/10 cm.","4. Tube & airway kit","ga","ind"],
+  ["Paeds ETT anchor: term 9 cm, 1 year 12 cm, then age/2 + 12.","1. Tube: size, depth, blade, suction","paeds","ind"],
+  ["Caudal: more than 1.2 mL/kg of 0.25% bupivacaine = toxicity.","9. Block: caudal","paeds","intra"],
+  ["Neonatal epidural: never exceed 0.2 mg/kg/h of local anaesthetic.","12. Block: lumbar / thoracic epidural","paeds","intra"],
+  ["LAST: Intralipid 20% 1.5 mL/kg over 1 min, then 15 mL/kg/h.","LA toxicity (LAST)","emerg","adult"],
+  ["It is easier to manage hypotension than an inadequate block.","A1. Spinal: dose by height","obs","lscs"],
+  ["Do NOT flush a dural-puncture catheter before removal — residual LA.","4. Problem: accidental dural puncture","obs","labour"],
+  ["Remi PCA not working? Adjust the background rate, not the bolus.","5. No epidural: IV PCA","obs","labour"],
+  ["4/2/1: a 10 kg child needs 40 mL/h maintenance.","1. Fluids: maintenance & insensible loss","paeds","intra"],
+  ["Apfel 2 risk factors = 39% PONV risk → give 2 agents.","2. PONV: Apfel score","ga","post"],
+  ["SGLT2 inhibitors: stop 3 days before surgery (ertugliflozin 4).","2. Regular drugs: stop or continue","ga","pre"],
+  ["Laryngospasm: suxamethonium 0.5 mg/kg with atropine 0.02 mg/kg.","Laryngospasm","emerg","paeds"]];
+const CAPNO = (() => { let d = "M0 40"; for (let i=0;i<6;i++){ const x=i*100; d += ` L${x+18} 40 L${x+23} 13 Q${x+40} 10 ${x+58} 8 L${x+63} 40 L${x+100} 40`; } return d; })();
+function greet(){ const h = new Date().getHours(); return h<5 ? "Night shift" : h<12 ? "Good morning" : h<17 ? "Good afternoon" : "Good evening"; }
+function clockTxt(){ const d = new Date(); return d.toLocaleTimeString("en-GB", {hour:"2-digit", minute:"2-digit", hour12:false}); }
+function dateTxt(){ return new Date().toLocaleDateString("en-GB", {weekday:"long", day:"numeric", month:"long"}); }
+function quickLive(){
+  const h = Math.round(S.spHt), row = LSCS.find(r => h <= r[0]);
+  const ah = S.height, depth = r05(4 + ah/10), sz = S.sex==="F" ? "6.5–7.0" : "7.0–7.5";
+  const e = paedEtt(), main = e.useCuff ? f1(e.cuffed) : e.plainTxt;
+  const ac = activeCase(), child = ac && ac.y < 16, male = ac && ac.sex === "M";
+  const na = why => `—<small>${why}</small>`;
+  return [
+    ["obs","LSCS spinal",`${h} cm`,(child||male) ? na(child?"not for a child case":"male case") : `${row[1]===row[2]?fmt(row[1]):fmt(row[1])+"–"+fmt(row[2])}<small>mL heavy bupi</small>`,"A1. Spinal: dose by height","obs","lscs","t-obs"],
+    ["airway","Adult ETT",`${S.sex==="F"?"♀":"♂"} ${ah} cm`,child ? na("child case — see Paeds") : `${sz}<small>${f1(depth)} cm at mouth corner</small>`,"4. Tube & airway kit","ga","ind","t-ga"],
+    ["paeds","Paeds ETT",`${sig(S.pw)} kg · ${S.pY} y${S.pM?` ${S.pM} m`:""}`,(ac && !child) ? na("adult case") : `${main}<small>${e.useCuff?"cuffed · ":""}${fmt(e.depth)} cm</small>`,"1. Tube: size, depth, blade, suction","paeds","ind","t-paeds"]];
+}
+screens.home = () => {
+  const th = store.get("theme","auto"), thLabel = th==="auto" ? "◐" : th==="dark" ? "☾" : "☀";
+  const pearl = PEARLS[Math.floor(Date.now()/86400000) % PEARLS.length];
+  const secs = ["ga","regional","paeds","obs"].map(id=>GROUPS.find(g=>g.id===id));
+  const short = {ga:"General anaesthesia", regional:"Regional anaesthesia", paeds:"Paediatric", obs:"Obstetric"};
+  return `<section class="hero">
+    <svg class="capno" viewBox="0 0 400 48" preserveAspectRatio="none" aria-hidden="true"><g class="trace"><path d="${CAPNO}"/></g></svg>
+    <div class="hero-top"><span class="brand">${svg("capno")} Induction Card</span>
+      <span class="hero-r"><span id="clock" class="clock">${clockTxt()}</span><button class="iconbtn themebtn herobtn" data-theme-toggle aria-label="Theme: ${th}">${thLabel}</button></span></div>
+    <h1 class="hello">${greet()},<br>${DOCTOR}</h1>
+    <div class="date">${dateTxt()}</div>
+  </section>
+  <div class="searchbox">${svg("search")}<input id="q" class="search" type="search" placeholder="Search caudal, remi, LSCS…" autocomplete="off" aria-label="Search cards"></div><div id="results"></div>
+  ${tile("t-emerg","emerg","Emergencies","Crisis steps with doses",'data-go="g-emerg"')}
+  ${caseStrip()}
+  <div class="label">Quick</div>
+  <div class="quick">${quickLive().map(([ic,lab,inp,ans,t,g,tb,cls])=>`<button class="qbtn ${cls}" data-open="${esc(t)}" data-g="${g}" data-tab="${tb}"><span class="qi qmini">${svg(ic)}</span><span class="qlab">${lab}</span><span class="qin">${inp}</span><span class="qans">${ans}</span></button>`).join("")}</div>
+  <button class="pearl" data-open="${esc(pearl[1])}" data-g="${pearl[2]}" data-tab="${pearl[3]}"><span class="plab">Pearl of the day</span><span class="ptxt">${pearl[0]}</span><span class="pgo">Open card ›</span></button>
+  <div class="label">Sections</div>
+  <div class="grid2">${secs.map(g=>`<button class="sq t-${g.id}" data-go="g-${g.id}"><span class="qi">${svg(g.id)}</span><span class="sqt">${short[g.id]}</span><span class="sqs">${g.tabs.map(t=>t.label).join(" · ")}</span></button>`).join("")}</div>
+  <button class="linkbtn" data-go="values">${svg("values")} Values sheet</button>` + disc;
+};
+setInterval(() => { const c = document.getElementById("clock"); if (c) c.textContent = clockTxt(); }, 30000);
+
+/* ---------- ETT ---------- */
+const ettCalc = (adultOnly, noInputs) => {
+  if (adultOnly) S.ettMode = "adult";
+  let inputs = adultOnly ? "" : seg("ettMode",[["adult","Adult"],["child","Child / infant / neonate"]]);
+  let out = "";
+  if (S.ettMode==="adult"){
+    inputs += seg("sex",[["F","♀ Female"],["M","♂ Male"]]) + step("height","Height","cm",130,210,1);
+    const h = S.height, depth = r05(4 + h/10);
+    const sz = S.sex==="F" ? ["6.0","6.5 – 7.0","7.5"] : ["6.5","7.0 – 7.5","8.0"];
+    out = `<div class="result"><div class="row">
+      <div><div class="sub">Tube ID (mm)</div><div class="big">${sz[1]}</div>${trio(sz[0],sz[1],sz[2])}</div>
+      <div><div class="sub">Oral depth at mouth corner</div><div class="big">${f1(depth)} cm</div>
+        <div class="sub">4 + height/10 = 4 + ${h}/10</div></div></div>
+      <div class="sub" style="margin-top:8px">Western 21/23 rule would give ${S.sex==="F"?"21":"23"} cm (21/23 is measured at the incisors).</div>
+      ${src("Depth: Chula formula (Thai adults; measured at the upper canine ≈ mouth corner). Size: my practice, Malaysian adults.")}</div>`;
+  } else {
+    inputs += pInputs(true);
+    out = ettBlock(paedEtt());
+  }
+  return noInputs ? out : `<div class="card">${inputs}</div>` + out;
+};
+
+/* ---------- SPINAL ---------- */
+const LSCS = [ // [maxHeight inclusive, bupi mL lo, hi, total lo, hi, label]
+  [150, 1.8,1.8, 2.1,2.1, "≤ 150"],
+  [155, 1.9,2.0, 2.2,2.3, "151 – 155"],
+  [160, 2.1,2.2, 2.4,2.5, "156 – 160"],
+  [999, 2.3,2.3, 2.6,2.6, "> 160"]];
+const OPS = { // DRAFT textbook ranges, heavy bupivacaine 0.5% mL
+  saddle:{name:"Perineal / saddle", level:"S1–S5 (sit 5–10 min)", r:[1.0,1.5]},
+  turp:{name:"Urology / TURP", level:"T10", r:[2.0,2.5]},
+  hernia:{name:"Inguinal hernia / lower abdo", level:"T10", r:[2.5,3.0]},
+  limb:{name:"Lower limb / hip / knee", level:"T10–T12", r:[2.5,3.0]} };
+const rng = (a,b,u="") => a===b ? `${fmt(a)}${u}` : `${fmt(a)} – ${fmt(b)}${u}`;
+
+/* ---------- SPINAL: LSCS dose (used inside Caesarean tab) ---------- */
+const lscsBody = () => {
+  const h = Math.round(S.spHt), row = LSCS.find(r => h <= r[0]);
+  return step("spHt","Height","cm",140,200,1) + `<div class="result">
+    <div class="sub">Heavy bupivacaine 0.5% (height ${row[5]} cm)</div>
+    <div class="big">${rng(row[1],row[2])} mL</div>
+    <div class="sub">= ${rng(row[1]*5,row[2]*5)} mg</div>
+    <h3>+ IT opioids (0.3 mL)</h3>
+    <ul><li><b>Morphine 0.1 mg (0.1 mL)</b> — <span class="danger" style="display:inline;padding:1px 6px">1 mg/mL DILUTED, not 10 mg/mL</span></li>
+    <li><b>Fentanyl 10 mcg (0.2 mL</b> of 50 mcg/mL)</li></ul>
+    <div class="sub">Total volume: <b>${rng(row[3],row[4])} mL</b></div>
+    <table style="margin-top:10px"><tr><th>Height</th><th>Bupi mL</th><th>Total mL</th></tr>
+    ${LSCS.map(r=>`<tr class="${r===row?"hl":""}"><td>${r[5]}</td><td>${rng(r[1],r[2])}</td><td>${rng(r[3],r[4])}</td></tr>`).join("")}</table>
+    <div class="warn">Obese / big abdomen (polyhydramnios, twins): <b>REDUCE</b> heavy bupivacaine dose (amount: your judgement).<br>Preload unless contraindicated. Left lateral tilt (right side up).</div>
+    <div class="sub">Easier to manage hypotension than an inadequate block.</div>
+    ${protoSrc()}</div>`;
+};
+
+/* ---------- SPINAL: non-obstetric (own home button) ---------- */
+const nonObsCalc = () => {
+  if (!OPS[S.spOp]) S.spOp = "saddle";
+  const h = Math.round(S.height);
+  const o = OPS[S.spOp], [lo,hi] = o.r, mid = Math.round((lo+hi)/2*10)/10;
+  const pick = h<=150 ? lo : h<=165 ? mid : hi;
+  const band = h<=150 ? "≤150 cm → lower end" : h<=165 ? "151–165 cm → middle" : ">165 cm → upper end";
+  return `<div class="card"><div class="sub">1. Operation</div>${seg("spOp",[["saddle","Perineal"],["turp","TURP / uro"],["hernia","Hernia"],["limb","Lower limb"]])}
+    <div class="sub">2. Height: ${h} cm (patient box)</div></div>
+    <div class="result">
+    <div class="sub">3. Heavy bupivacaine 0.5% · ${o.name} · target ${o.level}</div>
+    <div class="big">${fmt(pick)} mL</div>
+    <div class="sub">= ${fmt(pick*5)} mg · range ${rng(lo,hi)} mL (${rng(lo*5,hi*5)} mg) · ${band}</div>
+    <h3>4. Optional additives</h3>
+    <ul><li>Fentanyl 10–25 mcg</li><li>Morphine 0.1 mg (preservative-free, <b>1 mg/mL diluted</b>) — e.g. hip/knee arthroplasty</li></ul>
+    ${src("Standard textbook ranges for 0.5% hyperbaric bupivacaine.")}</div>
+    <div class="card"><h2>5. Cautions</h2><ul>
+    <li>Elderly, very short or obese: consider reducing dose.</li>
+    <li>Check platelets &amp; anticoagulant timing before neuraxial block.</li></ul></div>`;
+};
+
+/* ---------- OBSTETRIC (journey: Labour → Caesarean → After delivery) ---------- */
+const kv = rows => `<table>${rows.map(([k,v])=>`<tr><th style="width:42%">${k}</th><td>${v}</td></tr>`).join("")}</table>`;
+const MINE = "My practice (personal notes).";
+const obsCards = {};
+
+/* LABOUR */
+obsCards.lStart = () => `<div class="card"><h2>1. Start: test, bolus &amp; loading</h2>
+  <h3>Epidural</h3>
+  <p><b>Bolus — ropivacaine 0.25% 3 mL</b> (1 mL ropi 0.75% diluted to 3 mL).</p>
+  <p><b>Loading — ropi 0.15% + fentanyl 100 mcg, 10 mL, run at 40 mL/hr</b><br>2 mL ropi 0.75% + fentanyl 2 mL, dilute to 10 mL — or use 10 mL of the infusion preparation.</p>
+  ${src(MINE)}
+  <h3>CSE / single-shot spinal</h3>
+  <p><b>Fentanyl 10–25 mcg</b> diluted to 1 mL NS, 27G pencil-point, aseptic.</p>${protoSrc()}</div>`;
+
+obsCards.lInfusion = () => `<div class="card"><h2>2. Maintain: infusion recipes</h2>
+  <h3>Mine — run 8–15 mL/hr</h3>
+  <table><tr><th>Target</th><th>50 mL syringe</th><th>60 mL syringe</th></tr>
+  <tr><td>Ropi 0.1% + fentanyl 2 mcg/mL</td><td>7 mL ropi 0.75% + fentanyl 2 mL (100 mcg)</td><td>8 mL ropi 0.75% + fentanyl 2.4 mL (120 mcg)</td></tr>
+  <tr><td>Ropi 0.15% + fentanyl 2 mcg/mL</td><td>10 mL ropi 0.75% + fentanyl 2 mL (100 mcg)</td><td>12 mL ropi 0.75% + fentanyl 2.4 mL (120 mcg)</td></tr>
+  <tr><td>Ropi 0.15% from 0.2% stock</td><td>38 mL ropi 0.2% (+ fentanyl)</td><td>45 mL ropi 0.2% (+ fentanyl)</td></tr></table>
+  <p class="sub">Made up to syringe volume with NS. 7 mL in 50 mL = 0.105% (≈0.1%).</p>${src(MINE)}
+  <h3>Departmental protocol cocktail (50 mL)</h3>
+  <p><b>A. Ropi 0.05% + fentanyl 2 mcg/mL:</b> 3.4 mL ropi 0.75% + fentanyl 100 mcg (2 mL), make up to 50 mL NS.</p>
+
+  <p><b>B. Levobupivacaine 0.05% + fentanyl 2 mcg/mL:</b> 5 mL levobupi 0.5% + fentanyl 100 mcg (2 mL), make up to 50 mL NS.</p>${protoSrc()}</div>`;
+
+const PUMPS = {
+  pcea_cse:["PCEA + CSE",[["Spinal dose","10–25 mcg fentanyl (diluted to 1 mL NS)"],["Basal","10 mL/h"],["PCA bolus","10 mL"],["Lockout","10 min"],["4-hour limit","No"]]],
+  pcea_epi:["PCEA + epidural bolus",[["Epidural bolus","3 mL lignocaine 1% OR 10 mL cocktail"],["Basal","10 mL/h"],["PCA bolus","10 mL"],["Lockout","10 min"],["4-hour limit","No"]]],
+  pieb_epi:["PIEB + PCEA, epidural bolus",[["Epidural dose","3 mL lignocaine 1% OR 10 mL cocktail (automatic by machine)"],["Basal","Nil"],["PIEB lockout","60 min"],["PCEA lockout","10 min"],["4-hour limit","No"]]],
+  pieb_cse:["PIEB + PCEA, CSE",[["Spinal dose","10–25 mcg fentanyl (diluted to 1 mL NS)"],["Epidural dose","10 mL cocktail (automatic by machine)"],["Basal","Nil"],["PIEB lockout","60 min"],["PCEA lockout","10 min"],["4-hour limit","No"]]]};
+obsCards.lPump = () => { const p = PUMPS[S.pump] || PUMPS.pcea_cse;
+  return `<div class="card"><h2>2b. Maintain: pump settings</h2>
+  ${seg("pump",Object.entries(PUMPS).map(([k,v])=>[k,v[0]]))}<h3>${p[0]}</h3>${kv(p[1])}${protoSrc()}</div>`; };
+
+obsCards.lTopup = () => `<div class="card"><h2>3. Top-up: breakthrough pain</h2>
+  <p><b>Mine — ropi ≈0.23% 5 mL</b>: 1.5 mL ropi 0.75% diluted to 5 mL (true strength 0.225%).<br>± fentanyl 50–100 mcg boluses.</p>${src(MINE)}
+  <p><b>Protocol:</b> 3 mL lignocaine 1% OR 10 mL of cocktail.</p>${protoSrc()}</div>`;
+
+obsCards.lAdp = () => `<div class="card"><h2>4. Problem: accidental dural puncture</h2>
+  <div class="danger" style="text-align:center">INTRATHECAL CATHETER — SPINAL DOSES ONLY</div>
+  <p><b>IT bolus:</b> fentanyl 10–25 mcg + NS to 1 mL total.</p>
+  <p><b>Top-up:</b> cocktail 3 mL every 1–2 hours — assess first.</p>
+  <p><b>Going for Caesarean:</b> see Caesarean tab, route C.</p>
+  <div class="danger">Do NOT flush the catheter before removal (residual LA).</div>${src(MINE)}</div>`;
+
+obsCards.lPca = () => `<div class="card"><h2>5. No epidural: IV PCA</h2>
+  <h3>Remifentanil — 20 mcg/mL</h3>
+  <ol><li>Reconstitute 1 vial with 5 mL NS → 1 mg/mL.</li><li>Take 1 mL (1 mg), make up to 50 mL NS → 20 mcg/mL.</li></ol>
+  ${kv([["PCA bolus","20 mcg (not faster than 30 s)"],["Lockout","2 min"],["Background","4 mL/h (80 mcg/h), max 120 mcg/h"]])}
+  <div class="warn">Remi: one-to-one nursing · dedicated IV line · no BP cuff on same arm · O₂ · monitor sedation, RR, SpO₂ · in-house anaesthetist.</div>
+  <h3>Fentanyl — 10 mcg/mL</h3><p>500 mcg (5 ampoules) made up to 50 mL NS.</p>
+  ${kv([["IV bolus","25 mcg stat"],["Basal","10 mcg/h"],["PCA bolus","10 mcg"],["Lockout","12 min"]])}
+  <div class="warn">Pain not controlled → adjust <b>background rate</b>, NOT the PCA bolus.</div>${protoSrc()}</div>`;
+
+/* CAESAREAN */
+obsCards.cSpinal = () => `<div class="card"><h2>A1. Spinal: dose by height</h2>${lscsBody()}</div>`;
+obsCards.cIt = () => `<div class="card"><h2>A2. Spinal: IT morphine &amp; fentanyl</h2>
+  <h3>Fentanyl (syringe 2)</h3><ol><li>Fentanyl 50 mcg/mL. 1 mL syringe: draw <b>10 mcg (0.2 mL)</b>.</li><li>Add into the intended dose of 0.5% heavy bupivacaine.</li></ol>
+  <h3>Morphine (syringe 1)</h3><p>Dose: <b>0.1 mg = 0.1 mL of 1 mg/mL diluted morphine</b>.</p>
+  <ol><li>Morphine <b>10 mg/mL preservative-free</b>: 1 mL syringe, draw <b>0.1 mL (1 mg)</b>.</li><li>Make up to <b>1 mL with NS</b> = 1 mg/mL.</li><li>Give <b>0.1 mL = 0.1 mg</b> into the heavy bupivacaine syringe.</li></ol>
+  <p class="sub">After IT morphine: no other opioids or sedatives for 24 h; OAS follow-up.</p>${protoSrc()}</div>`;
+obsCards.cPhenyl = () => `<div class="card"><h2>A3. Spinal: phenylephrine</h2>
+  <p>Target 50 mcg/mL, for co-loading infusion with IV fluids. Vial 10 mg/mL (1 mL).</p>
+  <ol><li>Draw <b>0.1 mL (1000 mcg)</b> from the 10 mg/mL vial.</li><li>Make up to <b>20 mL</b> with NS = <b>50 mcg/mL</b>.</li></ol><p class="sub">Infusion bag: 1 mL (10 mg) in 200 mL = 50 mcg/mL.</p>${protoSrc()}</div>`;
+
+const TOPUP = {
+  lig:{name:"Lignocaine 2% + adrenaline 1:200 000 + fentanyl 100 mcg", prep:["Insulin syringe: 0.1 mL adrenaline 1:1000.","Draw 20 mL lignocaine 2%.","Add the 0.1 mL adrenaline (→ 1:200 000).","Fentanyl 100 mcg in a separate 2 mL syringe."],
+       dose:"17 mL lignocaine mix + fentanyl 100 mcg", more:"3 mL at a time, wait 2–3 min"},
+  ropi:{name:"Ropivacaine 0.75% + fentanyl 100 mcg", prep:["Draw 20 mL ropivacaine 0.75%.","Fentanyl 100 mcg in a separate 2 mL syringe."],
+       dose:"10 mL ropi 0.75% + fentanyl 100 mcg (total 12 mL)", more:"3 mL at a time, wait 3–5 min"}};
+obsCards.cTopup = () => { const t = TOPUP[S.topup] || TOPUP.lig;
+  return `<div class="card"><h2>B. Epidural top-up for LSCS</h2>
+  <p class="sub">Labouring patient with a working epidural. The labour cocktail is too dilute for surgery.</p>
+  ${seg("topup",[["lig","Lignocaine 2%"],["ropi","Ropivacaine 0.75%"]])}
+  <h3>1. Prepare — ${t.name}</h3><ol>${t.prep.map(x=>`<li>${x}</li>`).join("")}</ol>
+  <h3>2. Test dose</h3><p><b>3 mL, wait 5 min.</b></p>
+  <h3>3. Top-up dose</h3><p><b>${t.dose}</b></p>
+  <h3>4. Check block after 5–10 min</h3><p>Aim <b>T4</b> (touch or pin prick). Not adequate: top up ${t.more}, re-check.</p>
+  <h3>5. Full 20 mL given and still not working</h3>
+  <p><b>No block:</b> catheter likely not in place. Urgent → GA. Single-shot spinal only by consultant — may need lower dose.<br>
+  <b>Block present but inadequate:</b> GA, or single-shot spinal by consultant — may need lower dose.</p>
+  <div class="warn">Keep epidural catheter in situ &amp; stoppered post-op.</div>${protoSrc()}</div>`; };
+obsCards.cAdp = () => `<div class="card"><h2>C. Dural puncture catheter: LSCS dosing</h2>
+  <div class="danger" style="text-align:center">INTRATHECAL CATHETER — SPINAL DOSES ONLY</div>
+  <ol><li>Use the <b>intended spinal dose by height</b> (A1).</li><li>Give it in <b>small amounts, testing</b> the block as you go.</li><li>Do NOT flush the catheter before removal (residual LA).</li></ol>
+  <button class="homebtn" data-open="A1. Spinal: dose by height" data-g="obs" data-tab="lscs">Open A1 dose by height ›</button>${src(MINE)}</div>`;
+
+/* AFTER DELIVERY */
+obsCards.pAnalg = () => { const w = S.morWt, lo = w*0.05, hi = w*0.1;
+  return `<div class="card"><h2>1. Analgesia by technique</h2>
+  <table><tr><th>GA</th><td>IV morphine 0.05–0.1 mg/kg after delivery → PCA morphine</td></tr>
+  <tr><th>SAB</th><td>With 0.1 mg IT morphine; or without → TAP block or LA skin infiltration</td></tr>
+  <tr><th>CSE</th><td>0.1 mg IT morphine; or without → epidural morphine 2 mg in 5 mL NS stat at end of surgery</td></tr>
+  <tr><th>Epidural</th><td>Epidural top-ups → epidural morphine 2 mg in 5 mL NS stat at end of surgery</td></tr></table>
+  <h3>IV morphine after delivery (GA)</h3>${step("morWt","Weight","kg",30,200,1)}
+  <div class="result"><div class="sub">0.05 – 0.1 mg/kg</div><div class="big">${f1(lo)} – ${f1(hi)} mg</div></div>
+  <div class="warn">After IT/epidural morphine: no other opioids or sedatives for 24 h. OAS follow-up (yellow form).</div>${protoSrc()}</div>`; };
+obsCards.pNsaid = () => `<div class="card"><h2>2. NSAID yes / no</h2>
+  <h3>NSAIDs contraindicated</h3><ul><li>IV paracetamol 1 g stat</li><li>Tab paracetamol 1 g QID × 3 days</li><li>Cap Oxynorm 5 mg 8-hourly (if POD1 or PRN, if needed)</li></ul>
+  <h3>NSAIDs OK</h3><ul><li>Supp diclofenac 100 mg OR 50 mg stat (according to body weight)</li></ul>
+  <ul><li>Then tab diclofenac <b>50 mg TDS × 3 days</b> (max 150 mg/day, including the suppository on day 1)</li></ul>${protoSrc()}</div>`;
+obsCards.pPca = () => `<div class="card"><h2>3. PCA morphine (after GA)</h2><p><b>1 mg/mL:</b> 50 mg morphine (5 mL) made up to 50 mL NS.</p>${protoSrc()}</div>`;
+obsCards.pWard = () => `<div class="card"><h2>4. Ward (OAS) problems &amp; catheter care</h2>
+  <p class="sub">Instructions for ward / OAS nurses.</p>
+  <h3>Hypotension</h3><p>SBP &lt; 90 mmHg or 20% below baseline: stop epidural infusion; call doctor (OAS or ward); run 250 mL Hartmann's fast.</p>
+  <h3>Pruritus</h3><p>Tab Piriton 4 mg with a little water. Severe: IV Piriton 10 mg stat.</p>
+  <h3>Nausea &amp; vomiting</h3><p>Check NIBP first. IV metoclopramide (Maxolon) 10 mg.</p>
+  <h3>High block</h3><p>Stop epidural infusion; prop up; O₂ by mask; inform OAS / on-call anaesthetist; resus trolley at bedside — KIV intubation; monitor ECG, NIBP, SpO₂.</p>
+  <h3>Epidural catheter</h3><ul><li>Disconnected from filter → removed by OAS doctor / nurse immediately</li><li>Only OAS nurse and doctor inject through the catheter</li><li>After dural puncture catheter: do NOT flush before removal</li></ul>${protoSrc()}</div>`;
+
+/* ---------- PAEDS ---------- */
+const PSRC = "My paeds notes (Jan 2024).";
+const sig = x => Number(Number(x).toPrecision(3));
+const W = () => S.pw;
+const AGEM = () => S.pY*12 + S.pM;
+// per-kg dose: per = number or [lo,hi]; returns "x unit" or "x – y unit", capped at max
+function pk(per, unit, max){
+  const w = W(), lo = Array.isArray(per)?per[0]:per, hi = Array.isArray(per)?per[1]:per;
+  let a = lo*w, b = hi*w, capped = false;
+  if (max!=null){ if (a>max){a=max;capped=true;} if (b>max){b=max;capped=true;} }
+  const t = a===b ? `${sig(a)} ${unit}` : `${sig(a)} – ${sig(b)} ${unit}`;
+  return capped ? `${t} <span class="sub">(max ${max} ${unit} applied)</span>` : t;
+}
+const perTxt = (per, unit) => (Array.isArray(per)?`${per[0]}–${per[1]}`:per) + ` ${unit}/kg`;
+// table row: name, rule, result, note
+const R = (name, rule, res, note) => `<tr><td>${name}${note?`<div class="sub">${note}</div>`:""}</td><td class="sub">${rule}</td><td class="hl">${res}</td></tr>`;
+const T = rows => `<div style="overflow-x:auto"><table><tr><th>Drug / item</th><th>Rule</th><th>For ${sig(W())} kg</th></tr>${rows.join("")}</table></div>`;
+const DR = (name, per, unit, note, max) => R(name, perTxt(per,unit), pk(per,unit,max), note);
+function unvP(what, why, prop){ return `<div class="unv"><b>UNVERIFIED — HIDDEN.</b> ${what}<br>${why}${prop?`<br><b>Proposed:</b> ${prop}`:""}</div>`; }
+const psrc = () => src(PSRC);
+const LA_MAX = {bupi:2.5, ropi:3, lido:3, lidoAdr:7};
+function laLine(){ const w=W(); return `<div class="lamax"><b>LA max for ${sig(w)} kg:</b> bupi / levobupi 2.5 mg/kg = <b>${sig(2.5*w)} mg</b> (${sig(w)} mL of 0.25%) · ropi 3 mg/kg = <b>${sig(3*w)} mg</b> · lignocaine 3 mg/kg = ${sig(3*w)} mg (7 with adrenaline = ${sig(7*w)} mg). <b>Doses from different blocks add up</b> — use "+ add" and the LA dose calculator (card 7).</div>`; }
+// LA row: ml = [lo,hi] mL/kg, mgml = mg per mL, max = mg/kg, capml = absolute mL cap
+function LAR(name, ml, mgml, max, note, capml){
+  const w = W(); let a = ml[0]*w, b = ml[1]*w, cap = false;
+  if (capml!=null){ if (a>capml){a=capml;cap=true;} if (b>capml){b=capml;cap=true;} }
+  const mgkg = b*mgml/w, over = mgkg > max + 1e-9;
+  const add = `<button class="addla mini" data-addla="${esc(JSON.stringify({d:"bupi",c:String(mgml/10),ml:+sig(b),bi:1,l:name.split(" · ")[0]}))}" data-lt="p">+ add</button>`;
+  return `<tr class="${over?"over":""}"><td>${name}${note?`<div class="sub">${note}</div>`:""}${add}</td><td class="sub">${ml[0]===ml[1]?ml[0]:ml.join("–")} mL/kg · ${sig(mgkg)} mg/kg</td><td class="hl">${a===b?sig(a):sig(a)+"–"+sig(b)} mL${cap?` <span class="sub">(max ${capml} mL)</span>`:""}${over?`<div class="danger" style="margin:4px 0 0">Above max ${max} mg/kg</div>`:""}</td></tr>`;
+}
+
+function pInputs(forEtt){
+  const y = S.pY, est = (y>=1 && y<=10) ? (y+4)*2 : null;
+  return `${step("pw","Weight","kg",0.4,90,0.5)}${step("pY","Age","y",0,16,1)}${step("pM","+ months","m",0,11,1)}
+    ${est?`<div class="sub">Estimated weight for age: (age + 4) × 2 = <b>${est} kg</b> <button class="iconbtn" style="height:34px;min-width:0" data-setw="${est}">Use</button></div>`:""}
+    ${forEtt?`<div class="sub" style="margin-top:4px">Neonate &lt; 28 days: set age 0 y 0 m and enter weight.</div>`:""}`;
+}
+
+function paedEtt(){
+  const w = W(), mo = AGEM(), y = S.pY;
+  let plain, plainTxt, cuffed = null, depth, depthRule, sizeRule, conv = false;
+  if (mo >= 24){
+    plain = floor05(y/4 + 4); cuffed = floor05(y/4 + 3.5);
+    sizeRule = "> 1 y: plain age/4 + 4, cuffed age/4 + 3.5 (rounded down to 0.5)";
+    depth = y/2 + 12; depthRule = "age/2 + 12";
+  } else if (mo >= 12){
+    plain = 4.5; cuffed = floor05(1/4 + 3.5);
+    sizeRule = "1 y: 4.5 plain; cuffed age/4 + 3.5";
+    depth = 12; depthRule = "1 y: 12 cm";
+  } else {
+    if (w < 1){ plain = 2.5; plainTxt = "2.5"; sizeRule = "< 1 kg: 2.5 plain"; }
+    else if (w < 2){ plain = 2.5; plainTxt = "2.5 – 3.0"; sizeRule = "1–2 kg: 2.5–3.0 plain (gap in notes, agreed)"; }
+    else if (w < 3.5){ plain = 3.0; sizeRule = "> 2 kg: 3.0 plain"; }
+    else if (mo < 4){ plain = 3.5; plainTxt = "3.5"; sizeRule = "> 3.5 kg: 3.5 plain (neonate 3.0–3.5)"; }
+    else if (mo < 8){ plain = 4.0; sizeRule = "4 months: 4.0 plain"; }
+    else { plain = 4.0; plainTxt = "4.0 – 4.5"; sizeRule = "8 months: 4.0–4.5 plain"; }
+    if (w > 5){ cuffed = plain - 0.5; conv = true; }
+    if (mo < 1){ depth = w < 1.5 ? 7 : w < 2.5 ? 8 : 9; depthRule = "Premature ~1 kg 7 cm, ~2 kg 8 cm; term 9 cm"; }
+    else { depth = 3*plain; depthRule = "3 × ETT (term 9 cm → 1 y 12 cm)"; }
+  }
+  const useCuff = cuffed!==null && w > 5;
+  return {w, mo, y, plain, plainTxt: plainTxt || f1(plain), cuffed, useCuff, depth, depthRule, sizeRule, conv};
+}
+function ettBlock(e){
+  const main = e.useCuff ? e.cuffed : e.plain;
+  const mainTxt = e.useCuff ? f1(e.cuffed) : e.plainTxt;
+  return `<div class="result">
+    <div class="sub">${e.useCuff?"Cuffed ID (mm) — weight > 5 kg":"Plain (uncuffed) ID (mm)"}</div>
+    <div class="big">${mainTxt}</div>${trio(f1(main-0.5), mainTxt, f1(main+0.5))}
+    ${e.useCuff?`<div class="sub" style="margin-top:8px">Plain alternative: <b>${e.plainTxt}</b></div>`:""}
+    <div class="row" style="margin-top:10px">
+      <div><div class="sub">Oral depth (anchor)</div><div class="big">${fmt(e.depth)} cm</div><div class="sub">${e.depthRule}</div></div>
+      <div><div class="sub">Nasal</div><div class="big">${fmt(e.depth+2)}–${fmt(e.depth+3)} cm</div><div class="sub">oral + 2–3 cm</div></div>
+    </div>
+    <div class="sub" style="margin-top:6px">Cross-check 3 × ETT = ${fmt(3*main)} cm · Suction catheter 2 × ETT = <b>${fmt(2*main)} Fr</b></div>
+    <div class="sub">Laryngoscope: ${e.w < 5 ? "straight Miller 0 or MAC 1 (&lt; 5 kg)" : "curved blade (&gt; 5 kg)"} · Paeds Glidescope size 2 / 2.5 (ages 8–9)</div>
+    ${e.conv?`<div class="warn">Infant cuffed size shown as 0.5 smaller than plain — this is a convention, not from your notes. Check on values sheet.</div>`:""}
+    ${e.y>=12?`<div class="warn">Age ≥ 12: consider Adult mode (height-based).</div>`:""}
+    ${src(PSRC+" Size: "+e.sizeRule+".")}</div>`;
+}
+
+const PAEDS = [
+  ["airway","Airway","ETT, NPA, HMEF, bag, Storz"],
+  ["vent","Ventilation &amp; vitals","TV, PEEP, I:E, estimated BP"],
+  ["tiva","TIVA &amp; sedation","Remi, Paedfusor, MRI, dynamic airway, delirium"],
+  ["drugs","Drugs, infusions, inotropes, resus",""],
+  ["fluids","Fluids, glucose, blood",""],
+  ["regional","Regional blocks","Caudal, ilioinguinal, penile, epidural, intrapleural"],
+  ["procs","Lines, laryngospasm, extubation","Double lumen, warming, T-tube"],
+  ["special","Special populations","Syndromes, OSA, hypospadias, cardiac, neonatal surgery"]];
+
+
+const pCards = {};
+pCards.ett = () => `<div class="card"><h2>Paeds ETT</h2>${ettBlock(paedEtt())}</div>`;
+pCards.airway = () => {
+  const w = W();
+  return ettBlock(paedEtt()) + `
+  <div class="card"><h2>NPA</h2><p>Size 2.5 – 5. If size 2 needed, use a modified ETT. Weight 7.5 kg: use 3.5.</p></div>
+  <div class="card"><h2>Micro HMEF</h2><p class="sub">TV 4–7 mL/kg for ${sig(w)} kg = <b>${sig(4*w)}–${sig(7*w)} mL</b></p>
+  <table><tr><th>Tidal volume</th><th>HMEF</th></tr><tr><td>10–50 mL</td><td>Blue (ETT 3) / red (ETT 3.5)</td></tr>
+  <tr><td>&gt; 35 mL</td><td>Green</td></tr><tr><td>&gt; 90 mL (max 250 mL)</td><td>Green</td></tr><tr><td>&gt; 200 mL</td><td>Yellow</td></tr></table></div>
+  <div class="card"><h2>Bag</h2><p class="sub">3 × vital capacity (35 mL/kg) = <b>${sig(105*w)} mL</b></p>
+  <table><tr><th>Bag</th><th>Weight</th></tr><tr><td>500 mL</td><td>5 kg</td></tr><tr><td>1000 mL</td><td>10–20 kg</td></tr><tr><td>1500 mL</td><td>&gt; 20 kg</td></tr></table></div>
+  <div class="card"><h2>One-lung ventilation (Storz)</h2><table><tr><th>Scope</th><th>ETT</th></tr>
+  <tr><td>Storz 2.2</td><td>ETT &gt; 3</td></tr><tr><td>Storz 2.8</td><td>ETT &gt; 3.5</td></tr><tr><td>Storz 4.0</td><td>ETT &gt; 4.5</td></tr></table>${psrc()}</div>`;
+};
+
+pCards.vent = () => {
+  const w = W(), y = S.pY, mo = AGEM();
+  let sbp, sbpRule;
+  if (mo < 1 && w <= 3.5){ sbp = w < 1.5 ? 40 : w < 2.5 ? 50 : 60; sbpRule = "1 kg 40 · 2 kg 50 · 3 kg 60"; }
+  else { sbp = 90 + 2*y; sbpRule = "90 + (age × 2)"; }
+  return `<div class="card"><h2>Estimated systolic BP</h2><div class="big">${sbp} mmHg</div><div class="sub">${sbpRule}</div></div>
+  <div class="card"><h2>Paeds ventilation</h2>
+  <table><tr><th>TV</th><td class="hl">4–7 mL/kg = ${sig(4*w)}–${sig(7*w)} mL</td></tr><tr><th>PIP</th><td>&lt; 20</td></tr>
+  <tr><th>PEEP</th><td>4–6 (pneumonia may need higher)</td></tr><tr><th>RR</th><td>30–35</td></tr>
+  <tr><th>I:E</th><td>1:2. If RR &gt; 35, pneumonia or BPD: 1:1.5.<br>Alternative: neonate 1:1, infant 1:1.5, &gt; 8 y 1:2</td></tr>
+  <tr><th>Recruitment</th><td>Consider IP &gt; 10, higher at start of op</td></tr></table>
+  <div class="warn">CGA &lt; 48–52 weeks or Hb &lt; 7: consider post-op ventilation (apnoea risk).</div>
+  <h3>Neonatal extubation criteria</h3><ol><li>No medical illness</li><li>Weight &gt; 3 kg</li><li>Term baby</li></ol>
+  <p class="sub">NICU: &lt; 1 month or weight &lt; 5 kg. Neonate = up to 28 days of life.</p>${psrc()}</div>`;
+};
+
+const mlh10 = (r, w) => sig(r*w*60/10);  // remi mcg/kg/min -> mL/h at 10 mcg/mL
+pCards.tiva = () => {
+  const w = W(), y = S.pY + S.pM/12;
+  const pf = (y>=1 && y<=16 && w>5), kt = (y>=3 && y<=16 && w>=15 && w<=60);
+  const remiR = (a,b) => `${a}–${b} mcg/kg/min = <b>${mlh10(a,w)}–${mlh10(b,w)} mL/h</b>`;
+  return `<div class="card"><h2>TCI model check</h2>
+  <p>Paedfusor (age 1–16 y, weight &gt; 5 kg): <b>${pf?"✓ eligible":"✗ not eligible"}</b><br>Kataria (age 3–16 y, 15–60 kg): <b>${kt?"✓ eligible":"✗ not eligible"}</b></p>
+  <h3>Propofol TCI (Paedfusor, Alaris)</h3><ul><li>GA induction: at least <b>5 mcg/mL</b> (high Vd)</li><li>GA maintenance: &gt; <b>3.5 mcg/mL</b></li><li>Spontaneous breathing (dynamic airway): 2.5–4 mcg/mL</li></ul></div>
+  <div class="card"><h2>Remifentanil 10 mcg/mL</h2><p class="sub">1 mg in 100 mL NS; 20 mL syringe. ${w>30?"Weight &gt; 30 kg: <b>Minto</b>.":"Weight &lt; 30 kg: <b>mass rate</b>."}</p>
+  <ul><li>Induction ${remiR(0.15,0.3)} over 90 s (neonate: no induction time). Faster = severe bradycardia.</li>
+  <li>Maintenance ${remiR(0.3,1)}</li><li>Sedation ${remiR(0.05,0.2)}</li></ul>
+  <p>Start remi first, then propofol (reduces propofol use). Propofol 1% in 20 mL.</p>
+  <h3>Items</h3><ul><li>Tubing 210 cm × 2</li><li>One-way valve (white) × 2</li><li>Three-way valve</li></ul>
+  <h3>Adrenaline 1:10 000 (dilute in 10 mL)</h3><p>1 mL per 10 kg = <b>${sig(w/10)} mL</b> (${sig(w*10)} mcg)</p>
+  <h3>Deep extubation on TIVA</h3><ol><li>Off remi / propofol</li><li>Flush NS 5 mL</li><li>Wait RR &gt; 14/min, then extubate</li></ol>${psrc()}</div>
+  <div class="card"><h2>Emergence delirium</h2>${T([
+    DR("IV dexmedetomidine","1","mcg"," over 10 min"),
+    DR("Dexmedetomidine in recovery",[0.3,0.5],"mcg","diluted in 10 mL, slow bolus"),
+    R("IV clonidine","1–2 mcg/kg over 10 min",`${pk([1,2],"mcg")}<div class="sub">= ${sig(W()/150)}–${sig(2*W()/150)} mL (0.1 mL = 15 mcg)</div>`,"sedation, analgesia, antiemetic, antisialogue, antihypertensive")])}</div>
+  <div class="card"><h2>MRI under sedation</h2>
+  <p>&lt; 6 months: tube. &gt; 6 months: consider sedation. Drip + FM5L + capnography.<br>Snoring, difficult airway, enlarged tonsils: try to avoid sedation.</p>
+  <h3>Option 1 — propofol single pump</h3><p>150–180 mcg/kg/min = <b>${sig(150*w*60/10000)}–${sig(180*w*60/10000)} mL/h</b> of 1%<br>+ bolus 2 mg/kg = <b>${sig(2*w)} mg (${sig(2*w/10)} mL)</b></p>
+  <h3>Option 2 — ketofol 3:1 (single pump)</h3><p>Propofol 150 mg + ketamine 50 mg in 20 mL = <b>propofol 7.5 + ketamine 2.5 mg/mL</b>.<br>Run 1–1.5 mL/kg/h = <b>${sig(w)}–${sig(1.5*w)} mL/h</b> (propofol 125–190 mcg/kg/min).</p>
+  <h3>Option 3 — double pumps</h3><p>Dexmedetomidine 4 mcg/mL (0.8 mL in 20 mL): loading 1 mcg/kg over 10 min = <b>${sig(w)} mcg (${sig(w/4)} mL)</b>, then 0.5–1 mcg/kg/h = <b>${sig(w*0.5/4)}–${sig(w/4)} mL/h</b><br>
+  Propofol 1 mg/kg bolus if anxious = <b>${sig(w)} mg</b>, then 2 mL/h.</p>${psrc()}</div>
+  <div class="card"><h2>Dynamic airway assessment (spontaneous breathing)</h2>
+  <p>Flexible scope: vocal cord movement, tracheomalacia. Maintain spontaneous breathing — <b>no paralysis</b>.<br>Airway options: NPO₂ with capno; nasal airway to universal port.</p>
+  ${T([DR("IV glycopyrrolate","4","mcg"), DR("Ketamine (optional)",[1,2],"mg"),
+    R("Remifentanil (mass rate)","0.05–0.3 mcg/kg/min; induction 0.1, maintenance 0.05",`${mlh10(0.05,W())}–${mlh10(0.3,W())} mL/h at 10 mcg/mL`,"run with Sterofundin 50 mL/h; consider lower concentration for faster rate"),
+    R("Lignocaine 2% spray (cords, carina)","max 4 mg/kg",`${sig(4*W())} mg = ${sig(4*W()/20)} mL`,"ideally by surgeon; consider atomiser")])}
+  <div class="warn">Remi max 1 mcg/kg/min. Above 0.3 mcg/kg/min may cause apnoea.</div>
+  <ol><li>Sevoflurane down, then TIVA (TCI propofol Paedfusor 2.5–4 mcg/mL)</li><li>Jaw thrust to assess depth</li><li>Once deep, spray cords and carina</li><li>Taper sevoflurane</li><li>Once breathing spontaneously, insert NPA (preferably right nostril), connect to circuit, hold circuit to avoid kinking</li><li>Ensure spontaneous breathing (chest movement); bag if desaturating</li></ol>
+  <p>Unable to oxygenate: consider LMA — smallest size 1.5 to allow flexible bronchoscope.</p>
+  <h3>Rigid bronchoscopy</h3><ul><li>Deepen (increase remi/propofol)</li><li>May consider relaxant — <b>NOT for foreign body removal</b> (risk of distal movement)</li><li>Connect circuit to 22 mm port; controlled ventilation</li><li>Allow CO₂ retention, SpO₂ &gt; 80%</li><li>Consider intubation to proceed further</li></ul>${psrc()}</div>`;
+};
+
+pCards.drugs = () => {
+  const w = W();
+  return `<div class="card"><h2>Paeds induction drugs</h2>${T([
+    (()=>{ const mo=AGEM(), b = mo<1 ? ["neonate",[1,2]] : mo<12 ? ["infant 1–12 months",[3,5]] : ["child &gt; 1 y",[2.5,3.5]]; return R(`Propofol (${b[0]})`,`${b[1].join("–")} mg/kg`,`${pk(b[1],"mg")} = ${pk([b[1][0]/10,b[1][1]/10],"mL")}`,"neonate 1–2 · infant 3–5 · child 2.5–3.5"); })(),
+    DR("IV glycopyrrolate","4","mcg"),
+    R("Local anaesthetic (max)","bupivacaine 0.25% 1 mL/kg",pk(1,"mL"),"maximum for infiltration / blocks")])}
+
+  <p class="sub">Remifentanil induction: see TIVA card. Ketamine: see ketamine card.</p>${psrc()}</div>
+  <div class="card"><h2>Paeds intra-op drugs</h2>${T([
+    R("Tranexamic acid","15 mg/kg over 30 min, then 2–5 mg/kg/h",`${pk(15,"mg")}, then ${pk([2,5],"mg")}/h`,"bolus: &gt; 1 y laparotomy; infusion: craniofacial, scoliosis"),
+    R("Dexamethasone (oedema)","0.2 mg/kg (up to 0.6)",`${pk(0.2,"mg")} (up to ${sig(0.6*w)} mg)`,"watch for tumour lysis syndrome"),
+    DR("Hydrocortisone","4","mg"),
+    R("Calcium gluconate 10%","0.5 mL/kg over 30–60 min",pk(0.5,"mL")),
+    R("Calcium chloride 10%","0.2 mL/kg over 1 h",pk(0.2,"mL")),
+    DR("Ranitidine","1","mg"),
+    DR("Frusemide",[0.5,1],"mg","consider in blood transfusion; watch for polyuria"),
+    R("Neb salbutamol (1 mL = 5 mg)","2.5 mg &lt; 20 kg; 5 mg &gt; 20 kg",w<20?"2.5 mg (0.5 mL + 0.5 mL saline)":"5 mg (1 mL + 1 mL saline)")])}
+
+  <p><b>Albumin 5%:</b> 25 mL of 20% + 75 mL NS = 100 mL.</p>${psrc()}</div>
+  <div class="card"><h2>Paeds PONV</h2>${T([DR("Dexamethasone (PONV)","0.15","mg"), DR("Ondansetron","0.15","mg"), DR("Granisetron","0.04","mg")])}${psrc()}</div>
+  <div class="card"><h2>Paeds analgesia &amp; infusions</h2>${T([
+    R("Cocaine 10% (1 mL = 100 mg)","2 mg/kg",`${pk(2,"mg")} = ${sig(2*w/100)} mL`),
+    R("Morphine","lip 0.1 mg/kg; palate 0.15 mg/kg",`lip ${pk(0.1,"mg")} · palate ${pk(0.15,"mg")}`),
+    R("IVI morphine","½ × BW mg in 50 mL at 1–2 mL/h",`${sig(w/2)} mg in 50 mL`,"= 10–20 mcg/kg/h; separate IV line"),
+    R("IVI fentanyl","20 mcg/kg in 50 mL at 1–2 mL/h",`${sig(20*w)} mcg in 50 mL`,"= 0.4–0.8 mcg/kg/h"),
+    DR("Ketamine bolus",[0.2,0.5],"mg"),
+    R("Ketamine infusion","5 mg/kg in 50 mL, 0.2–2 mL/h",`${sig(5*w)} mg in 50 mL`,"1 mL/h = 0.1 mg/kg/h")])}${psrc()}</div>
+  <div class="card"><h2>Inotropes (50 mL syringe)</h2>${T([
+    R("Noradrenaline / adrenaline","0.3 mg/kg in 50 mL",`<b>${sig(0.3*w)} mg</b> in 50 mL`,"1 mL/h = 0.1 mcg/kg/min"),
+    R("… neonate, fluid-limited (× 5)","1.5 mg/kg in 50 mL",`${sig(1.5*w)} mg in 50 mL`,"1 mL/h = 0.5 mcg/kg/min"),
+    R("Dobutamine / dopamine","3 mg/kg in 50 mL",`<b>${sig(3*w)} mg</b> in 50 mL`,"1 mL/h = 1 mcg/kg/min"),
+    R("… × 5","15 mg/kg in 50 mL",`${sig(15*w)} mg in 50 mL`,"1 mL/h = 5 mcg/kg/min")])}${psrc()}</div>
+  <div class="card"><h2>Paeds resuscitation</h2>${T([
+    R("Adrenaline 1:10 000 (arrest)","0.1 mL/kg (1 mL per 10 kg)",`${pk(0.1,"mL")} = ${sig(10*w)} mcg`),
+    R("Atropine (1 mg in 10 mL = 100 mcg/mL)","0.02 mg/kg = 0.2 mL/kg",`${pk(0.02,"mg")} = ${pk(0.2,"mL")}`),
+    R("Sodium bicarbonate","1 mmol/kg = 2 mL/kg of 4.2% (or 1 mL/kg of 8.4% if &gt; 2 y)",`${pk(2,"mL")} of 4.2%`,"over 30–60 min; 4.2% for &lt; 2 y")])}
+  <p class="sub">Sodium bicarbonate: use 4.2% for &lt; 2 y. Deficit (mmol) = 0.3 × weight × base excess = 0.3 × ${sig(w)} × BE.</p>
+  <button class="homebtn" data-open="Paeds anaphylaxis" data-g="emerg" data-tab="paeds">Anaphylaxis doses → Emergencies › Paeds ›</button>
+
+  ${psrc()}</div>`;
+};
+
+pCards.fluids = () => {
+  const w = W();
+  const maint = w<=10 ? 4*w : w<=20 ? 40 + 2*(w-10) : 60 + (w-20);
+  return `<div class="card"><h2>Maintenance (4/2/1)</h2><div class="big">${sig(maint)} mL/h</div>
+  <p class="sub">Total = maintenance + deficit (× fasting / 2) + insensible loss.<br>&gt; 20 kg: direct set; &lt; 20 kg: chamber (burette).</p>
+  <h3>Insensible loss</h3><table><tr><td>Minor &lt; 1 h</td><td>none</td></tr><tr><td>Minor &gt; 1 h</td><td class="hl">2 mL/kg/h = ${sig(2*w)} mL/h</td></tr>
+  <tr><td>Moderate</td><td class="hl">4 mL/kg/h = ${sig(4*w)} mL/h</td></tr><tr><td>Major</td><td class="hl">&gt; 10 mL/kg/h = &gt; ${sig(10*w)} mL/h</td></tr></table>
+  <p><b>Exposed bowel:</b> insensible loss 10–20 mL/kg/h (${sig(10*w)}–${sig(20*w)} mL/h), up to 30 if losses high, until bowel back inside. Guide by HR, CRT, urine.</p>
+  <h3>Fluid choice</h3><ul><li>Neonate / neuro: Sterofundin maintenance (less sodium)</li><li>Replacement: Hartmann's (HM); paeds can use Hartmann's</li></ul>
+  <h3>Tips</h3><ul><li>Duhamel: replace deficit from start (7 kg ≈ 200 mL/h), then taper to losses</li><li>Crystalloid &gt; 20 mL/kg/h (${sig(20*w)} mL/h): consider albumin 5%</li><li>Max Gelofusine 25 mL/kg = <b>${sig(25*w)} mL</b>; albumin unlimited</li><li>FFP for coagulopathy / volume to replace loss</li><li>Major op: at least blue cannula — 1 deficit, 1 replacement, 1 inotrope</li></ul>${psrc()}</div>
+  <div class="card"><h2>Glucose (neonate / paeds)</h2><p>Check glucose for neonates in OT.</p>
+  <table><tr><td>Neonate</td><td>aim &gt; 2.5 mmol/L</td></tr><tr><td>&gt; 6 months</td><td>aim &gt; 4.1 mmol/L</td></tr><tr><td>&gt; 8 y</td><td>aim &gt; 6 mmol/L</td></tr></table>
+  <p>Hypoglycaemia (neonate): D10 2 mL/kg = <b>${sig(2*w)} mL</b></p>
+  <h3>Glucose maintenance if high risk of hypoglycaemia</h3><p>HMD2 = 2 mL D50 + 48 mL Hartmann's (2%)</p>
+  <p>SD5 = 5 mL D50 + 45 mL Sterofundin = 50 mL of 5%</p>${psrc()}</div>
+  <div class="card"><h2>Blood products</h2><p>Neonate: Hb &gt; 10–12. Colostomy: GXM. Bowel resection = blood loss.</p>
+  ${T([R("Max transfusion rate","0.5–1 mL/kg/min",`${sig(30*w)}–${sig(60*w)} mL/h`,"higher rate → hyperkalaemia; start calcium gluconate"),
+    R("Packed cells","10–20 mL/kg (4 mL/kg ↑ Hb 1 g/dL)",pk([10,20],"mL")),
+    DR("FFP",[10,15],"mL"), DR("Platelets",[10,15],"mL"), DR("Cryo",[5,10],"mL")])}
+${psrc()}</div>`;
+};
+
+pCards.regional = () => {
+  const w = W(), y = S.pY;
+  const needle = w<5 ? "orange" : w<=10 ? "black" : w>15 ? "yellow" : "— (10–15 kg not stated in notes)";
+  const bran = w<5 ? "yellow" : w<15 ? "blue" : w<40 ? "pink" : "green";
+  return `<div class="card"><h2>Which block (paeds)</h2><ul><li>Palatoplasty: maxillary block (CT/US guided)</li><li>Lip repair: infraorbital block, 0.5 mL levo 0.25% each side</li><li>Inguinal hernia: ilioinguinal</li><li>Orchidopexy, appendix, lower limb: caudal</li><li>Higher level: caudal epidural</li></ul></div>
+  <div class="card"><h2>Caudal block</h2><p>Up to 10 y · sacral hiatus · caudal needle: <b>${needle}</b> (&lt; 5 kg orange, 5–10 kg black, &gt; 15 kg yellow)${y>10?`<br><span class="warn" style="display:inline-block">Age &gt; 10 y</span>`:""}</p>
+  ${laLine()}
+  ${T([LAR("Sacro-lumbar · bupi 0.25%",[0.5,0.5],2.5,2.5),
+    LAR("Upper abdominal · bupi 0.25%",[1,1],2.5,2.5),
+    LAR("Mid-thoracic · bupi 0.2%",[1.2,1.2],2,2.5,"0.2% = 4 mL 0.5% in 10 mL NS"),
+    LAR("Hypospadias · levobupi 0.25%",[0.75,1],2.5,2.5,null,20),
+    R("+ morphine (preservative-free)","30–50 mcg/kg",pk([30,50],"mcg"),"monitor RR &amp; SpO₂ 24 h; avoid &lt; 6 months unless HDU"),
+    DR("+ ketamine (additive)","1","mg"), DR("+ clonidine (additive)",[1,2],"mcg")])}
+  <div class="danger">&gt; 1.2 mL/kg of 0.25% = toxicity (&gt; ${sig(1.2*w)} mL)</div>
+
+  <h3>Caudal with branula (sheath fully in)</h3><p>For ${sig(w)} kg: <b>${bran}</b> (&lt; 5 kg yellow, &lt; 15 kg blue, &lt; 40 kg pink, &gt; 40 kg green)</p>${psrc()}</div>
+  <div class="card"><h2>Ilioinguinal block</h2><p>Levobupivacaine 0.25%. Less volume is better.<br>Landmark: 1 cm medial and caudal to ASIS, above panty line.<br>Double pop: 3 mL (internal oblique); 1st pop: 3 mL (external oblique); distribute laterally.</p>
+  ${laLine()}${T([LAR("Per side · levobupi 0.25%",[0.3,0.3],2.5,2.5,"US-guided: 0.1–0.2 mL/kg is enough"),LAR("Both sides",[0.6,0.6],2.5,2.5)])}${psrc()}</div>
+  <div class="card"><h2>Penile block</h2><p>Levobupivacaine 0.25%, max 10 mL. 0.1 mL/kg + 1 mL = <b>${sig(Math.min(0.1*w+1,10))} mL</b> (${sig(Math.min(0.1*w+1,10)*2.5/w)} mg/kg) ${laAddBtn("p","bupi","0.25",Math.min(0.1*w+1,10),1,"Penile block")}<br>Dorsum fan-like; ventral at 10 and 2 o'clock, 1st pop.</p>${psrc()}</div>
+  <div class="card"><h2>Paeds lumbar / thoracic epidural</h2>
+  <p>&gt; 3 months: consider lumbar/thoracic. &lt; 3 months: caudal epidural.</p>
+  ${laLine()}${T([R("Skin to space","1 mm/kg",`${sig(w)} mm`),R("Max air (LOR)","0.1 mL/kg",pk(0.1,"mL")),LAR("Bolus · levobupi 0.25%",[0.5,0.5],2.5,2.5)])}
+  <ul><li>Do not flush catheter (avoid confusion with CSF)</li><li>Anchor: dermatome level parallel to skin + skin-to-space; &lt; 3 months max anchor 12 cm</li></ul>
+  <h3>Infusion</h3>${(()=>{ const bands=[["&lt; 5 kg (neonate / &lt; 3 months)","0.1% LA, no opioid",[0.1,0.2],0.2,w<5],["5–10 kg","0.1% + fentanyl 1 mcg/mL",[0.2,0.3],0.4,w>=5&&w<=10],["&gt; 10 kg","0.1% + fentanyl 2 mcg/mL",[0.2,0.4],0.4,w>10]];
+    return `<div style="overflow-x:auto"><table><tr><th>Weight</th><th>Solution · rate</th><th>For ${sig(w)} kg</th></tr>${bands.map(([b,sol,r,mx,on])=>`<tr class="${on?"hl":""}"><td>${b}</td><td>${sol}<div class="sub">${r[0]}–${r[1]} mL/kg/h · max ${mx} mg/kg/h</div></td><td class="hl">${on?`${sig(r[0]*w)}–${sig(r[1]*w)} mL/h`:"—"}</td></tr>`).join("")}</table></div>
+    <div class="danger">Never exceed ${w<5?"0.2":"0.4"} mg/kg/h of LA = ${sig((w<5?0.2:0.4)*w)} mL/h of 0.1%.</div>`; })()}
+  <p class="sub">0.1% = 10 mL of 0.5% (50 mg) in 50 mL NS = 1 mg/mL.</p>
+  ${psrc()}</div>
+  <div class="card"><h2>Intrapleural block</h2>
+  ${laLine()}<p>Lignocaine 2 mg/kg = <b>${sig(2*w)} mg</b> · ropivacaine 3 mg/kg = <b>${sig(3*w)} mg</b> (= max)</p>
+  <ol><li>Lateral position</li><li>Clean; palpate angle of scapula (T7)</li><li>Find space between T7–T8</li><li>Lungs down (off ventilator)</li><li>Insert 16G needle above the rib below</li><li>Leave fluid at needle hub; advance until fluid is sucked in (negative pressure)</li><li>Reconnect syringe, aspirate for blood; if nil, give LA</li><li>Reconnect ventilator</li><li>Watch for bradycardia, toxicity</li></ol>${psrc()}</div>`;
+};
+
+pCards.procs = () => {
+  const w = W(), len = S.pHt/10 - 1;
+  return `<div class="card"><h2>Laryngospasm</h2>${T([DR("Propofol",[0.5,1],"mg"),DR("Suxamethonium","0.5","mg"),DR("+ atropine","0.02","mg"),
+    R("Prevention: IV lignocaine before extubation","1–2 mg/kg",pk([1,2],"mg"),"also dexmedetomidine, clonidine")])}
+  <ul><li>Remove airway device</li><li>Jaw thrust, Larson manoeuvre</li><li>Flutter the bag</li><li>Gentle thoracic pressure 20–25 compressions/min</li></ul>${psrc()}</div>
+  <div class="card"><h2>Deep extubation (MAC 1)</h2><div class="danger">DO NOT TRY IF NOT FAMILIAR</div>
+  <ul><li>Choose the correct patient</li><li>Rule out airway / aspiration risk / difficult mask ventilation</li><li>Consider lateral position</li></ul></div>
+  <div class="card"><h2>Double-lumen CVC</h2>
+  ${step("pHt","Height","cm",30,190,1)}<p>Length = height/10 − 1 = <b>${sig(len)} cm</b> · Arrow sizes 5, 8, 13 cm</p>
+  <table><tr><td>4 Fr</td><td>5, 13 cm</td><td>&lt; 1 y, &lt; 10 kg</td></tr><tr><td>5 Fr</td><td>5, 8, 13 cm</td><td>&gt; 1 y, &gt; 10 kg</td></tr></table>
+  <ul><li>Femoral in &lt; 5 kg (neonate): consider single-lumen Arrow 22G — double lumen femoral can cause leg congestion</li><li>IJ: can use double lumen 4 Fr</li></ul>
+  <h3>Preparation</h3><ul><li><b>Don't open the set first</b> (open only when guidewire confirmed in vessel)</li><li>Blue/yellow branula, Arrow guidewire, linear US probe</li></ul>
+  <h3>Steps</h3><ol><li>US-guided vein scan</li><li>Puncture with blue/yellow (22G/24G), through-and-through; remove needle, leave catheter</li><li>Withdraw catheter slowly until venous backflow</li><li>Insert Arrow guidewire</li><li>Keep guidewire, remove cannula</li><li>Skin nick with needle tip, then dilator — follow anatomical direction, stretch skin</li><li>Remove Arrow guidewire, insert set guidewire</li><li>Remove dilator, insert double lumen</li><li>Remove guidewire</li><li>Anchor at 3 points</li></ol>${psrc()}</div>
+  <div class="card"><h2>Keeping warm</h2><ul><li>Bair Hugger (× 2) — &lt; 10 kg put warmer below</li><li>Radiant warmer, warming mattress</li><li>S-line / fluid / blood warmer</li><li>Plastic taped properly around patient</li><li>Off warmers once temperature reaches 36 °C</li></ul></div>
+  <div class="card"><h2>T-tube</h2><p>Problems on insertion: spontaneous breathing, cannot ventilate, no barking during insertion, difficult suctioning.<br>Attach ETT connector by T-tube size (ETT 5.0 for T-tube 7).</p>${psrc()}</div>`;
+};
+
+pCards.special = () => {
+  const w = W(), y = S.pY;
+  const parec = y<5 ? 0.9 : y<10 ? 0.75 : 0.65;
+  return `<div class="card"><h2>Airway syndromes</h2><ul>
+  <li><b>Apert</b> — airway + coagulopathy</li><li><b>Pierre Robin sequence</b></li><li><b>Treacher Collins</b> — small mouth, limited TMJ</li><li><b>Goldenhar</b> — small mouth, limited TMJ</li><li><b>Klippel-Feil</b> — limited neck extension</li>
+  <li><b>Mucopolysaccharidoses</b> — difficult mask/LMA, need enzyme therapy, may need tracheostomy first, asleep FOI</li></ul></div>
+  <div class="card"><h2>Down syndrome</h2><ul><li>OSA</li><li>Unstable C-spine — CMAC</li><li>Tracheal stenosis / malacia</li><li>AVSD</li></ul></div>
+  <div class="card"><h2>OSA for tonsillectomy — opioid-free</h2>${T([DR("Supp paracetamol","40","mg"),
+    R("Parecoxib","0.9 mg/kg (2 y) · 0.75 (7 y) · 0.65 (12 y)",`${sig(parec*w)} mg`,`using ${parec} mg/kg for age ${y}`),
+    DR("Ketamine",[0.3,0.5],"mg"), DR("Dexmedetomidine","1","mcg")])}${psrc()}</div>
+  <div class="card"><h2>Hypospadias repair</h2><h3>Intra-op</h3>${T([
+    R("Caudal levobupivacaine 0.25%","0.75–1 mL/kg, max 20 mL",pk([0.75,1],"mL",20)), DR("± clonidine","1","mcg"),
+    DR("Supp Voren (diclofenac)","1","mg"), DR("Supp paracetamol","40","mg"), DR("IV morphine","0.1","mg")])}
+  <h3>Post-op</h3>${T([R("Syr morphine","0.3 mg/kg up to 4-hourly × 2 days",pk(0.3,"mg")), DR("Syr ibuprofen","10","mg"), DR("Syr paracetamol","15","mg")])}${psrc()}</div>
+  <div class="card"><h2>Cyanotic heart disease / Fallot spell</h2><p>Aim: increased FiO₂, normal pH, normal EtCO₂, normal SVR (normal BP).</p>
+  <h3>Fallot spell</h3>${T([R("Fluids","10–20 mL/kg",pk([10,20],"mL")), DR("Phenylephrine",[1,5],"mcg","titrate"), R("Esmolol","500 mcg/kg over 1 min, then 50–300 mcg/kg/min",`${pk(500,"mcg")} bolus`,`then ${sig(50*W())}–${sig(300*W())} mcg/min`)])}
+  <p>Oxygen; direct aortic compression.</p>${psrc()}</div>
+  <div class="card"><h2>Pyloric stenosis</h2><p>3–5 weeks, projectile vomiting, \"olive\" on palpation.</p><ul><li>Fluid resuscitation with isotonic fluid (HM/NS)</li><li>Correct metabolic alkalosis (hypochloraemic, hypokalaemic)</li><li>Nasoduodenal feeding</li><li>4-quadrant aspiration</li></ul></div>
+  <div class="card"><h2>Neonatal surgery</h2>
+  <p><b>PDA:</b> pre- and post-ductal saturation; lung down; double lumen, femoral art line.</p>
+  <p><b>TOF repair:</b> gastrostomy if unable to ventilate; if minimal oxygen requirement can wait; if intubated proceed ASAP (gastric insufflation risk).</p>
+  <p><b>CDH repair:</b> pulmonary hypertension; stabilise oxygenation; muscle relaxant may disrupt ventilation.</p>
+  <p><b>NEC repair:</b> bedside if unstable.</p></div>
+  <div class="card"><h2>Ketamine anaesthesia</h2><p>Short, painless procedures (e.g. MRI, EUA). Consider contraindications.</p>
+  ${T([DR("Induction","2","mg"), DR("Top-up",[0.5,1],"mg"), DR("Glycopyrrolate (give before)","4","mcg")])}<p>Sniffing position (roll under shoulder blades).</p>${psrc()}</div>`;
+};
+
+/* ---------- EMERGENCIES (crisis cards, DRAFT from published guidelines) ---------- */
+const CRISIS_CHECKED = true;
+const crisisDraft = () => CRISIS_CHECKED ? "" : `<div class="warn" style="margin-top:0">DRAFT — from published guidelines, not yet ticked by you.</div>`;
+const wk = (w, per, unit, max) => { let v = per*w, c = false; if (max!=null && v>max){ v=max; c=true; } return `${sig(v)} ${unit}${c?` (max ${max} ${unit})`:""}`; };
+const B = x => `<b class="dose">${x}</b>`;
+const crisis = (title, steps, srcTxt, extra="") =>
+  `<div class="card"><h2>${title}</h2>${crisisDraft()}<ol class="crisis">${steps.map(s=>`<li>${s}</li>`).join("")}</ol>${extra}${src(srcTxt)}</div>`;
+
+const eCards = {};
+eCards.adult = () => {
+  const w = S.aw;
+  return crisis("High / total spinal", [
+    "Call for help. Tell the surgeon.",
+    "Keep left uterine displacement. <b>Do not</b> tip head-down.",
+    "100% O₂. Support breathing with bag-mask.",
+    "Can't speak, weak cough, falling SpO₂ or unconscious → "+B("RSI and intubate")+". Sedate after (may be aware).",
+    "Hypotension: fast fluids + "+B("phenylephrine 50–100 mcg")+" or "+B("ephedrine 6–9 mg")+". Severe: "+B("adrenaline 10–100 mcg IV")+".",
+    "Bradycardia: "+B("atropine 0.5 mg")+" (to 3 mg) or "+B("glycopyrrolate 200–400 mcg")+". Severe: adrenaline.",
+    "Arrest → ALS. Pregnant ≥ 20 weeks: perimortem Caesarean within 5 min."],
+    "OAA / Association of Anaesthetists guidance.")
+  + crisis("LA toxicity (LAST)", [
+    "Stop injecting LA. Call for help.",
+    "Airway, 100% O₂, IV access.",
+    "Seizures: "+B("midazolam 1–2 mg")+" or small dose propofol/thiopentone.",
+    "Intralipid 20%: bolus "+B("1.5 mL/kg = "+wk(w,1.5,"mL"))+" over 1 min.",
+    "Start infusion "+B("15 mL/kg/h = "+wk(w,15,"mL")+"/h")+".",
+    "After 5 min still unstable: repeat bolus (max 2 more) and double infusion to "+B("30 mL/kg/h = "+wk(w,30,"mL")+"/h")+".",
+    "Max total "+B("12 mL/kg = "+wk(w,12,"mL"))+".",
+    "Arrest: CPR (may be prolonged). No lignocaine for arrhythmia. Pregnant: perimortem Caesarean."],
+    "Association of Anaesthetists LAST guideline.")
+  + crisis("Anaphylaxis", [
+    "Stop trigger (antibiotic, relaxant, chlorhexidine, latex). Call for help.",
+    "100% O₂, secure airway. Legs up.",
+    "IV adrenaline "+B("50 mcg")+" (0.5 mL of 1:10 000), repeat as needed. No IV: IM "+B("0.5 mg")+" (0.5 mL of 1:1000).",
+    "Crystalloid "+B("20 mL/kg = "+wk(w,20,"mL"))+".",
+    "Needing repeated boluses: adrenaline infusion "+B("0.05–0.1 mcg/kg/min")+".",
+    "Bronchospasm: salbutamol. Arrest → ALS. Pregnant: left uterine displacement.",
+    "After stable: "+B("chlorphenamine 10 mg IV")+", "+B("hydrocortisone 200 mg IV")+".",
+    "Tryptase: as soon as resuscitated, at 1–2 h, and at 24 h. Refer for allergy testing."],
+    "Association of Anaesthetists / RCUK anaphylaxis guidance.")
+  + crisis("Hypotension after spinal", [
+    "Left uterine displacement. Fluid co-load running.",
+    "Phenylephrine (50 mcg/mL): bolus "+B("50–100 mcg")+" or infusion "+B("25–50 mcg/min = 30–60 mL/h")+", started at spinal.",
+    "Aim SBP ≥ 90% of baseline.",
+    "Low BP with HR &lt; 60: "+B("ephedrine 6–9 mg")+" or "+B("glycopyrrolate 200 mcg")+".",
+    "Nausea often = low BP. Check BP first."],
+    "International consensus on vasopressors at Caesarean.")
+  + crisis("Bradycardia &amp; cardiac arrest", [
+    "Bradycardia with low BP: "+B("atropine 500 mcg")+", repeat to max 3 mg. Or "+B("glycopyrrolate 200–400 mcg")+".",
+    "Not responding: adrenaline infusion 2–10 mcg/min or pacing.",
+    "Arrest: CPR 30:2, call arrest team, attach defibrillator.",
+    "Shockable (VF/pVT): shock "+B("150–200 J")+". Adrenaline "+B("1 mg")+" and "+B("amiodarone 300 mg")+" after 3rd shock; amiodarone "+B("150 mg")+" after 5th.",
+    "Non-shockable: "+B("adrenaline 1 mg")+" ASAP, then every 3–5 min.",
+    "Pregnant ≥ 20 weeks: manual uterine displacement; perimortem Caesarean within 5 min.",
+    "4 Hs and 4 Ts (think high spinal, LAST, haemorrhage, anaphylaxis)."],
+    "Resuscitation Council UK ALS 2021.")
+  + crisis("Bronchospasm", [
+    "100% O₂. Check tube, circuit, capnograph (rule out kink, endobronchial, pneumothorax).",
+    "Deepen: sevoflurane, propofol or "+B("ketamine 0.5–1 mg/kg = "+wk(w,0.5,"mg")+"–"+wk(w,1,"mg"))+".",
+    "Salbutamol "+B("6–10 puffs")+" into circuit, or neb "+B("5 mg")+".",
+    "IV salbutamol "+B("250 mcg")+" slow. IV "+B("magnesium 2 g")+" over 20 min.",
+    "Severe: "+B("adrenaline 10–100 mcg IV")+". Think anaphylaxis.",
+    "IV "+B("hydrocortisone 200 mg")+". Ventilate slow with long expiration."],
+    "Standard crisis management.")
+  + crisis("Malignant hyperthermia", [
+    "Stop volatile. Call for help, get MH kit.",
+    "High-flow O₂ &gt; 10 L/min. Activated charcoal filters or clean circuit. Switch to TIVA.",
+    "Dantrolene "+B("2.5 mg/kg = "+wk(w,2.5,"mg"))+" IV ("+Math.ceil(2.5*w/20)+" × 20 mg vials, each in 60 mL water).",
+    "Repeat "+B("1 mg/kg = "+wk(w,1,"mg"))+" every 5 min until improving, max "+B("10 mg/kg = "+wk(w,10,"mg"))+".",
+    "Cool actively; stop at 38.5 °C.",
+    "Hyperkalaemia: insulin + dextrose, "+B("calcium chloride 10% 10 mL")+". Arrhythmia: amiodarone (no calcium channel blockers).",
+    "Monitor urine output, CK, ABG. ICU."],
+    "Association of Anaesthetists MH guideline.")
+  + crisis("Failed intubation / CICO", [
+    "Plan A: max 3 + 1 attempts (obstetric: 2, 3rd by most experienced). Release cricoid if view poor.",
+    "Plan B: 2nd-generation supraglottic airway, max 3 attempts.",
+    "Plan C: face mask. Wake up — "+B("sugammadex 16 mg/kg = "+wk(w,16,"mg"))+" if rocuronium.",
+    "Plan D — CICO: declare it. Full paralysis, 100% O₂.",
+    "Front of neck: "+B("scalpel – bougie – size 6.0 cuffed tube")+" through cricothyroid membrane.",
+    "Obstetric: decide early — wake up or proceed with SAD."],
+    "DAS 2015 / OAA-DAS obstetric guideline.")
+  + crisis("Massive obstetric haemorrhage", [
+    "Call for help — activate massive transfusion protocol. 2 large-bore IVs, crossmatch, FBC, coags, fibrinogen.",
+    "Uterine massage. Empty bladder.",
+    B("Oxytocin 5 IU")+" slow IV, then "+B("40 IU in 500 mL at 125 mL/h")+".",
+    B("Ergometrine 500 mcg IM")+" (avoid in hypertension / pre-eclampsia).",
+    B("Carboprost 250 mcg IM")+" every 15 min, max 8 doses (avoid in asthma).",
+    B("Misoprostol 800 mcg")+" sublingual / PR.",
+    B("Tranexamic acid 1 g IV")+" over 10 min; repeat 1 g after 30 min if still bleeding.",
+    "Warm everything. Blood products early (1:1 RBC:FFP). Keep fibrinogen &gt; 2 g/L. Give calcium."],
+    "RCOG / MOH Malaysia PPH guidance.")
+  + crisis("Eclampsia", [
+    "Call for help. Left lateral, airway, O₂. Protect from injury.",
+    "MgSO₄ loading "+B("4 g IV over 10–15 min")+", then "+B("1 g/h")+" for 24 h.",
+    "Recurrent fit: further "+B("2 g IV over 5 min")+".",
+    "Monitor: reflexes, RR &gt; 12, urine &gt; 25 mL/h.",
+    "Mg toxicity: stop infusion, "+B("calcium gluconate 10% 10 mL IV")+" over 10 min.",
+    "BP: "+B("labetalol 20 mg IV")+" (repeat 40, 80 mg) or "+B("hydralazine 5 mg IV")+".",
+    "Deliver once stable."],
+    "MOH Malaysia / NICE hypertension in pregnancy (Zuspan regimen).");
+};
+eCards.paeds = () => {
+  const w = W();
+  return crisis("Paeds bronchospasm", [
+    "100% O₂. Check tube and circuit.",
+    "Deepen: sevoflurane, propofol or "+B("ketamine 1–2 mg/kg = "+wk(w,1,"mg")+"–"+wk(w,2,"mg"))+".",
+    "Salbutamol "+B("2–10 puffs")+" into circuit.",
+    "IV salbutamol "+B("15 mcg/kg = "+wk(w,15,"mcg",250))+" over 10 min.",
+    "IV magnesium "+B("40 mg/kg = "+wk(w,40,"mg",2000))+" over 20 min.",
+    "Hydrocortisone "+B("4 mg/kg = "+wk(w,4,"mg"))+".",
+    "Severe: adrenaline "+B("1 mcg/kg = "+wk(w,1,"mcg"))+" IV, titrated. Think anaphylaxis."],
+    "APA / standard paediatric crisis management.")
+  + crisis("Paeds cardiac arrest", [
+    "CPR 15:2. Call arrest team.",
+    "Adrenaline "+B("10 mcg/kg = "+wk(w,0.1,"mL")+" of 1:10 000")+" every 3–5 min.",
+    "Shockable: "+B("4 J/kg = "+wk(w,4,"J"))+". Amiodarone "+B("5 mg/kg = "+wk(w,5,"mg",300))+" after 3rd and 5th shock.",
+    "Atropine "+B("0.02 mg/kg = "+wk(w,0.02,"mg"))+" (bradycardia from vagal cause).",
+    "Fluid bolus "+B("10 mL/kg = "+wk(w,10,"mL"))+". Glucose 10% "+B("2 mL/kg = "+wk(w,2,"mL"))+" if low.",
+    "4 Hs and 4 Ts. Hyperkalaemia: calcium chloride 10% "+B("0.2 mL/kg = "+wk(w,0.2,"mL"))+"."],
+    "APLS / RCUK PLS 2021 + my paeds notes.")
+  + crisis("Paeds LA toxicity (LAST)", [
+    "Stop injecting LA. Call for help. Airway, 100% O₂.",
+    "Seizures: "+B("midazolam 0.05–0.1 mg/kg = "+wk(w,0.05,"mg")+"–"+wk(w,0.1,"mg"))+".",
+    "Intralipid 20%: bolus "+B("1.5 mL/kg = "+wk(w,1.5,"mL"))+" over 1 min.",
+    "Infusion "+B("15 mL/kg/h = "+wk(w,15,"mL")+"/h")+".",
+    "Still unstable at 5 min: repeat bolus (max 2 more), double infusion to "+B(wk(w,30,"mL")+"/h")+".",
+    "Max total "+B("12 mL/kg = "+wk(w,12,"mL"))+"."],
+    "Association of Anaesthetists LAST guideline.")
+  + crisis("Paeds anaphylaxis", [
+    "Stop trigger. Call for help. 100% O₂, airway.",
+    "IV adrenaline "+B("1 mcg/kg = "+wk(w,1,"mcg"))+" (= "+wk(w,0.01,"mL")+" of 1:10 000), titrate and repeat.",
+    "No IV: IM adrenaline "+B("10 mcg/kg = "+wk(w,0.01,"mL",0.5)+" of 1:1000")+" (max 0.5 mL).",
+    "Crystalloid "+B("10 mL/kg = "+wk(w,10,"mL"))+", repeat.",
+    "Bronchospasm: salbutamol. Arrest → paeds arrest card.",
+    "After stable: hydrocortisone "+B("4 mg/kg = "+wk(w,4,"mg"))+". Tryptase at 0, 1–2 h, 24 h."],
+    "APA / RCUK anaphylaxis guidance.")
+  + crisis("Paeds malignant hyperthermia", [
+    "Stop volatile. Call for help. High-flow O₂, charcoal filters, TIVA.",
+    "Dantrolene "+B("2.5 mg/kg = "+wk(w,2.5,"mg"))+" IV ("+Math.ceil(2.5*w/20)+" × 20 mg vials).",
+    "Repeat "+B("1 mg/kg = "+wk(w,1,"mg"))+" every 5 min, max "+B("10 mg/kg = "+wk(w,10,"mg"))+".",
+    "Cool; stop at 38.5 °C.",
+    "Hyperkalaemia: calcium chloride 10% "+B("0.2 mL/kg = "+wk(w,0.2,"mL"))+"; insulin "+B("0.1 unit/kg = "+wk(w,0.1,"units"))+" with glucose 10% "+B("5 mL/kg = "+wk(w,5,"mL"))+"."],
+    "Association of Anaesthetists MH guideline.");
+};
+
+/* ---------- GENERAL ANAESTHESIA (adult) — DRAFT from standard references ---------- */
+const GA_CHECKED = true;
+const gaDraft = () => GA_CHECKED ? "" : `<div class="warn" style="margin-top:0">DRAFT — from standard references, not yet ticked by you.</div>`;
+function wts(){
+  const w = S.aw, h = S.height, m = S.sex === "M";
+  const bmi = w / Math.pow(h/100, 2);
+  let ibw = (m ? 50 : 45.5) + 0.91*(h - 152.4); ibw = Math.max(ibw, 30);
+  const lbw = m ? 9270*w/(6680 + 216*bmi) : 9270*w/(8780 + 244*bmi);
+  const ibwU = Math.min(ibw, w);                       // if actual < ideal, use actual
+  const adj = w < ibw ? w : ibw + 0.4*(w - ibw);
+  return {tbw:w, ibw:ibwU, ibwRaw:ibw, lbw:Math.min(lbw,w), adj, bmi};
+}
+const WN = {tbw:"TBW", ibw:"IBW", lbw:"LBW", adj:"AdjBW"};
+// dose row: name, per-kg [lo,hi], unit, weight key, concentration per mL (same unit) or null, note, max
+function GD(name, per, unit, wk, conc, note, max){
+  const W2 = wts(), w = W2[wk], lo = Array.isArray(per)?per[0]:per, hi = Array.isArray(per)?per[1]:per;
+  let a = lo*w, b = hi*w, capped = false;
+  if (max!=null){ if (a>max){a=max;capped=true;} if (b>max){b=max;capped=true;} }
+  const dose = a===b ? `${sig(a)} ${unit}` : `${sig(a)}–${sig(b)} ${unit}`;
+  const ml = conc ? (a===b ? `${sig(a/conc)} mL` : `${sig(a/conc)}–${sig(b/conc)} mL`) : "";
+  return `<tr><td>${name}${note?`<div class="sub">${note}</div>`:""}</td><td class="sub">${Array.isArray(per)?per.join("–"):per} ${unit}/kg<br><b>${WN[wk]} ${sig(w)} kg</b></td><td class="hl">${dose}${capped?` <span class="sub">(max ${max})</span>`:""}${ml?`<div class="sub">${ml}</div>`:""}</td></tr>`;
+}
+const GT = rows => `<div style="overflow-x:auto"><table><tr><th>Drug</th><th>Rule · weight used</th><th>Dose</th></tr>${rows.join("")}</table></div>`;
+const GSRC = "Standard references: BNF, Association of Anaesthetists / SOBA obesity guidance, Miller.";
+
+function gaInputs(){
+  const W2 = wts();
+  return seg("sex",[["F","♀ Female"],["M","♂ Male"]]) + step("height","Height","cm",130,210,1) + step("aw","Weight","kg",30,250,1) + step("age","Age","y",16,100,1) +
+    `<div class="chips" style="margin-top:var(--s2)">
+      <span class="chip" style="cursor:default">BMI <b>${sig(W2.bmi)}</b></span>
+      <span class="chip" style="cursor:default">IBW <b>${sig(W2.ibw)}</b> kg</span>
+      <span class="chip" style="cursor:default">LBW <b>${sig(W2.lbw)}</b> kg</span>
+      <span class="chip" style="cursor:default">AdjBW <b>${sig(W2.adj)}</b> kg</span></div>
+    ${S.aw < W2.ibwRaw ? `<div class="sub" style="margin-top:4px">Actual weight below ideal: actual weight used for IBW / AdjBW doses.</div>` : ""}`;
+}
+
+const gaCards = {};
+/* PRE-OP */
+gaCards.fasting = () => `<div class="card"><h2>1. Fasting</h2>${gaDraft()}
+  <table><tr><td>Clear fluids</td><td class="hl">2 h</td></tr><tr><td>Light meal, milk</td><td class="hl">6 h</td></tr><tr><td>Fatty / heavy meal</td><td class="hl">8 h</td></tr></table>
+  <h3>GLP-1 agonists (semaglutide, liraglutide…)</h3>
+  <ul><li>Weekly dose: hold 1 week before</li><li>Daily dose: hold on the day</li><li>GI symptoms (nausea, bloating) or not held: treat as <b>full stomach</b> (consider gastric US, RSI)</li></ul>
+  ${src("ASA / ESAIC fasting guidance; ASA 2023 GLP-1 statement.")}</div>`;
+gaCards.meds = () => `<div class="card"><h2>2. Regular drugs: stop or continue</h2>${gaDraft()}
+  <table>
+  <tr><th>Continue</th><td>Beta-blockers, statins, antiepileptics, inhalers, thyroxine, antiparkinson, steroids</td></tr>
+  <tr><th>Omit morning</th><td>ACEi / ARB, diuretics, sulfonylureas</td></tr>
+  <tr><th>SGLT2 inhibitors</th><td><b>Stop 3 days before</b> (ertugliflozin 4 days) — euglycaemic DKA risk</td></tr>
+  <tr><th>Metformin</th><td>Continue if ≤ 1 missed meal; omit if eGFR &lt; 60, contrast or long fast</td></tr>
+  <tr><th>Insulin</th><td>Long-acting basal: give <b>80%</b> of usual dose. Short-acting: omit while fasting. &gt; 1 missed meal: variable-rate insulin infusion</td></tr>
+  <tr><th>Anticoagulants / antiplatelets</th><td>See Regional › Anticoagulants</td></tr></table>
+  <button class="homebtn" data-open="3. Anticoagulant timing" data-g="regional" data-tab="safety">Open anticoagulant timing table ›</button>
+  ${src("CPOC 2021 perioperative diabetes; FDA SGLT2i advice.")}</div>`;
+gaCards.steroid = () => `<div class="card"><h2>3. Steroid cover</h2>${gaDraft()}
+  <p>On ≥ 5 mg prednisolone (or equivalent) for &gt; 4 weeks:</p>
+  <ul><li>Give usual morning dose</li><li>Major / moderate surgery: <b>hydrocortisone 100 mg IV</b> at induction, then 200 mg / 24 h infusion (or 50 mg 6-hourly)</li><li>Minor surgery: usual dose ± 100 mg at induction</li></ul>
+  ${src("Association of Anaesthetists 2020 steroid guideline.")}</div>`;
+gaCards.airway = () => `<div class="card"><h2>4. Airway assessment &amp; plan</h2>${gaDraft()}
+  <h3>Predictors of difficulty</h3>
+  <ul><li>Previous difficulty (ask, check notes)</li><li>Mallampati III–IV, mouth opening &lt; 3 cm, thyromental &lt; 6 cm</li><li>Poor jaw protrusion, limited neck movement</li><li>BMI &gt; 35, neck circumference &gt; 40 cm, OSA (STOP-BANG ≥ 3)</li><li>Beard, no teeth, airway pathology, radiotherapy</li></ul>
+  <h3>Plan before induction</h3>
+  <ul><li>State plans A → D to the team (DAS)</li><li>Preoxygenate to EtO₂ &gt; 0.9; consider high-flow nasal O₂</li><li>Ramp position if obese</li><li>Very difficult: awake tracheal intubation (topical lignocaine max <b>9 mg/kg LBW = ${sig(9*wts().lbw)} mg</b>)</li></ul>
+  ${src("DAS 2015 / DAS ATI 2020.")}</div>`;
+
+/* INDUCTION */
+gaCards.induction = () => `<div class="card"><h2>1. Induction drugs</h2>${gaDraft()}${GT([
+  GD("Propofol 1%",[1.5,2.5],"mg","lbw",10,"Elderly / frail: 1–1.5 mg/kg"),
+  GD("Thiopentone 2.5%",[3,5],"mg","lbw",25),
+  GD("Ketamine",[1,2],"mg","lbw",50,"Haemodynamically unstable, asthma"),
+  GD("Etomidate",[0.2,0.3],"mg","lbw",2),
+  GD("Fentanyl",[1,3],"mcg","lbw",50)])}
+  <p class="sub">Midazolam co-induction 1–2 mg. Reduce all doses in elderly, shocked or septic patients.</p>${src(GSRC)}</div>`;
+gaCards.rsi = () => { const W2 = wts();
+  return `<div class="card"><h2>2. RSI</h2>${gaDraft()}
+  <ol><li>Check: suction on, tipping trolley, bougie, VL, SAD, plan A–D said aloud</li><li>Preoxygenate EtO₂ &gt; 0.9 (± high-flow nasal O₂)</li><li>Cricoid 10 N awake → 30 N after LOC; release if view poor</li><li>Induction agent + relaxant, no bag-mask unless SpO₂ falling (then gentle)</li></ol>
+  <div class="row" style="margin-top:var(--s3)">
+    <div class="result" style="margin:0"><div class="sub">Suxamethonium 1.5 mg/kg · TBW ${sig(W2.tbw)} kg</div><div class="big">${sig(1.5*W2.tbw)} mg</div><div class="sub">${sig(1.5*W2.tbw/50)} mL of 50 mg/mL</div></div>
+    <div class="result" style="margin:0"><div class="sub">Rocuronium 1.2 mg/kg · IBW ${sig(W2.ibw)} kg</div><div class="big">${sig(1.2*W2.ibw)} mg</div><div class="sub">${sig(1.2*W2.ibw/10)} mL of 10 mg/mL</div>
+      <div class="danger" style="margin-bottom:0">Rescue: sugammadex 16 mg/kg TBW = ${sig(16*W2.tbw)} mg (${sig(16*W2.tbw/100)} mL)</div></div></div>
+  <p class="sub">Sux: avoid in hyperkalaemia, burns &gt; 48 h, denervation, MH history.</p>${src(GSRC)}</div>`; };
+gaCards.relax = () => `<div class="card"><h2>3. Muscle relaxants</h2>${gaDraft()}${GT([
+  GD("Suxamethonium",[1,1.5],"mg","tbw",50),
+  GD("Rocuronium (intubation)",0.6,"mg","ibw",10),
+  GD("Rocuronium (RSI)",1.2,"mg","ibw",10),
+  GD("Atracurium",0.5,"mg","ibw",10,"Hofmann — renal/liver failure"),
+  GD("Cisatracurium",0.15,"mg","ibw",2),
+  GD("Vecuronium",0.1,"mg","ibw",1,"10 mg in 10 mL")])}
+  <p class="sub">Top-ups: about ¼ of the intubating dose, guided by TOF.</p>${src(GSRC)}</div>`;
+gaCards.kit = () => { const w = S.aw;
+  const lma = w < 30 ? "2.5" : w < 50 ? "3" : w < 70 ? "4" : w <= 100 ? "5" : "5 (or 6 if available)";
+  const igel = w < 30 ? "2.5" : w < 50 ? "3" : w < 90 ? "4" : "5";
+  return `<div class="card"><h2>4. Tube &amp; airway kit</h2>${ettCalc(true, true)}
+  <button class="homebtn" data-open="1. Tube: size, depth, blade, suction" data-g="paeds" data-tab="ind">Child or neonate? → Paediatric › Induction ›</button>
+  <h3>Supraglottic airway for ${sig(w)} kg</h3>
+  <table><tr><td>LMA Classic / Supreme / ProSeal</td><td class="hl">Size ${lma}</td></tr><tr><td>i-gel</td><td class="hl">Size ${igel}</td></tr></table>
+  <p class="sub">LMA: 3 = 30–50 kg, 4 = 50–70 kg, 5 = 70–100 kg. i-gel: 3 = 30–60 kg, 4 = 50–90 kg, 5 = &gt; 90 kg.</p>
+  <h3>Video laryngoscope</h3><ul><li>Macintosh-type blade 3 or 4</li><li>Hyperangulated blade: use a pre-shaped stylet</li></ul>
+  ${src("Manufacturer weight bands.")}</div>`; };
+
+/* MAINTENANCE */
+gaCards.tiva = () => { const W2 = wts(), w = W2.lbw;
+  return `<div class="card"><h2>1. TIVA</h2>${gaDraft()}
+  <table><tr><th>Propofol — Marsh</th><td>Plasma target: induction <b>4–6 mcg/mL</b>, maintenance <b>3–6</b>. Obese: enter <b>AdjBW ${sig(W2.adj)} kg</b>.</td></tr>
+  <tr><th>Propofol — Schnider</th><td>Effect-site target: induction <b>3–5 mcg/mL</b> (step up slowly), maintenance <b>2.5–5</b>. Needs age, height, weight, sex.</td></tr>
+  <tr><th>Remifentanil — Minto</th><td>Effect-site target: intubation <b>4–6 ng/mL</b>, maintenance <b>2–8</b>.</td></tr></table>
+  <h3>Remifentanil without TCI (50 mcg/mL)</h3>
+  <p>0.05–0.25 mcg/kg/min on LBW ${sig(w)} kg = <b>${sig(0.05*w*60/50)}–${sig(0.25*w*60/50)} mL/h</b></p>
+  <p class="sub">Elderly: lower targets. Use processed EEG where available. Dedicated cannula, anti-reflux valves.</p>
+  ${src("Association of Anaesthetists / SIVA TIVA guidance.")}</div>`; };
+gaCards.mac = () => { const a = S.age, f = Math.pow(10, -0.00269*(a-40));
+  const r = (m40) => sig(m40*f);
+  return `<div class="card"><h2>2. Volatile: MAC by age</h2><p class="sub">Age ${a} y (set in the patient box)</p>${gaDraft()}
+  <table><tr><th>Agent</th><th>MAC at 40 y</th><th>MAC at ${a} y</th></tr>
+  <tr><td>Sevoflurane</td><td>2.1%</td><td class="hl">${r(2.1)}%</td></tr>
+  <tr><td>Isoflurane</td><td>1.17%</td><td class="hl">${r(1.17)}%</td></tr>
+  <tr><td>Desflurane</td><td>6.6%</td><td class="hl">${r(6.6)}%</td></tr></table>
+  <p class="sub">Mapleson age correction. Aim ~0.7–1.0 MAC with opioid. N₂O adds to MAC (MAC 104%).</p>${src("Mapleson 1996.")}</div>`; };
+gaCards.opioid = () => `<div class="card"><h2>3. Intra-op opioids</h2>${gaDraft()}${GT([
+  GD("Fentanyl (top-up)",[0.5,1],"mcg","lbw",50),
+  GD("Morphine",[0.1,0.15],"mg","ibw",10,"Titrate; reduce in elderly / renal"),
+  GD("Ketamine (analgesic)",[0.1,0.3],"mg","ibw",50),
+  GD("Magnesium (adjunct)",[30,50],"mg","ibw",null,"Over 15–20 min")])}${src(GSRC)}</div>`;
+gaCards.pressors = () => { const w = S.aw, rate = (lo,hi,conc) => `${sig(lo*w*60/conc)}–${sig(hi*w*60/conc)} mL/h`;
+  return `<div class="card"><h2>4. Vasopressors &amp; inotropes</h2>${gaDraft()}
+  <div style="overflow-x:auto"><table><tr><th>Drug · mix</th><th>Dose</th><th>For ${sig(w)} kg</th></tr>
+  <tr><td>Ephedrine<div class="sub">30 mg in 5 mL = 6 mg/mL</div></td><td>3–6 mg bolus</td><td class="hl">0.5–1 mL</td></tr>
+  <tr><td>Phenylephrine<div class="sub">10 mg in 100 mL = 100 mcg/mL</div></td><td>50–100 mcg bolus; infusion 25–100 mcg/min</td><td class="hl">0.5–1 mL; 15–60 mL/h</td></tr>
+  <tr><td>Noradrenaline<div class="sub">4 mg in 50 mL = 80 mcg/mL</div></td><td>0.05–0.5 mcg/kg/min</td><td class="hl">${rate(0.05,0.5,80)}</td></tr>
+  <tr><td>Adrenaline<div class="sub">4 mg in 50 mL = 80 mcg/mL</div></td><td>0.05–0.5 mcg/kg/min</td><td class="hl">${rate(0.05,0.5,80)}</td></tr>
+  <tr><td>Dobutamine<div class="sub">250 mg in 50 mL = 5 mg/mL</div></td><td>2–20 mcg/kg/min</td><td class="hl">${rate(2,20,5000)}</td></tr></table></div>
+  <p class="sub">Infusion rates use actual weight. Check your unit's standard concentrations.</p>${src("Common UK/Malaysian ICU concentrations.")}</div>`; };
+gaCards.abx = () => { const w = S.aw;
+  return `<div class="card"><h2>5. Antibiotic prophylaxis</h2>${gaDraft()}
+  <table><tr><th>Cefazolin</th><td><b>${w>=120?"3 g":"2 g"} IV</b> (${w>=120?"≥ 120 kg":"&lt; 120 kg"}) within 60 min before incision; redose every 4 h or blood loss &gt; 1.5 L</td></tr>
+  <tr><th>Penicillin allergy / MRSA</th><td>Vancomycin 15 mg/kg TBW = <b>${sig(Math.min(15*w,2000))} mg</b> over ≥ 60 min, start 60–120 min before; or clindamycin 900 mg</td></tr>
+  <tr><th>Colorectal / gynae</th><td>Add metronidazole 500 mg</td></tr></table>
+  ${src("ASHP/IDSA/SIS 2013; MOH Malaysia antibiotic guideline. Follow local policy.")}</div>`; };
+gaCards.txa = () => `<div class="card"><h2>6. Tranexamic acid</h2>${gaDraft()}
+  <p><b>1 g IV</b> over 10 min at induction (or 15 mg/kg = ${sig(15*S.aw)} mg). Repeat 1 g if bleeding continues or long case.</p>
+  <p class="sub">Caution: recent VTE, seizure history, severe renal impairment.</p>${src("Common practice.")}</div>`;
+
+/* WAKE & POST-OP */
+gaCards.reversal = () => { const W2 = wts(); const neo = Math.min(0.05*W2.ibw, 5);
+  return `<div class="card"><h2>1. Reversal</h2>${gaDraft()}
+  <h3>Sugammadex (rocuronium / vecuronium) · TBW ${sig(W2.tbw)} kg · 100 mg/mL</h3>
+  <table><tr><td>TOF ≥ 2 twitches</td><td>2 mg/kg</td><td class="hl">${sig(2*W2.tbw)} mg (${sig(2*W2.tbw/100)} mL)</td></tr>
+  <tr><td>1–2 post-tetanic counts</td><td>4 mg/kg</td><td class="hl">${sig(4*W2.tbw)} mg (${sig(4*W2.tbw/100)} mL)</td></tr>
+  <tr><td>Immediate (after RSI dose)</td><td>16 mg/kg</td><td class="hl">${sig(16*W2.tbw)} mg (${sig(16*W2.tbw/100)} mL)</td></tr></table>
+  <h3>Neostigmine + glycopyrrolate · IBW ${sig(W2.ibw)} kg</h3>
+  <p>Neostigmine 0.05 mg/kg = <b>${sig(neo)} mg</b> (${sig(neo/2.5)} mL of 2.5 mg/mL, max 5 mg) + glycopyrrolate <b>${sig(neo*0.2)} mg</b> (200 mcg per 1 mg neostigmine).</p>
+  <p class="sub">Only when TOF ≥ 2–4 twitches. Confirm TOF ratio ≥ 0.9 before extubation.</p>${src(GSRC)}</div>`; };
+gaCards.ponv = () => { const f = S.apfel || 0, n = [0,1,2,3].filter(i => f & (1<<i)).length;
+  const risk = [10,21,39,61,79][n], plan = n<=0 ? "None, or 1 agent" : n<=2 ? "2 agents" : "3–4 agents (consider TIVA)";
+  const labels = ["Female","Non-smoker","History of PONV / motion sickness","Post-op opioids"];
+  return `<div class="card"><h2>2. PONV: Apfel score</h2>${gaDraft()}
+  <div class="seg">${labels.map((l,i)=>`<button aria-pressed="${!!(f&(1<<i))}" data-apf="${i}">${l}</button>`).join("")}</div>
+  <div class="result"><div class="sub">${n} risk factor${n===1?"":"s"}</div><div class="big">${risk}%</div><div class="sub">Prophylaxis: <b>${plan}</b></div></div>
+  <table><tr><td>Dexamethasone</td><td class="hl">4–8 mg</td><td class="sub">at induction</td></tr>
+  <tr><td>Ondansetron</td><td class="hl">4 mg</td><td class="sub">end of surgery</td></tr>
+  <tr><td>Granisetron</td><td class="hl">1 mg</td><td class="sub">end of surgery</td></tr>
+  <tr><td>Droperidol</td><td class="hl">0.625–1.25 mg</td><td class="sub">end; QT caution</td></tr>
+  <tr><td>Propofol TIVA</td><td class="hl">—</td><td class="sub">avoid volatile / N₂O</td></tr></table>
+  ${src("Apfel 1999; 4th consensus PONV guidelines 2020.")}</div>`; };
+gaCards.extub = () => `<div class="card"><h2>3. Extubation criteria</h2>${gaDraft()}
+  <ul><li>Awake, obeys commands (or deep extubation planned)</li><li>TOF ratio ≥ 0.9</li><li>Regular breathing, RR &gt; 10, Vt &gt; 5 mL/kg</li><li>SpO₂ adequate on FiO₂ ≤ 0.4, normal EtCO₂</li><li>Haemodynamically stable, temperature &gt; 36 °C</li><li>Airway clear, suctioned; bite block</li></ul>
+  <p class="sub">At-risk airway: DAS extubation plan (exchange catheter, awake, ICU).</p>${src("DAS extubation guideline 2012.")}</div>`;
+gaCards.analgesia = () => { const W2 = wts(), w = S.aw;
+  return `<div class="card"><h2>4. Analgesia ladder &amp; PCA</h2>${gaDraft()}
+  <table><tr><th>Paracetamol</th><td>${w<50?`15 mg/kg = <b>${sig(15*w)} mg</b>`:"<b>1 g</b>"} IV/PO 6-hourly, max ${w<50?"60 mg/kg/day":"4 g/day"}</td></tr>
+  <tr><th>NSAID</th><td>Parecoxib 40 mg IV, or diclofenac 50 mg 8-hourly (max 150 mg/day)</td></tr>
+  <tr><th>Weak opioid</th><td>Tramadol 50–100 mg 6-hourly (max 400 mg/day)</td></tr>
+  <tr><th>PACU morphine</th><td>1–2 mg IV every 5 min, titrate; usual max 0.1–0.15 mg/kg IBW = <b>${sig(0.1*W2.ibw)}–${sig(0.15*W2.ibw)} mg</b></td></tr></table>
+  <h3>Adult PCA</h3>
+  <table><tr><th>Morphine 1 mg/mL</th><td>Bolus 1 mg, lockout 5 min, no background</td></tr>
+  <tr><th>Fentanyl 10 mcg/mL</th><td>Bolus 10–20 mcg, lockout 5 min, no background</td></tr></table>
+  <p class="sub">Monitor sedation score and RR. Naloxone 100–200 mcg IV for respiratory depression.</p>${src("Common acute pain service protocols.")}</div>`; };
+
+/* REGIONAL: anticoagulant timing */
+gaCards.anticoag = () => `<div class="card"><h2>Neuraxial &amp; deep blocks: anticoagulant timing</h2>${gaDraft()}
+  <div style="overflow-x:auto"><table><tr><th>Drug</th><th>Last dose before block</th><th>Restart after block / catheter removal</th></tr>
+  <tr><td>Aspirin, NSAIDs</td><td class="hl">No need to stop</td><td>—</td></tr>
+  <tr><td>Clopidogrel</td><td class="hl">5–7 days</td><td>6 h (no loading dose)</td></tr>
+  <tr><td>Ticagrelor</td><td class="hl">5–7 days</td><td>6 h</td></tr>
+  <tr><td>Prasugrel</td><td class="hl">7–10 days</td><td>6 h</td></tr>
+  <tr><td>Warfarin</td><td class="hl">5 days, INR normal (≤ 1.4)</td><td>After catheter removal</td></tr>
+  <tr><td>UFH SC prophylaxis (5000 IU)</td><td class="hl">4–6 h</td><td>1 h</td></tr>
+  <tr><td>UFH IV</td><td class="hl">4–6 h, normal aPTT</td><td>1 h</td></tr>
+  <tr><td>Enoxaparin prophylactic (40 mg OD)</td><td class="hl">12 h</td><td>12 h after puncture; 4 h after catheter removal</td></tr>
+  <tr><td>Enoxaparin therapeutic</td><td class="hl">24 h</td><td>24 h; 4 h after catheter removal</td></tr>
+  <tr><td>Fondaparinux</td><td class="hl">36–42 h; avoid catheters</td><td>6 h after removal</td></tr>
+  <tr><td>Rivaroxaban, apixaban, edoxaban</td><td class="hl">72 h</td><td>6 h after catheter removal</td></tr>
+  <tr><td>Dabigatran</td><td class="hl">72–120 h by CrCl (≥ 80: 72 h; 50–79: 96 h; 30–49: 120 h)</td><td>6 h after catheter removal</td></tr>
+  <tr><td>Thrombolytics</td><td class="hl">48 h; avoid</td><td>—</td></tr></table></div>
+  <p><b>Platelets:</b> ≥ 80 × 10⁹/L for neuraxial (obstetric ≥ 70 if stable).</p>
+  ${src("ASRA 2018 (4th ed.) / ESAIC 2022. Check local policy.")}</div>`;
+
+/* ---------- REGIONAL ANAESTHESIA (adult) + LA dose calculator — DRAFT from standard sources ---------- */
+const RA_CHECKED = true;
+const raDraft = () => RA_CHECKED ? "" : `<div class="warn" style="margin-top:0">DRAFT — from standard sources (NYSORA, ASRA, RA-UK), not yet ticked by you.</div>`;
+const RSRC = "NYSORA / RA-UK Plan A blocks / ASRA.";
+const LAD = {
+  bupi:{n:"Bupi / levobupi", max:2, pmax:2.5, cap:150, concs:["0.25","0.5"]},
+  ropi:{n:"Ropivacaine", max:3, pmax:3, cap:225, concs:["0.2","0.375","0.5","0.75"]},
+  lido:{n:"Lignocaine plain", max:3, pmax:3, cap:200, concs:["1","2"]},
+  lidoA:{n:"Lignocaine + adrenaline", max:7, pmax:7, cap:500, concs:["1","2"]}};
+function laWeight(lt){
+  if (lt==="p") return {w:W(), why:`paeds weight ${sig(W())} kg`};
+  const x = wts(); return x.bmi >= 30 ? {w:x.lbw, why:`LBW ${sig(x.lbw)} kg (BMI ${sig(x.bmi)} ≥ 30)`} : {w:x.tbw, why:`actual weight ${sig(x.tbw)} kg`};
+}
+function laMaxMg(d, lt){ const {w} = laWeight(lt), D = LAD[d]; return Math.min((lt==="p"?D.pmax:D.max)*w, D.cap); }
+const laKey = lt => lt==="p" ? "laP" : "laA";
+function laAddBtn(lt, d, conc, ml, sides, label){
+  const spec = esc(JSON.stringify({d, c:String(conc), ml:+sig(ml), bi:sides, l:label}));
+  return `<button class="addla" data-addla="${spec}" data-lt="${lt}">+ Add ${sig(ml)} mL ${conc}%${sides===2?" × 2 sides":""} to LA calculator</button>`;
+}
+function laCalc(lt){
+  const list = S[laKey(lt)] || [], D = LAD[S.laD] || LAD.bupi;
+  if (!D.concs.includes(S.laC)) S.laC = D.concs[D.concs.length > 2 ? 1 : 0];
+  const {why} = laWeight(lt);
+  let total = 0;
+  const rows = list.map((it,i) => { const mg = it.ml * it.bi * (+it.c) * 10, pct = mg / laMaxMg(it.d, lt) * 100; total += pct;
+    return `<tr><td>${esc(it.l||LAD[it.d].n)}<div class="sub">${LAD[it.d].n} ${it.c}% · ${sig(it.ml)} mL${it.bi===2?" × 2":""}</div></td><td class="hl">${sig(mg)} mg</td><td class="hl">${Math.round(pct)}%</td><td><button class="rmla" data-rmla="${lt}:${i}" aria-label="Remove">×</button></td></tr>`; }).join("");
+  const state = total > 100 ? "over" : total > 80 ? "near" : "ok";
+  const maxLine = Object.entries(LAD).map(([k,v]) => `${v.n} ${sig(laMaxMg(k,lt))} mg`).join(" · ");
+  return `<p class="sub">Max for this patient (${why}): ${maxLine}</p>
+    <div class="sub">Add a block</div>${seg("laD",Object.entries(LAD).map(([k,v])=>[k,v.n]))}${seg("laC",D.concs.map(c=>[c,c+"%"]))}
+    ${step("laMl","Volume","mL",1,60,1)}${seg("laBi",[["1","One side"],["2","Both sides"]])}
+    <button class="homebtn" data-addla="form" data-lt="${lt}">+ Add ${S.laMl} mL ${D.n} ${S.laC}%${S.laBi==="2"?" × 2":""}</button>
+    ${list.length ? `<div style="overflow-x:auto"><table><tr><th>Block</th><th>Dose</th><th>% max</th><th></th></tr>${rows}</table></div>` : `<p class="sub">No blocks added yet. Use the form above or the "+ Add" button on any block card.</p>`}
+    <div class="meter ${state}"><span style="width:${Math.min(total,100)}%"></span></div>
+    <div class="${state==="over"?"danger":state==="near"?"warn":"result"}" style="margin-top:var(--s2)"><b>Total: ${Math.round(total)}% of maximum</b>${state==="over"?" — ABOVE MAXIMUM. Reduce volume or concentration.":state==="near"?" — close to maximum.":""}</div>
+    ${list.length?`<button class="linkbtn" data-clrla="${lt}">Clear list</button>`:""}
+    <p class="sub">Different drugs combine as % of each one's own maximum. Doses apply to one sitting.</p>`;
+}
+
+/* block card builder */
+function blk(o){
+  const x = wts(), conc = o.anal ? 0.25 : 0.5, bi = o.bilat ? 2 : 1;
+  const mgLo = o.vol[0]*conc*10*bi, mgHi = o.vol[1]*conc*10*bi, pct = mgHi / laMaxMg("bupi","a") * 100;
+  return `<div class="card"><h2>${o.t}</h2>${raDraft()}
+  <table class="blk"><tr><th>Indication</th><td>${o.ind}</td></tr>
+  <tr><th>Position &amp; probe</th><td>${o.pos}</td></tr>
+  <tr><th>Sonoanatomy</th><td>${o.sono}</td></tr>
+  <tr><th>Needle</th><td>${o.needle}</td></tr>
+  <tr><th>Drug &amp; volume</th><td><b>${o.vol[0]}–${o.vol[1]} mL${o.bilat?" per side":""}</b> bupi/levobupi <b>${conc}%</b> (${o.anal?"analgesia":"surgical"})<br>= ${sig(mgLo)}–${sig(mgHi)} mg${o.bilat?" both sides":""} · <span class="${pct>100?"bad":""}">${Math.round(pct)}% of max</span></td></tr>
+  <tr><th>Cautions</th><td>${o.caut}</td></tr></table>
+  ${laAddBtn("a","bupi",conc,o.vol[1],bi,o.t)}${src(RSRC)}</div>`;
+}
+const raCards = {};
+raCards.calc = () => `<div class="card"><h2>LA dose calculator</h2>${raDraft()}${laCalc("a")}</div>`;
+raCards.sbyb = () => `<div class="card"><h2>Stop Before You Block &amp; safe injection</h2>${raDraft()}
+  <ol><li>Consent, site and side marked</li><li><b>Stop Before You Block</b>: anaesthetist + assistant re-check the mark immediately before needle insertion</li>
+  <li>Monitoring (SpO₂, ECG, NIBP), IV access, resuscitation drugs and <b>Intralipid</b> available</li><li>Aseptic technique; ultrasound ± nerve stimulator</li>
+  <li>Inject slowly, aspirate every 5 mL, keep injection pressure low</li><li>Stop if pain, paraesthesia, high pressure or no spread seen</li></ol>
+  <button class="emlink" data-open="LA toxicity (LAST)" data-g="emerg" data-tab="adult">⚠ LA toxicity → Emergencies</button>
+  ${src("RCoA / RA-UK Stop Before You Block; Association of Anaesthetists LAST.")}</div>`;
+
+/* NEURAXIAL */
+raCards.epidural = () => `<div class="card"><h2>Epidural (adult)</h2>${raDraft()}
+  <table class="blk"><tr><th>Level</th><td>Thoracotomy / upper abdo: T4–T10 · lower abdo: T10–L1 · lower limb: L2–L4</td></tr>
+  <tr><th>Catheter</th><td>4–5 cm in the space</td></tr>
+  <tr><th>Test dose</th><td><b>3 mL lignocaine 2% + adrenaline 1:200 000</b>. Intravascular: HR ↑ &gt; 20 within 30 s. Intrathecal: dense block within 3–5 min</td></tr>
+  <tr><th>Loading</th><td>Levobupi 0.25%, 3–5 mL increments: ~1–1.5 mL per segment thoracic, 1.5–2 mL lumbar</td></tr>
+  <tr><th>Surgical top-up</th><td>Levobupi 0.5% or lignocaine 2% + adrenaline, 5 mL increments</td></tr>
+  <tr><th>Infusion</th><td><b>Bupi/levobupi 0.1% + fentanyl 2 mcg/mL</b>: thoracic <b>4–10 mL/h</b> · lumbar <b>6–14 mL/h</b></td></tr>
+  <tr><th>Breakthrough</th><td>3–5 mL bolus, check block and BP</td></tr>
+  <tr><th>Removal</th><td>Check anticoagulant timing (Safety tab)</td></tr></table>${src("Common acute pain service practice.")}</div>`;
+raCards.cse = () => `<div class="card"><h2>CSE (combined spinal–epidural)</h2>${raDraft()}
+  <ul><li>When: long or uncertain duration, high-risk patient needing slow titration, post-op epidural analgesia</li>
+  <li>Needle-through-needle at L3–4 or below; spinal first, then thread epidural catheter</li>
+  <li>Spinal dose can be reduced (e.g. heavy bupi 1.5–2.5 mL) and extended via the epidural</li>
+  <li>Catheter can pass through the dural hole: test carefully, give top-ups in small increments</li></ul>${src(RSRC)}</div>`;
+raCards.pdph = () => `<div class="card"><h2>Post-dural puncture headache</h2>${raDraft()}
+  <ul><li>Postural headache (worse upright) usually within 5 days of puncture</li>
+  <li><b>Red flags → image:</b> focal neurology, fever, non-postural, seizures (subdural, cerebral venous thrombosis)</li>
+  <li><b>Conservative:</b> hydration, paracetamol, NSAID, caffeine (up to 300 mg/day), ± sphenopalatine ganglion block</li>
+  <li><b>Epidural blood patch</b> if severe or &gt; 24–48 h: <b>15–20 mL</b> autologous blood at the same or lower level, stop if back pain; success ~70%, may repeat</li></ul>
+  ${src("OAA PDPH guideline 2018.")}</div>`;
+raCards.failed = () => `<div class="card"><h2>Failed or patchy block</h2>${raDraft()}
+  <h3>Spinal</h3><ul><li>Wait 10–15 min; check level with cold and touch</li><li>Hyperbaric: tilt to encourage spread</li><li>Options: supplement with local infiltration / analgesia, repeat spinal with reduced dose (count total LA), or convert to GA</li></ul>
+  <h3>Epidural</h3><ul><li>Unilateral: withdraw catheter 1–2 cm, top up with patient lying on the weak side</li><li>Patchy: stronger LA (0.5% levobupi or 2% lignocaine + adrenaline)</li><li>No block after adequate dose: re-site, or GA</li></ul>${src(RSRC)}</div>`;
+raCards.adjuncts = () => { const x = wts();
+  return `<div class="card"><h2>Adjuncts</h2>${raDraft()}
+  <table class="blk"><tr><th>Dexamethasone</th><td>4 mg perineural prolongs block ~6–8 h; <b>IV 0.1–0.15 mg/kg</b> has similar effect — IV preferred (off-label perineural)</td></tr>
+  <tr><th>Dexmedetomidine</th><td>Perineural 0.5–1 mcg/kg = <b>${sig(0.5*x.ibw)}–${sig(x.ibw)} mcg</b> (IBW); sedation, bradycardia</td></tr>
+  <tr><th>Clonidine</th><td>Perineural 0.5–1 mcg/kg = <b>${sig(0.5*x.ibw)}–${sig(x.ibw)} mcg</b>; hypotension, sedation</td></tr>
+  <tr><th>Adrenaline</th><td>1:200 000 (5 mcg/mL): intravascular marker, prolongs lignocaine, raises lignocaine max to 7 mg/kg</td></tr>
+  <tr><th>IT fentanyl</th><td>10–25 mcg</td></tr>
+  <tr><th>IT morphine</th><td>100–150 mcg (e.g. TKR, hip, laparotomy); monitor RR and sedation for 24 h</td></tr></table>${src("ASRA / NYSORA adjunct reviews.")}</div>`; };
+
+/* UPPER LIMB */
+raCards.isb = () => blk({t:"Interscalene", ind:"Shoulder, proximal humerus, lateral clavicle", pos:"Semi-sitting, head turned away · linear probe transverse at C6 (cricoid)", sono:"C5–C6 roots (\"traffic lights\") between anterior and middle scalene", needle:"22G 50 mm, in-plane lateral → medial", vol:[10,15], caut:"Phrenic palsy ~100% — avoid in severe respiratory disease or contralateral palsy · Horner's, hoarseness · vertebral artery / intrathecal injection"});
+raCards.scb = () => blk({t:"Supraclavicular", ind:"Elbow, forearm, hand (and humerus)", pos:"Supine, head turned away · linear probe coronal-oblique in supraclavicular fossa", sono:"\"Bunch of grapes\" lateral to subclavian artery, above first rib and pleura", needle:"22G 50 mm, in-plane lateral → medial", vol:[20,25], caut:"Pneumothorax · phrenic palsy ~50% · vascular puncture"});
+raCards.axb = () => blk({t:"Axillary", ind:"Elbow, forearm, hand", pos:"Supine, arm abducted 90° · linear probe in axilla across the humerus", sono:"Axillary artery: median superolateral, ulnar medial, radial posterior; musculocutaneous in coracobrachialis", needle:"22G 50 mm, in-plane", vol:[20,25], caut:"Veins compress — intravascular risk; ~5 mL around each nerve + 5 mL musculocutaneous · no phrenic palsy"});
+/* LOWER LIMB */
+raCards.fem = () => blk({t:"Femoral", ind:"Anterior thigh, femur, knee surgery; hip analgesia", pos:"Supine · linear probe at inguinal crease", sono:"Femoral nerve lateral to artery, deep to fascia iliaca (hyperechoic triangle)", needle:"22G 50–80 mm, in-plane lateral → medial", vol:[15,20], caut:"Quadriceps weakness → fall risk", anal:false});
+raCards.fic = () => blk({t:"Fascia iliaca (suprainguinal)", ind:"Hip fracture, hip surgery", pos:"Supine · linear probe sagittal, medial to ASIS (\"bow-tie\": sartorius + internal oblique)", sono:"Inject deep to fascia iliaca, superficial to iliacus; deep circumflex iliac artery as landmark", needle:"22G 80–100 mm, in-plane caudal → cranial", vol:[30,40], anal:true, caut:"Large volume — check LA max in frail elderly · quadriceps weakness"});
+raCards.peng = () => blk({t:"PENG", ind:"Hip fracture / hip surgery analgesia, motor-sparing", pos:"Supine · curvilinear probe transverse-oblique over AIIS – iliopubic eminence", sono:"Psoas tendon on the pubic ramus; femoral artery medial", needle:"22G 80–100 mm, in-plane lateral → medial, deep to psoas tendon", vol:[20,20], anal:true, caut:"Femoral vessels nearby · large volumes may weaken quadriceps"});
+raCards.acb = () => blk({t:"Adductor canal", ind:"Knee surgery (TKR) analgesia; saphenous territory", pos:"Supine, leg externally rotated · linear probe mid-thigh", sono:"Saphenous nerve lateral to femoral artery, deep to sartorius", needle:"22G 80 mm, in-plane", vol:[10,20], anal:true, caut:"Mostly motor-sparing · vascular puncture"});
+raCards.pop = () => blk({t:"Popliteal sciatic", ind:"Foot and ankle surgery, below knee", pos:"Prone, lateral, or supine with leg raised · linear probe at popliteal crease, scan up to bifurcation", sono:"Tibial and common peroneal nerves posterolateral to popliteal artery; inject at the bifurcation inside the paraneural sheath", needle:"22G 80–100 mm, in-plane lateral", vol:[20,30], caut:"Add saphenous block for medial leg · foot drop — fall precautions"});
+/* TRUNK */
+raCards.esp = () => blk({t:"Erector spinae (ESP)", ind:"Thoracic: rib fractures, thoracotomy, breast · lumbar: spine, hip", pos:"Sitting, lateral or prone · linear probe parasagittal ~3 cm from midline at target level (T5 thoracic)", sono:"Transverse process with erector spinae muscle above", needle:"22G 50–80 mm, in-plane cranial → caudal onto the transverse process", vol:[20,30], bilat:true, anal:true, caut:"Bilateral = large total dose — use the calculator · pneumothorax rare"});
+raCards.rsb = () => blk({t:"Rectus sheath", ind:"Midline laparotomy, umbilical / incisional hernia", pos:"Supine · linear probe transverse, lateral to the umbilicus", sono:"Inject between rectus abdominis and posterior rectus sheath", needle:"22G 50–80 mm, in-plane medial → lateral", vol:[10,15], bilat:true, anal:true, caut:"Inferior epigastric vessels · peritoneal puncture"});
+raCards.tap = () => blk({t:"TAP", ind:"Lower abdominal incisions (Pfannenstiel, LSCS, appendix, hernia) — somatic only", pos:"Supine · linear probe mid-axillary line between costal margin and iliac crest", sono:"External oblique, internal oblique, transversus abdominis — inject between IO and TA", needle:"22G 80–100 mm, in-plane anterior → posterior", vol:[15,20], bilat:true, anal:true, caut:"No visceral analgesia · liver / bowel puncture · bilateral total dose"});
+raCards.sap = () => blk({t:"Serratus anterior", ind:"Breast surgery, rib fractures, thoracotomy, chest drain", pos:"Supine or lateral, arm abducted · linear probe at 4th–5th rib, mid-axillary line", sono:"Latissimus dorsi and serratus anterior over the ribs — inject superficial or deep to serratus", needle:"22G 50–80 mm, in-plane", vol:[20,30], anal:true, caut:"Pneumothorax · thoracodorsal artery, long thoracic nerve"});
+
+/* PAEDS calculator card */
+pCards.lacalc = () => `<div class="card"><h2>Paeds LA dose calculator</h2>${laCalc("p")}${psrc()}</div>`;
+
+/* ---------- VALUES SHEET ---------- */
+const VALUES = [
+ ["ETT – adult", [
+  "Depth (oral, at mouth corner ≈ upper canine) = 4 + height(cm)/10, rounded to 0.5 cm — Chula formula",
+  "Female size 6.5–7.0 mm (shown with 6.0 / 7.5)",
+  "Male size 7.0–7.5 mm (shown with 6.5 / 8.0)",
+  "21/23 cm shown for comparison only"]],
+ ["ETT – paeds (my paeds notes)", [
+  "<1 kg 2.5; 1–2 kg 2.5–3.0 (gap in notes); >2 kg 3.0; >3.5 kg 3.5 (neonate 3–3.5) — all plain",
+  "4 months 4.0; 8 months 4.0–4.5; 1 y 4.5 plain",
+  ">1 y: plain age/4 + 4, cuffed age/4 + 3.5 (rounded down to 0.5); cuffed if > 5 kg",
+  "Infant > 5 kg cuffed size = plain − 0.5 (convention, NOT in your notes)",
+  "Depth: premature ~1 kg 7 cm, ~2 kg 8 cm; term 9 cm; 1–11 months 3 × ETT; 1 y 12 cm; then age/2 + 12",
+  "Nasal = oral + 2–3 cm; suction catheter 2 × ETT (Fr)",
+  "Laryngoscope: <5 kg Miller 0 / MAC 1; >5 kg curved; Glidescope 2/2.5 (8–9 y)"]],
+ ["Paeds – general (my paeds notes)", [
+  "Estimated weight (age + 4) × 2 for 1–10 y; estimated SBP 1/2/3 kg = 40/50/60, else 90 + 2 × age",
+  "TV 4–7 mL/kg, PIP <20, PEEP 4–6, RR 30–35, I:E as notes",
+  "TCI propofol (Paedfusor): GA induction ≥5 mcg/mL, maintenance >3.5 mcg/mL; spontaneous 2.5–4 mcg/mL",
+  "Remi 10 mcg/mL: mL/h = rate × weight × 60 / 10",
+  "All mg/kg drug doses, infusions and inotrope dilutions transcribed as in your notes",
+  "Fluids 4/2/1; insensible 2/4/>10 mL/kg/h; D10 2 mL/kg; blood products as notes; max rate 0.5–1 mL/kg/min (= 30–60 mL/kg/h)",
+  "Blocks: caudal 0.5/1/1.2 mL/kg; hypospadias max 20 mL; epidural bolus 0.5 mL/kg; intrapleural lignocaine 2 / ropi 3 mg/kg",
+  "Caudal needle colour: 10–15 kg not stated in your notes (shown as gap)",
+  "Parecoxib mg/kg chosen by age: <5 y 0.9, 5–9 y 0.75, ≥10 y 0.65 (my banding of your 2/7/12 y values)"]],
+ ["Spinal – LSCS (departmental chart)", [
+  "≤150 cm: 1.8 mL (9 mg); total 2.1 mL",
+  "151–155 cm: 1.9–2.0 mL (9.5–10 mg); total 2.2–2.3 mL",
+  "156–160 cm: 2.1–2.2 mL (10.5–11 mg); total 2.4–2.5 mL",
+  ">160 cm: 2.3 mL (11.5 mg); total 2.6 mL",
+  "Height rounded to nearest cm; exactly 150 → 1.8 mL row",
+  "Morphine 0.1 mg (0.1 mL of 1 mg/mL diluted); fentanyl 10 mcg (0.2 mL of 50 mcg/mL)"]],
+ ["Spinal – other ops (DRAFT textbook, 0.5% heavy)", [
+  "Perineal/saddle S1–S5: 1.0–1.5 mL",
+  "TURP/urology T10: 2.0–2.5 mL",
+  "Inguinal hernia/lower abdo T10: 2.5–3.0 mL",
+  "Lower limb/hip/knee T10–T12: 2.5–3.0 mL",
+  "Height ≤150 → lower end; 151–165 → middle; >165 → upper end",
+  "Optional: fentanyl 10–25 mcg; morphine 0.1 mg (1 mg/mL) for hip/knee"]],
+ ["Labour epidural (my practice)", [
+  "Bolus 0.25% 3 mL (1 mL 0.75% → 3 mL)",
+  "Loading 40 mL/hr: 0.15% + fentanyl 100 mcg (2 mL 0.75% + 2 mL fentanyl → 10 mL)",
+  "Infusion 8–15 mL/hr: 50 mL syringe 7 mL (0.1%) or 10 mL (0.15%) 0.75% + fentanyl 2 mL",
+  "60 mL syringe: 8 mL (0.1%) or 12 mL (0.15%) 0.75% + fentanyl 2.4 mL (120 mcg)",
+  "0.15% from 0.2% stock: 38 mL → 50 mL; 45 mL → 60 mL",
+  "Top-up 1.5 mL 0.75% → 5 mL (≈0.23%) ± fentanyl 50–100 mcg"]],
+ ["Accidental dural puncture (my practice)", [
+  "IT fentanyl 10–25 mcg + NS to 1 mL",
+  "Cocktail 3 mL every 1–2 h, assess first",
+  "LSCS: intended spinal dose by height, small increments",
+  "Do not flush catheter before removal"]],
+ ["Departmental protocol cards", [
+  "Emergency top-up A: 0.1 mL adrenaline 1:1000 + 20 mL lignocaine 2%; test 3 mL; top-up 17 mL + fentanyl 100 mcg; +3 mL every 2–3 min",
+  "Emergency top-up B: 20 mL ropi 0.75%; test 3 mL; top-up 10 mL + fentanyl 100 mcg (12 mL); +3 mL every 3–5 min",
+  "Cocktail A: 3.4 mL ropi 0.75% + fentanyl 100 mcg → 50 mL; B: 5 mL levobupi 0.5% + fentanyl 100 mcg → 50 mL",
+  "Pump settings 1–4 and labour spinal single shot as transcribed",
+  "PCA morphine 1 mg/mL; fentanyl 10 mcg/mL (25 mcg bolus IV, basal 10 mcg/h, PCA 10 mcg, LO 12 min)",
+  "PCA remi 20 mcg/mL; bolus 20 mcg over ≥30 s; LO 2 min; background 4 mL/h (80 mcg/h), max 120 mcg/h",
+  "Complications, post-op flowchart; IV morphine 0.05–0.1 mg/kg"]],
+ ["Previously UNVERIFIED — corrected 14 Nov 2026", [
+  "Paeds a: caudal morphine 30–50 mcg/kg (corrected)",
+  "Paeds c: esmolol 500 mcg/kg then 50–300 mcg/kg/min; phenylephrine 1–5 mcg/kg (corrected)",
+  "Paeds d: blood max 0.5–1 mL/kg/min (corrected)",
+  "Paeds e: frusemide 0.5–1 mg/kg (corrected)",
+  "Paeds f: epidural bands <5 kg 0.1% 0.1–0.2 mL/kg/h (max 0.2 mg/kg/h); 5–10 / >10 kg 0.2–0.3 / 0.2–0.4 (max 0.4) (corrected)",
+  "Paeds g: ilioinguinal 0.3 mL/kg per side (corrected)",
+  "Paeds h: bicarbonate 2 mL/kg of 4.2% (corrected)",
+  "Paeds i: RESOLVED — anaphylaxis doses now on Emergencies › Paeds card",
+  "Paeds j: atropine 1 mg in 10 mL, 0.2 mL/kg (corrected)",
+  "Paeds k: ketofol 3:1, 1–1.5 mL/kg/h (corrected)",
+  "Paeds l: SD5 = 5 mL D50 + 45 mL (corrected)",
+  "Paeds m: albumin 25 mL 20% + 75 mL NS (corrected)",
+  "Paeds n: exposed bowel 10–20 (up to 30) mL/kg/h (corrected)",
+  "Paeds o: propofol by age 1–2 / 3–5 / 2.5–3.5 mg/kg (corrected)",
+  "IT morphine: 10 mg/mL, 0.1 mL to 1 mL NS, give 0.1 mL (corrected)",
+  "Phenylephrine: 0.1 mL of 10 mg/mL to 20 mL = 50 mcg/mL (corrected)",
+  "Cocktail A 0.2% alternative removed",
+  "Diclofenac 50 mg TDS × 3 days, max 150 mg/day (corrected)"]],
+ ["Emergency crisis cards (from guidelines)", [
+  "High spinal: phenylephrine 50–100 mcg, ephedrine 6–9 mg, adrenaline 10–100 mcg, atropine 0.5 mg (max 3), glyco 200–400 mcg; RSI if failing",
+  "LAST (adult + paeds): intralipid 20% 1.5 mL/kg bolus, 15 mL/kg/h, repeat ×2 + 30 mL/kg/h, max 12 mL/kg; midazolam 1–2 mg adult / 0.05–0.1 mg/kg paeds",
+  "Anaphylaxis adult: IV adrenaline 50 mcg, IM 0.5 mg; fluid 20 mL/kg; infusion 0.05–0.1 mcg/kg/min; chlorphenamine 10 mg, hydrocortisone 200 mg",
+  "Anaphylaxis paeds: IV adrenaline 1 mcg/kg (0.01 mL/kg 1:10 000); IM 10 mcg/kg (0.01 mL/kg 1:1000, max 0.5 mL); fluid 10 mL/kg; hydrocortisone 4 mg/kg",
+  "Spinal hypotension: phenylephrine 50–100 mcg bolus or 25–50 mcg/min (30–60 mL/h of 50 mcg/mL); ephedrine 6–9 mg / glyco 200 mcg if HR <60",
+  "Adult ALS: atropine 500 mcg to 3 mg; adrenaline 1 mg q3–5 min; amiodarone 300 then 150 mg; 150–200 J",
+  "Bronchospasm adult: salbutamol 6–10 puffs / neb 5 mg / IV 250 mcg; Mg 2 g; ketamine 0.5–1 mg/kg; hydrocortisone 200 mg",
+  "Bronchospasm paeds: IV salbutamol 15 mcg/kg (max 250); Mg 40 mg/kg (max 2 g); ketamine 1–2 mg/kg; adrenaline 1 mcg/kg",
+  "MH (adult + paeds): dantrolene 2.5 mg/kg, repeat 1 mg/kg to max 10 mg/kg; 20 mg vials in 60 mL; stop cooling 38.5 °C; paeds CaCl 0.2 mL/kg, insulin 0.1 U/kg + D10 5 mL/kg",
+  "CICO: DAS plans A–D; sugammadex 16 mg/kg; scalpel–bougie–6.0 tube",
+  "PPH: oxytocin 5 IU then 40 IU/500 mL at 125 mL/h; ergometrine 500 mcg IM; carboprost 250 mcg IM q15 min max 8; misoprostol 800 mcg; TXA 1 g, repeat once",
+  "Eclampsia: MgSO4 4 g over 10–15 min then 1 g/h × 24 h; recurrent 2 g; toxicity Ca gluconate 10% 10 mL; labetalol 20/40/80 mg, hydralazine 5 mg",
+  "Paeds arrest: adrenaline 0.1 mL/kg 1:10 000; 4 J/kg; amiodarone 5 mg/kg (max 300); fluid 10 mL/kg; D10 2 mL/kg; CaCl 0.2 mL/kg"]],
+ ["General anaesthesia (standard references)", [
+  "Weights: IBW Devine; LBW Janmahasatian; AdjBW = IBW + 0.4 × (TBW − IBW); actual used if below ideal",
+  "Fasting 2 h clear / 6 h light / 8 h fatty; GLP-1 weekly hold 1 week, daily hold on day",
+  "Drugs: continue β-blocker/statin etc; omit ACEi/ARB, diuretics, SU on morning; SGLT2i stop 3 days (ertugliflozin 4); basal insulin 80%",
+  "Steroid cover: hydrocortisone 100 mg at induction then 200 mg/24 h (major)",
+  "Induction (LBW): propofol 1.5–2.5, thiopentone 3–5, ketamine 1–2, etomidate 0.2–0.3 mg/kg; fentanyl 1–3 mcg/kg",
+  "Relaxants: sux 1–1.5 mg/kg TBW (RSI 1.5); roc 0.6 / RSI 1.2 mg/kg IBW; atracurium 0.5, cis 0.15, vec 0.1 mg/kg IBW",
+  "Sugammadex TBW 2 / 4 / 16 mg/kg; neostigmine 0.05 mg/kg IBW max 5 mg + glyco 0.2 mg per mg",
+  "SAD: LMA 3 = 30–50, 4 = 50–70, 5 = 70–100 kg; i-gel 3 = 30–60, 4 = 50–90, 5 = >90 kg",
+  "TIVA: Marsh Cp 4–6 / 3–6 (AdjBW if obese); Schnider Ce 3–5 / 2.5–5; Minto 4–6 / 2–8 ng/mL; remi 0.05–0.25 mcg/kg/min LBW at 50 mcg/mL",
+  "MAC 40 y: sevo 2.1, iso 1.17, des 6.6% with Mapleson age correction",
+  "Pressors: ephedrine 6 mg/mL; phenylephrine 100 mcg/mL; NA/adrenaline 4 mg/50 mL; dobutamine 250 mg/50 mL",
+  "Antibiotics: cefazolin 2 g (3 g ≥120 kg), redose 4 h; vancomycin 15 mg/kg (max 2 g); TXA 1 g",
+  "PONV: Apfel 10/21/39/61/79%; dex 4–8 mg, ondansetron 4 mg, granisetron 1 mg, droperidol 0.625–1.25 mg",
+  "Analgesia: paracetamol 1 g (15 mg/kg <50 kg); parecoxib 40 mg; tramadol 50–100 mg; PCA morphine 1 mg/5 min; fentanyl 10–20 mcg/5 min",
+  "Anticoagulant timing (ASRA 2018) table as shown in Regional › Anticoagulants; platelets ≥80 (obstetric ≥70)"]],
+ ["Regional anaesthesia (standard sources)", [
+  "LA max adult: lignocaine 3 mg/kg (200 mg), + adrenaline 7 mg/kg (500 mg), bupi/levobupi 2 mg/kg (150 mg), ropi 3 mg/kg (225 mg); LBW if BMI ≥ 30; paeds bupi 2.5 mg/kg",
+  "Calculator combines drugs as % of each maximum; amber > 80%, red > 100%",
+  "Block solution: bupi/levobupi 0.5% surgical, 0.25% analgesia",
+  "Volumes: ISB 10–15, SCB 20–25, axillary 20–25, femoral 15–20, fascia iliaca 30–40, PENG 20, adductor 10–20, popliteal 20–30, ESP 20–30/side, rectus sheath 10–15/side, TAP 15–20/side, serratus 20–30 mL",
+  "Epidural: test 3 mL lignocaine 2% + adrenaline; 0.1% + fentanyl 2 mcg/mL thoracic 4–10, lumbar 6–14 mL/h; bolus 3–5 mL",
+  "PDPH: caffeine ≤300 mg/day; blood patch 15–20 mL",
+  "Adjuncts: dexamethasone IV 0.1–0.15 mg/kg (4 mg perineural); dexmedetomidine / clonidine 0.5–1 mcg/kg; IT fentanyl 10–25 mcg; IT morphine 100–150 mcg"]]];
+
+/* ---------- ANONYMOUS CASES (phone only, 36 h) ---------- */
+const CASE_TTL = 36*3600*1000, CASE_MAX = 6;
+function getCases(){ const now = Date.now(); const all = store.get("cases",[]); const live = all.filter(c => now - c.created < CASE_TTL); if (live.length !== all.length) store.set("cases", live); return live; }
+const caseName = c => c.nick ? `${c.label} · ${esc(c.nick)}` : c.label;
+const caseAge = c => c.y < 1 ? `${c.m} m` : c.y < 16 && c.m ? `${c.y} y ${c.m} m` : `${c.y} y`;
+const caseLine = c => `${c.sex==="F"?"♀":"♂"} ${sig(c.w)} kg · ${c.h} cm · ${caseAge(c)}`;
+function activeCase(){ const id = store.get("active", null); return getCases().find(c => c.id === id) || null; }
+function applyCase(c){
+  S.sex = c.sex; S.height = c.h; S.aw = c.w; S.age = Math.max(16, c.y); S.morWt = c.w;
+  if (c.y < 16){ S.pw = c.w; S.pY = c.y; S.pM = c.m; S.pHt = c.h; }
+  if (c.sex === "F") S.spHt = Math.min(200, Math.max(140, c.h));
+}
+function activeBar(){ const c = activeCase(); return c ? `<button class="activebar" data-go="cases"><span>Active: <b>${caseName(c)}</b> · ${caseLine(c)}</span><span class="sub">change ›</span></button>` : ""; }
+function caseStrip(){
+  const cs = getCases(), act = store.get("active", null);
+  return `<div class="label">Today's list</div><div class="chips">${cs.map(c => `<button class="chip ${c.id===act?"on":""}" data-case="${c.id}">${caseName(c)} · ${c.sex==="F"?"♀":"♂"} ${sig(c.w)} kg</button>`).join("")}
+    ${cs.length < CASE_MAX ? `<button class="chip add" data-go="cases">+ Add case</button>` : ""}${cs.length ? `<button class="chip ghost" data-go="cases">Edit</button>` : ""}</div>`;
+}
+screens.cases = () => {
+  const cs = getCases(), act = store.get("active", null), now = Date.now();
+  const list = cs.length ? cs.map(c => { const left = Math.max(0, Math.round((CASE_TTL - (now - c.created))/3600000));
+    return `<div class="card casecard ${c.id===act?"on":""}"><div><b>${caseName(c)}</b>${c.id===act?` <span class="pill">active</span>`:""}<div class="sub">${caseLine(c)} · deletes in ${left} h</div></div>
+      <div class="caseact"><button class="iconbtn" data-case="${c.id}">${c.id===act?"✓ In use":"Use"}</button><button class="iconbtn" data-delcase="${c.id}" aria-label="Delete">Delete</button></div></div>`; }).join("")
+    : `<p class="sub">No cases yet.</p>`;
+  const form = cs.length >= CASE_MAX ? `<p class="sub">Maximum ${CASE_MAX} cases. Delete one to add another.</p>` : `<div class="card"><h2>Add case ${cs.length+1}</h2>
+    <label class="sub" for="cNick">Nickname (optional, max 12)</label>
+    <input id="cNick" class="search" style="padding-left:12px" maxlength="12" autocomplete="off" placeholder="e.g. Bed 4, LSCS am" value="${esc(S.cNick||"")}">
+    <div class="warn">No names, IC or MRN — anonymous only.</div>
+    ${seg("cSex",[["F","♀ Female"],["M","♂ Male"]])}${step("cY","Age","y",0,100,1)}${S.cY<16?step("cM","+ months","m",0,11,1):""}${step("cH","Height","cm",30,210,1)}${step("cW","Weight","kg",0.5,250,0.5)}
+    <button class="homebtn primary" data-savecase="1">Save case</button></div>`;
+  return head("Today's list","home") + `<p class="sub">Saved on this phone only. Each case deletes itself 36 h after it is added.</p>` + list + form + disc;
+};
+screens.values = () => {
+  const ticks = store.get("ticks",{});
+  let i=0, total=0, done=0;
+  const body = VALUES.map(([sec,items]) => `<div class="card vs"><h2>${sec}</h2>${items.map(t=>{const id="v"+(i++); total++; if(ticks[id])done++;
+    return `<label><input type="checkbox" data-tick="${id}" ${ticks[id]?"checked":""}><span>${esc(t)}</span></label>`;}).join("")}</div>`).join("");
+  return head("Values sheet","home") + `<div class="card"><p>Tick each line you agree with. Tell Claude about anything that needs changing.
+    When everything is ticked, tell Claude and the DRAFT banner will be replaced by the check date.</p>
+    <p class="sub">Ticked: <b>${done} / ${total}</b> (saved on this phone only)</p></div>` + body + disc;
+};
+
+/* ================= ROUTER & EVENTS ================= */
+/* ================= GROUPS (by situation) ================= */
+const EMERG_ADULT = ["High / total spinal","LA toxicity (LAST)","Anaphylaxis","Hypotension after spinal","Bradycardia & cardiac arrest","Bronchospasm","Malignant hyperthermia","Failed intubation / CICO","Massive obstetric haemorrhage","Eclampsia"];
+const EMERG_PAEDS = ["Laryngospasm","Paeds bronchospasm","Paeds cardiac arrest","Paeds LA toxicity (LAST)","Paeds anaphylaxis","Paeds malignant hyperthermia","Cyanotic heart disease / Fallot spell"];
+const GROUPS = [
+ {id:"emerg", name:"Emergencies", sub:"Adult & obstetric · Paeds — crisis steps with doses", tabKey:"emTab", tabs:[
+   {id:"adult", label:"Adult / Obstetric", input:()=>step("aw","Weight","kg",30,200,1), cards:EMERG_ADULT},
+   {id:"paeds", label:"Paeds", input:()=>pInputs(), cards:EMERG_PAEDS}], cards:[]},
+ {id:"ga", name:"General anaesthesia", sub:"Pre-op · Induction · Intra-op · Post-op", tabKey:"gaTab", tabs:[
+   {id:"pre", label:"Pre-op", input:()=>gaInputs(), hint:"Before the day: fasting, drugs, steroids, airway plan.",
+    cards:["1. Fasting","2. Regular drugs: stop or continue","3. Steroid cover","4. Airway assessment & plan"],
+    links:[["Failed intubation / CICO","adult","Failed intubation / CICO"]]},
+   {id:"ind", label:"Induction", input:()=>gaInputs(), hint:"Drugs → RSI → relaxant → tube & airway kit.",
+    cards:["1. Induction drugs","2. RSI","3. Muscle relaxants","4. Tube & airway kit"],
+    links:[["Failed intubation / CICO","adult","Failed intubation / CICO"],["Anaphylaxis","adult","Anaphylaxis"],["Bronchospasm","adult","Bronchospasm"]]},
+   {id:"maint", label:"Intra-op", input:()=>gaInputs(), hint:"Keep them asleep and stable.",
+    cards:["1. TIVA","2. Volatile: MAC by age","3. Intra-op opioids","4. Vasopressors & inotropes","5. Antibiotic prophylaxis","6. Tranexamic acid"],
+    links:[["Anaphylaxis","adult","Anaphylaxis"],["Malignant hyperthermia","adult","Malignant hyperthermia"],["LA toxicity (LAST)","adult","LA toxicity"],["Bradycardia & cardiac arrest","adult","Bradycardia / arrest"]]},
+   {id:"post", label:"Post-op", input:()=>gaInputs(), hint:"Reverse → prevent PONV → extubate → analgesia.",
+    cards:["1. Reversal","2. PONV: Apfel score","3. Extubation criteria","4. Analgesia ladder & PCA"],
+    links:[["Bronchospasm","adult","Bronchospasm"],["Anaphylaxis","adult","Anaphylaxis"]]}], cards:[]},
+ {id:"regional", name:"Regional anaesthesia", sub:"Safety · Neuraxial · Upper · Lower · Trunk", tabKey:"raTab", tabs:[
+   {id:"safety", label:"Safety", input:()=>gaInputs(), hint:"Before every block: dose limits, checklist, anticoagulants.",
+    cards:[["LA dose calculator","1. LA dose calculator"],["Stop Before You Block & safe injection","2. Stop Before You Block"],["Neuraxial & deep blocks: anticoagulant timing","3. Anticoagulant timing"]],
+    links:[["LA toxicity (LAST)","adult","LA toxicity"]]},
+   {id:"neuraxial", label:"Neuraxial", input:()=>gaInputs(), top:()=>nonObsCalc(), hint:"Spinal dose above; then epidural, CSE and problems.",
+    cards:[["Epidural (adult)","1. Epidural"],["CSE (combined spinal–epidural)","2. CSE"],["Adjuncts","3. Adjuncts"],["Failed or patchy block","4. Failed or patchy block"],["Post-dural puncture headache","5. Post-dural puncture headache"]],
+    links:[["High / total spinal","adult","High / total spinal"],["Hypotension after spinal","adult","Hypotension"],["LA toxicity (LAST)","adult","LA toxicity"]]},
+   {id:"upper", label:"Upper", input:()=>gaInputs(), hint:"Shoulder → hand.", cards:[["Interscalene","1. Interscalene"],["Supraclavicular","2. Supraclavicular"],["Axillary","3. Axillary"]],
+    links:[["LA toxicity (LAST)","adult","LA toxicity"]]},
+   {id:"lower", label:"Lower", input:()=>gaInputs(), hint:"Hip → foot.", cards:[["Fascia iliaca (suprainguinal)","1. Fascia iliaca"],["PENG","2. PENG"],["Femoral","3. Femoral"],["Adductor canal","4. Adductor canal"],["Popliteal sciatic","5. Popliteal sciatic"]],
+    links:[["LA toxicity (LAST)","adult","LA toxicity"]]},
+   {id:"trunk", label:"Trunk", input:()=>gaInputs(), hint:"Chest → abdomen. Bilateral blocks: check the calculator.", cards:[["Erector spinae (ESP)","1. Erector spinae (ESP)"],["Serratus anterior","2. Serratus anterior"],["Rectus sheath","3. Rectus sheath"],["TAP","4. TAP"]],
+    links:[["LA toxicity (LAST)","adult","LA toxicity"]]}], cards:[]},
+ {id:"paeds", name:"Paediatric", sub:"Pre-op · Induction · Intra-op · Post-op", tabKey:"pTab", tabs:[
+   {id:"pre", label:"Pre-op", input:()=>pInputs(), hint:"Plan the case: expected BP, then check for a special condition.",
+    cards:[["Estimated systolic BP","1. Expected BP for age / weight"],["Airway syndromes","2. Difficult airway syndromes"],["Down syndrome","3. Down syndrome"],
+      ["OSA for tonsillectomy — opioid-free","4. OSA / tonsillectomy (opioid-free)"],["Cyanotic heart disease / Fallot spell","5. Cyanotic heart disease / Fallot spell"],
+      ["Pyloric stenosis","6. Pyloric stenosis"],["Neonatal surgery","7. Neonatal surgery (PDA, TOF, CDH, NEC)"],["Hypospadias repair","8. Hypospadias repair (whole plan)"],
+      ["MRI under sedation","9. MRI / sedation outside theatre"],["Dynamic airway assessment (spontaneous breathing)","10. Dynamic airway / bronchoscopy"]],
+    links:[["Cyanotic heart disease / Fallot spell","paeds","Fallot spell"]]},
+   {id:"ind", label:"Induction", input:()=>pInputs(true), hint:"Airway kit → drugs → TIVA → ventilate → lines.",
+    cards:[["Paeds ETT","1. Tube: size, depth, blade, suction"],["NPA","2. NPA"],["Micro HMEF","3. HMEF"],["Bag","4. Bag"],
+      ["Paeds induction drugs","5. Induction drugs"],["Ketamine anaesthesia","6. Ketamine induction (short cases)"],
+      ["TCI model check","7. TIVA: model check & propofol targets"],["Remifentanil 10 mcg/mL","8. TIVA: remifentanil"],
+      ["Paeds ventilation","9. Ventilation settings"],["One-lung ventilation (Storz)","10. One-lung ventilation (Storz)"],["T-tube","11. T-tube"],["Double-lumen CVC","12. Lines: double-lumen CVC"]],
+    links:[["Laryngospasm","paeds","Laryngospasm"],["Paeds bronchospasm","paeds","Bronchospasm"],["Paeds anaphylaxis","paeds","Anaphylaxis"]]},
+   {id:"intra", label:"Intra-op", input:()=>pInputs(), hint:"Keep them stable: fluids → drugs → blocks → warmth.",
+    cards:[["Maintenance (4/2/1)","1. Fluids: maintenance & insensible loss"],["Glucose (neonate / paeds)","2. Fluids: glucose"],["Blood products","3. Fluids: blood products"],
+      ["Paeds intra-op drugs","4. Drugs: TXA, steroids, calcium…"],["Inotropes (50 mL syringe)","5. Drugs: inotropes"],["Paeds resuscitation","6. Drugs: resuscitation"],
+      ["Paeds LA dose calculator","7. Block: LA dose calculator"],["Which block (paeds)","8. Block: which one"],["Caudal block","9. Block: caudal"],["Ilioinguinal block","10. Block: ilioinguinal"],["Penile block","11. Block: penile"],
+      ["Paeds lumbar / thoracic epidural","12. Block: lumbar / thoracic epidural"],["Intrapleural block","13. Block: intrapleural"],["Keeping warm","14. Keeping warm"]],
+    links:[["Paeds LA toxicity (LAST)","paeds","LA toxicity"],["Paeds malignant hyperthermia","paeds","Malignant hyperthermia"],["Paeds cardiac arrest","paeds","Cardiac arrest"]]},
+   {id:"post", label:"Post-op", input:()=>pInputs(), hint:"Wake-up and after: PONV → extubation → delirium → analgesia.",
+    cards:[["Paeds PONV","1. PONV prophylaxis"],["Deep extubation (MAC 1)","2. Deep extubation"],["Laryngospasm","3. Laryngospasm: prevent & treat"],
+      ["Emergence delirium","4. Emergence delirium"],["Paeds analgesia & infusions","5. Analgesia & infusions"]],
+    links:[["Laryngospasm","paeds","Laryngospasm"],["Paeds bronchospasm","paeds","Bronchospasm"]]}], cards:[]},
+ {id:"obs", name:"Obstetric", sub:"Labour · Caesarean · After delivery", tabKey:"obTab", tabs:[
+   {id:"labour", label:"Labour", hint:"Epidural, in the order you do it.",
+    cards:["1. Start: test, bolus & loading","2. Maintain: infusion recipes","2b. Maintain: pump settings","3. Top-up: breakthrough pain","4. Problem: accidental dural puncture","5. No epidural: IV PCA"],
+    links:[["High / total spinal","adult","High block"],["LA toxicity (LAST)","adult","LA toxicity"]]},
+   {id:"lscs", label:"Caesarean", hint:"Pick your route: A spinal · B epidural top-up · C dural puncture catheter.",
+    cards:["A1. Spinal: dose by height","A2. Spinal: IT morphine & fentanyl","A3. Spinal: phenylephrine","B. Epidural top-up for LSCS","C. Dural puncture catheter: LSCS dosing"],
+    links:[["Hypotension after spinal","adult","Hypotension after spinal"],["High / total spinal","adult","High / total spinal"],["LA toxicity (LAST)","adult","LA toxicity (top-up)"],["Failed intubation / CICO","adult","GA: failed intubation / CICO"],["Massive obstetric haemorrhage","adult","Massive haemorrhage"]]},
+   {id:"post", label:"After delivery", hint:"Analgesia, then ward problems.",
+    cards:["1. Analgesia by technique","2. NSAID yes / no","3. PCA morphine (after GA)","4. Ward (OAS) problems & catheter care"],
+    links:[["Eclampsia","adult","Eclampsia"],["Massive obstetric haemorrhage","adult","Massive haemorrhage"]]}], cards:[]}];
+const SEARCH_EXTRA = {
+  "4. Tube & airway kit":"ett tube endotracheal chula lma igel i-gel supraglottic laryngoscope video adult",
+  "Neuraxial & deep blocks: anticoagulant timing":"anticoagulant antiplatelet clopidogrel enoxaparin clexane heparin warfarin doac rivaroxaban apixaban dabigatran asra platelets",
+  "A1. Spinal: dose by height":"lscs caesarean cesarean c-section sab spinal heavy bupivacaine marcaine dose height obstetric",
+  "A2. Spinal: IT morphine & fentanyl":"lscs caesarean intrathecal it opioid",
+  "A3. Spinal: phenylephrine":"lscs caesarean vasopressor hypotension",
+  "2b. Maintain: pump settings":"pcea pieb cse labour epidural pump",
+  "1. Start: test, bolus & loading":"labour epidural initiate loading cse",
+  "2. Maintain: infusion recipes":"labour epidural cocktail ropivacaine levobupivacaine infusion"};
+const CALC_KW = {ga:"ett tube endotracheal depth size cuffed plain anchor intubation neonate chula suction laryngoscope", regional:"spinal sab heavy bupivacaine marcaine height dose turp urology hernia perineal saddle lower limb hip knee ortho"};
+const CALC_TITLES = {regional:"Spinal dose – non-obstetric (TURP, hernia, perineal, lower limb)"};
+
+function cardMap(){
+  const html = Object.keys(obsCards).map(k=>obsCards[k]()).join("") + Object.keys(pCards).map(k=>pCards[k]()).join("") + eCards.adult() + eCards.paeds() + Object.keys(gaCards).map(k=>gaCards[k]()).join("") + Object.keys(raCards).map(k=>raCards[k]()).join("");
+  const tpl = document.createElement("template"); tpl.innerHTML = html;
+  const m = {};
+  Array.from(tpl.content.children).forEach(c => { if (!c.classList.contains("card")) return;
+    const h = c.querySelector("h2"); if (h && h.parentElement===c) m[h.textContent.trim()] = c; });
+  return m;
+}
+function accordion(c, t, gid, label){
+  const cl = c.cloneNode(true), h = cl.querySelector("h2"), sum = label ? esc(label) : h.innerHTML; h.remove();
+  const mm = sum.match(/^([A-C]?\d+[a-z]?)\.\s+(.*)$/s);
+  const summ = mm ? `<span class="stepno">${mm[1]}</span><span class="st">${mm[2]}</span>` : `<span class="st">${sum}</span>`;
+  return `<details class="card acc" name="acc" data-t="${esc(t)}" data-g="${gid}"><summary>${summ}</summary>${cl.innerHTML}</details>`;
+}
+function groupScreen(g){
+  const m = cardMap();
+  const acc = list => list.map(it => { const [o,l] = Array.isArray(it) ? it : [it,it];
+    return m[o] ? accordion(m[o], l, g.id, l!==o ? l : null) : `<div class="danger">Missing card: ${esc(o)}</div>`; }).join("");
+  if (g.tabs){
+    const tab = g.tabs.find(t=>t.id===S[g.tabKey]) || g.tabs[0];
+    const ab = activeBar();
+    const links = (tab.links||[]).map(([t,tb,label])=>`<button class="emlink" data-open="${esc(t)}" data-g="emerg" data-tab="${tb}">⚠ ${esc(label)} → Emergencies</button>`).join("");
+    return head(g.name,"home",g.id) + ab + (g.tabs.length>1 ? `<div class="seg emtabs${g.tabs.length>=5?" five":""}">${g.tabs.map(t=>`<button aria-pressed="${t===tab}" data-seg="${g.tabKey}" data-val="${t.id}">${t.label}</button>`).join("")}</div>` : `<div class="label" style="margin-top:0">${tab.label}</div>`) +
+      (tab.input ? `<div class="card">${tab.input()}</div>` : "") + (tab.top ? tab.top() : "") +
+      (tab.cards.length ? `<div class="hint">${tab.hint || "Tap a heading to open it."}</div>` + acc(tab.cards) : "") +
+      (links ? `<div class="card emlinks"><div class="sub">If it goes wrong</div>${links}</div>` : "") + disc;
+  }
+  return head(g.name,"home",g.id) + (g.calc ? g.calc() : "") + (g.weight ? `<div class="card">${pInputs()}</div>` : "") +
+    (g.cards.length?`<div class="hint">Tap a heading to open it.</div>`:"") + acc(g.cards) + disc;
+}
+function searchIndex(){
+  if (searchIndex.cache) return searchIndex.cache;
+  const m = cardMap(), idx = [], seen = {};
+  const order = GROUPS.filter(g=>g.id!=="emerg").concat(GROUPS.filter(g=>g.id==="emerg"));
+  for (const g of order){
+    if (CALC_TITLES[g.id]) idx.push({t:CALC_TITLES[g.id], g:g.id, calc:true, tab:g.id==="regional"?"neuraxial":(g.tabs?g.tabs[0].id:null), text:(CALC_TITLES[g.id]+" "+CALC_KW[g.id]).toLowerCase()});
+    const lists = g.tabs ? g.tabs.map(t=>[t.id,t.cards]) : [[null,g.cards]];
+    for (const [tab,list] of lists) for (const it of list){ const [o,t] = Array.isArray(it) ? it : [it,it]; if (seen[t] || !m[o]) continue; seen[t]=1; idx.push({t, g:g.id, tab, text:(t+" "+o+" "+m[o].textContent+" "+(SEARCH_EXTRA[t]||"")+(g.id==="emerg"?" emergency crisis":"")).toLowerCase()}); }
+  }
+  return (searchIndex.cache = idx);
+}
+function runSearch(q){
+  const el = $("#results"); if (!el) return;
+  q = q.trim().toLowerCase(); if (!q){ el.innerHTML = ""; return; }
+  const words = q.split(/\s+/);
+  const hits = searchIndex().map(e => ({e, score: words.every(w=>e.text.includes(w)) ? (words.every(w=>e.t.toLowerCase().includes(w))?2:1) : 0}))
+    .filter(x=>x.score).sort((a,b)=>b.score-a.score).slice(0,12);
+  el.innerHTML = hits.length ? hits.map(({e})=>`<button class="hit" data-open="${esc(e.t)}" data-g="${e.g}" ${e.tab?`data-tab="${e.tab}"`:""} ${e.calc?'data-calc="1"':""}>${esc(e.t)}<small>${(()=>{const g=GROUPS.find(g=>g.id===e.g), tb=g.tabs&&e.tab?g.tabs.find(t=>t.id===e.tab):null; return esc(g.name+(tb?" › "+tb.label:""));})()}</small></button>`).join("")
+    : `<div class="sub" style="padding:6px">No card matches "${esc(q)}".</div>`;
+}
+function remember(g, t){ const r = store.get("recent",[]).filter(x=>x.t!==t); r.unshift({g,t}); store.set("recent", r.slice(0,5)); }
+
+function render(){
+  let h = (location.hash||"#home").slice(1);
+  if (h==="ett"||h==="g-airway") h="g-ga"; if (h==="spinal"||h==="g-spinal") h="g-regional";
+  let html;
+  if (h.startsWith("g-")){ const g = GROUPS.find(x=>x.id===h.slice(2)); html = g ? groupScreen(g) : screens.home(); }
+  else html = (screens[h]||screens.home)();
+  const app = $("#app"), active = document.activeElement && document.activeElement.dataset ? document.activeElement.dataset.in : null;
+  const y = window.scrollY;
+  app.dataset.group = h.startsWith("g-") ? h.slice(2) : "";
+  app.innerHTML = html;
+  if (S.open){ const d = app.querySelector(`details[data-t="${CSS.escape(S.open)}"]`); if (d){ d.open = true; if (S.scrollTo){ d.scrollIntoView({block:"start"}); } } }
+  if (!S.scrollTo) window.scrollTo(0, y);
+  S.scrollTo = false;
+  if (active){ const el = app.querySelector(`[data-in="${active}"]`); if (el){ el.focus(); const v=el.value; el.value=""; el.value=v; } }
+}
+document.addEventListener("toggle", e => {
+  const d = e.target; if (!d.matches || !d.matches("details.acc")) return;
+  if (d.open){ S.open = d.dataset.t; remember(d.dataset.g, d.dataset.t);
+    document.querySelectorAll("details.acc[open]").forEach(o => { if (o!==d) o.open = false; }); }
+  else if (S.open === d.dataset.t) S.open = null;
+}, true);
+document.addEventListener("input", e => { if (e.target.id==="q") runSearch(e.target.value); if (e.target.id==="cNick") S.cNick = e.target.value.slice(0,12); });
+function clamp(v,min,max){ return Math.min(max, Math.max(min, v)); }
+document.addEventListener("click", e => {
+  const b = e.target.closest("button, input[type=checkbox]"); if (!b) return;
+  const d = b.dataset;
+  if (d.open){ const og = GROUPS.find(x=>x.id===d.g); if (og && og.tabs) S[og.tabKey] = d.tab || (og.tabs.find(t=>t.cards.some(c=>(Array.isArray(c)?c[1]:c)===d.open))||og.tabs[0]).id;
+    S.open = d.calc ? null : d.open; S.scrollTo = !d.calc; if (!d.calc) remember(d.g, d.open);
+    const target = "#g-"+d.g; if (location.hash===target) render(); else { location.hash = target; } if (d.calc) window.scrollTo(0,0); return; }
+  if (d.lscs){ S.spOp="lscs"; S.open=null; location.hash="#g-spinal"; window.scrollTo(0,0); return; }
+  if (d.go){ S.open = null; location.hash = "#"+d.go; window.scrollTo(0,0); return; }
+  if (d.case){ const c = getCases().find(x=>x.id===d.case); if (c){ store.set("active", c.id); applyCase(c); } if ((location.hash||"#home")==="#cases") render(); else render(); return; }
+  if (d.delcase){ const cs = getCases().filter(x=>x.id!==d.delcase); store.set("cases", cs); if (store.get("active",null)===d.delcase) store.set("active", null); render(); return; }
+  if (d.savecase){ const cs = getCases(); if (cs.length >= CASE_MAX) return;
+    const used = cs.map(c=>+c.label.replace("Case ","")); let n = 1; while (used.includes(n)) n++;
+    const nick = (S.cNick||"").trim().slice(0,12);
+    const c = {id: String(Date.now()), label: "Case "+n, nick, sex:S.cSex, y:+S.cY, m:+S.cY<16?+S.cM:0, h:+S.cH, w:+S.cW, created: Date.now()};
+    cs.push(c); store.set("cases", cs); store.set("active", c.id); applyCase(c); S.cNick = ""; render(); return; }
+  if (d.addla){ const lt = d.lt, k = laKey(lt); S[k] = S[k] || [];
+    const it = d.addla==="form" ? {d:S.laD, c:S.laC, ml:+S.laMl, bi:+S.laBi, l:LAD[S.laD].n} : JSON.parse(d.addla);
+    S[k].push(it); b.textContent = "✓ Added"; setTimeout(render, 350); return; }
+  if (d.rmla){ const [lt,i] = d.rmla.split(":"); S[laKey(lt)].splice(+i,1); render(); return; }
+  if (d.clrla){ S[laKey(d.clrla)] = []; render(); return; }
+  if (d.apf!==undefined){ S.apfel = (S.apfel||0) ^ (1<<(+d.apf)); render(); return; }
+  if (d.goTab){ const [gid,tid] = d.goTab.split(":"); const og = GROUPS.find(x=>x.id===gid); if (og) S[og.tabKey]=tid; S.open=null; const tg="#g-"+gid; if (location.hash===tg) render(); else location.hash=tg; window.scrollTo(0,0); return; }
+  if (d.setw){ S.pw = parseFloat(d.setw); render(); return; }
+  if (d.seg){ S[d.seg] = d.val; render(); return; }
+  if (d.step){ const k=d.step, st=parseFloat(d.d); let v=parseFloat(S[k])||0; v=clamp(Math.round((v+st)*10)/10, +d.min, +d.max); S[k]=v; render(); return; }
+  if (d.tick!==undefined){ const t=store.get("ticks",{}); t[d.tick]=b.checked; store.set("ticks",t); render(); return; }
+  if (b.hasAttribute("data-theme-toggle")){ const cur=store.get("theme","auto"); const nxt = cur==="auto"?"dark":cur==="dark"?"light":"auto"; store.set("theme",nxt); applyTheme(); render(); }
+});
+document.addEventListener("change", e => {
+  const el = e.target; if (!el.dataset || !el.dataset.in) return;
+  const k = el.dataset.in; let v = parseFloat(el.value.replace(",", "."));
+  if (isNaN(v)) v = S[k];
+  S[k] = clamp(v, +el.dataset.min, +el.dataset.max); render();
+});
+function applyTheme(){ const t=store.get("theme","auto"); if (t==="auto") document.documentElement.removeAttribute("data-theme"); else document.documentElement.setAttribute("data-theme", t); }
+window.addEventListener("hashchange", render);
+applyTheme(); { const c = activeCase(); if (c) applyCase(c); } render();
+if ("serviceWorker" in navigator && location.protocol==="https:") { navigator.serviceWorker.register("sw.js").catch(()=>{}); }
+</script>
+</body>
+</html>
