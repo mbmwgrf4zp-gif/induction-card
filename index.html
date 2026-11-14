@@ -6,6 +6,8 @@
 <title>Induction Card</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <meta name="robots" content="noindex, nofollow">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data:; connect-src 'self'; manifest-src 'self'; worker-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta name="referrer" content="no-referrer">
 <meta name="description" content="Personal offline memory aid for ETT size/depth, spinal doses and obstetric anaesthesia reference cards.">
 <meta name="theme-color" content="#0f766e">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -14,9 +16,14 @@
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="icon-180.png">
 <link rel="icon" href="icon-192.png">
-<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
 <style>
+/* IBM Plex (SIL Open Font License), bundled for privacy and offline use */
+@font-face{font-family:'IBM Plex Mono';font-style:normal;font-weight:500;font-display:swap;src:url(fonts/plex-mono-db14f4.woff2) format('woff2');unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD}
+@font-face{font-family:'IBM Plex Mono';font-style:normal;font-weight:600;font-display:swap;src:url(fonts/plex-mono-ed96d0.woff2) format('woff2');unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD}
+@font-face{font-family:'IBM Plex Sans';font-style:normal;font-weight:400;font-display:swap;src:url(fonts/plex-sans-118b75.woff2) format('woff2');unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD}
+@font-face{font-family:'IBM Plex Sans';font-style:normal;font-weight:500;font-display:swap;src:url(fonts/plex-sans-118b75.woff2) format('woff2');unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD}
+@font-face{font-family:'IBM Plex Sans';font-style:normal;font-weight:600;font-display:swap;src:url(fonts/plex-sans-118b75.woff2) format('woff2');unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD}
+@font-face{font-family:'IBM Plex Sans';font-style:normal;font-weight:700;font-display:swap;src:url(fonts/plex-sans-118b75.woff2) format('woff2');unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD}
 /* Layout: one phone-width column; home = list of section tiles, each section has its own hue. */
 :root{
   /* type scale (6 steps) */
@@ -267,6 +274,10 @@ table.blk th{width:32%;font-size:var(--fs-xs);text-transform:uppercase;letter-sp
 .caseact{display:flex;gap:var(--s2)}
 .pill{display:inline-block;padding:1px 8px;border-radius:999px;background:var(--accent);color:var(--accent-ink);font-size:var(--fs-xs);font-weight:700}
 .homebtn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent);text-align:center}
+.step.sample input{color:var(--muted);font-style:italic;border-style:dashed}
+.stag{display:inline-block;font-size:var(--fs-xs);font-weight:700;color:var(--warn-ink);background:var(--warn-bg);border:1px solid var(--warn-line);border-radius:6px;padding:0 5px;margin-left:4px;font-style:normal;vertical-align:1px}
+.samplewarn{background:var(--warn-bg);color:var(--warn-ink);border:1px solid var(--warn-line);border-radius:var(--r-sm);padding:var(--s2) var(--s3);margin:0 0 var(--s3);font-size:var(--fs-sm)}
+.updbar{position:fixed;left:max(16px,env(safe-area-inset-left,0px));right:max(16px,env(safe-area-inset-right,0px));bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:20;padding:var(--s3);border-radius:var(--r);border:0;background:var(--accent);color:var(--accent-ink);font-weight:700;font-size:var(--fs-base);box-shadow:0 6px 20px rgba(0,0,0,.25);cursor:pointer}
 .disc{color:var(--muted);font-size:var(--fs-xs);text-align:center;margin-top:var(--s5);line-height:1.5}
 a{color:var(--accent)}
 .vs label{display:flex;gap:var(--s3);align-items:flex-start;padding:var(--s2) 0;border-bottom:1px solid var(--line);font-size:var(--fs-sm)}
@@ -280,7 +291,8 @@ a{color:var(--accent)}
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.3.1";
+const APP_VERSION = "2.4.0";
+const APP_DATE = "14 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
 /* ================= HELPERS ================= */
@@ -296,7 +308,7 @@ const store = {
 };
 // Inputs are not remembered between uses (per plan): state lives in memory only.
 const S = { ettMode:"adult", sex:"F", height:158, ageY:4, ageM:0, wt:3.0,
-            spOp:"lscs", spHt:155, morWt:60, pw:10, pY:1, pM:0, pHt:75, pBE:-5, aw:70, emTab:"adult", obTab:"labour", pTab:"pre", gaTab:"pre", raTab:"safety", laA:[], laP:[], cSex:"F", cY:40, cM:0, cH:160, cW:60, cNick:"", laD:"bupi", laC:"0.5", laMl:15, laBi:"1", age:45, apfel:0, pump:"pcea_cse", topup:"lig" };
+            touched:{}, spOp:"lscs", spHt:155, morWt:60, pw:10, pY:1, pM:0, pHt:75, pBE:-5, aw:70, emTab:"adult", obTab:"labour", pTab:"pre", gaTab:"pre", raTab:"safety", laA:[], laP:[], cSex:"F", cY:40, cM:0, cH:160, cW:60, cNick:"", laD:"bupi", laC:"0.5", laMl:15, laBi:"1", age:45, apfel:0, pump:"pcea_cse", topup:"lig" };
 
 function src(text){ return `<div class="src">Source: ${text}</div>`; }
 function protoSrc(){
@@ -309,15 +321,17 @@ function seg(key, opts){
   return `<div class="seg">` + opts.map(([v,l]) =>
     `<button aria-pressed="${S[key]===v}" data-seg="${key}" data-val="${v}">${l}</button>`).join("") + `</div>`;
 }
+const SAMPLE_KEYS = ["height","aw","age","pw","pY","pM","spHt","morWt","sex"];
+const isSample = k => SAMPLE_KEYS.includes(k) && !S.touched[k];
 function step(key, label, unit, min, max, stp){
-  return `<div class="step"><label for="in-${key}">${label}</label>
+  return `<div class="step ${isSample(key)?"sample":""}"><label for="in-${key}">${label}${isSample(key)?` <span class="stag">sample</span>`:""}</label>
     <button aria-label="decrease" data-step="${key}" data-d="${-stp}" data-min="${min}" data-max="${max}">−</button>
     <input id="in-${key}" inputmode="decimal" data-in="${key}" data-min="${min}" data-max="${max}" value="${S[key]}">
     <button aria-label="increase" data-step="${key}" data-d="${stp}" data-min="${min}" data-max="${max}">+</button>
     <span class="unit">${unit}</span></div>`;
 }
 function trio(a,b,c){ return `<div class="trio"><span>${a}</span><span class="main">${b}</span><span>${c}</span></div>`; }
-const disc = `<div class="disc">${VALUES_CHECKED ? `Values checked ${VALUES_CHECKED}` : `<b>DRAFT – values not checked</b>`}<br>Memory aid only — clinical judgement decides. Cases are anonymous, kept on this phone only, auto-deleted after 36 h. v${APP_VERSION}</div>`;
+const disc = `<div class="disc">${VALUES_CHECKED ? `Values checked ${VALUES_CHECKED}` : `<b>DRAFT – values not checked</b>`}<br>Memory aid only — clinical judgement decides. Cases are anonymous, kept on this phone only, auto-deleted after 36 h.<br><b>Version ${APP_VERSION} · updated ${APP_DATE}</b></div>`;
 
 /* ================= SCREENS ================= */
 function banner(){
@@ -395,7 +409,7 @@ screens.home = () => {
   ${tile("t-emerg","emerg","Emergencies","Crisis steps with doses",'data-go="g-emerg"')}
   ${caseStrip()}
   <div class="label">Quick</div>
-  <div class="quick">${quickLive().map(([ic,lab,inp,ans,t,g,tb,cls])=>`<button class="qbtn ${cls}" data-open="${esc(t)}" data-g="${g}" data-tab="${tb}"><span class="qi qmini">${svg(ic)}</span><span class="qlab">${lab}</span><span class="qin">${inp}</span><span class="qans">${ans}</span></button>`).join("")}</div>
+  <div class="quick">${quickLive().map(([ic,lab,inp,ans,t,g,tb,cls],i)=>`<button class="qbtn ${cls}" data-open="${esc(t)}" data-g="${g}" data-tab="${tb}"><span class="qi qmini">${svg(ic)}</span><span class="qlab">${lab}</span><span class="qin">${inp}${(i===0&&isSample("spHt"))||(i===1&&isSample("height"))||(i===2&&isSample("pw"))?' <span class="stag">sample</span>':""}</span><span class="qans">${ans}</span></button>`).join("")}</div>
   <button class="pearl" data-open="${esc(pearl[1])}" data-g="${pearl[2]}" data-tab="${pearl[3]}"><span class="plab">Pearl of the day</span><span class="ptxt">${pearl[0]}</span><span class="pgo">Open card ›</span></button>
   <div class="label">Sections</div>
   <div class="grid2">${secs.map(g=>`<button class="sq t-${g.id}" data-go="g-${g.id}"><span class="qi">${svg(g.id)}</span><span class="sqt">${short[g.id]}</span><span class="sqs">${g.tabs.map(t=>t.label).join(" · ")}</span></button>`).join("")}</div>
@@ -1461,16 +1475,24 @@ const VALUES = [
 
 /* ---------- ANONYMOUS CASES (phone only, 36 h) ---------- */
 const CASE_TTL = 36*3600*1000, CASE_MAX = 6;
-function getCases(){ const now = Date.now(); const all = store.get("cases",[]); const live = all.filter(c => now - c.created < CASE_TTL); if (live.length !== all.length) store.set("cases", live); return live; }
-const caseName = c => c.nick ? `${c.label} · ${esc(c.nick)}` : c.label;
+function validCase(c){ return c && typeof c==="object" && /^\d{1,16}$/.test(String(c.id)) && /^Case [1-6]$/.test(c.label) && (c.sex==="F"||c.sex==="M")
+  && Number.isFinite(c.y) && c.y>=0 && c.y<=100 && Number.isFinite(c.m) && c.m>=0 && c.m<=11 && Number.isFinite(c.h) && c.h>=30 && c.h<=210
+  && Number.isFinite(c.w) && c.w>=0.4 && c.w<=250 && Number.isFinite(c.created) && typeof (c.nick||"")==="string" && (c.nick||"").length<=12; }
+function getCases(){ const now = Date.now(); let all = store.get("cases",[]); if (!Array.isArray(all)) all = []; const live = all.filter(c => validCase(c) && now - c.created < CASE_TTL && c.created <= now + 60000); if (live.length !== all.length) store.set("cases", live); return live; }
+const caseName = c => c.nick ? `${esc(c.label)} · ${esc(c.nick)}` : esc(c.label);
 const caseAge = c => c.y < 1 ? `${c.m} m` : c.y < 16 && c.m ? `${c.y} y ${c.m} m` : `${c.y} y`;
 const caseLine = c => `${c.sex==="F"?"♀":"♂"} ${sig(c.w)} kg · ${c.h} cm · ${caseAge(c)}`;
 function activeCase(){ const id = store.get("active", null); return getCases().find(c => c.id === id) || null; }
 function applyCase(c){
+  ["sex","height","aw","age","morWt"].forEach(k=>S.touched[k]=true); if (c.y<16) ["pw","pY","pM"].forEach(k=>S.touched[k]=true); if (c.sex==="F") S.touched.spHt=true;
   S.sex = c.sex; S.height = c.h; S.aw = c.w; S.age = Math.max(16, c.y); S.morWt = c.w;
   if (c.y < 16){ S.pw = c.w; S.pY = c.y; S.pM = c.m; S.pHt = c.h; }
   if (c.sex === "F") S.spHt = Math.min(200, Math.max(140, c.h));
 }
+const SAMPLE_BY = {emerg:{adult:["aw"], paeds:["pw","pY"]}, ga:{"*":["height","aw"]}, regional:{"*":["height","aw"]}, paeds:{"*":["pw","pY"]}, obs:{lscs:["spHt"], post:["morWt"]}};
+function sampleWarn(keys){ const k = keys.filter(isSample); if (!k.length) return "";
+  const names = {height:"height", aw:"weight", pw:"weight", pY:"age", spHt:"height", morWt:"weight"};
+  return `<div class="samplewarn"><b>Sample values</b> — ${[...new Set(k.map(x=>names[x]))].join(" and ")} not entered. Enter the patient or tap a case.</div>`; }
 function activeBar(){ const c = activeCase(); return c ? `<button class="activebar" data-go="cases"><span>Active: <b>${caseName(c)}</b> · ${caseLine(c)}</span><span class="sub">change ›</span></button>` : ""; }
 function caseStrip(){
   const cs = getCases(), act = store.get("active", null);
@@ -1600,7 +1622,7 @@ function groupScreen(g){
     return m[o] ? accordion(m[o], l, g.id, l!==o ? l : null) : `<div class="danger">Missing card: ${esc(o)}</div>`; }).join("");
   if (g.tabs){
     const tab = g.tabs.find(t=>t.id===S[g.tabKey]) || g.tabs[0];
-    const ab = activeBar();
+    const ab = activeBar() + sampleWarn(SAMPLE_BY[g.id] ? (SAMPLE_BY[g.id][tab.id] || SAMPLE_BY[g.id]["*"] || []) : []);
     const links = (tab.links||[]).map(([t,tb,label])=>`<button class="emlink" data-open="${esc(t)}" data-g="emerg" data-tab="${tb}">⚠ ${esc(label)} → Emergencies</button>`).join("");
     return head(g.name,"home",g.id) + ab + (g.tabs.length>1 ? `<div class="seg emtabs${g.tabs.length>=5?" five":""}">${g.tabs.map(t=>`<button aria-pressed="${t===tab}" data-seg="${g.tabKey}" data-val="${t.id}">${t.label}</button>`).join("")}</div>` : `<div class="label" style="margin-top:0">${tab.label}</div>`) +
       (tab.input ? `<div class="card">${tab.input()}</div>` : "") + (tab.top ? tab.top() : "") +
@@ -1678,21 +1700,27 @@ document.addEventListener("click", e => {
   if (d.apf!==undefined){ S.apfel = (S.apfel||0) ^ (1<<(+d.apf)); render(); return; }
   if (d.goTab){ const [gid,tid] = d.goTab.split(":"); const og = GROUPS.find(x=>x.id===gid); if (og) S[og.tabKey]=tid; S.open=null; const tg="#g-"+gid; if (location.hash===tg) render(); else location.hash=tg; window.scrollTo(0,0); return; }
   if (d.setw){ S.pw = parseFloat(d.setw); render(); return; }
-  if (d.seg){ S[d.seg] = d.val; render(); return; }
-  if (d.step){ const k=d.step, st=parseFloat(d.d); let v=parseFloat(S[k])||0; v=clamp(Math.round((v+st)*10)/10, +d.min, +d.max); S[k]=v; render(); return; }
+  if (d.seg){ S.touched[d.seg]=true; S[d.seg] = d.val; render(); return; }
+  if (d.step){ S.touched[d.step]=true; const k=d.step, st=parseFloat(d.d); let v=parseFloat(S[k])||0; v=clamp(Math.round((v+st)*10)/10, +d.min, +d.max); S[k]=v; render(); return; }
   if (d.tick!==undefined){ const t=store.get("ticks",{}); t[d.tick]=b.checked; store.set("ticks",t); render(); return; }
   if (b.hasAttribute("data-theme-toggle")){ const cur=store.get("theme","auto"); const nxt = cur==="auto"?"dark":cur==="dark"?"light":"auto"; store.set("theme",nxt); applyTheme(); render(); }
 });
 document.addEventListener("change", e => {
   const el = e.target; if (!el.dataset || !el.dataset.in) return;
-  const k = el.dataset.in; let v = parseFloat(el.value.replace(",", "."));
+  const k = el.dataset.in; S.touched[k]=true; let v = parseFloat(el.value.replace(",", "."));
   if (isNaN(v)) v = S[k];
   S[k] = clamp(v, +el.dataset.min, +el.dataset.max); render();
 });
 function applyTheme(){ const t=store.get("theme","auto"); if (t==="auto") document.documentElement.removeAttribute("data-theme"); else document.documentElement.setAttribute("data-theme", t); }
 window.addEventListener("hashchange", render);
 applyTheme(); { const c = activeCase(); if (c) applyCase(c); } render();
-if ("serviceWorker" in navigator && location.protocol==="https:") { navigator.serviceWorker.register("sw.js").catch(()=>{}); }
+if ("serviceWorker" in navigator && (location.protocol==="https:" || location.hostname==="localhost" || location.hostname==="127.0.0.1")) {
+  const hadController = !!navigator.serviceWorker.controller;
+  navigator.serviceWorker.register("sw.js").catch(()=>{});
+  navigator.serviceWorker.addEventListener("controllerchange", () => { if (!hadController || document.getElementById("updbar")) return;
+    const bar = document.createElement("button"); bar.id = "updbar"; bar.className = "updbar"; bar.textContent = "Update downloaded — tap to load the new version";
+    bar.addEventListener("click", () => location.reload()); document.body.appendChild(bar); });
+}
 </script>
 </body>
 </html>
