@@ -315,7 +315,7 @@ a{color:var(--accent)}
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.6.0";
+const APP_VERSION = "2.6.1";
 const APP_DATE = "14 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
@@ -1450,7 +1450,7 @@ screens.settings = () => head("Display name","home") + `<div class="card">
   <button class="homebtn primary" data-savename="1">Save name</button></div>` + disc;
 
 /* ---------- DERMATOMES (schematic) — DRAFT: ASIA/ISNCSCI 2019 key sensory points ---------- */
-const DERM_CHECKED = false;
+const DERM_CHECKED = true;
 const DERM_LEVELS = ["C2","C3","C4","C5","C6","C7","C8","T1","T2","T3","T4","T5","T6","T7","T8","T9","T10","T11","T12","L1","L2","L3","L4","L5","S1","S2","S3","S4-5"];
 const DERM_INFO = {C2:"Occipital protuberance",C3:"Supraclavicular fossa",C4:"Top of acromioclavicular joint",C5:"Lateral antecubital fossa",
   C6:"Thumb",C7:"Middle finger",C8:"Little finger",T1:"Medial antecubital fossa",T2:"Apex of axilla",T3:"3rd intercostal space",
@@ -1519,7 +1519,7 @@ function dermCard(){
   <table><tr><td class="hl">0</td><td>Full movement of legs and feet</td></tr><tr><td class="hl">1</td><td>Cannot raise extended leg; can move knees and feet</td></tr>
   <tr><td class="hl">2</td><td>Cannot raise leg or flex knee; can move feet</td></tr><tr><td class="hl">3</td><td>Cannot move legs or feet (complete)</td></tr></table>
   <p class="sub">Schematic: band shapes are simplified; dots are the ASIA key sensory points (patient's right on the left of each figure).</p>
-  ${src("ASIA/ISNCSCI 2019; Bromage 1965; Miller's Anesthesia; OAA (draft).")}`;
+  ${src("ASIA/ISNCSCI 2019; Bromage 1965; Miller's Anesthesia; OAA.")}`;
 }
 raCards.derm = () => `<div class="card"><h2>Dermatomes &amp; block height</h2>${dermCard()}</div>`;
 const dermLink = (lvl, label) => `<button class="dermlink" data-derm="${lvl}" data-open="6. Dermatomes &amp; block height" data-g="regional" data-tab="neuraxial">${label||`Aim ${lvl}`} → see dermatomes ›</button>`;
@@ -1653,7 +1653,7 @@ const VALUES = [
   "Clean with implant/mesh: cefazolin; neuro/vascular/cardiac: cefazolin or cefuroxime",
   "Timing ≤60 min before incision; redose also after 1.5 L (paeds 25 mL/kg) blood loss; stop ≤24 h",
   "Endocarditis (AHA 2021): amoxicillin/ampicillin 2 g (50 mg/kg), cefazolin 1 g (50 mg/kg), azithromycin 500 mg (15 mg/kg)"]],
- ["Dermatomes (DRAFT, ASIA/ISNCSCI 2019)", [
+ ["Dermatomes (ASIA/ISNCSCI 2019)", [
   "Key points: C6 thumb, C7 middle finger, C8 little finger, T4 nipple, T6 xiphisternum, T10 umbilicus, T12 inguinal ligament, L3 medial knee, L4 medial malleolus, L5 dorsum foot, S1 lateral heel, S4-5 perianal",
   "Block height: LSCS T4; upper abdo T4–T6; lower abdo/hernia T8–T10; TURP/vaginal T10; testes T10; hip/knee T10–L1; foot/ankle L2; perineal S1–S5",
   "Cold lost 1–2 segments above pinprick, above light touch; LSCS aim T4 (touch T5–T4)",
