@@ -324,7 +324,7 @@ a{color:var(--accent)}
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.10.1";
+const APP_VERSION = "2.11.0";
 const APP_DATE = "14 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
@@ -341,7 +341,7 @@ const store = {
 };
 // Inputs are not remembered between uses (per plan): state lives in memory only.
 const S = { ettMode:"adult", sex:"F", height:158, ageY:4, ageM:0, wt:3.0,
-            touched:{}, sc:{}, derm:"", abxSp:"general", spOp:"lscs", spHt:155, morWt:60, pw:10, pY:1, pM:0, pHt:75, pBE:-5, aw:70, emTab:"adult", obTab:"labour", pTab:"pre", gaTab:"pre", raTab:"safety", laA:[], laP:[], cSex:"F", cY:40, cM:0, cH:160, cW:60, cNick:"", laD:"bupi", laC:"0.5", laMl:15, laBi:"1", age:45, apfel:0, pump:"pcea_cse", topup:"lig" };
+            touched:{}, sc:{}, fastH:6, hbNow:12, hbLow:8, hbTarget:10, derm:"", abxSp:"general", spOp:"lscs", spHt:155, morWt:60, pw:10, pY:1, pM:0, pHt:75, pBE:-5, aw:70, emTab:"adult", obTab:"labour", pTab:"pre", gaTab:"pre", raTab:"safety", laA:[], laP:[], cSex:"F", cY:40, cM:0, cH:160, cW:60, cNick:"", laD:"bupi", laC:"0.5", laMl:15, laBi:"1", age:45, apfel:0, pump:"pcea_cse", topup:"lig" };
 
 function src(text){ return `<div class="src">Source: ${text}</div>`; }
 function protoSrc(){
@@ -529,6 +529,7 @@ const nonObsCalc = () => {
 const kv = rows => `<table>${rows.map(([k,v])=>`<tr><th style="width:42%">${k}</th><td>${v}</td></tr>`).join("")}</table>`;
 const MINE = "My practice (personal notes).";
 const LOC_CHECKED = true;
+const PREV_CHECKED = false;
 const locNote = () => LOC_CHECKED ? "" : `<div class="warn" style="margin-top:0">DRAFT — added from the departmental protocol. Tick on the Values sheet.</div>`;
 const obsCards = {};
 
@@ -703,9 +704,11 @@ function LAR(name, ml, mgml, max, note, capml){
 }
 
 function pInputs(forEtt){
-  const y = S.pY, est = (y>=1 && y<=10) ? (y+4)*2 : null;
+  const y = S.pY, mo = AGEM();
+  const est = mo < 1 ? null : y < 1 ? [0.5*mo+4, "0.5 × months + 4"] : y <= 5 ? [2*y+8, "2 × age + 8"] : y <= 12 ? [3*y+7, "3 × age + 7"] : null;
   return `${step("pw","Weight","kg",0.4,90,0.5)}${step("pY","Age","y",0,16,1)}${step("pM","+ months","m",0,11,1)}
-    ${est?`<div class="sub">Estimated weight for age: (age + 4) × 2 = <b>${est} kg</b> <button class="iconbtn" style="height:34px;min-width:0" data-setw="${est}">Use</button></div>`:""}
+    ${est?`<div class="sub">Estimated weight (APLS): ${est[1]} = <b>${sig(est[0])} kg</b> <button class="iconbtn" style="height:34px;min-width:0" data-setw="${sig(est[0])}">Use</button></div>`:""}
+    ${W()>40?`<div class="warn" style="margin-bottom:0">Weight &gt; 40 kg: doses are capped at adult maximums — consider the General anaesthesia (adult) section.</div>`:""}
     ${forEtt?`<div class="sub" style="margin-top:4px">Neonate &lt; 28 days: set age 0 y 0 m and enter weight.</div>`:""}`;
 }
 
@@ -717,8 +720,8 @@ function paedEtt(){
     sizeRule = "> 1 y: plain age/4 + 4, cuffed age/4 + 3.5 (rounded down to 0.5)";
     depth = y/2 + 12; depthRule = "age/2 + 12";
   } else if (mo >= 12){
-    plain = 4.5; cuffed = floor05(1/4 + 3.5);
-    sizeRule = "1 y: 4.5 plain; cuffed age/4 + 3.5";
+    plain = 4.5; cuffed = 3.5;
+    sizeRule = "1 y: 4.5 plain; cuffed (Microcuff) 8 months–2 y 3.5";
     depth = 12; depthRule = "1 y: 12 cm";
   } else {
     if (w < 1){ plain = 2.5; plainTxt = "2.5"; sizeRule = "< 1 kg: 2.5 plain"; }
@@ -727,7 +730,7 @@ function paedEtt(){
     else if (mo < 4){ plain = 3.5; plainTxt = "3.5"; sizeRule = "> 3.5 kg: 3.5 plain (neonate 3.0–3.5)"; }
     else if (mo < 8){ plain = 4.0; sizeRule = "4 months: 4.0 plain"; }
     else { plain = 4.0; plainTxt = "4.0 – 4.5"; sizeRule = "8 months: 4.0–4.5 plain"; }
-    if (w > 5){ cuffed = plain - 0.5; conv = true; }
+    if (w > 5){ cuffed = mo < 8 ? 3.0 : 3.5; sizeRule += "; cuffed (Microcuff): term–8 months 3.0, 8 months–2 y 3.5"; }
     if (mo < 1){ depth = w < 1.5 ? 7 : w < 2.5 ? 8 : 9; depthRule = "Premature ~1 kg 7 cm, ~2 kg 8 cm; term 9 cm"; }
     else { depth = 3*plain; depthRule = "3 × ETT (term 9 cm → 1 y 12 cm)"; }
   }
@@ -766,28 +769,35 @@ const PAEDS = [
 const pCards = {};
 pCards.ett = () => `<div class="card"><h2>Paeds ETT</h2>${ettBlock(paedEtt())}</div>`;
 pCards.airway = () => {
-  const w = W();
-  return ettBlock(paedEtt()) + `
-  <div class="card"><h2>NPA</h2><p>Size 2.5 – 5. If size 2 needed, use a modified ETT. Weight 7.5 kg: use 3.5.</p></div>
+  const w = W(), e = paedEtt(), ett = e.useCuff ? e.cuffed : e.plain, tv = 7*w;
+  const hm = tv < 35 ? 0 : tv <= 90 ? 1 : tv <= 200 ? 2 : 3;
+  const vc3 = 105*w, bags = [500,1000,1500], bag = bags.reduce((a,b)=>Math.abs(b-vc3)<Math.abs(a-vc3)?b:a);
+  const stz = ett >= 5 ? 2 : ett >= 4 ? 1 : ett >= 3.5 ? 0 : -1;
+  const hl = c => c ? ' class="hl"' : "";
+  return ettBlock(e) + `
+  <div class="card"><h2>NPA</h2><p>Suggested: <b>${f1(e.plain)}</b> (≈ plain ETT size); length nose tip → tragus.</p>
+  <p class="sub">Notes: size 2.5–5; if size 2 needed, use a modified ETT; 7.5 kg → 3.5.</p></div>
   <div class="card"><h2>Micro HMEF</h2><p class="sub">TV 4–7 mL/kg for ${sig(w)} kg = <b>${sig(4*w)}–${sig(7*w)} mL</b></p>
-  <table><tr><th>Tidal volume</th><th>HMEF</th></tr><tr><td>10–50 mL</td><td>Blue (ETT 3) / red (ETT 3.5)</td></tr>
-  <tr><td>&gt; 35 mL</td><td>Green</td></tr><tr><td>&gt; 90 mL (max 250 mL)</td><td>Green</td></tr><tr><td>&gt; 200 mL</td><td>Yellow</td></tr></table></div>
-  <div class="card"><h2>Bag</h2><p class="sub">3 × vital capacity (35 mL/kg) = <b>${sig(105*w)} mL</b></p>
-  <table><tr><th>Bag</th><th>Weight</th></tr><tr><td>500 mL</td><td>5 kg</td></tr><tr><td>1000 mL</td><td>10–20 kg</td></tr><tr><td>1500 mL</td><td>&gt; 20 kg</td></tr></table></div>
-  <div class="card"><h2>One-lung ventilation (Storz)</h2><table><tr><th>Scope</th><th>ETT</th></tr>
-  <tr><td>Storz 2.2</td><td>ETT &gt; 3</td></tr><tr><td>Storz 2.8</td><td>ETT &gt; 3.5</td></tr><tr><td>Storz 4.0</td><td>ETT &gt; 4.5</td></tr></table>${psrc()}</div>`;
+  <table><tr><th>Tidal volume</th><th>HMEF</th></tr><tr${hl(hm===0)}><td>10–50 mL</td><td>Blue (ETT 3) / red (ETT 3.5)</td></tr>
+  <tr${hl(hm===1)}><td>&gt; 35 mL</td><td>Green</td></tr><tr${hl(hm===2)}><td>&gt; 90 mL (max 250 mL)</td><td>Green</td></tr><tr${hl(hm===3)}><td>&gt; 200 mL</td><td>Yellow</td></tr></table></div>
+  <div class="card"><h2>Bag</h2><p class="sub">3 × vital capacity (35 mL/kg) = <b>${sig(vc3)} mL</b> → <b>${bag} mL bag</b></p>
+  <table><tr><th>Bag</th><th>Weight</th></tr><tr${hl(bag===500)}><td>500 mL</td><td>5 kg</td></tr><tr${hl(bag===1000)}><td>1000 mL</td><td>10–20 kg</td></tr><tr${hl(bag===1500)}><td>1500 mL</td><td>&gt; 20 kg</td></tr></table></div>
+  <div class="card"><h2>One-lung ventilation (Storz)</h2><p class="sub">For ETT ${f1(ett)}: ${stz<0?"<b>no Storz scope fits</b> (needs ETT ≥ 3.5)":`largest fitting scope <b>Storz ${["2.2","2.8","4.0"][stz]}</b>`}</p><table><tr><th>Scope</th><th>ETT</th></tr>
+  <tr${hl(stz===0)}><td>Storz 2.2</td><td>ETT &gt; 3</td></tr><tr${hl(stz===1)}><td>Storz 2.8</td><td>ETT &gt; 3.5</td></tr><tr${hl(stz===2)}><td>Storz 4.0</td><td>ETT &gt; 4.5</td></tr></table>${psrc()}</div>`;
 };
 
 pCards.vent = () => {
   const w = W(), y = S.pY, mo = AGEM();
-  let sbp, sbpRule;
+  let sbp, sbpRule, low = null;
   if (mo < 1 && w <= 3.5){ sbp = w < 1.5 ? 40 : w < 2.5 ? 50 : 60; sbpRule = "1 kg 40 · 2 kg 50 · 3 kg 60"; }
-  else { sbp = 90 + 2*y; sbpRule = "90 + (age × 2)"; }
-  return `<div class="card"><h2>Estimated systolic BP</h2><div class="big">${sbp} mmHg</div><div class="sub">${sbpRule}</div></div>
+  else { sbp = 90 + 2*y; sbpRule = "median 90 + (age × 2)"; low = 70 + 2*y; }
+  const ie = mo < 1 ? "1:1 (neonate)" : mo < 12 ? "1:1.5 (infant)" : "1:2";
+  return `<div class="card"><h2>Estimated systolic BP</h2><div class="row"><div><div class="sub">Expected</div><div class="big">${sbp} mmHg</div><div class="sub">${sbpRule}</div></div>
+  ${low?`<div><div class="sub">Hypotension below</div><div class="big">${low} mmHg</div><div class="sub">lower limit 70 + (age × 2)</div></div>`:""}</div></div>
   <div class="card"><h2>Paeds ventilation</h2>
   <table><tr><th>TV</th><td class="hl">4–7 mL/kg = ${sig(4*w)}–${sig(7*w)} mL</td></tr><tr><th>PIP</th><td>&lt; 20</td></tr>
   <tr><th>PEEP</th><td>4–6 (pneumonia may need higher)</td></tr><tr><th>RR</th><td>30–35</td></tr>
-  <tr><th>I:E</th><td>1:2. If RR &gt; 35, pneumonia or BPD: 1:1.5.<br>Alternative: neonate 1:1, infant 1:1.5, &gt; 8 y 1:2</td></tr>
+  <tr><th>I:E</th><td class="hl">${ie}</td></tr><tr><th></th><td class="sub">1:2 standard; RR &gt; 35, pneumonia or BPD: 1:1.5. Neonate 1:1, infant 1:1.5, &gt; 8 y 1:2</td></tr>
   <tr><th>Recruitment</th><td>Consider IP &gt; 10, higher at start of op</td></tr></table>
   <div class="warn">CGA &lt; 48–52 weeks or Hb &lt; 7: consider post-op ventilation (apnoea risk).</div>
   <h3>Neonatal extubation criteria</h3><ol><li>No medical illness</li><li>Weight &gt; 3 kg</li><li>Term baby</li></ol>
@@ -821,7 +831,7 @@ pCards.tiva = () => {
   Propofol 1 mg/kg bolus if anxious = <b>${sig(w)} mg</b>, then 2 mL/h.</p>${psrc()}</div>
   <div class="card"><h2>Dynamic airway assessment (spontaneous breathing)</h2>
   <p>Flexible scope: vocal cord movement, tracheomalacia. Maintain spontaneous breathing — <b>no paralysis</b>.<br>Airway options: NPO₂ with capno; nasal airway to universal port.</p>
-  ${T([DR("IV glycopyrrolate","4","mcg"), DR("Ketamine (optional)",[1,2],"mg"),
+  ${T([DR("IV glycopyrrolate","4","mcg",null,200), DR("Ketamine (optional)",[1,2],"mg"),
     R("Remifentanil (mass rate)","0.05–0.3 mcg/kg/min; induction 0.1, maintenance 0.05",`${mlh10(0.05,W())}–${mlh10(0.3,W())} mL/h at 10 mcg/mL`,"run with Sterofundin 50 mL/h; consider lower concentration for faster rate"),
     R("Lignocaine 2% spray (cords, carina)","max 4 mg/kg",`${sig(4*W())} mg = ${sig(4*W()/20)} mL`,"ideally by surgeon; consider atomiser")])}
   <div class="warn">Remi max 1 mcg/kg/min. Above 0.3 mcg/kg/min may cause apnoea.</div>
@@ -834,25 +844,25 @@ pCards.drugs = () => {
   const w = W();
   return `<div class="card"><h2>Paeds induction drugs</h2>${T([
     (()=>{ const mo=AGEM(), b = mo<1 ? ["neonate",[1,2]] : mo<12 ? ["infant 1–12 months",[3,5]] : ["child &gt; 1 y",[2.5,3.5]]; return R(`Propofol (${b[0]})`,`${b[1].join("–")} mg/kg`,`${pk(b[1],"mg")} = ${pk([b[1][0]/10,b[1][1]/10],"mL")}`,"neonate 1–2 · infant 3–5 · child 2.5–3.5"); })(),
-    DR("IV glycopyrrolate","4","mcg"),
+    DR("IV glycopyrrolate","4","mcg",null,200),
     R("Local anaesthetic (max)","bupivacaine 0.25% 1 mL/kg",pk(1,"mL"),"maximum for infiltration / blocks")])}
 
   <p class="sub">Remifentanil induction: see TIVA card. Ketamine: see ketamine card.</p>${psrc()}</div>
   <div class="card"><h2>Paeds intra-op drugs</h2>${T([
-    R("Tranexamic acid","15 mg/kg over 30 min, then 2–5 mg/kg/h",`${pk(15,"mg")}, then ${pk([2,5],"mg")}/h`,"bolus: &gt; 1 y laparotomy; infusion: craniofacial, scoliosis"),
+    R("Tranexamic acid","15 mg/kg over 30 min, then 2–5 mg/kg/h",`${pk(15,"mg",1000)}, then ${pk([2,5],"mg")}/h`,"bolus: &gt; 1 y laparotomy; infusion: craniofacial, scoliosis"),
     R("Dexamethasone (oedema)","0.2 mg/kg (up to 0.6)",`${pk(0.2,"mg")} (up to ${sig(0.6*w)} mg)`,"watch for tumour lysis syndrome"),
-    DR("Hydrocortisone","4","mg"),
-    R("Calcium gluconate 10%","0.5 mL/kg over 30–60 min",pk(0.5,"mL")),
-    R("Calcium chloride 10%","0.2 mL/kg over 1 h",pk(0.2,"mL")),
-    DR("Ranitidine","1","mg"),
+    DR("Hydrocortisone","4","mg",null,100),
+    R("Calcium gluconate 10%","0.5 mL/kg over 30–60 min, max 20 mL",pk(0.5,"mL",20)),
+    R("Calcium chloride 10%","0.2 mL/kg over 1 h, max 10 mL",pk(0.2,"mL",10)),
+    DR("Ranitidine","1","mg",null,50),
     DR("Frusemide",[0.5,1],"mg","consider in blood transfusion; watch for polyuria"),
     R("Neb salbutamol (1 mL = 5 mg)","2.5 mg &lt; 20 kg; 5 mg &gt; 20 kg",w<20?"2.5 mg (0.5 mL + 0.5 mL saline)":"5 mg (1 mL + 1 mL saline)")])}
 
   <p><b>Albumin 5%:</b> 25 mL of 20% + 75 mL NS = 100 mL.</p>${psrc()}</div>
-  <div class="card"><h2>Paeds PONV</h2>${T([DR("Dexamethasone (PONV)","0.15","mg"), DR("Ondansetron","0.15","mg"), DR("Granisetron","0.04","mg")])}${psrc()}</div>
+  <div class="card"><h2>Paeds PONV</h2>${T([DR("Dexamethasone (PONV)","0.15","mg",null,4), DR("Ondansetron","0.15","mg",null,4), DR("Granisetron","0.04","mg",null,1)])}${psrc()}</div>
   <div class="card"><h2>Paeds analgesia &amp; infusions</h2>${T([
     R("Cocaine 10% (1 mL = 100 mg)","2 mg/kg",`${pk(2,"mg")} = ${sig(2*w/100)} mL`),
-    R("Morphine","lip 0.1 mg/kg; palate 0.15 mg/kg",`lip ${pk(0.1,"mg")} · palate ${pk(0.15,"mg")}`),
+    R("Morphine","lip 0.1 mg/kg; palate 0.15 mg/kg (max 10 mg)",`lip ${pk(0.1,"mg",10)} · palate ${pk(0.15,"mg",10)}`),
     R("IVI morphine","½ × BW mg in 50 mL at 1–2 mL/h",`${sig(w/2)} mg in 50 mL`,"= 10–20 mcg/kg/h; separate IV line"),
     R("IVI fentanyl","20 mcg/kg in 50 mL at 1–2 mL/h",`${sig(20*w)} mcg in 50 mL`,"= 0.4–0.8 mcg/kg/h"),
     DR("Ketamine bolus",[0.2,0.5],"mg"),
@@ -861,12 +871,19 @@ pCards.drugs = () => {
     R("Noradrenaline / adrenaline","0.3 mg/kg in 50 mL",`<b>${sig(0.3*w)} mg</b> in 50 mL`,"1 mL/h = 0.1 mcg/kg/min"),
     R("… neonate, fluid-limited (× 5)","1.5 mg/kg in 50 mL",`${sig(1.5*w)} mg in 50 mL`,"1 mL/h = 0.5 mcg/kg/min"),
     R("Dobutamine / dopamine","3 mg/kg in 50 mL",`<b>${sig(3*w)} mg</b> in 50 mL`,"1 mL/h = 1 mcg/kg/min"),
-    R("… × 5","15 mg/kg in 50 mL",`${sig(15*w)} mg in 50 mL`,"1 mL/h = 5 mcg/kg/min")])}${psrc()}</div>
+    R("… × 5","15 mg/kg in 50 mL",`${sig(15*w)} mg in 50 mL`,"1 mL/h = 5 mcg/kg/min")])}
+  <h3>Rates</h3><table><tr><th>Noradrenaline / adrenaline (mcg/kg/min)</th><td>0.05</td><td>0.1</td><td>0.2</td><td>0.5</td><td>1</td></tr>
+  <tr><th>Standard mix (mL/h)</th><td class="hl">0.5</td><td class="hl">1</td><td class="hl">2</td><td class="hl">5</td><td class="hl">10</td></tr>
+  <tr><th>Neonate × 5 mix (mL/h)</th><td>0.1</td><td>0.2</td><td>0.4</td><td>1</td><td>2</td></tr>
+  <tr><th>Dobutamine / dopamine (mcg/kg/min)</th><td>2.5</td><td>5</td><td>10</td><td>15</td><td>20</td></tr>
+  <tr><th>Standard mix (mL/h)</th><td class="hl">2.5</td><td class="hl">5</td><td class="hl">10</td><td class="hl">15</td><td class="hl">20</td></tr></table>
+  <p class="sub">These rates are the same for every weight because the mix is weight-based.</p>${psrc()}</div>
   <div class="card"><h2>Paeds resuscitation</h2>${T([
-    R("Adrenaline 1:10 000 (arrest)","0.1 mL/kg (1 mL per 10 kg)",`${pk(0.1,"mL")} = ${sig(10*w)} mcg`),
-    R("Atropine (1 mg in 10 mL = 100 mcg/mL)","0.02 mg/kg = 0.2 mL/kg",`${pk(0.02,"mg")} = ${pk(0.2,"mL")}`),
+    R("Adrenaline 1:10 000 (arrest)","0.1 mL/kg (1 mL per 10 kg), max 10 mL",`${pk(0.1,"mL",10)} = ${sig(Math.min(10*w,1000))} mcg`),
+    R("Atropine (1 mg in 10 mL = 100 mcg/mL)","0.02 mg/kg = 0.2 mL/kg, max 0.6 mg",`${pk(0.02,"mg",0.6)} = ${pk(0.2,"mL",6)}`),
     R("Sodium bicarbonate","1 mmol/kg = 2 mL/kg of 4.2% (or 1 mL/kg of 8.4% if &gt; 2 y)",`${pk(2,"mL")} of 4.2%`,"over 30–60 min; 4.2% for &lt; 2 y")])}
-  <p class="sub">Sodium bicarbonate: use 4.2% for &lt; 2 y. Deficit (mmol) = 0.3 × weight × base excess = 0.3 × ${sig(w)} × BE.</p>
+  ${step("pBE","Base excess","mmol/L",-30,0,1)}
+  ${(()=>{ const mm = 0.3*w*Math.abs(S.pBE), half = mm/2; return `<p>Deficit = 0.3 × ${sig(w)} × ${Math.abs(S.pBE)} = <b>${sig(mm)} mmol</b>. Give half: <b>${sig(half)} mmol</b> = <b>${sig(half*2)} mL of 4.2%</b> or ${sig(half)} mL of 8.4%${S.pY<2?" (use 4.2% under 2 y)":""}.</p>`; })()}
   <button class="homebtn" data-open="Paeds anaphylaxis" data-g="emerg" data-tab="paeds">Anaphylaxis doses → Emergencies › Paeds ›</button>
 
   ${psrc()}</div>`;
@@ -874,16 +891,24 @@ pCards.drugs = () => {
 
 pCards.fluids = () => {
   const w = W();
-  const maint = w<=10 ? 4*w : w<=20 ? 40 + 2*(w-10) : 60 + (w-20);
-  return `<div class="card"><h2>Maintenance (4/2/1)</h2><div class="big">${sig(maint)} mL/h</div>
-  <p class="sub">Total = maintenance + deficit (× fasting / 2) + insensible loss.<br>&gt; 20 kg: direct set; &lt; 20 kg: chamber (burette).</p>
+  const m0 = w<=10 ? 4*w : w<=20 ? 40 + 2*(w-10) : 60 + (w-20), maint = Math.min(m0, 100), def = maint*S.fastH;
+  return `<div class="card"><h2>Maintenance (4/2/1)</h2><div class="big">${sig(maint)} mL/h</div>${m0>100?`<div class="sub">capped at 100 mL/h (formula ${sig(m0)})</div>`:""}
+  ${step("fastH","Fasting","h",0,24,1)}
+  <p class="sub">Deficit = maintenance × fasting hours = <b>${sig(def)} mL</b>; give ½ in hour 1, ¼ in hours 2 and 3.</p>
+  <table><tr><th>Hour</th><th>Maintenance + deficit</th><th>Rate</th></tr>
+  <tr><td>1</td><td>${sig(maint)} + ${sig(def/2)}</td><td class="hl">${sig(maint+def/2)} mL/h</td></tr>
+  <tr><td>2</td><td>${sig(maint)} + ${sig(def/4)}</td><td class="hl">${sig(maint+def/4)} mL/h</td></tr>
+  <tr><td>3</td><td>${sig(maint)} + ${sig(def/4)}</td><td class="hl">${sig(maint+def/4)} mL/h</td></tr>
+  <tr><td>4 +</td><td>maintenance</td><td class="hl">${sig(maint)} mL/h</td></tr></table>
+  <p class="sub">Add insensible loss below. &gt; 20 kg: direct set; &lt; 20 kg: chamber (burette).</p>
   <h3>Insensible loss</h3><table><tr><td>Minor &lt; 1 h</td><td>none</td></tr><tr><td>Minor &gt; 1 h</td><td class="hl">2 mL/kg/h = ${sig(2*w)} mL/h</td></tr>
   <tr><td>Moderate</td><td class="hl">4 mL/kg/h = ${sig(4*w)} mL/h</td></tr><tr><td>Major</td><td class="hl">&gt; 10 mL/kg/h = &gt; ${sig(10*w)} mL/h</td></tr></table>
   <p><b>Exposed bowel:</b> insensible loss 10–20 mL/kg/h (${sig(10*w)}–${sig(20*w)} mL/h), up to 30 if losses high, until bowel back inside. Guide by HR, CRT, urine.</p>
   <h3>Fluid choice</h3><ul><li>Neonate / neuro: Sterofundin maintenance (less sodium)</li><li>Replacement: Hartmann's (HM); paeds can use Hartmann's</li></ul>
   <h3>Tips</h3><ul><li>Duhamel: replace deficit from start (7 kg ≈ 200 mL/h), then taper to losses</li><li>Crystalloid &gt; 20 mL/kg/h (${sig(20*w)} mL/h): consider albumin 5%</li><li>Max Gelofusine 25 mL/kg = <b>${sig(25*w)} mL</b>; albumin unlimited</li><li>FFP for coagulopathy / volume to replace loss</li><li>Major op: at least blue cannula — 1 deficit, 1 replacement, 1 inotrope</li></ul>${psrc()}</div>
   <div class="card"><h2>Glucose (neonate / paeds)</h2><p>Check glucose for neonates in OT.</p>
-  <table><tr><td>Neonate</td><td>aim &gt; 2.5 mmol/L</td></tr><tr><td>&gt; 6 months</td><td>aim &gt; 4.1 mmol/L</td></tr><tr><td>&gt; 8 y</td><td>aim &gt; 6 mmol/L</td></tr></table>
+  ${(()=>{ const mo=AGEM(), g = mo<1?0:(S.pY>=8?2:(mo>=6?1:-1)); const h=i=>i===g?' class="hl"':"";
+    return `<table><tr${h(0)}><td>Neonate</td><td>aim &gt; 2.5 mmol/L</td></tr><tr${h(1)}><td>&gt; 6 months</td><td>aim &gt; 4.1 mmol/L</td></tr><tr${h(2)}><td>&gt; 8 y</td><td>aim &gt; 6 mmol/L</td></tr></table>${g<0?'<p class="sub">1–5 months: not specified in notes.</p>':""}`; })()}
   <p>Hypoglycaemia (neonate): D10 2 mL/kg = <b>${sig(2*w)} mL</b></p>
   <h3>Glucose maintenance if high risk of hypoglycaemia</h3><p>HMD2 = 2 mL D50 + 48 mL Hartmann's (2%)</p>
   <p>SD5 = 5 mL D50 + 45 mL Sterofundin = 50 mL of 5%</p>${psrc()}</div>
@@ -891,15 +916,21 @@ pCards.fluids = () => {
   ${T([R("Max transfusion rate","0.5–1 mL/kg/min",`${sig(30*w)}–${sig(60*w)} mL/h`,"higher rate → hyperkalaemia; start calcium gluconate"),
     R("Packed cells","10–20 mL/kg (4 mL/kg ↑ Hb 1 g/dL)",pk([10,20],"mL")),
     DR("FFP",[10,15],"mL"), DR("Platelets",[10,15],"mL"), DR("Cryo",[5,10],"mL")])}
+  ${(()=>{ const mo=AGEM(), y=S.pY, ebvk = mo<1?85:mo<12?80:y<12?75:70, ebv=ebvk*w, abl=S.hbNow>S.hbLow?ebv*(S.hbNow-S.hbLow)/S.hbNow:0, prbc=Math.max(0,4*w*(S.hbTarget-S.hbNow));
+    return `<h3>Blood volume &amp; allowable loss</h3><p>EBV ${ebvk} mL/kg (${mo<1?"term neonate; prem 95":mo<12?"infant":y<12?"child":"&gt; 12 y"}) = <b>${sig(ebv)} mL</b></p>
+    ${step("hbNow","Hb now","g/dL",4,20,0.5)}${step("hbLow","Lowest acceptable Hb","g/dL",4,14,0.5)}
+    <p>Allowable blood loss = EBV × (Hb now − lowest) / Hb now = <b>${sig(abl)} mL</b></p>
+    ${step("hbTarget","Target Hb","g/dL",6,16,0.5)}
+    <p>Packed cells to reach target = 4 mL/kg × rise = <b>${sig(prbc)} mL</b></p>`; })()}
 ${psrc()}</div>`;
 };
 
 pCards.regional = () => {
   const w = W(), y = S.pY;
-  const needle = w<5 ? "orange" : w<=10 ? "black" : w>15 ? "yellow" : "— (10–15 kg not stated in notes)";
+  const needle = w<5 ? "orange" : w<=15 ? "black" : "yellow";
   const bran = w<5 ? "yellow" : w<15 ? "blue" : w<40 ? "pink" : "green";
   return `<div class="card"><h2>Which block (paeds)</h2><ul><li>Palatoplasty: maxillary block (CT/US guided)</li><li>Lip repair: infraorbital block, 0.5 mL levo 0.25% each side</li><li>Inguinal hernia: ilioinguinal</li><li>Orchidopexy, appendix, lower limb: caudal</li><li>Higher level: caudal epidural</li></ul></div>
-  <div class="card"><h2>Caudal block</h2><p>Up to 10 y · sacral hiatus · caudal needle: <b>${needle}</b> (&lt; 5 kg orange, 5–10 kg black, &gt; 15 kg yellow)${y>10?`<br><span class="warn" style="display:inline-block">Age &gt; 10 y</span>`:""}</p>
+  <div class="card"><h2>Caudal block</h2><p>Up to 10 y · sacral hiatus · caudal needle: <b>${needle}</b> (&lt; 5 kg orange, 5–15 kg black, &gt; 15 kg yellow)${y>10?`<br><span class="warn" style="display:inline-block">Age &gt; 10 y</span>`:""}</p>
   ${laLine()}
   ${T([LAR("Sacro-lumbar · bupi 0.25%",[0.5,0.5],2.5,2.5),
     LAR("Upper abdominal · bupi 0.25%",[1,1],2.5,2.5),
@@ -930,7 +961,7 @@ pCards.regional = () => {
 
 pCards.procs = () => {
   const w = W(), len = S.pHt/10 - 1;
-  return `<div class="card"><h2>Laryngospasm</h2>${T([DR("Propofol",[0.5,1],"mg"),DR("Suxamethonium","0.5","mg"),DR("+ atropine","0.02","mg"),
+  return `<div class="card"><h2>Laryngospasm</h2>${T([DR("Propofol",[0.5,1],"mg"),DR("Suxamethonium","0.5","mg"),DR("+ atropine","0.02","mg",null,0.6),
     R("Prevention: IV lignocaine before extubation","1–2 mg/kg",pk([1,2],"mg"),"also dexmedetomidine, clonidine")])}
   <ul><li>Remove airway device</li><li>Jaw thrust, Larson manoeuvre</li><li>Flutter the bag</li><li>Gentle thoracic pressure 20–25 compressions/min</li></ul>${psrc()}</div>
   <div class="card"><h2>Deep extubation (MAC 1)</h2><div class="danger">DO NOT TRY IF NOT FAMILIAR</div>
@@ -957,10 +988,10 @@ pCards.special = () => {
     DR("Ketamine",[0.3,0.5],"mg"), DR("Dexmedetomidine","1","mcg")])}${psrc()}</div>
   <div class="card"><h2>Hypospadias repair</h2><h3>Intra-op</h3>${T([
     R("Caudal levobupivacaine 0.25%","0.75–1 mL/kg, max 20 mL",pk([0.75,1],"mL",20)), DR("± clonidine","1","mcg"),
-    DR("Supp Voren (diclofenac)","1","mg"), DR("Supp paracetamol","40","mg"), DR("IV morphine","0.1","mg")])}
-  <h3>Post-op</h3>${T([R("Syr morphine","0.3 mg/kg up to 4-hourly × 2 days",pk(0.3,"mg")), DR("Syr ibuprofen","10","mg"), DR("Syr paracetamol","15","mg")])}${psrc()}</div>
+    DR("Supp Voren (diclofenac)","1","mg"), DR("Supp paracetamol","40","mg"), DR("IV morphine","0.1","mg",null,10)])}
+  <h3>Post-op</h3>${T([R("Syr morphine","0.3 mg/kg up to 4-hourly × 2 days (max 10 mg)",pk(0.3,"mg",10)), DR("Syr ibuprofen","10","mg"), DR("Syr paracetamol","15","mg")])}${psrc()}</div>
   <div class="card"><h2>Cyanotic heart disease / Fallot spell</h2><p>Aim: increased FiO₂, normal pH, normal EtCO₂, normal SVR (normal BP).</p>
-  <h3>Fallot spell</h3>${T([R("Fluids","10–20 mL/kg",pk([10,20],"mL")), DR("Phenylephrine",[1,5],"mcg","titrate"), R("Esmolol","500 mcg/kg over 1 min, then 50–300 mcg/kg/min",`${pk(500,"mcg")} bolus`,`then ${sig(50*W())}–${sig(300*W())} mcg/min`)])}
+  <h3>Fallot spell</h3>${T([R("Fluids","10–20 mL/kg (max 500 mL per bolus)",pk([10,20],"mL",500)), DR("Phenylephrine",[1,5],"mcg","titrate"), R("Esmolol","500 mcg/kg over 1 min, then 50–300 mcg/kg/min",`${pk(500,"mcg")} bolus`,`then ${sig(50*W())}–${sig(300*W())} mcg/min`)])}
   <p>Oxygen; direct aortic compression.</p>${psrc()}</div>
   <div class="card"><h2>Pyloric stenosis</h2><p>3–5 weeks, projectile vomiting, \"olive\" on palpation.</p><ul><li>Fluid resuscitation with isotonic fluid (HM/NS)</li><li>Correct metabolic alkalosis (hypochloraemic, hypokalaemic)</li><li>Nasoduodenal feeding</li><li>4-quadrant aspiration</li></ul></div>
   <div class="card"><h2>Neonatal surgery</h2>
@@ -969,7 +1000,7 @@ pCards.special = () => {
   <p><b>CDH repair:</b> pulmonary hypertension; stabilise oxygenation; muscle relaxant may disrupt ventilation.</p>
   <p><b>NEC repair:</b> bedside if unstable.</p></div>
   <div class="card"><h2>Ketamine anaesthesia</h2><p>Short, painless procedures (e.g. MRI, EUA). Consider contraindications.</p>
-  ${T([DR("Induction","2","mg"), DR("Top-up",[0.5,1],"mg"), DR("Glycopyrrolate (give before)","4","mcg")])}<p>Sniffing position (roll under shoulder blades).</p>${psrc()}</div>`;
+  ${T([DR("Induction","2","mg"), DR("Top-up",[0.5,1],"mg"), DR("Glycopyrrolate (give before)","4","mcg",null,200)])}<p>Sniffing position (roll under shoulder blades).</p>${psrc()}</div>`;
 };
 
 /* ---------- EMERGENCIES (crisis cards, DRAFT from published guidelines) ---------- */
@@ -1084,16 +1115,16 @@ eCards.paeds = () => {
     "Salbutamol "+B("2–10 puffs")+" into circuit.",
     "IV salbutamol "+B("15 mcg/kg = "+wk(w,15,"mcg",250))+" over 10 min.",
     "IV magnesium "+B("40 mg/kg = "+wk(w,40,"mg",2000))+" over 20 min.",
-    "Hydrocortisone "+B("4 mg/kg = "+wk(w,4,"mg"))+".",
+    "Hydrocortisone "+B("4 mg/kg = "+wk(w,4,"mg",100))+".",
     "Severe: adrenaline "+B("1 mcg/kg = "+wk(w,1,"mcg"))+" IV, titrated. Think anaphylaxis."],
     "APA / standard paediatric crisis management.")
   + crisis("Paeds cardiac arrest", [
     "CPR 15:2. Call arrest team.",
-    "Adrenaline "+B("10 mcg/kg = "+wk(w,0.1,"mL")+" of 1:10 000")+" every 3–5 min.",
+    "Adrenaline "+B("10 mcg/kg = "+wk(w,0.1,"mL",10)+" of 1:10 000")+" every 3–5 min.",
     "Shockable: "+B("4 J/kg = "+wk(w,4,"J"))+". Amiodarone "+B("5 mg/kg = "+wk(w,5,"mg",300))+" after 3rd and 5th shock.",
-    "Atropine "+B("0.02 mg/kg = "+wk(w,0.02,"mg"))+" (bradycardia from vagal cause).",
-    "Fluid bolus "+B("10 mL/kg = "+wk(w,10,"mL"))+". Glucose 10% "+B("2 mL/kg = "+wk(w,2,"mL"))+" if low.",
-    "4 Hs and 4 Ts. Hyperkalaemia: calcium chloride 10% "+B("0.2 mL/kg = "+wk(w,0.2,"mL"))+"."],
+    "Atropine "+B("0.02 mg/kg = "+wk(w,0.02,"mg",0.6))+" (bradycardia from vagal cause).",
+    "Fluid bolus "+B("10 mL/kg = "+wk(w,10,"mL",500))+". Glucose 10% "+B("2 mL/kg = "+wk(w,2,"mL"))+" if low.",
+    "4 Hs and 4 Ts. Hyperkalaemia: calcium chloride 10% "+B("0.2 mL/kg = "+wk(w,0.2,"mL",10))+"."],
     "APLS / RCUK PLS 2021 + my paeds notes.", newerFlag("RCUK paediatric life support","2025","RCUK 2021"))
   + crisis("Paeds LA toxicity (LAST)", [
     "Stop injecting LA. Call for help. Airway, 100% O₂.",
@@ -1107,16 +1138,16 @@ eCards.paeds = () => {
     "Stop trigger. Call for help. 100% O₂, airway.",
     "IV adrenaline "+B("1 mcg/kg = "+wk(w,1,"mcg"))+" (= "+wk(w,0.01,"mL")+" of 1:10 000), titrate and repeat.",
     "No IV: IM adrenaline "+B("10 mcg/kg = "+wk(w,0.01,"mL",0.5)+" of 1:1000")+" (max 0.5 mL).",
-    "Crystalloid "+B("10 mL/kg = "+wk(w,10,"mL"))+", repeat.",
+    "Crystalloid "+B("10 mL/kg = "+wk(w,10,"mL",500))+", repeat.",
     "Bronchospasm: salbutamol. Arrest → paeds arrest card.",
-    "After stable: hydrocortisone "+B("4 mg/kg = "+wk(w,4,"mg"))+". Tryptase at 0, 1–2 h, 24 h."],
+    "After stable: hydrocortisone "+B("4 mg/kg = "+wk(w,4,"mg",100))+". Tryptase at 0, 1–2 h, 24 h."],
     "APA / RCUK anaphylaxis guidance.")
   + crisis("Paeds malignant hyperthermia", [
     "Stop volatile. Call for help. High-flow O₂, charcoal filters if available, TIVA.",
     "Dantrolene "+B("2–2.5 mg/kg actual weight = "+wk(w,2,"mg",300)+"–"+wk(w,2.5,"mg",300))+" IV (max 300 mg per dose).",
     "Repeat the same dose "+B("every 10 min")+" until signs settle. Max total 10 mg/kg = "+wk(w,10,"mg")+" may need exceeding (reconsider diagnosis).",
     "Cool with chilled IV crystalloid and surface cooling; stop below 38.5 °C.",
-    "Hyperkalaemia: calcium chloride 10% "+B("0.2 mL/kg = "+wk(w,0.2,"mL"))+"; insulin "+B("0.1 unit/kg = "+wk(w,0.1,"units"))+" with glucose 10% "+B("5 mL/kg = "+wk(w,5,"mL"))+"."],
+    "Hyperkalaemia: calcium chloride 10% "+B("0.2 mL/kg = "+wk(w,0.2,"mL",10))+"; insulin "+B("0.1 unit/kg = "+wk(w,0.1,"units"))+" with glucose 10% "+B("5 mL/kg = "+wk(w,5,"mL"))+"."],
     "EMHG malignant hyperthermia crisis guideline 2024.", updNote("EMHG 2024","the EMHG guideline text (emhg.org) + NYSORA summary"));
 };
 
@@ -1804,7 +1835,18 @@ const VALUES = [
   "Aspiration prophylaxis: elective ranitidine 150 mg PO 10 pm + morning, sodium citrate 30 mL; emergency ranitidine 50 mg IV, sodium citrate 30 mL ± metoclopramide 10 mg",
   "Post-natal: PCA morphine 1 mg/mL 100–200 mL; SC morphine 7.5–10 mg 4-hourly regular",
   "IT morphine ward obs hourly × 4 h then 4-hourly; call if RR < 8, sedation > 2, VAS > 50%, SBP < 90; pruritus naloxone 0.1–0.4 mg or nalbuphine 2.5–5 mg",
-  "PDPH practical steps: blood patch prerequisites and aftercare; SPG block with lignocaine 2%; local caffeine 300–500 mg/day × 3 days noted"]]];
+  "PDPH practical steps: blood patch prerequisites and aftercare; SPG block with lignocaine 2%; local caffeine 300–500 mg/day × 3 days noted"]],
+ ["Paediatric revisions Nov 2026 (DRAFT)", [
+  "Estimated weight (APLS): < 1 y 0.5 × months + 4; 1–5 y 2 × age + 8; 6–12 y 3 × age + 7; banner > 40 kg",
+  "Cuffed ETT (Microcuff): term–8 months 3.0; 8 months–2 y 3.5; then age/4 + 3.5",
+  "NPA ≈ plain ETT size; length nose tip → tragus",
+  "Auto-highlight: HMEF by TV 7 mL/kg; bag nearest 3 × VC; Storz scope by ETT; I:E by age; glucose target by age; caudal needle 5–15 kg black",
+  "BP: median 90 + 2 × age; hypotension below 70 + 2 × age",
+  "Fluids: maintenance capped 100 mL/h; deficit = maintenance × fasting h; ½ hour 1, ¼ hours 2–3",
+  "Blood: EBV 85 / 80 / 75 / 70 mL/kg (term / infant / child / > 12 y; prem 95); ABL = EBV × (Hb − Hb min) / Hb; PRBC = 4 mL/kg × rise",
+  "Inotrope rate table (1 mL/h = 0.1 mcg/kg/min or 1 mcg/kg/min)",
+  "Bicarbonate: 0.3 × weight × BE, give half; mL of 4.2% / 8.4%",
+  "Caps: ondansetron 4 mg, dex PONV 4 mg, granisetron 1 mg, glyco 200 mcg, TXA 1 g, hydrocortisone 100 mg, ranitidine 50 mg, Ca gluconate 20 mL, CaCl 10 mL, adrenaline 1 mg (10 mL), atropine 0.6 mg, bolus 500 mL, IV/syrup morphine 10 mg"]]];
 
 /* ---------- ANONYMOUS CASES (phone only, 36 h) ---------- */
 const CASE_TTL = 36*3600*1000, CASE_MAX = 6;
@@ -1961,7 +2003,7 @@ function groupScreen(g){
     return m[o] ? accordion(m[o], l, g.id, l!==o ? l : null) : `<div class="danger">Missing card: ${esc(o)}</div>`; }).join("");
   if (g.tabs){
     const tab = g.tabs.find(t=>t.id===S[g.tabKey]) || g.tabs[0];
-    const ab = activeBar() + sampleWarn(SAMPLE_BY[g.id] ? (SAMPLE_BY[g.id][tab.id] || SAMPLE_BY[g.id]["*"] || []) : []);
+    const ab = (g.id==="paeds" && !PREV_CHECKED ? `<div class="warn">DRAFT — paediatric revisions (Nov 2026): auto-calculations and dose caps. Tick on the Values sheet.</div>` : "") + activeBar() + sampleWarn(SAMPLE_BY[g.id] ? (SAMPLE_BY[g.id][tab.id] || SAMPLE_BY[g.id]["*"] || []) : []);
     const links = (tab.links||[]).map(([t,tb,label])=>`<button class="emlink" data-open="${esc(t)}" data-g="emerg" data-tab="${tb}">⚠ ${esc(label)} → Emergencies</button>`).join("");
     return head(g.name,"home",g.id) + ab + (g.tabs.length>1 ? `<div class="seg emtabs${g.tabs.length>=5?" five":""}">${g.tabs.map(t=>`<button aria-pressed="${t===tab}" data-seg="${g.tabKey}" data-val="${t.id}">${t.label}</button>`).join("")}</div>` : `<div class="label" style="margin-top:0">${tab.label}</div>`) +
       (tab.input ? `<div class="card">${tab.input()}</div>` : "") + (tab.top ? tab.top() : "") +
