@@ -278,6 +278,14 @@ table.blk th{width:32%;font-size:var(--fs-xs);text-transform:uppercase;letter-sp
 .stag{display:inline-block;font-size:var(--fs-xs);font-weight:700;color:var(--warn-ink);background:var(--warn-bg);border:1px solid var(--warn-line);border-radius:6px;padding:0 5px;margin-left:4px;font-style:normal;vertical-align:1px}
 .samplewarn{background:var(--warn-bg);color:var(--warn-ink);border:1px solid var(--warn-line);border-radius:var(--r-sm);padding:var(--s2) var(--s3);margin:0 0 var(--s3);font-size:var(--fs-sm)}
 .updbar{position:fixed;left:max(16px,env(safe-area-inset-left,0px));right:max(16px,env(safe-area-inset-right,0px));bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:20;padding:var(--s3);border-radius:var(--r);border:0;background:var(--accent);color:var(--accent-ink);font-weight:700;font-size:var(--fs-base);box-shadow:0 6px 20px rgba(0,0,0,.25);cursor:pointer}
+.namebtn{background:none;border:0;color:var(--mon-muted);font-size:var(--fs-base);cursor:pointer;padding:0 4px;vertical-align:2px}
+.abxopt{margin:var(--s1) 0}
+.abxrow{display:flex;justify-content:space-between;gap:var(--s2);padding:var(--s2) 0;border-bottom:1px solid var(--line);font-size:var(--fs-sm)}
+.abxrow b{text-align:right;font-family:var(--font-mono);font-weight:600}
+.abxrow b .sub{display:block;font-family:var(--font-sans);font-weight:400}
+.or{display:block;font-size:var(--fs-xs);font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin:var(--s2) 0 0}
+details.endo{margin-top:var(--s3);border:1px solid var(--line);border-radius:var(--r-sm);padding:var(--s2) var(--s3)}
+details.endo summary{cursor:pointer;font-weight:600;font-size:var(--fs-sm)}
 .disc{color:var(--muted);font-size:var(--fs-xs);text-align:center;margin-top:var(--s5);line-height:1.5}
 a{color:var(--accent)}
 .vs label{display:flex;gap:var(--s3);align-items:flex-start;padding:var(--s2) 0;border-bottom:1px solid var(--line);font-size:var(--fs-sm)}
@@ -291,7 +299,7 @@ a{color:var(--accent)}
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.4.0";
+const APP_VERSION = "2.5.0";
 const APP_DATE = "14 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
@@ -308,7 +316,7 @@ const store = {
 };
 // Inputs are not remembered between uses (per plan): state lives in memory only.
 const S = { ettMode:"adult", sex:"F", height:158, ageY:4, ageM:0, wt:3.0,
-            touched:{}, spOp:"lscs", spHt:155, morWt:60, pw:10, pY:1, pM:0, pHt:75, pBE:-5, aw:70, emTab:"adult", obTab:"labour", pTab:"pre", gaTab:"pre", raTab:"safety", laA:[], laP:[], cSex:"F", cY:40, cM:0, cH:160, cW:60, cNick:"", laD:"bupi", laC:"0.5", laMl:15, laBi:"1", age:45, apfel:0, pump:"pcea_cse", topup:"lig" };
+            touched:{}, abxSp:"general", spOp:"lscs", spHt:155, morWt:60, pw:10, pY:1, pM:0, pHt:75, pBE:-5, aw:70, emTab:"adult", obTab:"labour", pTab:"pre", gaTab:"pre", raTab:"safety", laA:[], laP:[], cSex:"F", cY:40, cM:0, cH:160, cW:60, cNick:"", laD:"bupi", laC:"0.5", laMl:15, laBi:"1", age:45, apfel:0, pump:"pcea_cse", topup:"lig" };
 
 function src(text){ return `<div class="src">Source: ${text}</div>`; }
 function protoSrc(){
@@ -402,7 +410,7 @@ screens.home = () => {
     <svg class="capno" viewBox="0 0 400 48" preserveAspectRatio="none" aria-hidden="true"><g class="trace"><path d="${CAPNO}"/></g></svg>
     <div class="hero-top"><span class="brand">${svg("capno")} Induction Card</span>
       <span class="hero-r"><span id="clock" class="clock">${clockTxt()}</span><button class="iconbtn themebtn herobtn" data-theme-toggle aria-label="Theme: ${th}">${thLabel}</button></span></div>
-    <h1 class="hello">${greet()},<br>${DOCTOR}</h1>
+    <h1 class="hello">${greet()},<br>${esc(doctorName())} <button class="namebtn" data-go="settings" aria-label="Change display name">✎</button></h1>
     <div class="date">${dateTxt()}</div>
   </section>
   <div class="searchbox">${svg("search")}<input id="q" class="search" type="search" placeholder="Search caudal, remi, LSCS…" autocomplete="off" aria-label="Search cards"></div><div id="results"></div>
@@ -1356,6 +1364,73 @@ raCards.sap = () => blk({t:"Serratus anterior", ind:"Breast surgery, rib fractur
 /* PAEDS calculator card */
 pCards.lacalc = () => `<div class="card"><h2>Paeds LA dose calculator</h2>${laCalc("p")}${psrc()}</div>`;
 
+/* ---------- ANTIBIOTIC PROPHYLAXIS (adult + paeds) — DRAFT: Malaysian NAG 2019 / ASHP-IDSA 2013 ---------- */
+const ABX_CHECKED = false;
+const abxDraft = () => ABX_CHECKED ? "" : `<div class="warn" style="margin-top:0">DRAFT — Malaysian National Antimicrobial Guideline 2019 / ASHP-IDSA 2013, not yet ticked by you. Follow local policy.</div>`;
+// adult: fixed dose or per-kg; paeds: per kg with max (mg)
+const ABX = {
+  cefazolin:{n:"Cefazolin", a:w=>w>=120?"3 g":"2 g", p:[30,2000], re:"4 h"},
+  cefuroxime:{n:"Cefuroxime", a:()=> "1.5 g", p:[50,1500], re:"4 h"},
+  unasyn:{n:"Unasyn (ampicillin–sulbactam)", a:()=> "3 g", p:[75,3000], pnote:"50 mg/kg ampicillin component", re:"2 h"},
+  augmentin:{n:"Augmentin IV (amoxicillin–clavulanate)", a:()=> "1.2 g", p:[30,1200], re:"2 h"},
+  metronidazole:{n:"Metronidazole", a:()=> "500 mg", p:[15,500], re:"—"},
+  gentamicin:{n:"Gentamicin", a:null, p:[2.5,null], re:"—"},
+  clindamycin:{n:"Clindamycin", a:()=> "900 mg", p:[10,900], re:"6 h"},
+  vancomycin:{n:"Vancomycin", a:null, p:[15,2000], re:"—", note:"infuse over ≥ 60 min, start 60–120 min before incision"},
+  azithromycin:{n:"Azithromycin", a:()=> "500 mg", p:[10,500], re:"—"}};
+function abxDose(k, paeds){
+  const d = ABX[k];
+  if (paeds){ const w = W(), mg = Math.min(d.p[0]*w, d.p[1] ?? Infinity); return `${sig(mg)} mg <span class="sub">(${d.p[0]} mg/kg${d.p[1]?`, max ${d.p[1]>=1000?d.p[1]/1000+" g":d.p[1]+" mg"}`:""}${d.pnote?`; ${d.pnote}`:""})</span>`; }
+  const x = wts();
+  if (k==="gentamicin"){ const dw = x.tbw > 1.2*x.ibwRaw ? x.adj : x.tbw; return `${sig(5*dw)} mg <span class="sub">(5 mg/kg ${x.tbw > 1.2*x.ibwRaw ? "AdjBW" : "TBW"} ${sig(dw)} kg)</span>`; }
+  if (k==="vancomycin"){ return `${sig(Math.min(15*x.tbw,2000))} mg <span class="sub">(15 mg/kg TBW, max 2 g)</span>`; }
+  return d.a(x.tbw);
+}
+const ABX_SP = {
+  general:{n:"General / upper GI", first:[["cefazolin"]], allergy:[["clindamycin","gentamicin"]], note:"Low-risk laparoscopic procedures may need none."},
+  hpb:{n:"HPB / biliary", first:[["cefazolin"],["unasyn"]], allergy:[["clindamycin","gentamicin"]], note:"Low-risk elective lap chole: none. Biliary obstruction, stents, Whipple: add metronidazole or use Unasyn."},
+  colorectal:{n:"Colorectal / appendix", first:[["cefazolin","metronidazole"],["unasyn"]], allergy:[["clindamycin","gentamicin"],["metronidazole","gentamicin"]], note:"Perforation / peritonitis = treatment course, not prophylaxis."},
+  uro:{n:"Urology", first:[["cefazolin"],["gentamicin"]], allergy:[["gentamicin"],["clindamycin","gentamicin"]], note:"Bowel opened (cystectomy, conduit): cefazolin + metronidazole. Treat a positive urine culture before surgery."},
+  gynae:{n:"Gynae (hysterectomy)", first:[["cefazolin"]], allergy:[["clindamycin","gentamicin"]], note:"Add metronidazole if bowel involved or per local policy."},
+  lscs:{n:"LSCS", first:[["cefazolin"]], allergy:[["clindamycin","gentamicin"]], note:"Give before incision. In labour or ruptured membranes: add azithromycin 500 mg."},
+  ortho:{n:"Ortho", first:[["cefazolin"]], allergy:[["vancomycin"],["clindamycin"]], note:"MRSA colonised: add vancomycin. Open fracture: start ASAP; add gentamicin for type III. Arthroplasty: may continue ≤ 24 h."},
+  dental:{n:"Dental / maxfax / head & neck", first:[["cefazolin","metronidazole"],["unasyn"],["augmentin"]], allergy:[["clindamycin"]], note:"Clean-contaminated (mucosa breached). Routine dental extraction or clean neck surgery (thyroid, parotid): usually none."},
+  clean:{n:"Clean (hernia, breast)", first:[["cefazolin"]], allergy:[["clindamycin"],["vancomycin"]], note:"Without mesh or implant and low risk: usually none."},
+  nvc:{n:"Neuro / vascular / cardiac", first:[["cefazolin"],["cefuroxime"]], allergy:[["vancomycin"],["clindamycin"]], note:"MRSA colonised: add vancomycin."}};
+function abxCard(paeds){
+  if (!ABX_SP[S.abxSp]) S.abxSp = "general";
+  const sp = ABX_SP[S.abxSp];
+  const opt = list => list.map((combo,i) => `<div class="abxopt">${i?`<span class="or">or</span>`:""}${combo.map(k=>`<div class="abxrow"><span>${ABX[k].n}</span><b>${abxDose(k,paeds)}</b></div>`).join("")}</div>`).join("");
+  const used = [...new Set([...sp.first.flat(), ...sp.allergy.flat()])];
+  const extra = S.abxSp==="lscs" ? `<div class="abxrow"><span>+ Azithromycin (labour / ROM)</span><b>${abxDose("azithromycin",paeds)}</b></div>` : "";
+  return `${seg("abxSp", Object.entries(ABX_SP).map(([k,v])=>[k,v.n]))}
+    <h3>First-line</h3>${opt(sp.first)}${extra}
+    <h3>Penicillin allergy</h3>${opt(sp.allergy)}
+    <div class="warn">${sp.note}</div>
+    <h3>Timing</h3><ul><li>IV within <b>60 min before incision</b> (vancomycin: start 60–120 min before)</li>
+      <li>Redose: ${used.filter(k=>ABX[k].re!=="—").map(k=>`${ABX[k].n.split(" (")[0]} every ${ABX[k].re}`).join(" · ") || "single dose"}; and after blood loss &gt; ${paeds?"25 mL/kg":"1.5 L"}</li>
+      <li>Stop within 24 h (most cases: single dose)</li></ul>
+    <details class="endo"><summary>Endocarditis prophylaxis (high-risk cardiac only)</summary>
+      <p class="sub">Prosthetic valve, previous endocarditis, some congenital heart disease — for dental work breaching gingiva.</p>
+      <table><tr><td>Amoxicillin PO</td><td class="hl">${paeds?`${sig(Math.min(50*W(),2000))} mg (50 mg/kg)`:"2 g"}</td></tr>
+      <tr><td>Ampicillin IV</td><td class="hl">${paeds?`${sig(Math.min(50*W(),2000))} mg (50 mg/kg)`:"2 g"}</td></tr>
+      <tr><td>Cefazolin IV (allergy, not anaphylaxis)</td><td class="hl">${paeds?`${sig(Math.min(50*W(),1000))} mg (50 mg/kg)`:"1 g"}</td></tr>
+      <tr><td>Azithromycin (severe allergy)</td><td class="hl">${paeds?`${sig(Math.min(15*W(),500))} mg (15 mg/kg)`:"500 mg"}</td></tr></table>
+      <p class="sub">30–60 min before. AHA 2021 (clindamycin no longer recommended).</p></details>
+    ${src("Malaysian National Antimicrobial Guideline 2019; ASHP/IDSA/SIS/SHEA 2013; AHA 2021 (draft).")}`;
+}
+gaCards.abx = () => `<div class="card"><h2>5. Antibiotic prophylaxis</h2>${abxDraft()}${abxCard(false)}</div>`;
+pCards.abx = () => `<div class="card"><h2>Paeds antibiotic prophylaxis</h2>${abxDraft()}${abxCard(true)}</div>`;
+
+/* ---------- DISPLAY NAME (phone only) ---------- */
+const cleanName = v => String(v||"").replace(/[<>&"'`]/g,"").trim().slice(0,24);
+const doctorName = () => cleanName(store.get("doctor", "Dr X")) || "Dr X";
+screens.settings = () => head("Display name","home") + `<div class="card">
+  <label class="sub" for="dname">Name shown in the greeting (max 24 characters)</label>
+  <input id="dname" class="search" style="padding-left:12px" maxlength="24" autocomplete="off" value="${esc(S.dname ?? doctorName())}">
+  <p class="sub">Saved on this phone only.</p>
+  <button class="homebtn primary" data-savename="1">Save name</button></div>` + disc;
+
 /* ---------- VALUES SHEET ---------- */
 const VALUES = [
  ["ETT – adult", [
@@ -1471,7 +1546,20 @@ const VALUES = [
   "Volumes: ISB 10–15, SCB 20–25, axillary 20–25, femoral 15–20, fascia iliaca 30–40, PENG 20, adductor 10–20, popliteal 20–30, ESP 20–30/side, rectus sheath 10–15/side, TAP 15–20/side, serratus 20–30 mL",
   "Epidural: test 3 mL lignocaine 2% + adrenaline; 0.1% + fentanyl 2 mcg/mL thoracic 4–10, lumbar 6–14 mL/h; bolus 3–5 mL",
   "PDPH: caffeine ≤300 mg/day; blood patch 15–20 mL",
-  "Adjuncts: dexamethasone IV 0.1–0.15 mg/kg (4 mg perineural); dexmedetomidine / clonidine 0.5–1 mcg/kg; IT fentanyl 10–25 mcg; IT morphine 100–150 mcg"]]];
+  "Adjuncts: dexamethasone IV 0.1–0.15 mg/kg (4 mg perineural); dexmedetomidine / clonidine 0.5–1 mcg/kg; IT fentanyl 10–25 mcg; IT morphine 100–150 mcg"]],
+ ["Antibiotic prophylaxis (DRAFT, Malaysian NAG 2019 / ASHP 2013)", [
+  "Adult: cefazolin 2 g (3 g ≥120 kg) redose 4 h; cefuroxime 1.5 g 4 h; Unasyn 3 g 2 h; Augmentin 1.2 g 2 h; metronidazole 500 mg; gentamicin 5 mg/kg (AdjBW if >120% IBW); clindamycin 900 mg 6 h; vancomycin 15 mg/kg max 2 g; azithromycin 500 mg",
+  "Paeds: cefazolin 30 mg/kg (max 2 g); cefuroxime 50 (1.5 g); Unasyn 75 mg/kg combined (3 g); Augmentin 30 (1.2 g); metronidazole 15 (500 mg); gentamicin 2.5; clindamycin 10 (900 mg); vancomycin 15 (2 g); azithromycin 10 (500 mg)",
+  "General/upper GI: cefazolin; allergy clinda + gent",
+  "HPB: cefazolin or Unasyn; allergy clinda + gent; low-risk lap chole none",
+  "Colorectal/appendix: cefazolin + metronidazole or Unasyn; allergy clinda + gent or metronidazole + gent",
+  "Urology: cefazolin or gentamicin; bowel opened add metronidazole",
+  "Gynae: cefazolin; LSCS cefazolin before incision + azithromycin if labour/ROM",
+  "Ortho: cefazolin; allergy/MRSA vancomycin or clinda; open fracture ± gentamicin",
+  "Dental/maxfax/H&N clean-contaminated: cefazolin + metronidazole, Unasyn or Augmentin; allergy clinda",
+  "Clean with implant/mesh: cefazolin; neuro/vascular/cardiac: cefazolin or cefuroxime",
+  "Timing ≤60 min before incision; redose also after 1.5 L (paeds 25 mL/kg) blood loss; stop ≤24 h",
+  "Endocarditis (AHA 2021): amoxicillin/ampicillin 2 g (50 mg/kg), cefazolin 1 g (50 mg/kg), azithromycin 500 mg (15 mg/kg)"]]];
 
 /* ---------- ANONYMOUS CASES (phone only, 36 h) ---------- */
 const CASE_TTL = 36*3600*1000, CASE_MAX = 6;
@@ -1568,7 +1656,7 @@ const GROUPS = [
     cards:[["Paeds ETT","1. Tube: size, depth, blade, suction"],["NPA","2. NPA"],["Micro HMEF","3. HMEF"],["Bag","4. Bag"],
       ["Paeds induction drugs","5. Induction drugs"],["Ketamine anaesthesia","6. Ketamine induction (short cases)"],
       ["TCI model check","7. TIVA: model check & propofol targets"],["Remifentanil 10 mcg/mL","8. TIVA: remifentanil"],
-      ["Paeds ventilation","9. Ventilation settings"],["One-lung ventilation (Storz)","10. One-lung ventilation (Storz)"],["T-tube","11. T-tube"],["Double-lumen CVC","12. Lines: double-lumen CVC"]],
+      ["Paeds ventilation","9. Ventilation settings"],["One-lung ventilation (Storz)","10. One-lung ventilation (Storz)"],["T-tube","11. T-tube"],["Double-lumen CVC","12. Lines: double-lumen CVC"],["Paeds antibiotic prophylaxis","13. Antibiotic prophylaxis"]],
     links:[["Laryngospasm","paeds","Laryngospasm"],["Paeds bronchospasm","paeds","Bronchospasm"],["Paeds anaphylaxis","paeds","Anaphylaxis"]]},
    {id:"intra", label:"Intra-op", input:()=>pInputs(), hint:"Keep them stable: fluids → drugs → blocks → warmth.",
     cards:[["Maintenance (4/2/1)","1. Fluids: maintenance & insensible loss"],["Glucose (neonate / paeds)","2. Fluids: glucose"],["Blood products","3. Fluids: blood products"],
@@ -1591,6 +1679,8 @@ const GROUPS = [
     cards:["1. Analgesia by technique","2. NSAID yes / no","3. PCA morphine (after GA)","4. Ward (OAS) problems & catheter care"],
     links:[["Eclampsia","adult","Eclampsia"],["Massive obstetric haemorrhage","adult","Massive haemorrhage"]]}], cards:[]}];
 const SEARCH_EXTRA = {
+  "5. Antibiotic prophylaxis":"antibiotic prophylaxis cefazolin unasyn ampicillin sulbactam augmentin metronidazole gentamicin clindamycin vancomycin cefuroxime azithromycin endocarditis uro gynae ortho dental hpb colorectal",
+  "13. Antibiotic prophylaxis":"antibiotic prophylaxis cefazolin unasyn metronidazole gentamicin clindamycin vancomycin paeds endocarditis",
   "4. Tube & airway kit":"ett tube endotracheal chula lma igel i-gel supraglottic laryngoscope video adult",
   "Neuraxial & deep blocks: anticoagulant timing":"anticoagulant antiplatelet clopidogrel enoxaparin clexane heparin warfarin doac rivaroxaban apixaban dabigatran asra platelets",
   "A1. Spinal: dose by height":"lscs caesarean cesarean c-section sab spinal heavy bupivacaine marcaine dose height obstetric",
@@ -1675,7 +1765,7 @@ document.addEventListener("toggle", e => {
     document.querySelectorAll("details.acc[open]").forEach(o => { if (o!==d) o.open = false; }); }
   else if (S.open === d.dataset.t) S.open = null;
 }, true);
-document.addEventListener("input", e => { if (e.target.id==="q") runSearch(e.target.value); if (e.target.id==="cNick") S.cNick = e.target.value.slice(0,12); });
+document.addEventListener("input", e => { if (e.target.id==="q") runSearch(e.target.value); if (e.target.id==="cNick") S.cNick = e.target.value.slice(0,12); if (e.target.id==="dname") S.dname = e.target.value.slice(0,24); });
 function clamp(v,min,max){ return Math.min(max, Math.max(min, v)); }
 document.addEventListener("click", e => {
   const b = e.target.closest("button, input[type=checkbox]"); if (!b) return;
@@ -1685,6 +1775,7 @@ document.addEventListener("click", e => {
     const target = "#g-"+d.g; if (location.hash===target) render(); else { location.hash = target; } if (d.calc) window.scrollTo(0,0); return; }
   if (d.lscs){ S.spOp="lscs"; S.open=null; location.hash="#g-spinal"; window.scrollTo(0,0); return; }
   if (d.go){ S.open = null; location.hash = "#"+d.go; window.scrollTo(0,0); return; }
+  if (d.savename){ const v = cleanName(S.dname ?? doctorName()); store.set("doctor", v || "Dr X"); S.dname = undefined; location.hash = "#home"; return; }
   if (d.case){ const c = getCases().find(x=>x.id===d.case); if (c){ store.set("active", c.id); applyCase(c); } if ((location.hash||"#home")==="#cases") render(); else render(); return; }
   if (d.delcase){ const cs = getCases().filter(x=>x.id!==d.delcase); store.set("cases", cs); if (store.get("active",null)===d.delcase) store.set("active", null); render(); return; }
   if (d.savecase){ const cs = getCases(); if (cs.length >= CASE_MAX) return;
