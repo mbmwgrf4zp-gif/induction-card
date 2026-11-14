@@ -324,7 +324,7 @@ a{color:var(--accent)}
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.11.0";
+const APP_VERSION = "2.11.1";
 const APP_DATE = "14 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
@@ -529,7 +529,7 @@ const nonObsCalc = () => {
 const kv = rows => `<table>${rows.map(([k,v])=>`<tr><th style="width:42%">${k}</th><td>${v}</td></tr>`).join("")}</table>`;
 const MINE = "My practice (personal notes).";
 const LOC_CHECKED = true;
-const PREV_CHECKED = false;
+const PREV_CHECKED = true;
 const locNote = () => LOC_CHECKED ? "" : `<div class="warn" style="margin-top:0">DRAFT — added from the departmental protocol. Tick on the Values sheet.</div>`;
 const obsCards = {};
 
@@ -1836,7 +1836,7 @@ const VALUES = [
   "Post-natal: PCA morphine 1 mg/mL 100–200 mL; SC morphine 7.5–10 mg 4-hourly regular",
   "IT morphine ward obs hourly × 4 h then 4-hourly; call if RR < 8, sedation > 2, VAS > 50%, SBP < 90; pruritus naloxone 0.1–0.4 mg or nalbuphine 2.5–5 mg",
   "PDPH practical steps: blood patch prerequisites and aftercare; SPG block with lignocaine 2%; local caffeine 300–500 mg/day × 3 days noted"]],
- ["Paediatric revisions Nov 2026 (DRAFT)", [
+ ["Paediatric revisions Nov 2026 (signed off 14 Nov 2026)", [
   "Estimated weight (APLS): < 1 y 0.5 × months + 4; 1–5 y 2 × age + 8; 6–12 y 3 × age + 7; banner > 40 kg",
   "Cuffed ETT (Microcuff): term–8 months 3.0; 8 months–2 y 3.5; then age/4 + 3.5",
   "NPA ≈ plain ETT size; length nose tip → tragus",
