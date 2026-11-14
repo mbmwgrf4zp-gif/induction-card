@@ -324,7 +324,7 @@ a{color:var(--accent)}
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.8.0";
+const APP_VERSION = "2.9.0";
 const APP_DATE = "14 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
@@ -939,6 +939,8 @@ pCards.special = () => {
 
 /* ---------- EMERGENCIES (crisis cards, DRAFT from published guidelines) ---------- */
 const CRISIS_CHECKED = true;
+const UPD_CHECKED = false;
+const updNote = (g, srcs) => UPD_CHECKED ? "" : `<div class="warn"><b>DRAFT — updated to ${g}</b>, verified from ${srcs}. Tick on the Values sheet.</div>`;
 const newerFlag = (name, yr, cur) => `<div class="newer"><b>⟳ Newer guideline published:</b> ${name} (${yr}). This card still follows ${cur} until it is updated from the full text.</div>`;
 const crisisDraft = () => CRISIS_CHECKED ? "" : `<div class="warn" style="margin-top:0">DRAFT — from published guidelines, not yet ticked by you.</div>`;
 const wk = (w, per, unit, max) => { let v = per*w, c = false; if (max!=null && v>max){ v=max; c=true; } return `${sig(v)} ${unit}${c?` (max ${max} ${unit})`:""}`; };
@@ -1004,21 +1006,21 @@ eCards.adult = () => {
     "Standard crisis management.")
   + crisis("Malignant hyperthermia", [
     "Stop volatile. Call for help, get MH kit.",
-    "High-flow O₂ &gt; 10 L/min. Activated charcoal filters or clean circuit. Switch to TIVA.",
-    "Dantrolene "+B("2.5 mg/kg = "+wk(w,2.5,"mg"))+" IV ("+Math.ceil(2.5*w/20)+" × 20 mg vials, each in 60 mL water).",
-    "Repeat "+B("1 mg/kg = "+wk(w,1,"mg"))+" every 5 min until improving, max "+B("10 mg/kg = "+wk(w,10,"mg"))+".",
-    "Cool actively; stop at 38.5 °C.",
+    "High-flow O₂ &gt; 10 L/min. Activated charcoal filters on inspiratory and expiratory limbs if available. Switch to TIVA.",
+    "Dantrolene "+B("2–2.5 mg/kg actual weight = "+wk(w,2,"mg",300)+"–"+wk(w,2.5,"mg",300))+" IV (max 300 mg per dose).",
+    "Repeat the same dose "+B("every 10 min")+" until PaCO₂ &lt; 6 kPa with normal ventilation and signs settle. Max total 10 mg/kg = "+wk(w,10,"mg")+" may need exceeding (reconsider diagnosis); an adult may need 1200 mg.",
+    "Cool: 2–3 L chilled (4–8 °C) crystalloid IV, surface cooling; stop below 38.5 °C.",
     "Hyperkalaemia: insulin + dextrose, "+B("calcium chloride 10% 10 mL")+". Arrhythmia: amiodarone (no calcium channel blockers).",
     "Monitor urine output, CK, ABG. ICU."],
-    "Association of Anaesthetists MH guideline 2020.", newerFlag("EMHG malignant hyperthermia crisis guideline","2024","the Association of Anaesthetists 2020 guideline"))
+    "EMHG malignant hyperthermia crisis guideline 2024.", updNote("EMHG 2024","the EMHG guideline text (emhg.org) + NYSORA summary"))
   + crisis("Failed intubation / CICO", [
-    "Plan A: max 3 + 1 attempts (obstetric: 2, 3rd by most experienced). Release cricoid if view poor.",
-    "Plan B: 2nd-generation supraglottic airway, max 3 attempts.",
+    "Plan A: "+B("videolaryngoscope first-line")+" whenever possible; neuromuscular block routinely; peroxygenation throughout. Max 3 + 1 attempts (obstetric: 2, 3rd by most experienced). Release cricoid if view poor.",
+    "Plan B: 2nd-generation supraglottic airway, max 3 attempts. No blind intubation through it. If SGA ventilation is difficult, start preparing for front-of-neck access.",
     "Plan C: face mask. Wake up — "+B("sugammadex 16 mg/kg = "+wk(w,16,"mg"))+" if rocuronium.",
     "Plan D — CICO: declare it. Full paralysis, 100% O₂.",
     "Front of neck: "+B("scalpel – bougie – size 6.0 cuffed tube")+" through cricothyroid membrane.",
     "Obstetric: decide early — wake up or proceed with SAD."],
-    "DAS 2015 / OAA-DAS obstetric guideline.", newerFlag("DAS 2025 unanticipated difficult intubation","Nov 2025","DAS 2015"))
+    "DAS 2025 / OAA-DAS obstetric guideline.", updNote("DAS 2025 (Nov 2025)","NYSORA summary + BJA guideline text excerpts"))
   + crisis("Massive obstetric haemorrhage", [
     "Call for help — activate massive transfusion protocol. 2 large-bore IVs, crossmatch, FBC, coags, fibrinogen.",
     "Uterine massage. Empty bladder.",
@@ -1075,12 +1077,12 @@ eCards.paeds = () => {
     "After stable: hydrocortisone "+B("4 mg/kg = "+wk(w,4,"mg"))+". Tryptase at 0, 1–2 h, 24 h."],
     "APA / RCUK anaphylaxis guidance.")
   + crisis("Paeds malignant hyperthermia", [
-    "Stop volatile. Call for help. High-flow O₂, charcoal filters, TIVA.",
-    "Dantrolene "+B("2.5 mg/kg = "+wk(w,2.5,"mg"))+" IV ("+Math.ceil(2.5*w/20)+" × 20 mg vials).",
-    "Repeat "+B("1 mg/kg = "+wk(w,1,"mg"))+" every 5 min, max "+B("10 mg/kg = "+wk(w,10,"mg"))+".",
-    "Cool; stop at 38.5 °C.",
+    "Stop volatile. Call for help. High-flow O₂, charcoal filters if available, TIVA.",
+    "Dantrolene "+B("2–2.5 mg/kg actual weight = "+wk(w,2,"mg",300)+"–"+wk(w,2.5,"mg",300))+" IV (max 300 mg per dose).",
+    "Repeat the same dose "+B("every 10 min")+" until signs settle. Max total 10 mg/kg = "+wk(w,10,"mg")+" may need exceeding (reconsider diagnosis).",
+    "Cool with chilled IV crystalloid and surface cooling; stop below 38.5 °C.",
     "Hyperkalaemia: calcium chloride 10% "+B("0.2 mL/kg = "+wk(w,0.2,"mL"))+"; insulin "+B("0.1 unit/kg = "+wk(w,0.1,"units"))+" with glucose 10% "+B("5 mL/kg = "+wk(w,5,"mL"))+"."],
-    "Association of Anaesthetists MH guideline 2020.", newerFlag("EMHG malignant hyperthermia crisis guideline","2024","the Association of Anaesthetists 2020 guideline"));
+    "EMHG malignant hyperthermia crisis guideline 2024.", updNote("EMHG 2024","the EMHG guideline text (emhg.org) + NYSORA summary"));
 };
 
 /* ---------- GENERAL ANAESTHESIA (adult) — DRAFT from standard references ---------- */
@@ -1123,9 +1125,11 @@ const gaCards = {};
 /* PRE-OP */
 gaCards.fasting = () => `<div class="card"><h2>1. Fasting</h2>${gaDraft()}
   <table><tr><td>Clear fluids</td><td class="hl">2 h</td></tr><tr><td>Light meal, milk</td><td class="hl">6 h</td></tr><tr><td>Fatty / heavy meal</td><td class="hl">8 h</td></tr></table>
-  <h3>GLP-1 agonists (semaglutide, liraglutide…)</h3>
-  <ul><li>Weekly dose: hold 1 week before</li><li>Daily dose: hold on the day</li><li>GI symptoms (nausea, bloating) or not held: treat as <b>full stomach</b> (consider gastric US, RSI)</li></ul>
-  ${newerFlag("Multisociety GLP-1 perioperative guidance (ASA, AGA, ASMBS, ISPCOP, SAGES)","Oct 2024","the ASA 2023 statement")}${src("ASA / ESAIC fasting guidance; ASA 2023 GLP-1 statement.")}</div>`;
+  <h3>GLP-1 agonists (semaglutide, liraglutide…)</h3>${updNote("2024 multisociety GLP-1 guidance","AGA (gastro.org) + EMJ / News-Medical coverage of the guidance")}
+  <ul><li><b>Most patients continue</b> the drug as prescribed; assess individual risk</li>
+  <li><b>Higher risk</b> (dose-escalation phase, higher doses, GI symptoms, other causes of slow gastric emptying): <b>clear-liquid diet for 24 h</b> before; adjust the anaesthetic plan (e.g. RSI, gastric ultrasound); holding the drug may be considered, weighed against glycaemic risk; rarely, delay</li>
+  <li>Nausea, vomiting or bloating on the day: treat as <b>full stomach</b></li></ul>
+  ${src("ASA / ESAIC fasting guidance; Multisociety GLP-1 guidance (ASA, AGA, ASMBS, ISPCOP, SAGES) 2024.")}</div>`;
 gaCards.meds = () => `<div class="card"><h2>2. Regular drugs: stop or continue</h2>${gaDraft()}
   <table>
   <tr><th>Continue</th><td>Beta-blockers, statins, antiepileptics, inhalers, thyroxine, antiparkinson, steroids</td></tr>
@@ -1235,7 +1239,7 @@ gaCards.reversal = () => { const W2 = wts(); const neo = Math.min(0.05*W2.ibw, 5
   <p>Neostigmine 0.05 mg/kg = <b>${sig(neo)} mg</b> (${sig(neo/2.5)} mL of 2.5 mg/mL, max 5 mg) + glycopyrrolate <b>${sig(neo*0.2)} mg</b> (200 mcg per 1 mg neostigmine).</p>
   <p class="sub">Only when TOF ≥ 2–4 twitches. Confirm TOF ratio ≥ 0.9 before extubation.</p>${src(GSRC)}</div>`; };
 gaCards.ponv = () => { const f = S.apfel || 0, n = [0,1,2,3].filter(i => f & (1<<i)).length;
-  const risk = [10,21,39,61,79][n], plan = n<=0 ? "None, or 1 agent" : n<=2 ? "2 agents" : "3–4 agents (consider TIVA)";
+  const risk = [10,21,39,61,79][n], plan = n<=0 ? "Risk reduction; consider 1 agent" : n<=2 ? "2 agents" : "3–4 agents + risk reduction (consider TIVA)";
   const labels = ["Female","Non-smoker","History of PONV / motion sickness","Post-op opioids"];
   return `<div class="card"><h2>2. PONV: Apfel score</h2>${gaDraft()}
   <div class="seg">${labels.map((l,i)=>`<button aria-pressed="${!!(f&(1<<i))}" data-apf="${i}">${l}</button>`).join("")}</div>
@@ -1245,7 +1249,8 @@ gaCards.ponv = () => { const f = S.apfel || 0, n = [0,1,2,3].filter(i => f & (1<
   <tr><td>Granisetron</td><td class="hl">1 mg</td><td class="sub">end of surgery</td></tr>
   <tr><td>Droperidol</td><td class="hl">0.625–1.25 mg</td><td class="sub">end; QT caution</td></tr>
   <tr><td>Propofol TIVA</td><td class="hl">—</td><td class="sub">avoid volatile / N₂O</td></tr></table>
-  ${newerFlag("Fifth consensus PONV guidelines","2025","the 4th consensus (2020)")}${src("Apfel 1999 (still used in the 5th consensus 2025); 4th consensus PONV guidelines 2020.")}</div>`; };
+  <p class="sub">Combine agents from different classes (e.g. 5-HT₃ antagonist + dexamethasone). High risk of nausea after discharge: consider a long-acting antiemetic before going home.</p>
+  ${updNote("5th consensus PONV guidelines (2025)","NYSORA + UCT Medicines Information summaries")}${src("Apfel 1999 (still used in the 5th consensus); 5th consensus PONV guidelines 2025.")}</div>`; };
 gaCards.extub = () => `<div class="card"><h2>3. Extubation criteria</h2>${gaDraft()}
   <ul><li>Awake, obeys commands (or deep extubation planned)</li><li>TOF ratio ≥ 0.9</li><li>Regular breathing, RR &gt; 10, Vt &gt; 5 mL/kg</li><li>SpO₂ adequate on FiO₂ ≤ 0.4, normal EtCO₂</li><li>Haemodynamically stable, temperature &gt; 36 °C</li><li>Airway clear, suctioned; bite block</li></ul>
   <p class="sub">At-risk airway: DAS extubation plan (exchange catheter, awake, ICU).</p>${src("DAS extubation guideline 2012.")}</div>`;
@@ -1268,16 +1273,17 @@ gaCards.anticoag = () => `<div class="card"><h2>Neuraxial &amp; deep blocks: ant
   <tr><td>Ticagrelor</td><td class="hl">5–7 days</td><td>6 h</td></tr>
   <tr><td>Prasugrel</td><td class="hl">7–10 days</td><td>6 h</td></tr>
   <tr><td>Warfarin</td><td class="hl">5 days, INR normal (≤ 1.4)</td><td>After catheter removal</td></tr>
-  <tr><td>UFH SC prophylaxis (5000 IU)</td><td class="hl">4–6 h</td><td>1 h</td></tr>
+  <tr><td>UFH SC low dose (5000 IU)</td><td class="hl">4–6 h</td><td>1 h</td></tr>
   <tr><td>UFH IV</td><td class="hl">4–6 h, normal aPTT</td><td>1 h</td></tr>
-  <tr><td>Enoxaparin prophylactic (40 mg OD)</td><td class="hl">12 h</td><td>12 h after puncture; 4 h after catheter removal</td></tr>
-  <tr><td>Enoxaparin therapeutic</td><td class="hl">24 h</td><td>24 h; 4 h after catheter removal</td></tr>
+  <tr><td>Enoxaparin low dose (e.g. 40 mg OD)</td><td class="hl">12 h</td><td>12 h after puncture; 4 h after catheter removal</td></tr>
+  <tr><td>Enoxaparin high dose (treatment)</td><td class="hl">24 h</td><td>24 h; 4 h after catheter removal</td></tr>
   <tr><td>Fondaparinux</td><td class="hl">36–42 h; avoid catheters</td><td>6 h after removal</td></tr>
   <tr><td>Rivaroxaban, apixaban, edoxaban</td><td class="hl">72 h</td><td>6 h after catheter removal</td></tr>
   <tr><td>Dabigatran</td><td class="hl">72–120 h by CrCl (≥ 80: 72 h; 50–79: 96 h; 30–49: 120 h)</td><td>6 h after catheter removal</td></tr>
   <tr><td>Thrombolytics</td><td class="hl">48 h; avoid</td><td>—</td></tr></table></div>
   <p><b>Platelets:</b> ≥ 80 × 10⁹/L for neuraxial (obstetric ≥ 70 if stable).</p>
-  ${newerFlag("ASRA antithrombotic guideline, 5th edition","2025","ASRA 4th edition (2018)")}${src("ASRA 2018 (4th ed.) / ESAIC 2022. Check local policy.")}</div>`;
+  <p class="sub">ASRA 5th edition: "low / high dose" replaces "prophylactic / therapeutic"; DOAC intervals are individualised by kidney function and thrombosis risk. The 72 h shown is the standard interval.</p>
+  ${updNote("ASRA 5th edition (2025) — wording; intervals confirmed unchanged","ESRA newsletter + NYSORA summaries")}${src("ASRA 5th ed. 2025 / ESAIC 2022. Check local policy.")}</div>`;
 
 /* ---------- REGIONAL ANAESTHESIA (adult) + LA dose calculator — DRAFT from standard sources ---------- */
 const RA_CHECKED = true;
@@ -1356,11 +1362,13 @@ raCards.cse = () => `<div class="card"><h2>CSE (combined spinal–epidural)</h2>
   <li>Spinal dose can be reduced (e.g. heavy bupi 1.5–2.5 mL) and extended via the epidural</li>
   <li>Catheter can pass through the dural hole: test carefully, give top-ups in small increments</li></ul>${src(RSRC)}</div>`;
 raCards.pdph = () => `<div class="card"><h2>Post-dural puncture headache</h2>${raDraft()}
-  <ul><li>Postural headache (worse upright) usually within 5 days of puncture</li>
-  <li><b>Red flags → image:</b> focal neurology, fever, non-postural, seizures (subdural, cerebral venous thrombosis)</li>
-  <li><b>Conservative:</b> hydration, paracetamol, NSAID, caffeine (up to 300 mg/day), ± sphenopalatine ganglion block</li>
-  <li><b>Epidural blood patch</b> if severe or &gt; 24–48 h: <b>15–20 mL</b> autologous blood at the same or lower level, stop if back pain; success ~70%, may repeat</li></ul>
-  ${newerFlag("Multisociety international PDPH guideline","2024","the OAA 2018 guideline")}${src("OAA PDPH guideline 2018.")}</div>`;
+  ${updNote("2024 multisociety PDPH guideline","ASRA announcement + AAFP practice-guideline summary")}
+  <ul><li>Suspect PDPH with <b>any headache or neurological symptom within 5 days</b> of a neuraxial procedure (typically worse upright)</li>
+  <li><b>Image</b> if non-orthostatic, late onset or neurological signs (subdural, cerebral venous thrombosis)</li>
+  <li><b>Conservative:</b> paracetamol + NSAID; opioids short-term only; <b>caffeine only in the first 24 h</b></li>
+  <li><b>Epidural blood patch</b> if refractory and impairing daily life: <b>15–20 mL</b> autologous blood, slow, aseptic; <b>never &gt; 30 mL</b>; a repeat may be needed if done within 48 h of puncture</li>
+  <li>Prophylactic blood patch: not routinely recommended</li></ul>
+  ${src("Multisociety international PDPH guideline (ASRA, ESRA, SOAP, OAA and others), 2024.")}</div>`;
 raCards.failed = () => `<div class="card"><h2>Failed or patchy block</h2>${raDraft()}
   <h3>Spinal</h3><ul><li>Wait 10–15 min; check level with cold and touch</li><li>Hyperbaric: tilt to encourage spread</li><li>Options: supplement with local infiltration / analgesia, repeat spinal with reduced dose (count total LA), or convert to GA</li></ul>
   <h3>Epidural</h3><ul><li>Unilateral: withdraw catheter 1–2 cm, top up with patient lying on the weak side</li><li>Patchy: stronger LA (0.5% levobupi or 2% lignocaine + adrenaline)</li><li>No block after adequate dose: re-site, or GA</li></ul>${src(RSRC)}</div>`;
@@ -1733,15 +1741,23 @@ const VALUES = [
   "Paeds: drinking not required; ex-prem < 60 weeks PCA overnight; tonsillectomy < 3 y / OSA overnight; paracetamol 15 mg/kg 6-hourly, ibuprofen 10 mg/kg 8-hourly"]],
  ["Sources — reviewed 14 Nov 2026 (next review Nov 2027)", [
   "UPDATED: RCUK Adult ALS 2025 (shock ≥ 150 J, lignocaine 100 mg alternative, isoprenaline 5 mcg/min) — read from the primary text",
-  "NEWER, NOT YET APPLIED (full text needed): DAS 2025 intubation (Nov 2025) — CICO card still DAS 2015",
-  "NEWER, NOT YET APPLIED: ASRA antithrombotic 5th ed. (2025) — anticoagulant table still ASRA 2018",
-  "NEWER, NOT YET APPLIED: Multisociety GLP-1 guidance (Oct 2024) — fasting card still ASA 2023",
-  "NEWER, NOT YET APPLIED: 5th consensus PONV (2025) — Apfel card still 4th consensus 2020",
-  "NEWER, NOT YET APPLIED: Multisociety PDPH (2024) — PDPH card still OAA 2018",
-  "NEWER, NOT YET APPLIED: EMHG MH crisis (2024) — MH cards still Association of Anaesthetists 2020",
-  "NEWER, NOT YET APPLIED: RCUK paediatric life support (2025) — paeds arrest still RCUK 2021",
+  "UPDATED (verified): DAS 2025 intubation — CICO card: VL first-line, routine NMB, no blind SGA intubation, prepare FONA early",
+  "UPDATED (verified): ASRA 5th ed. 2025 — low/high-dose wording; intervals confirmed unchanged",
+  "UPDATED (verified): Multisociety GLP-1 guidance 2024 — most continue; 24 h liquid diet if high risk",
+  "UPDATED (verified): 5th consensus PONV 2025 — 1–2 factors: 2 agents; ≥3: 3–4 agents",
+  "UPDATED (verified): Multisociety PDPH 2024 — caffeine first 24 h only; EBP 15–20 mL, never > 30 mL",
+  "UPDATED (verified): EMHG MH 2024 — dantrolene 2–2.5 mg/kg (max 300 mg/dose) every 10 min; charcoal filters",
+  "NOT YET VERIFIED: RCUK paediatric life support 2025 — doses could not be confirmed; paeds arrest still RCUK 2021 (flagged)",
   "LATEST AVAILABLE: RCOG PPH 2016; ASA PACU 2013; ASHP/IDSA 2013; Malaysian NAG 2019 (ask pharmacy re newer MOH policy); CPOC diabetes 2021; Association day-case 2019 (update pending); steroid 2020; LAST v3 (reviewed 2025); ESAIC 2022; AHA 2021; ASIA/ISNCSCI 2019; DAS ATI 2020",
-  "CLASSIC VALIDATED TOOLS (still current): Aldrete 1995, PADSS 1995, Apfel 1999, Mapleson 1996, Bromage 1965, Chula formula 2005"]]];
+  "CLASSIC VALIDATED TOOLS (still current): Aldrete 1995, PADSS 1995, Apfel 1999, Mapleson 1996, Bromage 1965, Chula formula 2005"]],
+ ["Guideline updates Nov 2026 (DRAFT — tick to sign off)", [
+  "GLP-1: most continue; high risk → 24 h clear-liquid diet, adjust plan, consider holding; symptomatic → full stomach",
+  "PONV: 0 factors risk reduction ± 1 agent; 1–2 factors 2 agents; ≥ 3 factors 3–4 agents + TIVA; PDNV long-acting antiemetic",
+  "PDPH: suspect ≤ 5 days; paracetamol + NSAID; caffeine first 24 h only; EBP 15–20 mL, never > 30 mL; no prophylactic EBP",
+  "Anticoagulants: low/high-dose wording; DOAC intervals individualised (72 h standard)",
+  "CICO: VL first-line; routine NMB; peroxygenation; 3 + 1 attempts; 2nd-gen SGA max 3, no blind intubation; prepare FONA if SGA difficult",
+  "MH: dantrolene 2–2.5 mg/kg actual weight, max 300 mg per dose, repeat every 10 min; max 10 mg/kg may be exceeded; charcoal filters; chilled crystalloid 2–3 L; stop cooling < 38.5 °C",
+  "Adult ALS (RCUK 2025): first shock ≥ 150 J; lignocaine 100 mg alternative; isoprenaline 5 mcg/min for bradycardia"]]];
 
 /* ---------- ANONYMOUS CASES (phone only, 36 h) ---------- */
 const CASE_TTL = 36*3600*1000, CASE_MAX = 6;
