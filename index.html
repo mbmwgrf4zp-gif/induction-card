@@ -324,7 +324,7 @@ a{color:var(--accent)}
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.9.0";
+const APP_VERSION = "2.9.1";
 const APP_DATE = "14 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
@@ -939,7 +939,7 @@ pCards.special = () => {
 
 /* ---------- EMERGENCIES (crisis cards, DRAFT from published guidelines) ---------- */
 const CRISIS_CHECKED = true;
-const UPD_CHECKED = false;
+const UPD_CHECKED = true;
 const updNote = (g, srcs) => UPD_CHECKED ? "" : `<div class="warn"><b>DRAFT — updated to ${g}</b>, verified from ${srcs}. Tick on the Values sheet.</div>`;
 const newerFlag = (name, yr, cur) => `<div class="newer"><b>⟳ Newer guideline published:</b> ${name} (${yr}). This card still follows ${cur} until it is updated from the full text.</div>`;
 const crisisDraft = () => CRISIS_CHECKED ? "" : `<div class="warn" style="margin-top:0">DRAFT — from published guidelines, not yet ticked by you.</div>`;
@@ -1750,7 +1750,7 @@ const VALUES = [
   "NOT YET VERIFIED: RCUK paediatric life support 2025 — doses could not be confirmed; paeds arrest still RCUK 2021 (flagged)",
   "LATEST AVAILABLE: RCOG PPH 2016; ASA PACU 2013; ASHP/IDSA 2013; Malaysian NAG 2019 (ask pharmacy re newer MOH policy); CPOC diabetes 2021; Association day-case 2019 (update pending); steroid 2020; LAST v3 (reviewed 2025); ESAIC 2022; AHA 2021; ASIA/ISNCSCI 2019; DAS ATI 2020",
   "CLASSIC VALIDATED TOOLS (still current): Aldrete 1995, PADSS 1995, Apfel 1999, Mapleson 1996, Bromage 1965, Chula formula 2005"]],
- ["Guideline updates Nov 2026 (DRAFT — tick to sign off)", [
+ ["Guideline updates Nov 2026 (signed off 14 Nov 2026)", [
   "GLP-1: most continue; high risk → 24 h clear-liquid diet, adjust plan, consider holding; symptomatic → full stomach",
   "PONV: 0 factors risk reduction ± 1 agent; 1–2 factors 2 agents; ≥ 3 factors 3–4 agents + TIVA; PDNV long-acting antiemetic",
   "PDPH: suspect ≤ 5 days; paracetamol + NSAID; caffeine first 24 h only; EBP 15–20 mL, never > 30 mL; no prophylactic EBP",
