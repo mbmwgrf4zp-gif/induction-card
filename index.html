@@ -299,7 +299,7 @@ a{color:var(--accent)}
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.5.0";
+const APP_VERSION = "2.5.1";
 const APP_DATE = "14 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
@@ -1365,7 +1365,7 @@ raCards.sap = () => blk({t:"Serratus anterior", ind:"Breast surgery, rib fractur
 pCards.lacalc = () => `<div class="card"><h2>Paeds LA dose calculator</h2>${laCalc("p")}${psrc()}</div>`;
 
 /* ---------- ANTIBIOTIC PROPHYLAXIS (adult + paeds) — DRAFT: Malaysian NAG 2019 / ASHP-IDSA 2013 ---------- */
-const ABX_CHECKED = false;
+const ABX_CHECKED = true;
 const abxDraft = () => ABX_CHECKED ? "" : `<div class="warn" style="margin-top:0">DRAFT — Malaysian National Antimicrobial Guideline 2019 / ASHP-IDSA 2013, not yet ticked by you. Follow local policy.</div>`;
 // adult: fixed dose or per-kg; paeds: per kg with max (mg)
 const ABX = {
@@ -1417,7 +1417,7 @@ function abxCard(paeds){
       <tr><td>Cefazolin IV (allergy, not anaphylaxis)</td><td class="hl">${paeds?`${sig(Math.min(50*W(),1000))} mg (50 mg/kg)`:"1 g"}</td></tr>
       <tr><td>Azithromycin (severe allergy)</td><td class="hl">${paeds?`${sig(Math.min(15*W(),500))} mg (15 mg/kg)`:"500 mg"}</td></tr></table>
       <p class="sub">30–60 min before. AHA 2021 (clindamycin no longer recommended).</p></details>
-    ${src("Malaysian National Antimicrobial Guideline 2019; ASHP/IDSA/SIS/SHEA 2013; AHA 2021 (draft).")}`;
+    ${src("Malaysian National Antimicrobial Guideline 2019; ASHP/IDSA/SIS/SHEA 2013; AHA 2021.")}`;
 }
 gaCards.abx = () => `<div class="card"><h2>5. Antibiotic prophylaxis</h2>${abxDraft()}${abxCard(false)}</div>`;
 pCards.abx = () => `<div class="card"><h2>Paeds antibiotic prophylaxis</h2>${abxDraft()}${abxCard(true)}</div>`;
@@ -1547,7 +1547,7 @@ const VALUES = [
   "Epidural: test 3 mL lignocaine 2% + adrenaline; 0.1% + fentanyl 2 mcg/mL thoracic 4–10, lumbar 6–14 mL/h; bolus 3–5 mL",
   "PDPH: caffeine ≤300 mg/day; blood patch 15–20 mL",
   "Adjuncts: dexamethasone IV 0.1–0.15 mg/kg (4 mg perineural); dexmedetomidine / clonidine 0.5–1 mcg/kg; IT fentanyl 10–25 mcg; IT morphine 100–150 mcg"]],
- ["Antibiotic prophylaxis (DRAFT, Malaysian NAG 2019 / ASHP 2013)", [
+ ["Antibiotic prophylaxis (Malaysian NAG 2019 / ASHP 2013)", [
   "Adult: cefazolin 2 g (3 g ≥120 kg) redose 4 h; cefuroxime 1.5 g 4 h; Unasyn 3 g 2 h; Augmentin 1.2 g 2 h; metronidazole 500 mg; gentamicin 5 mg/kg (AdjBW if >120% IBW); clindamycin 900 mg 6 h; vancomycin 15 mg/kg max 2 g; azithromycin 500 mg",
   "Paeds: cefazolin 30 mg/kg (max 2 g); cefuroxime 50 (1.5 g); Unasyn 75 mg/kg combined (3 g); Augmentin 30 (1.2 g); metronidazole 15 (500 mg); gentamicin 2.5; clindamycin 10 (900 mg); vancomycin 15 (2 g); azithromycin 10 (500 mg)",
   "General/upper GI: cefazolin; allergy clinda + gent",
