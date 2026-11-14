@@ -286,6 +286,22 @@ table.blk th{width:32%;font-size:var(--fs-xs);text-transform:uppercase;letter-sp
 .or{display:block;font-size:var(--fs-xs);font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin:var(--s2) 0 0}
 details.endo{margin-top:var(--s3);border:1px solid var(--line);border-radius:var(--r-sm);padding:var(--s2) var(--s3)}
 details.endo summary{cursor:pointer;font-weight:600;font-size:var(--fs-sm)}
+.dwrap{display:grid;grid-template-columns:1fr 1fr;gap:var(--s2);margin:var(--s2) 0}
+.dfig{margin:0;text-align:center}.dfig svg{width:100%;height:auto;max-height:300px}.dfig figcaption{font-size:var(--fs-xs);color:var(--muted)}
+.dfig .body{fill:var(--line)}
+.dfig .band{stroke:var(--card);stroke-width:.6;transition:opacity .15s}
+.dfig .r-c{fill:#f59e0b}.dfig .r-c.alt{fill:#fbbf24}.dfig .r-t{fill:#0891b2}.dfig .r-t.alt{fill:#22d3ee}
+.dfig .r-l{fill:#16a34a}.dfig .r-l.alt{fill:#4ade80}.dfig .r-s{fill:#db2777}.dfig .r-s.alt{fill:#f472b6}
+.dfig .band.off{opacity:.18}.dfig .band.on{opacity:1;stroke:var(--ink);stroke-width:1.2}
+.dfig .kp{fill:var(--ink)}.dfig .kp.on{fill:var(--danger-ink);stroke:var(--card);stroke-width:1}
+@media (prefers-reduced-motion: reduce){.dfig .band{transition:none}}
+.dsel{font-size:var(--fs-sm);background:var(--gc-soft);border-radius:var(--r-sm);padding:var(--s2) var(--s3);min-height:2.6em}
+.dchips{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin:var(--s2) 0}
+.dchip{min-height:36px;border-radius:8px;border:1px solid var(--line);background:var(--card);font-family:var(--font-mono);font-size:var(--fs-xs);font-weight:600;cursor:pointer;padding:0}
+.dchip.r-c{border-bottom:3px solid #f59e0b}.dchip.r-t{border-bottom:3px solid #0891b2}.dchip.r-l{border-bottom:3px solid #16a34a}.dchip.r-s{border-bottom:3px solid #db2777}
+.dchip.on{background:var(--ink);color:var(--card)}
+.linkish{background:none;border:0;padding:0;color:var(--accent);font-weight:700;font-family:var(--font-mono);cursor:pointer;font-size:inherit}
+.dermlink{display:block;box-sizing:border-box;margin:var(--s2) 0 0;padding:var(--s2) var(--s3);border-radius:var(--r-sm);border:1px solid var(--line);background:var(--card);color:var(--ink);font-weight:600;font-size:var(--fs-sm);text-align:left;cursor:pointer}
 .disc{color:var(--muted);font-size:var(--fs-xs);text-align:center;margin-top:var(--s5);line-height:1.5}
 a{color:var(--accent)}
 .vs label{display:flex;gap:var(--s3);align-items:flex-start;padding:var(--s2) 0;border-bottom:1px solid var(--line);font-size:var(--fs-sm)}
@@ -299,7 +315,7 @@ a{color:var(--accent)}
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.5.1";
+const APP_VERSION = "2.6.0";
 const APP_DATE = "14 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
@@ -316,7 +332,7 @@ const store = {
 };
 // Inputs are not remembered between uses (per plan): state lives in memory only.
 const S = { ettMode:"adult", sex:"F", height:158, ageY:4, ageM:0, wt:3.0,
-            touched:{}, abxSp:"general", spOp:"lscs", spHt:155, morWt:60, pw:10, pY:1, pM:0, pHt:75, pBE:-5, aw:70, emTab:"adult", obTab:"labour", pTab:"pre", gaTab:"pre", raTab:"safety", laA:[], laP:[], cSex:"F", cY:40, cM:0, cH:160, cW:60, cNick:"", laD:"bupi", laC:"0.5", laMl:15, laBi:"1", age:45, apfel:0, pump:"pcea_cse", topup:"lig" };
+            touched:{}, derm:"", abxSp:"general", spOp:"lscs", spHt:155, morWt:60, pw:10, pY:1, pM:0, pHt:75, pBE:-5, aw:70, emTab:"adult", obTab:"labour", pTab:"pre", gaTab:"pre", raTab:"safety", laA:[], laP:[], cSex:"F", cY:40, cM:0, cH:160, cW:60, cNick:"", laD:"bupi", laC:"0.5", laMl:15, laBi:"1", age:45, apfel:0, pump:"pcea_cse", topup:"lig" };
 
 function src(text){ return `<div class="src">Source: ${text}</div>`; }
 function protoSrc(){
@@ -475,6 +491,7 @@ const lscsBody = () => {
     ${LSCS.map(r=>`<tr class="${r===row?"hl":""}"><td>${r[5]}</td><td>${rng(r[1],r[2])}</td><td>${rng(r[3],r[4])}</td></tr>`).join("")}</table>
     <div class="warn">Obese / big abdomen (polyhydramnios, twins): <b>REDUCE</b> heavy bupivacaine dose (amount: your judgement).<br>Preload unless contraindicated. Left lateral tilt (right side up).</div>
     <div class="sub">Easier to manage hypotension than an inadequate block.</div>
+    ${dermLink("T4")}
     ${protoSrc()}</div>`;
 };
 
@@ -488,7 +505,7 @@ const nonObsCalc = () => {
   return `<div class="card"><div class="sub">1. Operation</div>${seg("spOp",[["saddle","Perineal"],["turp","TURP / uro"],["hernia","Hernia"],["limb","Lower limb"]])}
     <div class="sub">2. Height: ${h} cm (patient box)</div></div>
     <div class="result">
-    <div class="sub">3. Heavy bupivacaine 0.5% · ${o.name} · target ${o.level}</div>
+    <div class="sub">3. Heavy bupivacaine 0.5% · ${o.name} · target ${o.level}</div>${dermLink(({saddle:"S1–S4-5",turp:"T10",hernia:"T10",limb:"T10–T12"})[S.spOp], "Target "+o.level.split(" ")[0])}
     <div class="big">${fmt(pick)} mL</div>
     <div class="sub">= ${fmt(pick*5)} mg · range ${rng(lo,hi)} mL (${rng(lo*5,hi*5)} mg) · ${band}</div>
     <h3>4. Optional additives</h3>
@@ -577,7 +594,7 @@ obsCards.cTopup = () => { const t = TOPUP[S.topup] || TOPUP.lig;
   <h3>1. Prepare — ${t.name}</h3><ol>${t.prep.map(x=>`<li>${x}</li>`).join("")}</ol>
   <h3>2. Test dose</h3><p><b>3 mL, wait 5 min.</b></p>
   <h3>3. Top-up dose</h3><p><b>${t.dose}</b></p>
-  <h3>4. Check block after 5–10 min</h3><p>Aim <b>T4</b> (touch or pin prick). Not adequate: top up ${t.more}, re-check.</p>
+  <h3>4. Check block after 5–10 min</h3><p>Aim <b>T4</b> (touch or pin prick). Not adequate: top up ${t.more}, re-check.</p>${dermLink("T4")}
   <h3>5. Full 20 mL given and still not working</h3>
   <p><b>No block:</b> catheter likely not in place. Urgent → GA. Single-shot spinal only by consultant — may need lower dose.<br>
   <b>Block present but inadequate:</b> GA, or single-shot spinal by consultant — may need lower dose.</p>
@@ -847,6 +864,7 @@ pCards.regional = () => {
     R("+ morphine (preservative-free)","30–50 mcg/kg",pk([30,50],"mcg"),"monitor RR &amp; SpO₂ 24 h; avoid &lt; 6 months unless HDU"),
     DR("+ ketamine (additive)","1","mg"), DR("+ clonidine (additive)",[1,2],"mcg")])}
   <div class="danger">&gt; 1.2 mL/kg of 0.25% = toxicity (&gt; ${sig(1.2*w)} mL)</div>
+  ${dermLink("L1","Sacro-lumbar ≈ L1")}${dermLink("T10","Upper abdominal ≈ T10")}${dermLink("T6","Mid-thoracic ≈ T6")}
 
   <h3>Caudal with branula (sheath fully in)</h3><p>For ${sig(w)} kg: <b>${bran}</b> (&lt; 5 kg yellow, &lt; 15 kg blue, &lt; 40 kg pink, &gt; 40 kg green)</p>${psrc()}</div>
   <div class="card"><h2>Ilioinguinal block</h2><p>Levobupivacaine 0.25%. Less volume is better.<br>Landmark: 1 cm medial and caudal to ASIS, above panty line.<br>Double pop: 3 mL (internal oblique); 1st pop: 3 mL (external oblique); distribute laterally.</p>
@@ -1431,6 +1449,81 @@ screens.settings = () => head("Display name","home") + `<div class="card">
   <p class="sub">Saved on this phone only.</p>
   <button class="homebtn primary" data-savename="1">Save name</button></div>` + disc;
 
+/* ---------- DERMATOMES (schematic) — DRAFT: ASIA/ISNCSCI 2019 key sensory points ---------- */
+const DERM_CHECKED = false;
+const DERM_LEVELS = ["C2","C3","C4","C5","C6","C7","C8","T1","T2","T3","T4","T5","T6","T7","T8","T9","T10","T11","T12","L1","L2","L3","L4","L5","S1","S2","S3","S4-5"];
+const DERM_INFO = {C2:"Occipital protuberance",C3:"Supraclavicular fossa",C4:"Top of acromioclavicular joint",C5:"Lateral antecubital fossa",
+  C6:"Thumb",C7:"Middle finger",C8:"Little finger",T1:"Medial antecubital fossa",T2:"Apex of axilla",T3:"3rd intercostal space",
+  T4:"Nipple line",T5:"Between nipple and xiphoid",T6:"Xiphisternum",T7:"Lower costal margin (upper)",T8:"Lower costal margin",T9:"Above umbilicus",
+  T10:"Umbilicus",T11:"Between umbilicus and groin",T12:"Inguinal ligament (midpoint)",L1:"Upper anterior thigh / groin",L2:"Mid anterior thigh",
+  L3:"Knee (medial femoral condyle)",L4:"Medial malleolus / medial leg",L5:"Dorsum of foot / big toe",S1:"Lateral heel / lateral foot",
+  S2:"Popliteal fossa / posterior thigh",S3:"Ischial tuberosity",["S4-5"]:"Perianal"};
+const dermRegion = l => l[0]==="C" ? "c" : l[0]==="T" ? "t" : l[0]==="L" ? "l" : "s";
+const dermIdx = l => DERM_LEVELS.indexOf(l);
+function dermExpand(v){ if (!v) return []; const [a,b] = String(v).split("–"); const i = dermIdx(a), j = b ? dermIdx(b) : i; return i<0 ? [] : DERM_LEVELS.slice(i, (j<0?i:j)+1); }
+// torso outline (front and back identical)
+const TORSO = [[60,58],[68,100],[72,150],[66,172]];
+function tx(y){ for (let i=0;i<TORSO.length-1;i++){ const [x1,y1]=TORSO[i],[x2,y2]=TORSO[i+1]; if (y>=y1&&y<=y2) return x1+(x2-x1)*(y-y1)/(y2-y1); } return TORSO[TORSO.length-1][0]; }
+function tband(y1,y2){ const ys=[y1,...TORSO.map(p=>p[1]).filter(y=>y>y1&&y<y2),y2]; const L=ys.map(y=>[tx(y),y]), R=ys.slice().reverse().map(y=>[200-tx(y),y]); return [...L,...R]; }
+const pts = a => a.map(p=>p.join(",")).join(" ");
+const mir = a => a.map(([x,y])=>[200-x,y]);
+const TRUNK = {C4:[58,66],T2:[66,78],T3:[78,86],T4:[86,96],T5:[96,104],T6:[104,114],T7:[114,122],T8:[122,130],T9:[130,138],T10:[138,150],T11:[150,158],T12:[158,166]};
+// limb shapes (viewer-left side, mirrored for the other side)
+const FRONT_LIMB = {
+  C5:[[58,62],[44,70],[34,120],[43,121],[50,95],[60,76]], T2:[[60,76],[50,95],[43,121],[52,122],[64,92]],
+  C6:[[34,120],[28,170],[24,204],[29,206],[36,171],[43,121]], T1:[[43,121],[38,150],[47,150],[52,122]],
+  C8:[[38,150],[36,171],[44,171],[47,150]], C7:[[29,206],[36,171],[38,206]], C8b:[[36,171],[44,171],[42,205],[38,206]],
+  L1:[[66,172],[100,182],[100,188],[67,180]], L2:[[67,180],[100,188],[97,205],[68,200]], L3:[[68,200],[97,205],[96,242],[70,240]],
+  L5:[[70,240],[83,240],[84,290],[73,290]], L4:[[83,240],[96,242],[93,290],[84,290]], L5f:[[73,290],[93,290],[95,302],[74,302]], S1f:[[69,290],[73,290],[74,302],[68,302]]};
+const BACK_LIMB = {
+  C5:FRONT_LIMB.C5, T2:FRONT_LIMB.T2, C6:FRONT_LIMB.C6, T1:FRONT_LIMB.T1, C8:FRONT_LIMB.C8, C7:FRONT_LIMB.C7, C8b:FRONT_LIMB.C8b,
+  L1:[[66,166],[100,166],[100,172],[66,172]], L2:[[66,172],[86,172],[86,178],[66,178]], L3:[[66,178],[84,178],[80,190],[67,190]],
+  S3:[[84,174],[100,174],[100,192],[80,192]], S2:[[67,190],[100,192],[96,240],[70,240]], S1:[[70,240],[84,240],[84,302],[68,302]], L4:[[84,240],[96,242],[93,290],[84,290]]};
+const FRONT_DOTS = {C3:[82,61],C4:[64,62],C5:[39,118],C6:[25,203],C7:[33,205],C8:[41,203],T1:[50,123],T2:[62,82],T3:[84,82],T4:[84,91],T5:[85,100],T6:[86,109],T7:[86,118],T8:[86,126],T9:[86,134],T10:[86,144],T11:[86,154],T12:[78,165],L1:[80,178],L2:[86,194],L3:[92,236],L4:[90,286],L5:[84,297]};
+const BACK_DOTS = {C2:[100,32],S1:[73,298],S2:[83,236],S3:[92,186],["S4-5"]:[100,186]};
+function dermSVG(view){
+  const on = new Set(dermExpand(S.derm)), any = on.size>0;
+  const cls = l => `band r-${dermRegion(l)} ${dermIdx(l)%2?"alt":""} ${any?(on.has(l)?"on":"off"):""}`;
+  const limb = view==="F" ? FRONT_LIMB : BACK_LIMB;
+  let g = "";
+  g += `<ellipse class="body" cx="100" cy="28" rx="18" ry="22"/><rect class="body" x="91" y="46" width="18" height="14"/>`;
+  g += `<polygon class="body" points="${pts(tband(58,172))}"/>`;
+  const armL=[[58,62],[44,70],[34,120],[28,170],[24,204],[42,206],[44,171],[52,122],[64,92]], legL=[[66,172],[100,182],[96,242],[93,290],[95,302],[68,302],[73,290],[70,240],[67,180]];
+  [armL,legL].forEach(a=>{ g += `<polygon class="body" points="${pts(a)}"/><polygon class="body" points="${pts(mir(a))}"/>`; });
+  if (view==="B") g += `<path class="${cls("C2")}" data-l="C2" d="M82 34 Q100 52 118 34 L118 44 Q100 54 82 44Z"/>`;
+  g += `<rect class="${cls("C3")}" data-l="C3" x="91" y="46" width="18" height="12"/>`;
+  Object.entries(TRUNK).forEach(([l,[a,b]]) => g += `<polygon class="${cls(l)}" data-l="${l}" points="${pts(tband(a,b))}"/>`);
+  if (view==="F") g += `<polygon class="${cls("L1")}" data-l="L1" points="${pts([[66,166],[134,166],[134,172],[100,182],[66,172]])}"/>`;
+  Object.entries(limb).forEach(([k,a]) => { const l = k.replace(/[bf]$/,""); g += `<polygon class="${cls(l)}" data-l="${l}" points="${pts(a)}"/><polygon class="${cls(l)}" data-l="${l}" points="${pts(mir(a))}"/>`; });
+  if (view==="B") g += `<circle class="${cls("S4-5")}" data-l="S4-5" cx="100" cy="186" r="5"/>`;
+  const dots = view==="F" ? FRONT_DOTS : BACK_DOTS;
+  Object.entries(dots).forEach(([l,[x,y]]) => g += `<circle class="kp ${on.has(l)?"on":""}" cx="${x}" cy="${y}" r="${on.has(l)?3.2:2}"/>`);
+  return `<figure class="dfig"><svg viewBox="16 0 168 306" role="img" aria-label="${view==="F"?"Front":"Back"} dermatome schematic">${g}</svg><figcaption>${view==="F"?"Front":"Back"}</figcaption></figure>`;
+}
+const DERM_SURG = [["LSCS","T4"],["Upper abdominal","T4–T6"],["Lower abdominal / inguinal hernia","T8–T10"],["TURP / vaginal / cervix","T10"],["Testes","T10"],["Hip / knee","T10–L1"],["Foot / ankle","L2"],["Perineal / haemorrhoids (saddle)","S1–S4-5"]];
+function dermCard(){
+  const sel = dermExpand(S.derm), top = sel[0];
+  return `${DERM_CHECKED?"":`<div class="warn" style="margin-top:0">DRAFT — ASIA/ISNCSCI 2019 key points; Miller / OAA. Not yet ticked by you.</div>`}
+  <div class="dwrap">${dermSVG("F")}${dermSVG("B")}</div>
+  <div class="dsel">${top ? `<b>${S.derm}</b> — ${sel.map(l=>`${l}: ${DERM_INFO[l]}`).join(" · ")}` : "Tap a level or an operation to highlight it."}</div>
+  <div class="dchips">${DERM_LEVELS.map(l=>`<button class="dchip r-${dermRegion(l)} ${sel.includes(l)?"on":""}" data-derm="${l}">${l}</button>`).join("")}</div>
+  <h3>Landmarks</h3>
+  <table>${[["C6","Thumb"],["T4","Nipple"],["T6","Xiphoid"],["T10","Umbilicus"],["L1","Groin / inguinal ligament"],["L3","Knee"],["L5","Dorsum of foot, big toe"],["S1","Lateral foot, heel"],["S4-5","Perianal"]].map(([l,t])=>`<tr class="${sel.includes(l)?"hl":""}"><td><button class="linkish" data-derm="${l}">${l}</button></td><td>${t}</td></tr>`).join("")}</table>
+  <h3>Block height needed</h3>
+  <table>${DERM_SURG.map(([s,l])=>`<tr class="${S.derm===l?"hl":""}"><td>${s}</td><td><button class="linkish" data-derm="${l}">${l}</button></td></tr>`).join("")}</table>
+  <h3>Testing the block</h3>
+  <ul><li><b>Cold</b> (ice / ethyl chloride) is lost 1–2 segments higher than <b>pinprick</b>, which is higher than <b>light touch</b></li>
+  <li><b>LSCS:</b> aim <b>T4</b> bilaterally; light touch to T5–T4 is the best predictor of a comfortable section</li>
+  <li>Test both sides, from below upwards, along the mid-clavicular line</li></ul>
+  <h3>Bromage score (motor block)</h3>
+  <table><tr><td class="hl">0</td><td>Full movement of legs and feet</td></tr><tr><td class="hl">1</td><td>Cannot raise extended leg; can move knees and feet</td></tr>
+  <tr><td class="hl">2</td><td>Cannot raise leg or flex knee; can move feet</td></tr><tr><td class="hl">3</td><td>Cannot move legs or feet (complete)</td></tr></table>
+  <p class="sub">Schematic: band shapes are simplified; dots are the ASIA key sensory points (patient's right on the left of each figure).</p>
+  ${src("ASIA/ISNCSCI 2019; Bromage 1965; Miller's Anesthesia; OAA (draft).")}`;
+}
+raCards.derm = () => `<div class="card"><h2>Dermatomes &amp; block height</h2>${dermCard()}</div>`;
+const dermLink = (lvl, label) => `<button class="dermlink" data-derm="${lvl}" data-open="6. Dermatomes &amp; block height" data-g="regional" data-tab="neuraxial">${label||`Aim ${lvl}`} → see dermatomes ›</button>`;
+
 /* ---------- VALUES SHEET ---------- */
 const VALUES = [
  ["ETT – adult", [
@@ -1559,7 +1652,13 @@ const VALUES = [
   "Dental/maxfax/H&N clean-contaminated: cefazolin + metronidazole, Unasyn or Augmentin; allergy clinda",
   "Clean with implant/mesh: cefazolin; neuro/vascular/cardiac: cefazolin or cefuroxime",
   "Timing ≤60 min before incision; redose also after 1.5 L (paeds 25 mL/kg) blood loss; stop ≤24 h",
-  "Endocarditis (AHA 2021): amoxicillin/ampicillin 2 g (50 mg/kg), cefazolin 1 g (50 mg/kg), azithromycin 500 mg (15 mg/kg)"]]];
+  "Endocarditis (AHA 2021): amoxicillin/ampicillin 2 g (50 mg/kg), cefazolin 1 g (50 mg/kg), azithromycin 500 mg (15 mg/kg)"]],
+ ["Dermatomes (DRAFT, ASIA/ISNCSCI 2019)", [
+  "Key points: C6 thumb, C7 middle finger, C8 little finger, T4 nipple, T6 xiphisternum, T10 umbilicus, T12 inguinal ligament, L3 medial knee, L4 medial malleolus, L5 dorsum foot, S1 lateral heel, S4-5 perianal",
+  "Block height: LSCS T4; upper abdo T4–T6; lower abdo/hernia T8–T10; TURP/vaginal T10; testes T10; hip/knee T10–L1; foot/ankle L2; perineal S1–S5",
+  "Cold lost 1–2 segments above pinprick, above light touch; LSCS aim T4 (touch T5–T4)",
+  "Bromage 0–3 (0 full movement → 3 complete motor block)",
+  "Caudal (Armitage): 0.5 mL/kg ≈ L1, 1 mL/kg ≈ T10, 1.2 mL/kg ≈ T6"]]];
 
 /* ---------- ANONYMOUS CASES (phone only, 36 h) ---------- */
 const CASE_TTL = 36*3600*1000, CASE_MAX = 6;
@@ -1637,7 +1736,7 @@ const GROUPS = [
     cards:[["LA dose calculator","1. LA dose calculator"],["Stop Before You Block & safe injection","2. Stop Before You Block"],["Neuraxial & deep blocks: anticoagulant timing","3. Anticoagulant timing"]],
     links:[["LA toxicity (LAST)","adult","LA toxicity"]]},
    {id:"neuraxial", label:"Neuraxial", input:()=>gaInputs(), top:()=>nonObsCalc(), hint:"Spinal dose above; then epidural, CSE and problems.",
-    cards:[["Epidural (adult)","1. Epidural"],["CSE (combined spinal–epidural)","2. CSE"],["Adjuncts","3. Adjuncts"],["Failed or patchy block","4. Failed or patchy block"],["Post-dural puncture headache","5. Post-dural puncture headache"]],
+    cards:[["Epidural (adult)","1. Epidural"],["CSE (combined spinal–epidural)","2. CSE"],["Adjuncts","3. Adjuncts"],["Failed or patchy block","4. Failed or patchy block"],["Post-dural puncture headache","5. Post-dural puncture headache"],["Dermatomes & block height","6. Dermatomes & block height"]],
     links:[["High / total spinal","adult","High / total spinal"],["Hypotension after spinal","adult","Hypotension"],["LA toxicity (LAST)","adult","LA toxicity"]]},
    {id:"upper", label:"Upper", input:()=>gaInputs(), hint:"Shoulder → hand.", cards:[["Interscalene","1. Interscalene"],["Supraclavicular","2. Supraclavicular"],["Axillary","3. Axillary"]],
     links:[["LA toxicity (LAST)","adult","LA toxicity"]]},
@@ -1679,6 +1778,7 @@ const GROUPS = [
     cards:["1. Analgesia by technique","2. NSAID yes / no","3. PCA morphine (after GA)","4. Ward (OAS) problems & catheter care"],
     links:[["Eclampsia","adult","Eclampsia"],["Massive obstetric haemorrhage","adult","Massive haemorrhage"]]}], cards:[]}];
 const SEARCH_EXTRA = {
+  "6. Dermatomes & block height":"dermatome dermatomes block height level t4 t10 nipple umbilicus xiphoid bromage sensory testing cold pinprick",
   "5. Antibiotic prophylaxis":"antibiotic prophylaxis cefazolin unasyn ampicillin sulbactam augmentin metronidazole gentamicin clindamycin vancomycin cefuroxime azithromycin endocarditis uro gynae ortho dental hpb colorectal",
   "13. Antibiotic prophylaxis":"antibiotic prophylaxis cefazolin unasyn metronidazole gentamicin clindamycin vancomycin paeds endocarditis",
   "4. Tube & airway kit":"ett tube endotracheal chula lma igel i-gel supraglottic laryngoscope video adult",
@@ -1770,6 +1870,7 @@ function clamp(v,min,max){ return Math.min(max, Math.max(min, v)); }
 document.addEventListener("click", e => {
   const b = e.target.closest("button, input[type=checkbox]"); if (!b) return;
   const d = b.dataset;
+  if (d.derm){ S.derm = d.derm; if (!d.open){ render(); return; } }
   if (d.open){ const og = GROUPS.find(x=>x.id===d.g); if (og && og.tabs) S[og.tabKey] = d.tab || (og.tabs.find(t=>t.cards.some(c=>(Array.isArray(c)?c[1]:c)===d.open))||og.tabs[0]).id;
     S.open = d.calc ? null : d.open; S.scrollTo = !d.calc; if (!d.calc) remember(d.g, d.open);
     const target = "#g-"+d.g; if (location.hash===target) render(); else { location.hash = target; } if (d.calc) window.scrollTo(0,0); return; }
