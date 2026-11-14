@@ -310,6 +310,7 @@ details.endo summary{cursor:pointer;font-weight:600;font-size:var(--fs-sm)}
 .scopt.on{background:var(--gc);color:var(--on);border-color:var(--gc)}
 .result.ok{background:var(--g-paeds-soft)}
 .redlist li::marker{color:var(--danger-ink)}
+.newer{background:var(--unv-bg);color:var(--ink);border:1px solid var(--line);border-left:3px solid var(--g-airway);border-radius:var(--r-sm);padding:var(--s2) var(--s3);margin:var(--s2) 0;font-size:var(--fs-sm)}
 .disc{color:var(--muted);font-size:var(--fs-xs);text-align:center;margin-top:var(--s5);line-height:1.5}
 a{color:var(--accent)}
 .vs label{display:flex;gap:var(--s3);align-items:flex-start;padding:var(--s2) 0;border-bottom:1px solid var(--line);font-size:var(--fs-sm)}
@@ -323,7 +324,7 @@ a{color:var(--accent)}
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.7.1";
+const APP_VERSION = "2.8.0";
 const APP_DATE = "14 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
@@ -363,7 +364,7 @@ function step(key, label, unit, min, max, stp){
     <span class="unit">${unit}</span></div>`;
 }
 function trio(a,b,c){ return `<div class="trio"><span>${a}</span><span class="main">${b}</span><span>${c}</span></div>`; }
-const disc = `<div class="disc">${VALUES_CHECKED ? `Values checked ${VALUES_CHECKED}` : `<b>DRAFT – values not checked</b>`}<br>Memory aid only — clinical judgement decides. Cases are anonymous, kept on this phone only, auto-deleted after 36 h.<br><b>Version ${APP_VERSION} · updated ${APP_DATE}</b></div>`;
+const disc = `<div class="disc">${VALUES_CHECKED ? `Values checked ${VALUES_CHECKED}` : `<b>DRAFT – values not checked</b>`}<br>Memory aid only — clinical judgement decides. Cases are anonymous, kept on this phone only, auto-deleted after 36 h.<br><b>Version ${APP_VERSION} · updated ${APP_DATE}</b><br>Sources reviewed Nov 2026 · next review Nov 2027</div>`;
 
 /* ================= SCREENS ================= */
 function banner(){
@@ -938,6 +939,7 @@ pCards.special = () => {
 
 /* ---------- EMERGENCIES (crisis cards, DRAFT from published guidelines) ---------- */
 const CRISIS_CHECKED = true;
+const newerFlag = (name, yr, cur) => `<div class="newer"><b>⟳ Newer guideline published:</b> ${name} (${yr}). This card still follows ${cur} until it is updated from the full text.</div>`;
 const crisisDraft = () => CRISIS_CHECKED ? "" : `<div class="warn" style="margin-top:0">DRAFT — from published guidelines, not yet ticked by you.</div>`;
 const wk = (w, per, unit, max) => { let v = per*w, c = false; if (max!=null && v>max){ v=max; c=true; } return `${sig(v)} ${unit}${c?` (max ${max} ${unit})`:""}`; };
 const B = x => `<b class="dose">${x}</b>`;
@@ -965,7 +967,7 @@ eCards.adult = () => {
     "After 5 min still unstable: repeat bolus (max 2 more) and double infusion to "+B("30 mL/kg/h = "+wk(w,30,"mL")+"/h")+".",
     "Max total "+B("12 mL/kg = "+wk(w,12,"mL"))+".",
     "Arrest: CPR (may be prolonged). No lignocaine for arrhythmia. Pregnant: perimortem Caesarean."],
-    "Association of Anaesthetists LAST guideline.")
+    "Association of Anaesthetists LAST guideline (v3, reviewed 2025).")
   + crisis("Anaphylaxis", [
     "Stop trigger (antibiotic, relaxant, chlorhexidine, latex). Call for help.",
     "100% O₂, secure airway. Legs up.",
@@ -985,13 +987,13 @@ eCards.adult = () => {
     "International consensus on vasopressors at Caesarean.")
   + crisis("Bradycardia &amp; cardiac arrest", [
     "Bradycardia with low BP: "+B("atropine 500 mcg")+", repeat to max 3 mg. Or "+B("glycopyrrolate 200–400 mcg")+".",
-    "Not responding: adrenaline infusion 2–10 mcg/min or pacing.",
+    "Not responding: "+B("isoprenaline 5 mcg/min")+" or "+B("adrenaline 2–10 mcg/min")+", or pacing.",
     "Arrest: CPR 30:2, call arrest team, attach defibrillator.",
-    "Shockable (VF/pVT): shock "+B("150–200 J")+". Adrenaline "+B("1 mg")+" and "+B("amiodarone 300 mg")+" after 3rd shock; amiodarone "+B("150 mg")+" after 5th.",
+    "Shockable (VF/pVT): first shock "+B("≥ 150 J")+" biphasic (pulsed biphasic 130–150 J); increase energy for later shocks if possible. Adrenaline "+B("1 mg")+" and "+B("amiodarone 300 mg")+" after 3rd shock; amiodarone "+B("150 mg")+" after 5th. Alternative: "+B("lignocaine 100 mg")+" (+ 50 mg after 5th).",
     "Non-shockable: "+B("adrenaline 1 mg")+" ASAP, then every 3–5 min.",
     "Pregnant ≥ 20 weeks: manual uterine displacement; perimortem Caesarean within 5 min.",
     "4 Hs and 4 Ts (think high spinal, LAST, haemorrhage, anaphylaxis)."],
-    "Resuscitation Council UK ALS 2021.")
+    "Resuscitation Council UK ALS 2025 (updated from the 2025 text, Nov 2026).")
   + crisis("Bronchospasm", [
     "100% O₂. Check tube, circuit, capnograph (rule out kink, endobronchial, pneumothorax).",
     "Deepen: sevoflurane, propofol or "+B("ketamine 0.5–1 mg/kg = "+wk(w,0.5,"mg")+"–"+wk(w,1,"mg"))+".",
@@ -1008,7 +1010,7 @@ eCards.adult = () => {
     "Cool actively; stop at 38.5 °C.",
     "Hyperkalaemia: insulin + dextrose, "+B("calcium chloride 10% 10 mL")+". Arrhythmia: amiodarone (no calcium channel blockers).",
     "Monitor urine output, CK, ABG. ICU."],
-    "Association of Anaesthetists MH guideline.")
+    "Association of Anaesthetists MH guideline 2020.", newerFlag("EMHG malignant hyperthermia crisis guideline","2024","the Association of Anaesthetists 2020 guideline"))
   + crisis("Failed intubation / CICO", [
     "Plan A: max 3 + 1 attempts (obstetric: 2, 3rd by most experienced). Release cricoid if view poor.",
     "Plan B: 2nd-generation supraglottic airway, max 3 attempts.",
@@ -1016,7 +1018,7 @@ eCards.adult = () => {
     "Plan D — CICO: declare it. Full paralysis, 100% O₂.",
     "Front of neck: "+B("scalpel – bougie – size 6.0 cuffed tube")+" through cricothyroid membrane.",
     "Obstetric: decide early — wake up or proceed with SAD."],
-    "DAS 2015 / OAA-DAS obstetric guideline.")
+    "DAS 2015 / OAA-DAS obstetric guideline.", newerFlag("DAS 2025 unanticipated difficult intubation","Nov 2025","DAS 2015"))
   + crisis("Massive obstetric haemorrhage", [
     "Call for help — activate massive transfusion protocol. 2 large-bore IVs, crossmatch, FBC, coags, fibrinogen.",
     "Uterine massage. Empty bladder.",
@@ -1026,7 +1028,7 @@ eCards.adult = () => {
     B("Misoprostol 800 mcg")+" sublingual / PR.",
     B("Tranexamic acid 1 g IV")+" over 10 min; repeat 1 g after 30 min if still bleeding.",
     "Warm everything. Blood products early (1:1 RBC:FFP). Keep fibrinogen &gt; 2 g/L. Give calcium."],
-    "RCOG / MOH Malaysia PPH guidance.")
+    "RCOG Green-top 52 (2016) / MOH Malaysia PPH guidance · latest available, checked Nov 2026.")
   + crisis("Eclampsia", [
     "Call for help. Left lateral, airway, O₂. Protect from injury.",
     "MgSO₄ loading "+B("4 g IV over 10–15 min")+", then "+B("1 g/h")+" for 24 h.",
@@ -1055,7 +1057,7 @@ eCards.paeds = () => {
     "Atropine "+B("0.02 mg/kg = "+wk(w,0.02,"mg"))+" (bradycardia from vagal cause).",
     "Fluid bolus "+B("10 mL/kg = "+wk(w,10,"mL"))+". Glucose 10% "+B("2 mL/kg = "+wk(w,2,"mL"))+" if low.",
     "4 Hs and 4 Ts. Hyperkalaemia: calcium chloride 10% "+B("0.2 mL/kg = "+wk(w,0.2,"mL"))+"."],
-    "APLS / RCUK PLS 2021 + my paeds notes.")
+    "APLS / RCUK PLS 2021 + my paeds notes.", newerFlag("RCUK paediatric life support","2025","RCUK 2021"))
   + crisis("Paeds LA toxicity (LAST)", [
     "Stop injecting LA. Call for help. Airway, 100% O₂.",
     "Seizures: "+B("midazolam 0.05–0.1 mg/kg = "+wk(w,0.05,"mg")+"–"+wk(w,0.1,"mg"))+".",
@@ -1063,7 +1065,7 @@ eCards.paeds = () => {
     "Infusion "+B("15 mL/kg/h = "+wk(w,15,"mL")+"/h")+".",
     "Still unstable at 5 min: repeat bolus (max 2 more), double infusion to "+B(wk(w,30,"mL")+"/h")+".",
     "Max total "+B("12 mL/kg = "+wk(w,12,"mL"))+"."],
-    "Association of Anaesthetists LAST guideline.")
+    "Association of Anaesthetists LAST guideline (v3, reviewed 2025).")
   + crisis("Paeds anaphylaxis", [
     "Stop trigger. Call for help. 100% O₂, airway.",
     "IV adrenaline "+B("1 mcg/kg = "+wk(w,1,"mcg"))+" (= "+wk(w,0.01,"mL")+" of 1:10 000), titrate and repeat.",
@@ -1078,7 +1080,7 @@ eCards.paeds = () => {
     "Repeat "+B("1 mg/kg = "+wk(w,1,"mg"))+" every 5 min, max "+B("10 mg/kg = "+wk(w,10,"mg"))+".",
     "Cool; stop at 38.5 °C.",
     "Hyperkalaemia: calcium chloride 10% "+B("0.2 mL/kg = "+wk(w,0.2,"mL"))+"; insulin "+B("0.1 unit/kg = "+wk(w,0.1,"units"))+" with glucose 10% "+B("5 mL/kg = "+wk(w,5,"mL"))+"."],
-    "Association of Anaesthetists MH guideline.");
+    "Association of Anaesthetists MH guideline 2020.", newerFlag("EMHG malignant hyperthermia crisis guideline","2024","the Association of Anaesthetists 2020 guideline"));
 };
 
 /* ---------- GENERAL ANAESTHESIA (adult) — DRAFT from standard references ---------- */
@@ -1123,7 +1125,7 @@ gaCards.fasting = () => `<div class="card"><h2>1. Fasting</h2>${gaDraft()}
   <table><tr><td>Clear fluids</td><td class="hl">2 h</td></tr><tr><td>Light meal, milk</td><td class="hl">6 h</td></tr><tr><td>Fatty / heavy meal</td><td class="hl">8 h</td></tr></table>
   <h3>GLP-1 agonists (semaglutide, liraglutide…)</h3>
   <ul><li>Weekly dose: hold 1 week before</li><li>Daily dose: hold on the day</li><li>GI symptoms (nausea, bloating) or not held: treat as <b>full stomach</b> (consider gastric US, RSI)</li></ul>
-  ${src("ASA / ESAIC fasting guidance; ASA 2023 GLP-1 statement.")}</div>`;
+  ${newerFlag("Multisociety GLP-1 perioperative guidance (ASA, AGA, ASMBS, ISPCOP, SAGES)","Oct 2024","the ASA 2023 statement")}${src("ASA / ESAIC fasting guidance; ASA 2023 GLP-1 statement.")}</div>`;
 gaCards.meds = () => `<div class="card"><h2>2. Regular drugs: stop or continue</h2>${gaDraft()}
   <table>
   <tr><th>Continue</th><td>Beta-blockers, statins, antiepileptics, inhalers, thyroxine, antiparkinson, steroids</td></tr>
@@ -1133,11 +1135,11 @@ gaCards.meds = () => `<div class="card"><h2>2. Regular drugs: stop or continue</
   <tr><th>Insulin</th><td>Long-acting basal: give <b>80%</b> of usual dose. Short-acting: omit while fasting. &gt; 1 missed meal: variable-rate insulin infusion</td></tr>
   <tr><th>Anticoagulants / antiplatelets</th><td>See Regional › Anticoagulants</td></tr></table>
   <button class="homebtn" data-open="3. Anticoagulant timing" data-g="regional" data-tab="safety">Open anticoagulant timing table ›</button>
-  ${src("CPOC 2021 perioperative diabetes; FDA SGLT2i advice.")}</div>`;
+  ${src("CPOC 2021 perioperative diabetes; FDA SGLT2i advice · latest available, checked Nov 2026")}</div>`;
 gaCards.steroid = () => `<div class="card"><h2>3. Steroid cover</h2>${gaDraft()}
   <p>On ≥ 5 mg prednisolone (or equivalent) for &gt; 4 weeks:</p>
   <ul><li>Give usual morning dose</li><li>Major / moderate surgery: <b>hydrocortisone 100 mg IV</b> at induction, then 200 mg / 24 h infusion (or 50 mg 6-hourly)</li><li>Minor surgery: usual dose ± 100 mg at induction</li></ul>
-  ${src("Association of Anaesthetists 2020 steroid guideline.")}</div>`;
+  ${src("Association of Anaesthetists 2020 steroid guideline · latest available, checked Nov 2026")}</div>`;
 gaCards.airway = () => `<div class="card"><h2>4. Airway assessment &amp; plan</h2>${gaDraft()}
   <h3>Predictors of difficulty</h3>
   <ul><li>Previous difficulty (ask, check notes)</li><li>Mallampati III–IV, mouth opening &lt; 3 cm, thyromental &lt; 6 cm</li><li>Poor jaw protrusion, limited neck movement</li><li>BMI &gt; 35, neck circumference &gt; 40 cm, OSA (STOP-BANG ≥ 3)</li><li>Beard, no teeth, airway pathology, radiotherapy</li></ul>
@@ -1243,7 +1245,7 @@ gaCards.ponv = () => { const f = S.apfel || 0, n = [0,1,2,3].filter(i => f & (1<
   <tr><td>Granisetron</td><td class="hl">1 mg</td><td class="sub">end of surgery</td></tr>
   <tr><td>Droperidol</td><td class="hl">0.625–1.25 mg</td><td class="sub">end; QT caution</td></tr>
   <tr><td>Propofol TIVA</td><td class="hl">—</td><td class="sub">avoid volatile / N₂O</td></tr></table>
-  ${src("Apfel 1999; 4th consensus PONV guidelines 2020.")}</div>`; };
+  ${newerFlag("Fifth consensus PONV guidelines","2025","the 4th consensus (2020)")}${src("Apfel 1999 (still used in the 5th consensus 2025); 4th consensus PONV guidelines 2020.")}</div>`; };
 gaCards.extub = () => `<div class="card"><h2>3. Extubation criteria</h2>${gaDraft()}
   <ul><li>Awake, obeys commands (or deep extubation planned)</li><li>TOF ratio ≥ 0.9</li><li>Regular breathing, RR &gt; 10, Vt &gt; 5 mL/kg</li><li>SpO₂ adequate on FiO₂ ≤ 0.4, normal EtCO₂</li><li>Haemodynamically stable, temperature &gt; 36 °C</li><li>Airway clear, suctioned; bite block</li></ul>
   <p class="sub">At-risk airway: DAS extubation plan (exchange catheter, awake, ICU).</p>${src("DAS extubation guideline 2012.")}</div>`;
@@ -1275,7 +1277,7 @@ gaCards.anticoag = () => `<div class="card"><h2>Neuraxial &amp; deep blocks: ant
   <tr><td>Dabigatran</td><td class="hl">72–120 h by CrCl (≥ 80: 72 h; 50–79: 96 h; 30–49: 120 h)</td><td>6 h after catheter removal</td></tr>
   <tr><td>Thrombolytics</td><td class="hl">48 h; avoid</td><td>—</td></tr></table></div>
   <p><b>Platelets:</b> ≥ 80 × 10⁹/L for neuraxial (obstetric ≥ 70 if stable).</p>
-  ${src("ASRA 2018 (4th ed.) / ESAIC 2022. Check local policy.")}</div>`;
+  ${newerFlag("ASRA antithrombotic guideline, 5th edition","2025","ASRA 4th edition (2018)")}${src("ASRA 2018 (4th ed.) / ESAIC 2022. Check local policy.")}</div>`;
 
 /* ---------- REGIONAL ANAESTHESIA (adult) + LA dose calculator — DRAFT from standard sources ---------- */
 const RA_CHECKED = true;
@@ -1358,7 +1360,7 @@ raCards.pdph = () => `<div class="card"><h2>Post-dural puncture headache</h2>${r
   <li><b>Red flags → image:</b> focal neurology, fever, non-postural, seizures (subdural, cerebral venous thrombosis)</li>
   <li><b>Conservative:</b> hydration, paracetamol, NSAID, caffeine (up to 300 mg/day), ± sphenopalatine ganglion block</li>
   <li><b>Epidural blood patch</b> if severe or &gt; 24–48 h: <b>15–20 mL</b> autologous blood at the same or lower level, stop if back pain; success ~70%, may repeat</li></ul>
-  ${src("OAA PDPH guideline 2018.")}</div>`;
+  ${newerFlag("Multisociety international PDPH guideline","2024","the OAA 2018 guideline")}${src("OAA PDPH guideline 2018.")}</div>`;
 raCards.failed = () => `<div class="card"><h2>Failed or patchy block</h2>${raDraft()}
   <h3>Spinal</h3><ul><li>Wait 10–15 min; check level with cold and touch</li><li>Hyperbaric: tilt to encourage spread</li><li>Options: supplement with local infiltration / analgesia, repeat spinal with reduced dose (count total LA), or convert to GA</li></ul>
   <h3>Epidural</h3><ul><li>Unilateral: withdraw catheter 1–2 cm, top up with patient lying on the weak side</li><li>Patchy: stronger LA (0.5% levobupi or 2% lignocaine + adrenaline)</li><li>No block after adequate dose: re-site, or GA</li></ul>${src(RSRC)}</div>`;
@@ -1443,7 +1445,7 @@ function abxCard(paeds){
       <tr><td>Cefazolin IV (allergy, not anaphylaxis)</td><td class="hl">${paeds?`${sig(Math.min(50*W(),1000))} mg (50 mg/kg)`:"1 g"}</td></tr>
       <tr><td>Azithromycin (severe allergy)</td><td class="hl">${paeds?`${sig(Math.min(15*W(),500))} mg (15 mg/kg)`:"500 mg"}</td></tr></table>
       <p class="sub">30–60 min before. AHA 2021 (clindamycin no longer recommended).</p></details>
-    ${src("Malaysian National Antimicrobial Guideline 2019; ASHP/IDSA/SIS/SHEA 2013; AHA 2021.")}`;
+    ${src("Malaysian National Antimicrobial Guideline 2019; ASHP/IDSA/SIS/SHEA 2013; AHA 2021 · latest available, checked Nov 2026")}`;
 }
 gaCards.abx = () => `<div class="card"><h2>5. Antibiotic prophylaxis</h2>${abxDraft()}${abxCard(false)}</div>`;
 pCards.abx = () => `<div class="card"><h2>Paeds antibiotic prophylaxis</h2>${abxDraft()}${abxCard(true)}</div>`;
@@ -1566,7 +1568,7 @@ gaCards.pacu = () => `<div class="card"><h2>Discharge from recovery</h2>${disDra
   <h3>Also check</h3><ul><li>Airway clear, protective reflexes back</li><li>Pain and PONV controlled</li><li>Observed ≥ 30 min after last IV opioid; ≥ 15 min after last antiemetic / sedative</li>
   <li>Temperature &gt; 36 °C</li><li>No active bleeding; drains and urine output checked</li><li>Post-op instructions written (analgesia, O₂, fluids, monitoring)</li></ul>
   <h3>After spinal / epidural</h3><ul><li>Block regressing: sensory level falling, some leg movement (Bromage ≤ 2) before ward; documented level</li><li>Hypotension resolved</li></ul>
-  ${REDFLAGS}${src("Aldrete 1995; ASA PACU practice guideline 2013.")}</div>`;
+  ${REDFLAGS}${src("Aldrete 1995; ASA PACU practice guideline 2013 · latest available, checked Nov 2026")}</div>`;
 gaCards.home = () => `<div class="card"><h2>Discharge home (daycare)</h2>${disDraft()}
   <h3>PADSS (Post-Anaesthetic Discharge Scoring System)</h3>${scorer("pad", PADSS, 9, "Fit to go home")}
   <h3>Home checklist</h3><ul><li>Responsible adult to escort home, and an adult at home for 24 h</li>
@@ -1576,7 +1578,7 @@ gaCards.home = () => `<div class="card"><h2>Discharge home (daycare)</h2>${disDr
   <li><b>Voiding required only if high risk:</b> hernia, anorectal, urology, pelvic surgery, history of retention, large IV fluid volume. Low-risk patients may go home without voiding (written advice to return if unable to pass urine in 8–12 h)</li></ul>
   <h3>After a peripheral nerve block</h3><ul><li>May go home with a numb limb if protected: sling (arm) or crutches / no weight-bearing (leg)</li>
   <li>Written limb-care advice; start oral analgesia <b>before</b> the block wears off (usually 12–24 h)</li></ul>
-  ${REDFLAGS}${src("Chung PADSS 1995; Association of Anaesthetists / BADS day-case guideline 2019.")}</div>`;
+  ${REDFLAGS}${src("Chung PADSS 1995; Association of Anaesthetists / BADS day-case guideline 2019 · latest available, checked Nov 2026")}</div>`;
 pCards.disch = () => { const w = W();
   return `<div class="card"><h2>Paeds discharge</h2>${disDraft()}
   <h3>Leaving recovery: modified Aldrete</h3>${scorer("pald", ALDRETE, 9, "Ready to leave recovery")}
@@ -1728,7 +1730,18 @@ const VALUES = [
   "Home: PADSS (vital signs, walking, PONV, pain, bleeding) ≥ 9 with no zero; escort + adult at home 24 h; no driving 24 h",
   "Spinal: voiding required only if high risk (hernia, anorectal, urology, pelvic, retention history)",
   "Nerve block: home with protected numb limb; oral analgesia before block wears off",
-  "Paeds: drinking not required; ex-prem < 60 weeks PCA overnight; tonsillectomy < 3 y / OSA overnight; paracetamol 15 mg/kg 6-hourly, ibuprofen 10 mg/kg 8-hourly"]]];
+  "Paeds: drinking not required; ex-prem < 60 weeks PCA overnight; tonsillectomy < 3 y / OSA overnight; paracetamol 15 mg/kg 6-hourly, ibuprofen 10 mg/kg 8-hourly"]],
+ ["Sources — reviewed 14 Nov 2026 (next review Nov 2027)", [
+  "UPDATED: RCUK Adult ALS 2025 (shock ≥ 150 J, lignocaine 100 mg alternative, isoprenaline 5 mcg/min) — read from the primary text",
+  "NEWER, NOT YET APPLIED (full text needed): DAS 2025 intubation (Nov 2025) — CICO card still DAS 2015",
+  "NEWER, NOT YET APPLIED: ASRA antithrombotic 5th ed. (2025) — anticoagulant table still ASRA 2018",
+  "NEWER, NOT YET APPLIED: Multisociety GLP-1 guidance (Oct 2024) — fasting card still ASA 2023",
+  "NEWER, NOT YET APPLIED: 5th consensus PONV (2025) — Apfel card still 4th consensus 2020",
+  "NEWER, NOT YET APPLIED: Multisociety PDPH (2024) — PDPH card still OAA 2018",
+  "NEWER, NOT YET APPLIED: EMHG MH crisis (2024) — MH cards still Association of Anaesthetists 2020",
+  "NEWER, NOT YET APPLIED: RCUK paediatric life support (2025) — paeds arrest still RCUK 2021",
+  "LATEST AVAILABLE: RCOG PPH 2016; ASA PACU 2013; ASHP/IDSA 2013; Malaysian NAG 2019 (ask pharmacy re newer MOH policy); CPOC diabetes 2021; Association day-case 2019 (update pending); steroid 2020; LAST v3 (reviewed 2025); ESAIC 2022; AHA 2021; ASIA/ISNCSCI 2019; DAS ATI 2020",
+  "CLASSIC VALIDATED TOOLS (still current): Aldrete 1995, PADSS 1995, Apfel 1999, Mapleson 1996, Bromage 1965, Chula formula 2005"]]];
 
 /* ---------- ANONYMOUS CASES (phone only, 36 h) ---------- */
 const CASE_TTL = 36*3600*1000, CASE_MAX = 6;
