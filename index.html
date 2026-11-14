@@ -324,7 +324,7 @@ a{color:var(--accent)}
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.9.1";
+const APP_VERSION = "2.10.0";
 const APP_DATE = "14 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
@@ -528,10 +528,16 @@ const nonObsCalc = () => {
 /* ---------- OBSTETRIC (journey: Labour → Caesarean → After delivery) ---------- */
 const kv = rows => `<table>${rows.map(([k,v])=>`<tr><th style="width:42%">${k}</th><td>${v}</td></tr>`).join("")}</table>`;
 const MINE = "My practice (personal notes).";
+const LOC_CHECKED = false;
+const locNote = () => LOC_CHECKED ? "" : `<div class="warn" style="margin-top:0">DRAFT — added from the departmental protocol. Tick on the Values sheet.</div>`;
 const obsCards = {};
 
 /* LABOUR */
 obsCards.lStart = () => `<div class="card"><h2>1. Start: test, bolus &amp; loading</h2>
+  <details class="endo"><summary>Before starting: contraindications &amp; bloods (departmental protocol)</summary>${locNote()}
+    <p><b>Absolute:</b> coagulopathy · sepsis · uncontrolled hypovolaemia · patient refusal · raised ICP · no resuscitation facilities</p>
+    <p><b>Relative:</b> fixed-output cardiac disease · active neurological disease · abnormal spinal anatomy · fetal distress</p>
+    <p><b>Bloods:</b> FBC / PT / APTT for severe PE; group &amp; screen if indicated</p></details>
   <h3>Epidural</h3>
   <p><b>Bolus — ropivacaine 0.25% 3 mL</b> (1 mL ropi 0.75% diluted to 3 mL).</p>
   <p><b>Loading — ropi 0.15% + fentanyl 100 mcg, 10 mL, run at 40 mL/hr</b><br>2 mL ropi 0.75% + fentanyl 2 mL, dilute to 10 mL — or use 10 mL of the infusion preparation.</p>
@@ -569,8 +575,24 @@ obsCards.lAdp = () => `<div class="card"><h2>4. Problem: accidental dural punctu
   <p><b>IT bolus:</b> fentanyl 10–25 mcg + NS to 1 mL total.</p>
   <p><b>Top-up:</b> cocktail 3 mL every 1–2 hours — assess first.</p>
   <p><b>Going for Caesarean:</b> see Caesarean tab, route C.</p>
-  <div class="danger">Do NOT flush the catheter before removal (residual LA).</div>${src(MINE)}</div>`;
+  <div class="danger">Do NOT flush the catheter before removal (residual LA).</div>${src(MINE)}
+  <h3>Departmental protocol</h3>${locNote()}
+  <ul><li>Replace the stylet; <b>inform the specialist in charge</b></li><li>Either withdraw and re-site <b>one space above</b>, or thread the catheter intrathecally (label it <b>"intrathecal"</b>)</li>
+  <li>Top-ups by anaesthetic doctor only; document fully</li><li><b>Keep the catheter ≥ 24 h</b> after delivery; OAS / pain team follow-up for PDPH</li></ul>${protoSrc()}</div>`;
 
+obsCards.lTrouble = () => `<div class="card"><h2>4b. Problems: catheter troubleshooting</h2>${locNote()}
+  <table><tr><th>Problem</th><th>Action</th></tr>
+  <tr><td>Not working</td><td>3 mL test bolus ± fentanyl. Migrated → re-site. Kinked → inspect, re-plaster</td></tr>
+  <tr><td>Patchy / one-sided</td><td>Withdraw <b>0.5–1 cm</b>, less-blocked side down, bolus 3–5 mL (more volume, lower strength). Still patchy → re-site</td></tr>
+  <tr><td>Pain from changing labour</td><td>Ask obstetrician to assess; check bladder; increase volume/strength or add opioid</td></tr>
+  <tr><td>Working too well (intrathecal)</td><td>Convert to intrathecal regimen or re-site; follow up for PDPH</td></tr>
+  <tr><td>Subdural</td><td>Re-site</td></tr>
+  <tr><td>Blood in catheter</td><td>Withdraw to 3 cm in the space, re-aspirate; still blood → re-site</td></tr>
+  <tr><td>Pain on insertion</td><td>Withdraw to 3 cm in the space; persists → re-site</td></tr>
+  <tr><td>Infection</td><td>Remove catheter; abscess → drainage + antibiotic; meningitis → LP + antibiotic</td></tr>
+  <tr><td>Severed catheter</td><td>Leave the fragment (inert); inform HOD, patient and surgeon; image; refer only if symptomatic. Photograph the recovered part</td></tr>
+  <tr><td>Knotted / trapped</td><td>Gentle steady traction in the insertion position; maximal flexion; rotate spine; wait for tissues to soften; fill with saline; relaxation under GA</td></tr></table>
+  <p class="sub">Never withdraw a catheter through the epidural needle. Catheter 3–4 cm in the space.</p>${protoSrc()}</div>`;
 obsCards.lPca = () => `<div class="card"><h2>5. No epidural: IV PCA</h2>
   <h3>Remifentanil — 20 mcg/mL</h3>
   <ol><li>Reconstitute 1 vial with 5 mL NS → 1 mg/mL.</li><li>Take 1 mL (1 mg), make up to 50 mL NS → 20 mcg/mL.</li></ol>
@@ -581,6 +603,11 @@ obsCards.lPca = () => `<div class="card"><h2>5. No epidural: IV PCA</h2>
   <div class="warn">Pain not controlled → adjust <b>background rate</b>, NOT the PCA bolus.</div>${protoSrc()}</div>`;
 
 /* CAESAREAN */
+obsCards.cAsp = () => `<div class="card"><h2>0. Before theatre: aspiration prophylaxis</h2>${locNote()}
+  <h3>Elective LSCS</h3><ul><li>Nil by mouth from midnight</li><li>Ranitidine <b>150 mg PO</b> at 10 pm and on the morning of surgery</li><li>Sodium citrate 0.3 M <b>30 mL</b> when called to OT</li></ul>
+  <h3>Emergency LSCS</h3><ul><li>Ranitidine <b>50 mg IV</b> as soon as LSCS is decided</li><li>Sodium citrate 0.3 M <b>30 mL</b> when called to OT</li><li>± Metoclopramide <b>10 mg IV</b></li></ul>
+  <p>Transfer supine with left uterine displacement (wedge under right buttock). Group &amp; screen for all elective LSCS; crossmatch if ASA III, anaemia, rare group or anticipated bleeding.</p>
+  <div class="warn">Ranitidine has been recalled in several countries — use your pharmacy's H₂-antagonist / PPI alternative if it is not stocked.</div>${protoSrc()}</div>`;
 obsCards.cSpinal = () => `<div class="card"><h2>A1. Spinal: dose by height</h2>${lscsBody()}</div>`;
 obsCards.cIt = () => `<div class="card"><h2>A2. Spinal: IT morphine &amp; fentanyl</h2>
   <h3>Fentanyl (syringe 2)</h3><ol><li>Fentanyl 50 mcg/mL. 1 mL syringe: draw <b>10 mcg (0.2 mL)</b>.</li><li>Add into the intended dose of 0.5% heavy bupivacaine.</li></ol>
@@ -610,7 +637,9 @@ obsCards.cTopup = () => { const t = TOPUP[S.topup] || TOPUP.lig;
   <div class="warn">Keep epidural catheter in situ &amp; stoppered post-op.</div>${protoSrc()}</div>`; };
 obsCards.cAdp = () => `<div class="card"><h2>C. Dural puncture catheter: LSCS dosing</h2>
   <div class="danger" style="text-align:center">INTRATHECAL CATHETER — SPINAL DOSES ONLY</div>
-  <ol><li>Use the <b>intended spinal dose by height</b> (A1).</li><li>Give it in <b>small amounts, testing</b> the block as you go.</li><li>Do NOT flush the catheter before removal (residual LA).</li></ol>
+  <ol><li>Give the <b>intended spinal dose by height</b> (A1) through the catheter, in small amounts, testing as you go.</li>
+  <li>Further top-ups: <b>0.2 mL of 0.5% heavy bupivacaine</b> at a time, checking the block before each.</li>
+  <li>Keep the catheter <b>≥ 24 h</b>. Do NOT flush it before removal (residual LA).</li></ol>${locNote()}
   <button class="homebtn" data-open="A1. Spinal: dose by height" data-g="obs" data-tab="lscs">Open A1 dose by height ›</button>${src(MINE)}</div>`;
 
 /* AFTER DELIVERY */
@@ -622,6 +651,9 @@ obsCards.pAnalg = () => { const w = S.morWt, lo = w*0.05, hi = w*0.1;
   <tr><th>Epidural</th><td>Epidural top-ups → epidural morphine 2 mg in 5 mL NS stat at end of surgery</td></tr></table>
   <h3>IV morphine after delivery (GA)</h3>${step("morWt","Weight","kg",30,200,1)}
   <div class="result"><div class="sub">0.05 – 0.1 mg/kg</div><div class="big">${f1(lo)} – ${f1(hi)} mg</div></div>
+  <h3>Other ward options (departmental protocol)</h3>${locNote()}
+  <ul><li><b>PCA morphine</b> 1 mg/mL, 100–200 mL sent with the patient; pump set by OAS</li><li><b>SC morphine 7.5–10 mg 4-hourly</b>, undiluted, regular (not PRN), via SC cannula</li>
+  <li>Oral: NSAID or paracetamol once eating; Oxynorm on POD1 if NSAIDs contraindicated</li></ul>
   <div class="warn">After IT/epidural morphine: no other opioids or sedatives for 24 h. OAS follow-up (yellow form).</div>${protoSrc()}</div>`; };
 obsCards.pNsaid = () => `<div class="card"><h2>2. NSAID yes / no</h2>
   <h3>NSAIDs contraindicated</h3><ul><li>IV paracetamol 1 g stat</li><li>Tab paracetamol 1 g QID × 3 days</li><li>Cap Oxynorm 5 mg 8-hourly (if POD1 or PRN, if needed)</li></ul>
@@ -630,8 +662,11 @@ obsCards.pNsaid = () => `<div class="card"><h2>2. NSAID yes / no</h2>
 obsCards.pPca = () => `<div class="card"><h2>3. PCA morphine (after GA)</h2><p><b>1 mg/mL:</b> 50 mg morphine (5 mL) made up to 50 mL NS.</p>${protoSrc()}</div>`;
 obsCards.pWard = () => `<div class="card"><h2>4. Ward (OAS) problems &amp; catheter care</h2>
   <p class="sub">Instructions for ward / OAS nurses.</p>
+  <h3>After IT morphine: observe &amp; call</h3>${locNote()}
+  <p>Observations <b>hourly for 4 h, then 4-hourly</b>: RR, sedation score, pain (VAS), BP, pulse.</p>
+  <div class="danger" style="font-weight:400"><b>Call anaesthetic doctor / OAS nurse if:</b> RR &lt; 8/min · sedation score &gt; 2 · VAS &gt; 50% · SBP &lt; 90 mmHg (call ward doctor first)</div>
   <h3>Hypotension</h3><p>SBP &lt; 90 mmHg or 20% below baseline: stop epidural infusion; call doctor (OAS or ward); run 250 mL Hartmann's fast.</p>
-  <h3>Pruritus</h3><p>Tab Piriton 4 mg with a little water. Severe: IV Piriton 10 mg stat.</p>
+  <h3>Pruritus</h3><p>Often self-limiting — reassure. Tab Piriton 4 mg with a little water; severe: IV Piriton 10 mg stat. Persistent: <b>naloxone 0.1–0.4 mg IV</b> or <b>nalbuphine 2.5–5 mg IV</b>.</p>
   <h3>Nausea &amp; vomiting</h3><p>Check NIBP first. IV metoclopramide (Maxolon) 10 mg.</p>
   <h3>High block</h3><p>Stop epidural infusion; prop up; O₂ by mask; inform OAS / on-call anaesthetist; resus trolley at bedside — KIV intubation; monitor ECG, NIBP, SpO₂.</p>
   <h3>Epidural catheter</h3><ul><li>Disconnected from filter → removed by OAS doctor / nurse immediately</li><li>Only OAS nurse and doctor inject through the catheter</li><li>After dural puncture catheter: do NOT flush before removal</li></ul>${protoSrc()}</div>`;
@@ -1368,7 +1403,11 @@ raCards.pdph = () => `<div class="card"><h2>Post-dural puncture headache</h2>${r
   <li><b>Conservative:</b> paracetamol + NSAID; opioids short-term only; <b>caffeine only in the first 24 h</b></li>
   <li><b>Epidural blood patch</b> if refractory and impairing daily life: <b>15–20 mL</b> autologous blood, slow, aseptic; <b>never &gt; 30 mL</b>; a repeat may be needed if done within 48 h of puncture</li>
   <li>Prophylactic blood patch: not routinely recommended</li></ul>
-  ${src("Multisociety international PDPH guideline (ASRA, ESRA, SOAP, OAA and others), 2024.")}</div>`;
+  ${src("Multisociety international PDPH guideline (ASRA, ESRA, SOAP, OAA and others), 2024.")}
+  <h3>Departmental protocol — practical steps</h3>${locNote()}
+  <p class="sub">Note: departmental protocol gives caffeine 300–500 mg/day × 3 days (the 2024 guideline limits caffeine to the first 24 h).</p>
+  <p><b>Blood patch:</b> afebrile 24 h; FBC (WBC); written consent; IV access + ECG, NIBP, SpO₂; lateral often more comfortable; inject slowly until relief, back fullness or 20 mL; send remainder for culture; lie flat 2–3 h; review next day; give contact number. A 2nd patch may be done; if still no relief, reconsider the diagnosis.</p>
+  <p><b>SPG block</b> (diagnosis established, CT brain to exclude other pathology): supine, neck extended; cotton-tipped applicator soaked in <b>lignocaine 2%</b> into each nostril, slightly cephalad until resistance; drip 1–2 mL more; leave 10–15 min; watch for LA toxicity; may repeat after 24 h; if no lasting relief after 2 → blood patch.</p>${protoSrc()}</div>`;
 raCards.failed = () => `<div class="card"><h2>Failed or patchy block</h2>${raDraft()}
   <h3>Spinal</h3><ul><li>Wait 10–15 min; check level with cold and touch</li><li>Hyperbaric: tilt to encourage spread</li><li>Options: supplement with local infiltration / analgesia, repeat spinal with reduced dose (count total LA), or convert to GA</li></ul>
   <h3>Epidural</h3><ul><li>Unilateral: withdraw catheter 1–2 cm, top up with patient lying on the weak side</li><li>Patchy: stronger LA (0.5% levobupi or 2% lignocaine + adrenaline)</li><li>No block after adequate dose: re-site, or GA</li></ul>${src(RSRC)}</div>`;
@@ -1757,7 +1796,15 @@ const VALUES = [
   "Anticoagulants: low/high-dose wording; DOAC intervals individualised (72 h standard)",
   "CICO: VL first-line; routine NMB; peroxygenation; 3 + 1 attempts; 2nd-gen SGA max 3, no blind intubation; prepare FONA if SGA difficult",
   "MH: dantrolene 2–2.5 mg/kg actual weight, max 300 mg per dose, repeat every 10 min; max 10 mg/kg may be exceeded; charcoal filters; chilled crystalloid 2–3 L; stop cooling < 38.5 °C",
-  "Adult ALS (RCUK 2025): first shock ≥ 150 J; lignocaine 100 mg alternative; isoprenaline 5 mcg/min for bradycardia"]]];
+  "Adult ALS (RCUK 2025): first shock ≥ 150 J; lignocaine 100 mg alternative; isoprenaline 5 mcg/min for bradycardia"]],
+ ["Departmental protocol additions (DRAFT)", [
+  "Labour epidural contraindications (absolute / relative) and bloods (FBC/PT/APTT for severe PE)",
+  "Dural puncture: inform specialist; re-site one space above or intrathecal catheter; keep catheter ≥ 24 h; LSCS top-ups 0.2 mL 0.5% heavy bupivacaine",
+  "Catheter troubleshooting table (withdraw 0.5–1 cm for patchy block; 3 cm in space; severed / knotted catheter steps)",
+  "Aspiration prophylaxis: elective ranitidine 150 mg PO 10 pm + morning, sodium citrate 30 mL; emergency ranitidine 50 mg IV, sodium citrate 30 mL ± metoclopramide 10 mg",
+  "Post-natal: PCA morphine 1 mg/mL 100–200 mL; SC morphine 7.5–10 mg 4-hourly regular",
+  "IT morphine ward obs hourly × 4 h then 4-hourly; call if RR < 8, sedation > 2, VAS > 50%, SBP < 90; pruritus naloxone 0.1–0.4 mg or nalbuphine 2.5–5 mg",
+  "PDPH practical steps: blood patch prerequisites and aftercare; SPG block with lignocaine 2%; local caffeine 300–500 mg/day × 3 days noted"]]];
 
 /* ---------- ANONYMOUS CASES (phone only, 36 h) ---------- */
 const CASE_TTL = 36*3600*1000, CASE_MAX = 6;
@@ -1868,10 +1915,10 @@ const GROUPS = [
     links:[["Laryngospasm","paeds","Laryngospasm"],["Paeds bronchospasm","paeds","Bronchospasm"]]}], cards:[]},
  {id:"obs", name:"Obstetric", sub:"Labour · Caesarean · After delivery", tabKey:"obTab", tabs:[
    {id:"labour", label:"Labour", hint:"Epidural, in the order you do it.",
-    cards:["1. Start: test, bolus & loading","2. Maintain: infusion recipes","2b. Maintain: pump settings","3. Top-up: breakthrough pain","4. Problem: accidental dural puncture","5. No epidural: IV PCA"],
+    cards:["1. Start: test, bolus & loading","2. Maintain: infusion recipes","2b. Maintain: pump settings","3. Top-up: breakthrough pain","4. Problem: accidental dural puncture","4b. Problems: catheter troubleshooting","5. No epidural: IV PCA"],
     links:[["High / total spinal","adult","High block"],["LA toxicity (LAST)","adult","LA toxicity"]]},
    {id:"lscs", label:"Caesarean", hint:"Pick your route: A spinal · B epidural top-up · C dural puncture catheter.",
-    cards:["A1. Spinal: dose by height","A2. Spinal: IT morphine & fentanyl","A3. Spinal: phenylephrine","B. Epidural top-up for LSCS","C. Dural puncture catheter: LSCS dosing"],
+    cards:["0. Before theatre: aspiration prophylaxis","A1. Spinal: dose by height","A2. Spinal: IT morphine & fentanyl","A3. Spinal: phenylephrine","B. Epidural top-up for LSCS","C. Dural puncture catheter: LSCS dosing"],
     links:[["Hypotension after spinal","adult","Hypotension after spinal"],["High / total spinal","adult","High / total spinal"],["LA toxicity (LAST)","adult","LA toxicity (top-up)"],["Failed intubation / CICO","adult","GA: failed intubation / CICO"],["Massive obstetric haemorrhage","adult","Massive haemorrhage"]]},
    {id:"post", label:"After delivery", hint:"Analgesia, then ward problems.",
     cards:["1. Analgesia by technique","2. NSAID yes / no","3. PCA morphine (after GA)","4. Ward (OAS) problems & catheter care"],
