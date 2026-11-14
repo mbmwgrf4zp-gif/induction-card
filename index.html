@@ -302,6 +302,14 @@ details.endo summary{cursor:pointer;font-weight:600;font-size:var(--fs-sm)}
 .dchip.on{background:var(--ink);color:var(--card)}
 .linkish{background:none;border:0;padding:0;color:var(--accent);font-weight:700;font-family:var(--font-mono);cursor:pointer;font-size:inherit}
 .dermlink{display:block;box-sizing:border-box;margin:var(--s2) 0 0;padding:var(--s2) var(--s3);border-radius:var(--r-sm);border:1px solid var(--line);background:var(--card);color:var(--ink);font-weight:600;font-size:var(--fs-sm);text-align:left;cursor:pointer}
+.scrow{padding:var(--s2) 0;border-bottom:1px solid var(--line)}
+.sclab{font-size:var(--fs-sm);font-weight:700;margin-bottom:var(--s1)}
+.scopts{display:grid;grid-template-columns:repeat(3,1fr);gap:4px}
+.scopt{min-height:44px;border-radius:8px;border:1px solid var(--line);background:var(--card);font-size:var(--fs-xs);line-height:1.25;cursor:pointer;padding:4px;text-align:left}
+.scopt b{display:block;font-family:var(--font-mono);font-size:var(--fs-base)}
+.scopt.on{background:var(--gc);color:var(--on);border-color:var(--gc)}
+.result.ok{background:var(--g-paeds-soft)}
+.redlist li::marker{color:var(--danger-ink)}
 .disc{color:var(--muted);font-size:var(--fs-xs);text-align:center;margin-top:var(--s5);line-height:1.5}
 a{color:var(--accent)}
 .vs label{display:flex;gap:var(--s3);align-items:flex-start;padding:var(--s2) 0;border-bottom:1px solid var(--line);font-size:var(--fs-sm)}
@@ -315,7 +323,7 @@ a{color:var(--accent)}
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.6.1";
+const APP_VERSION = "2.7.0";
 const APP_DATE = "14 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
@@ -332,7 +340,7 @@ const store = {
 };
 // Inputs are not remembered between uses (per plan): state lives in memory only.
 const S = { ettMode:"adult", sex:"F", height:158, ageY:4, ageM:0, wt:3.0,
-            touched:{}, derm:"", abxSp:"general", spOp:"lscs", spHt:155, morWt:60, pw:10, pY:1, pM:0, pHt:75, pBE:-5, aw:70, emTab:"adult", obTab:"labour", pTab:"pre", gaTab:"pre", raTab:"safety", laA:[], laP:[], cSex:"F", cY:40, cM:0, cH:160, cW:60, cNick:"", laD:"bupi", laC:"0.5", laMl:15, laBi:"1", age:45, apfel:0, pump:"pcea_cse", topup:"lig" };
+            touched:{}, sc:{}, derm:"", abxSp:"general", spOp:"lscs", spHt:155, morWt:60, pw:10, pY:1, pM:0, pHt:75, pBE:-5, aw:70, emTab:"adult", obTab:"labour", pTab:"pre", gaTab:"pre", raTab:"safety", laA:[], laP:[], cSex:"F", cY:40, cM:0, cH:160, cW:60, cNick:"", laD:"bupi", laC:"0.5", laMl:15, laBi:"1", age:45, apfel:0, pump:"pcea_cse", topup:"lig" };
 
 function src(text){ return `<div class="src">Source: ${text}</div>`; }
 function protoSrc(){
@@ -1524,6 +1532,62 @@ function dermCard(){
 raCards.derm = () => `<div class="card"><h2>Dermatomes &amp; block height</h2>${dermCard()}</div>`;
 const dermLink = (lvl, label) => `<button class="dermlink" data-derm="${lvl}" data-open="6. Dermatomes &amp; block height" data-g="regional" data-tab="neuraxial">${label||`Aim ${lvl}`} → see dermatomes ›</button>`;
 
+/* ---------- DISCHARGE CRITERIA — DRAFT: Aldrete 1995, Chung PADSS 1995, AAGBI/BADS day case 2019, ASA PACU 2013 ---------- */
+const DIS_CHECKED = false;
+const disDraft = () => DIS_CHECKED ? "" : `<div class="warn" style="margin-top:0">DRAFT — Aldrete 1995, PADSS (Chung 1995), Association of Anaesthetists / BADS day-case 2019, ASA PACU 2013. Not yet ticked by you.</div>`;
+const ALDRETE = [
+  ["act","Activity",["Moves 4 limbs","Moves 2 limbs","Moves none"]],
+  ["resp","Breathing",["Deep breath & cough","Dyspnoea / shallow","Apnoeic"]],
+  ["circ","Circulation (BP vs pre-op)",["Within 20%","20–49% off","≥ 50% off"]],
+  ["cons","Consciousness",["Fully awake","Rousable to voice","Not responding"]],
+  ["spo2","SpO₂",["> 92% on air","Needs O₂ for > 90%","< 90% with O₂"]]];
+const PADSS = [
+  ["vs","Vital signs (BP & HR vs pre-op)",["Within 20%","20–40% off","> 40% off"]],
+  ["amb","Walking",["Steady, no dizziness","Needs help","Cannot walk"]],
+  ["nv","Nausea / vomiting",["Minimal (oral meds)","Moderate (IV/IM meds)","Severe, ongoing"]],
+  ["pain","Pain",["Acceptable on oral analgesia","Not acceptable",null]],
+  ["bleed","Surgical bleeding",["Minimal, no dressing change","Moderate, ≤ 2 changes","Severe, ≥ 3 changes"]]];
+function scorer(id, items, pass, okText){
+  const st = (S.sc[id] = S.sc[id] || {});
+  const done = items.every(([k]) => st[k] !== undefined), total = items.reduce((a,[k]) => a + (st[k] ?? 0), 0);
+  const zero = items.some(([k]) => st[k] === 0);
+  const rows = items.map(([k,label,opts]) => `<div class="scrow"><div class="sclab">${label}</div><div class="scopts">${opts.map((t,i) => t===null ? "" :
+      `<button class="scopt ${st[k]===2-i?"on":""}" data-score="${id}:${k}:${2-i}"><b>${2-i}</b> ${t}</button>`).join("")}</div></div>`).join("");
+  const verdict = !done ? `<div class="result"><div class="sub">Score so far</div><div class="big">${total} / 10</div><div class="sub">Tap every row.</div></div>`
+    : total >= pass && !zero ? `<div class="result ok"><div class="big">${total} / 10 ✓</div><div><b>${okText}</b> (≥ ${pass}, no zero)</div></div>`
+    : `<div class="danger"><div class="big">${total} / 10</div>Not yet — needs ≥ ${pass} with no zero. Reassess.</div>`;
+  return rows + verdict + `<button class="linkbtn" data-screset="${id}">Reset score</button>`;
+}
+const REDFLAGS = `<h3>Do not discharge — consider admission</h3><ul class="redlist">
+  <li>Pain or PONV not controlled</li><li>Active bleeding or surgical concern</li><li>SpO₂ below baseline, new O₂ need</li>
+  <li>OSA still needing opioids</li><li>No responsible adult / escort</li><li>Unexpected drowsiness, new neurology</li></ul>`;
+gaCards.pacu = () => `<div class="card"><h2>Discharge from recovery</h2>${disDraft()}
+  <h3>Modified Aldrete score</h3>${scorer("ald", ALDRETE, 9, "Ready to leave recovery")}
+  <h3>Also check</h3><ul><li>Airway clear, protective reflexes back</li><li>Pain and PONV controlled</li><li>Observed ≥ 30 min after last IV opioid; ≥ 15 min after last antiemetic / sedative</li>
+  <li>Temperature &gt; 36 °C</li><li>No active bleeding; drains and urine output checked</li><li>Post-op instructions written (analgesia, O₂, fluids, monitoring)</li></ul>
+  <h3>After spinal / epidural</h3><ul><li>Block regressing: sensory level falling, some leg movement (Bromage ≤ 2) before ward; documented level</li><li>Hypotension resolved</li></ul>
+  ${REDFLAGS}${src("Aldrete 1995; ASA PACU practice guideline 2013 (draft).")}</div>`;
+gaCards.home = () => `<div class="card"><h2>Discharge home (daycare)</h2>${disDraft()}
+  <h3>PADSS (Post-Anaesthetic Discharge Scoring System)</h3>${scorer("pad", PADSS, 9, "Fit to go home")}
+  <h3>Home checklist</h3><ul><li>Responsible adult to escort home, and an adult at home for 24 h</li>
+  <li><b>24 h:</b> no driving, machinery, alcohol, cooking alone, or legal / financial decisions</li>
+  <li>Written instructions, analgesia supplied with dosing, wound care</li><li>24-h contact number and follow-up plan</li></ul>
+  <h3>After spinal</h3><ul><li>Full sensation and motor function back; walks unaided</li>
+  <li><b>Voiding required only if high risk:</b> hernia, anorectal, urology, pelvic surgery, history of retention, large IV fluid volume. Low-risk patients may go home without voiding (written advice to return if unable to pass urine in 8–12 h)</li></ul>
+  <h3>After a peripheral nerve block</h3><ul><li>May go home with a numb limb if protected: sling (arm) or crutches / no weight-bearing (leg)</li>
+  <li>Written limb-care advice; start oral analgesia <b>before</b> the block wears off (usually 12–24 h)</li></ul>
+  ${REDFLAGS}${src("Chung PADSS 1995; Association of Anaesthetists / BADS day-case guideline 2019 (draft).")}</div>`;
+pCards.disch = () => { const w = W();
+  return `<div class="card"><h2>Paeds discharge</h2>${disDraft()}
+  <h3>Leaving recovery: modified Aldrete</h3>${scorer("pald", ALDRETE, 9, "Ready to leave recovery")}
+  <h3>Child-specific rules</h3><ul><li>Back to baseline behaviour, parent present</li><li>Drinking <b>not required</b> before discharge unless the surgeon asks</li>
+  <li><b>Ex-premature &lt; 60 weeks post-conceptual age:</b> overnight apnoea monitoring (your notes: CGA &lt; 48–52 w or Hb &lt; 7 → consider post-op ventilation)</li>
+  <li><b>Tonsillectomy &lt; 3 y</b> or significant OSA: overnight stay</li></ul>
+  <h3>Going home</h3><ul><li>Two adults for the car journey if the child is small (one to drive); car seat</li>
+  <li>Written instructions; regular paracetamol <b>${sig(Math.min(15*w,1000))} mg</b> 6-hourly (15 mg/kg) ± ibuprofen <b>${sig(Math.min(10*w,400))} mg</b> 8-hourly (10 mg/kg)</li>
+  <li>24-h contact number</li></ul>
+  ${REDFLAGS}${src("Aldrete 1995; APA / RCoA day-case paediatric guidance; my paeds notes (draft).")}</div>`; };
+
 /* ---------- VALUES SHEET ---------- */
 const VALUES = [
  ["ETT – adult", [
@@ -1658,7 +1722,13 @@ const VALUES = [
   "Block height: LSCS T4; upper abdo T4–T6; lower abdo/hernia T8–T10; TURP/vaginal T10; testes T10; hip/knee T10–L1; foot/ankle L2; perineal S1–S5",
   "Cold lost 1–2 segments above pinprick, above light touch; LSCS aim T4 (touch T5–T4)",
   "Bromage 0–3 (0 full movement → 3 complete motor block)",
-  "Caudal (Armitage): 0.5 mL/kg ≈ L1, 1 mL/kg ≈ T10, 1.2 mL/kg ≈ T6"]]];
+  "Caudal (Armitage): 0.5 mL/kg ≈ L1, 1 mL/kg ≈ T10, 1.2 mL/kg ≈ T6"]],
+ ["Discharge criteria (DRAFT)", [
+  "Recovery: modified Aldrete (activity, breathing, circulation, consciousness, SpO₂) ≥ 9 with no zero; ≥ 30 min after last IV opioid; temp > 36 °C",
+  "Home: PADSS (vital signs, walking, PONV, pain, bleeding) ≥ 9 with no zero; escort + adult at home 24 h; no driving 24 h",
+  "Spinal: voiding required only if high risk (hernia, anorectal, urology, pelvic, retention history)",
+  "Nerve block: home with protected numb limb; oral analgesia before block wears off",
+  "Paeds: drinking not required; ex-prem < 60 weeks PCA overnight; tonsillectomy < 3 y / OSA overnight; paracetamol 15 mg/kg 6-hourly, ibuprofen 10 mg/kg 8-hourly"]]];
 
 /* ---------- ANONYMOUS CASES (phone only, 36 h) ---------- */
 const CASE_TTL = 36*3600*1000, CASE_MAX = 6;
@@ -1729,7 +1799,7 @@ const GROUPS = [
     cards:["1. TIVA","2. Volatile: MAC by age","3. Intra-op opioids","4. Vasopressors & inotropes","5. Antibiotic prophylaxis","6. Tranexamic acid"],
     links:[["Anaphylaxis","adult","Anaphylaxis"],["Malignant hyperthermia","adult","Malignant hyperthermia"],["LA toxicity (LAST)","adult","LA toxicity"],["Bradycardia & cardiac arrest","adult","Bradycardia / arrest"]]},
    {id:"post", label:"Post-op", input:()=>gaInputs(), hint:"Reverse → prevent PONV → extubate → analgesia.",
-    cards:["1. Reversal","2. PONV: Apfel score","3. Extubation criteria","4. Analgesia ladder & PCA"],
+    cards:["1. Reversal","2. PONV: Apfel score","3. Extubation criteria","4. Analgesia ladder & PCA",["Discharge from recovery","5. Discharge from recovery"],["Discharge home (daycare)","6. Discharge home (daycare)"]],
     links:[["Bronchospasm","adult","Bronchospasm"],["Anaphylaxis","adult","Anaphylaxis"]]}], cards:[]},
  {id:"regional", name:"Regional anaesthesia", sub:"Safety · Neuraxial · Upper · Lower · Trunk", tabKey:"raTab", tabs:[
    {id:"safety", label:"Safety", input:()=>gaInputs(), hint:"Before every block: dose limits, checklist, anticoagulants.",
@@ -1765,7 +1835,7 @@ const GROUPS = [
     links:[["Paeds LA toxicity (LAST)","paeds","LA toxicity"],["Paeds malignant hyperthermia","paeds","Malignant hyperthermia"],["Paeds cardiac arrest","paeds","Cardiac arrest"]]},
    {id:"post", label:"Post-op", input:()=>pInputs(), hint:"Wake-up and after: PONV → extubation → delirium → analgesia.",
     cards:[["Paeds PONV","1. PONV prophylaxis"],["Deep extubation (MAC 1)","2. Deep extubation"],["Laryngospasm","3. Laryngospasm: prevent & treat"],
-      ["Emergence delirium","4. Emergence delirium"],["Paeds analgesia & infusions","5. Analgesia & infusions"]],
+      ["Emergence delirium","4. Emergence delirium"],["Paeds analgesia & infusions","5. Analgesia & infusions"],["Paeds discharge","6. Discharge (recovery & home)"]],
     links:[["Laryngospasm","paeds","Laryngospasm"],["Paeds bronchospasm","paeds","Bronchospasm"]]}], cards:[]},
  {id:"obs", name:"Obstetric", sub:"Labour · Caesarean · After delivery", tabKey:"obTab", tabs:[
    {id:"labour", label:"Labour", hint:"Epidural, in the order you do it.",
@@ -1778,6 +1848,9 @@ const GROUPS = [
     cards:["1. Analgesia by technique","2. NSAID yes / no","3. PCA morphine (after GA)","4. Ward (OAS) problems & catheter care"],
     links:[["Eclampsia","adult","Eclampsia"],["Massive obstetric haemorrhage","adult","Massive haemorrhage"]]}], cards:[]}];
 const SEARCH_EXTRA = {
+  "5. Discharge from recovery":"discharge recovery pacu aldrete score ward",
+  "6. Discharge home (daycare)":"discharge home daycare day case padss escort void voiding driving",
+  "6. Discharge (recovery & home)":"discharge paeds child aldrete home ex-prem apnoea tonsillectomy",
   "6. Dermatomes & block height":"dermatome dermatomes block height level t4 t10 nipple umbilicus xiphoid bromage sensory testing cold pinprick",
   "5. Antibiotic prophylaxis":"antibiotic prophylaxis cefazolin unasyn ampicillin sulbactam augmentin metronidazole gentamicin clindamycin vancomycin cefuroxime azithromycin endocarditis uro gynae ortho dental hpb colorectal",
   "13. Antibiotic prophylaxis":"antibiotic prophylaxis cefazolin unasyn metronidazole gentamicin clindamycin vancomycin paeds endocarditis",
@@ -1870,6 +1943,8 @@ function clamp(v,min,max){ return Math.min(max, Math.max(min, v)); }
 document.addEventListener("click", e => {
   const b = e.target.closest("button, input[type=checkbox]"); if (!b) return;
   const d = b.dataset;
+  if (d.score){ const [id,k,v] = d.score.split(":"); (S.sc[id] = S.sc[id] || {})[k] = +v; render(); return; }
+  if (d.screset){ S.sc[d.screset] = {}; render(); return; }
   if (d.derm){ S.derm = d.derm; if (!d.open){ render(); return; } }
   if (d.open){ const og = GROUPS.find(x=>x.id===d.g); if (og && og.tabs) S[og.tabKey] = d.tab || (og.tabs.find(t=>t.cards.some(c=>(Array.isArray(c)?c[1]:c)===d.open))||og.tabs[0]).id;
     S.open = d.calc ? null : d.open; S.scrollTo = !d.calc; if (!d.calc) remember(d.g, d.open);
