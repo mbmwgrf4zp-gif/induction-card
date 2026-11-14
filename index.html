@@ -324,7 +324,7 @@ a{color:var(--accent)}
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.10.0";
+const APP_VERSION = "2.10.1";
 const APP_DATE = "14 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
@@ -528,7 +528,7 @@ const nonObsCalc = () => {
 /* ---------- OBSTETRIC (journey: Labour → Caesarean → After delivery) ---------- */
 const kv = rows => `<table>${rows.map(([k,v])=>`<tr><th style="width:42%">${k}</th><td>${v}</td></tr>`).join("")}</table>`;
 const MINE = "My practice (personal notes).";
-const LOC_CHECKED = false;
+const LOC_CHECKED = true;
 const locNote = () => LOC_CHECKED ? "" : `<div class="warn" style="margin-top:0">DRAFT — added from the departmental protocol. Tick on the Values sheet.</div>`;
 const obsCards = {};
 
@@ -1797,7 +1797,7 @@ const VALUES = [
   "CICO: VL first-line; routine NMB; peroxygenation; 3 + 1 attempts; 2nd-gen SGA max 3, no blind intubation; prepare FONA if SGA difficult",
   "MH: dantrolene 2–2.5 mg/kg actual weight, max 300 mg per dose, repeat every 10 min; max 10 mg/kg may be exceeded; charcoal filters; chilled crystalloid 2–3 L; stop cooling < 38.5 °C",
   "Adult ALS (RCUK 2025): first shock ≥ 150 J; lignocaine 100 mg alternative; isoprenaline 5 mcg/min for bradycardia"]],
- ["Departmental protocol additions (DRAFT)", [
+ ["Departmental protocol additions (signed off 14 Nov 2026)", [
   "Labour epidural contraindications (absolute / relative) and bloods (FBC/PT/APTT for severe PE)",
   "Dural puncture: inform specialist; re-site one space above or intrathecal catheter; keep catheter ≥ 24 h; LSCS top-ups 0.2 mL 0.5% heavy bupivacaine",
   "Catheter troubleshooting table (withdraw 0.5–1 cm for patchy block; 3 cm in space; severed / knotted catheter steps)",
