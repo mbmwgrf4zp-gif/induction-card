@@ -1,5 +1,5 @@
 // Offline cache. Bump CACHE when any file changes so phones pick up the new version.
-const CACHE = "induction-card-v2.7.0";
+const CACHE = "induction-card-v2.7.1";
 const FILES = ["./", "index.html", "manifest.json", "icon-180.png", "icon-192.png", "icon-512.png",
   "fonts/plex-sans-118b75.woff2", "fonts/plex-mono-db14f4.woff2", "fonts/plex-mono-ed96d0.woff2"];
 self.addEventListener("install", e => { e.waitUntil(caches.open(CACHE).then(c => c.addAll(FILES))); self.skipWaiting(); });

@@ -323,7 +323,7 @@ a{color:var(--accent)}
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.7.0";
+const APP_VERSION = "2.7.1";
 const APP_DATE = "14 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
@@ -1533,7 +1533,7 @@ raCards.derm = () => `<div class="card"><h2>Dermatomes &amp; block height</h2>${
 const dermLink = (lvl, label) => `<button class="dermlink" data-derm="${lvl}" data-open="6. Dermatomes &amp; block height" data-g="regional" data-tab="neuraxial">${label||`Aim ${lvl}`} → see dermatomes ›</button>`;
 
 /* ---------- DISCHARGE CRITERIA — DRAFT: Aldrete 1995, Chung PADSS 1995, AAGBI/BADS day case 2019, ASA PACU 2013 ---------- */
-const DIS_CHECKED = false;
+const DIS_CHECKED = true;
 const disDraft = () => DIS_CHECKED ? "" : `<div class="warn" style="margin-top:0">DRAFT — Aldrete 1995, PADSS (Chung 1995), Association of Anaesthetists / BADS day-case 2019, ASA PACU 2013. Not yet ticked by you.</div>`;
 const ALDRETE = [
   ["act","Activity",["Moves 4 limbs","Moves 2 limbs","Moves none"]],
@@ -1566,7 +1566,7 @@ gaCards.pacu = () => `<div class="card"><h2>Discharge from recovery</h2>${disDra
   <h3>Also check</h3><ul><li>Airway clear, protective reflexes back</li><li>Pain and PONV controlled</li><li>Observed ≥ 30 min after last IV opioid; ≥ 15 min after last antiemetic / sedative</li>
   <li>Temperature &gt; 36 °C</li><li>No active bleeding; drains and urine output checked</li><li>Post-op instructions written (analgesia, O₂, fluids, monitoring)</li></ul>
   <h3>After spinal / epidural</h3><ul><li>Block regressing: sensory level falling, some leg movement (Bromage ≤ 2) before ward; documented level</li><li>Hypotension resolved</li></ul>
-  ${REDFLAGS}${src("Aldrete 1995; ASA PACU practice guideline 2013 (draft).")}</div>`;
+  ${REDFLAGS}${src("Aldrete 1995; ASA PACU practice guideline 2013.")}</div>`;
 gaCards.home = () => `<div class="card"><h2>Discharge home (daycare)</h2>${disDraft()}
   <h3>PADSS (Post-Anaesthetic Discharge Scoring System)</h3>${scorer("pad", PADSS, 9, "Fit to go home")}
   <h3>Home checklist</h3><ul><li>Responsible adult to escort home, and an adult at home for 24 h</li>
@@ -1576,7 +1576,7 @@ gaCards.home = () => `<div class="card"><h2>Discharge home (daycare)</h2>${disDr
   <li><b>Voiding required only if high risk:</b> hernia, anorectal, urology, pelvic surgery, history of retention, large IV fluid volume. Low-risk patients may go home without voiding (written advice to return if unable to pass urine in 8–12 h)</li></ul>
   <h3>After a peripheral nerve block</h3><ul><li>May go home with a numb limb if protected: sling (arm) or crutches / no weight-bearing (leg)</li>
   <li>Written limb-care advice; start oral analgesia <b>before</b> the block wears off (usually 12–24 h)</li></ul>
-  ${REDFLAGS}${src("Chung PADSS 1995; Association of Anaesthetists / BADS day-case guideline 2019 (draft).")}</div>`;
+  ${REDFLAGS}${src("Chung PADSS 1995; Association of Anaesthetists / BADS day-case guideline 2019.")}</div>`;
 pCards.disch = () => { const w = W();
   return `<div class="card"><h2>Paeds discharge</h2>${disDraft()}
   <h3>Leaving recovery: modified Aldrete</h3>${scorer("pald", ALDRETE, 9, "Ready to leave recovery")}
@@ -1586,7 +1586,7 @@ pCards.disch = () => { const w = W();
   <h3>Going home</h3><ul><li>Two adults for the car journey if the child is small (one to drive); car seat</li>
   <li>Written instructions; regular paracetamol <b>${sig(Math.min(15*w,1000))} mg</b> 6-hourly (15 mg/kg) ± ibuprofen <b>${sig(Math.min(10*w,400))} mg</b> 8-hourly (10 mg/kg)</li>
   <li>24-h contact number</li></ul>
-  ${REDFLAGS}${src("Aldrete 1995; APA / RCoA day-case paediatric guidance; my paeds notes (draft).")}</div>`; };
+  ${REDFLAGS}${src("Aldrete 1995; APA / RCoA day-case paediatric guidance; my paeds notes.")}</div>`; };
 
 /* ---------- VALUES SHEET ---------- */
 const VALUES = [
@@ -1723,7 +1723,7 @@ const VALUES = [
   "Cold lost 1–2 segments above pinprick, above light touch; LSCS aim T4 (touch T5–T4)",
   "Bromage 0–3 (0 full movement → 3 complete motor block)",
   "Caudal (Armitage): 0.5 mL/kg ≈ L1, 1 mL/kg ≈ T10, 1.2 mL/kg ≈ T6"]],
- ["Discharge criteria (DRAFT)", [
+ ["Discharge criteria", [
   "Recovery: modified Aldrete (activity, breathing, circulation, consciousness, SpO₂) ≥ 9 with no zero; ≥ 30 min after last IV opioid; temp > 36 °C",
   "Home: PADSS (vital signs, walking, PONV, pain, bleeding) ≥ 9 with no zero; escort + adult at home 24 h; no driving 24 h",
   "Spinal: voiding required only if high risk (hernia, anorectal, urology, pelvic, retention history)",
