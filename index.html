@@ -311,6 +311,40 @@ details.endo summary{cursor:pointer;font-weight:600;font-size:var(--fs-sm)}
 .result.ok{background:var(--g-paeds-soft)}
 .redlist li::marker{color:var(--danger-ink)}
 .newer{background:var(--unv-bg);color:var(--ink);border:1px solid var(--line);border-left:3px solid var(--g-airway);border-radius:var(--r-sm);padding:var(--s2) var(--s3);margin:var(--s2) 0;font-size:var(--fs-sm)}
+/* ---- responsive: tablet & desktop ---- */
+.sidenav{display:none}
+.gwrap{display:grid;grid-template-columns:1fr}
+.gside{min-width:0}.gmain{min-width:0}
+.toprow .t-emerg{margin-top:0}
+@media (min-width:700px){
+  main{max-width:1000px}
+  .gwrap{grid-template-columns:minmax(0,1fr) 320px;gap:var(--s4);align-items:start}
+  .gwrap.noside{grid-template-columns:1fr}
+  .gside{order:2;position:sticky;top:var(--s3)}
+  .gmain{order:1}
+  .gwrap .gside .card:first-child{margin-top:var(--s3)}
+}
+@media (min-width:1100px){
+  html{font-size:17px}
+  main{max-width:1380px}
+  .shell{display:grid;grid-template-columns:230px minmax(0,1fr);gap:var(--s5);align-items:start}
+  .sidenav{display:flex;flex-direction:column;gap:4px;position:sticky;top:0;padding:var(--s4) 0;max-height:100vh;overflow:auto}
+  .snbrand{display:flex;align-items:center;gap:8px;font-weight:700;font-size:var(--fs-sm);letter-spacing:.06em;text-transform:uppercase;color:var(--muted);padding:var(--s2) var(--s3) var(--s3)}
+  .snbrand svg{width:20px;height:20px;color:var(--g-airway)}
+  .snitem{display:flex;align-items:center;gap:10px;text-align:left;background:none;border:0;border-radius:var(--r-sm);padding:10px var(--s3);font-weight:600;font-size:var(--fs-sm);color:var(--ink);cursor:pointer}
+  .snitem:hover{background:var(--card)} .snitem.on{background:var(--card);box-shadow:inset 0 0 0 1px var(--line)}
+  .snico{width:28px;height:28px;border-radius:8px;display:grid;place-items:center;background:var(--t-soft,var(--accent-soft));color:var(--t,var(--accent))}.snico svg{width:18px;height:18px}
+  .sn-emerg{--t:var(--g-emerg);--t-soft:var(--g-emerg-soft)} .sn-ga{--t:var(--g-airway);--t-soft:var(--g-airway-soft)} .sn-regional{--t:var(--g-spinal);--t-soft:var(--g-spinal-soft)}
+  .sn-paeds{--t:var(--g-paeds);--t-soft:var(--g-paeds-soft)} .sn-obs{--t:var(--g-obs);--t-soft:var(--g-obs-soft)} .sn-values,.sn-home{--t:var(--g-values);--t-soft:var(--g-values-soft)}
+  .snkeys{margin-top:auto;padding:var(--s3);font-size:var(--fs-xs);color:var(--muted)}
+  .content{min-width:0}
+  .gwrap{grid-template-columns:minmax(0,820px) 340px}
+  .toprow{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,2fr);gap:var(--s4);align-items:stretch}
+  .tr-emerg,.tr-quick{display:flex;flex-direction:column}.tr-emerg .t-emerg{flex:1}.tr-quick .quick{flex:1}
+  .grid2{grid-template-columns:repeat(4,1fr)}
+  .hero .capno{height:56px}
+  .date{margin-bottom:56px}
+}
 .disc{color:var(--muted);font-size:var(--fs-xs);text-align:center;margin-top:var(--s5);line-height:1.5}
 a{color:var(--accent)}
 .vs label{display:flex;gap:var(--s3);align-items:flex-start;padding:var(--s2) 0;border-bottom:1px solid var(--line);font-size:var(--fs-sm)}
@@ -324,7 +358,7 @@ a{color:var(--accent)}
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.11.1";
+const APP_VERSION = "2.12.0";
 const APP_DATE = "14 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
@@ -439,10 +473,11 @@ screens.home = () => {
     <div class="date">${dateTxt()}</div>
   </section>
   <div class="searchbox">${svg("search")}<input id="q" class="search" type="search" placeholder="Search caudal, remi, LSCS…" autocomplete="off" aria-label="Search cards"></div><div id="results"></div>
-  ${tile("t-emerg","emerg","Emergencies","Crisis steps with doses",'data-go="g-emerg"')}
-  ${caseStrip()}
+  <div class="toprow"><div class="tr-emerg"><div class="label">Emergency</div>${tile("t-emerg","emerg","Emergencies","Crisis steps with doses",'data-go="g-emerg"')}</div><div class="tr-quick">
   <div class="label">Quick</div>
   <div class="quick">${quickLive().map(([ic,lab,inp,ans,t,g,tb,cls],i)=>`<button class="qbtn ${cls}" data-open="${esc(t)}" data-g="${g}" data-tab="${tb}"><span class="qi qmini">${svg(ic)}</span><span class="qlab">${lab}</span><span class="qin">${inp}${(i===0&&isSample("spHt"))||(i===1&&isSample("height"))||(i===2&&isSample("pw"))?' <span class="stag">sample</span>':""}</span><span class="qans">${ans}</span></button>`).join("")}</div>
+  </div></div>
+  ${caseStrip()}
   <button class="pearl" data-open="${esc(pearl[1])}" data-g="${pearl[2]}" data-tab="${pearl[3]}"><span class="plab">Pearl of the day</span><span class="ptxt">${pearl[0]}</span><span class="pgo">Open card ›</span></button>
   <div class="label">Sections</div>
   <div class="grid2">${secs.map(g=>`<button class="sq t-${g.id}" data-go="g-${g.id}"><span class="qi">${svg(g.id)}</span><span class="sqt">${short[g.id]}</span><span class="sqs">${g.tabs.map(t=>t.label).join(" · ")}</span></button>`).join("")}</div>
@@ -1991,11 +2026,12 @@ function cardMap(){
     const h = c.querySelector("h2"); if (h && h.parentElement===c) m[h.textContent.trim()] = c; });
   return m;
 }
+const isWide = () => window.matchMedia("(min-width: 1100px)").matches;
 function accordion(c, t, gid, label){
   const cl = c.cloneNode(true), h = cl.querySelector("h2"), sum = label ? esc(label) : h.innerHTML; h.remove();
   const mm = sum.match(/^([A-C]?\d+[a-z]?)\.\s+(.*)$/s);
   const summ = mm ? `<span class="stepno">${mm[1]}</span><span class="st">${mm[2]}</span>` : `<span class="st">${sum}</span>`;
-  return `<details class="card acc" name="acc" data-t="${esc(t)}" data-g="${gid}"><summary>${summ}</summary>${cl.innerHTML}</details>`;
+  return `<details class="card acc" ${isWide()?"":'name="acc"'} data-t="${esc(t)}" data-g="${gid}"><summary>${summ}</summary>${cl.innerHTML}</details>`;
 }
 function groupScreen(g){
   const m = cardMap();
@@ -2005,10 +2041,11 @@ function groupScreen(g){
     const tab = g.tabs.find(t=>t.id===S[g.tabKey]) || g.tabs[0];
     const ab = (g.id==="paeds" && !PREV_CHECKED ? `<div class="warn">DRAFT — paediatric revisions (Nov 2026): auto-calculations and dose caps. Tick on the Values sheet.</div>` : "") + activeBar() + sampleWarn(SAMPLE_BY[g.id] ? (SAMPLE_BY[g.id][tab.id] || SAMPLE_BY[g.id]["*"] || []) : []);
     const links = (tab.links||[]).map(([t,tb,label])=>`<button class="emlink" data-open="${esc(t)}" data-g="emerg" data-tab="${tb}">⚠ ${esc(label)} → Emergencies</button>`).join("");
-    return head(g.name,"home",g.id) + ab + (g.tabs.length>1 ? `<div class="seg emtabs${g.tabs.length>=5?" five":""}">${g.tabs.map(t=>`<button aria-pressed="${t===tab}" data-seg="${g.tabKey}" data-val="${t.id}">${t.label}</button>`).join("")}</div>` : `<div class="label" style="margin-top:0">${tab.label}</div>`) +
-      (tab.input ? `<div class="card">${tab.input()}</div>` : "") + (tab.top ? tab.top() : "") +
-      (tab.cards.length ? `<div class="hint">${tab.hint || "Tap a heading to open it."}</div>` + acc(tab.cards) : "") +
-      (links ? `<div class="card emlinks"><div class="sub">If it goes wrong</div>${links}</div>` : "") + disc;
+    const side = ab + (tab.input ? `<div class="card">${tab.input()}</div>` : "");
+    return head(g.name,"home",g.id) + (g.tabs.length>1 ? `<div class="seg emtabs${g.tabs.length>=5?" five":""}">${g.tabs.map(t=>`<button aria-pressed="${t===tab}" data-seg="${g.tabKey}" data-val="${t.id}">${t.label}</button>`).join("")}</div>` : `<div class="label" style="margin-top:0">${tab.label}</div>`) +
+      `<div class="gwrap${side.trim()?"":" noside"}"><aside class="gside">${side}</aside><div class="gmain">` + (tab.top ? tab.top() : "") +
+      (tab.cards.length ? `<div class="hint">${tab.hint || "Tap a heading to open it."}${isWide()?" Several can be open at once.":""}</div>` + acc(tab.cards) : "") +
+      (links ? `<div class="card emlinks"><div class="sub">If it goes wrong</div>${links}</div>` : "") + `</div></div>` + disc;
   }
   return head(g.name,"home",g.id) + (g.calc ? g.calc() : "") + (g.weight ? `<div class="card">${pInputs()}</div>` : "") +
     (g.cards.length?`<div class="hint">Tap a heading to open it.</div>`:"") + acc(g.cards) + disc;
@@ -2035,7 +2072,14 @@ function runSearch(q){
 }
 function remember(g, t){ const r = store.get("recent",[]).filter(x=>x.t!==t); r.unshift({g,t}); store.set("recent", r.slice(0,5)); }
 
+let rendering = false, renderAgain = false;
 function render(){
+  if (rendering){ renderAgain = true; return; }
+  rendering = true;
+  try { renderNow(); } finally { rendering = false; }
+  if (renderAgain){ renderAgain = false; render(); }
+}
+function renderNow(){
   let h = (location.hash||"#home").slice(1);
   if (h==="ett"||h==="g-airway") h="g-ga"; if (h==="spinal"||h==="g-spinal") h="g-regional";
   let html;
@@ -2044,7 +2088,11 @@ function render(){
   const app = $("#app"), active = document.activeElement && document.activeElement.dataset ? document.activeElement.dataset.in : null;
   const y = window.scrollY;
   app.dataset.group = h.startsWith("g-") ? h.slice(2) : "";
-  app.innerHTML = html;
+  const navItems = [["home","Home","search","home"],["g-emerg","Emergencies","emerg","emerg"],["g-ga","General anaesthesia","ga","ga"],["g-regional","Regional anaesthesia","regional","regional"],["g-paeds","Paediatric","paeds","paeds"],["g-obs","Obstetric","obs","obs"],["values","Values sheet","values","values"]];
+  const nav = `<nav class="sidenav" aria-label="Sections"><div class="snbrand">${svg("capno")} Induction Card</div>${navItems.map(([hh,l,ic,cls])=>`<button class="snitem sn-${cls} ${h===hh||(hh==="home"&&!h.startsWith("g-")&&h!=="values")?"on":""}" data-go="${hh}"><span class="snico">${svg(ic)}</span>${l}</button>`).join("")}
+    <div class="snkeys">Keys: <b>/</b> search · <b>Esc</b> back · <b>1–5</b> tabs</div></nav>`;
+  app.innerHTML = `<div class="shell">${nav}<div class="content">${html}</div></div>`;
+  if (isWide() && S.openSet) S.openSet.forEach(t => { const d = app.querySelector(`details[data-t="${CSS.escape(t)}"]`); if (d) d.open = true; });
   if (S.open){ const d = app.querySelector(`details[data-t="${CSS.escape(S.open)}"]`); if (d){ d.open = true; if (S.scrollTo){ d.scrollIntoView({block:"start"}); } } }
   if (!S.scrollTo) window.scrollTo(0, y);
   S.scrollTo = false;
@@ -2052,9 +2100,10 @@ function render(){
 }
 document.addEventListener("toggle", e => {
   const d = e.target; if (!d.matches || !d.matches("details.acc")) return;
-  if (d.open){ S.open = d.dataset.t; remember(d.dataset.g, d.dataset.t);
-    document.querySelectorAll("details.acc[open]").forEach(o => { if (o!==d) o.open = false; }); }
-  else if (S.open === d.dataset.t) S.open = null;
+  S.openSet = S.openSet || new Set();
+  if (d.open){ S.open = d.dataset.t; S.openSet.add(d.dataset.t); remember(d.dataset.g, d.dataset.t);
+    if (!isWide()) document.querySelectorAll("details.acc[open]").forEach(o => { if (o!==d) o.open = false; }); }
+  else { S.openSet.delete(d.dataset.t); if (S.open === d.dataset.t) S.open = null; }
 }, true);
 document.addEventListener("input", e => { if (e.target.id==="q") runSearch(e.target.value); if (e.target.id==="cNick") S.cNick = e.target.value.slice(0,12); if (e.target.id==="dname") S.dname = e.target.value.slice(0,24); });
 function clamp(v,min,max){ return Math.min(max, Math.max(min, v)); }
@@ -2068,7 +2117,7 @@ document.addEventListener("click", e => {
     S.open = d.calc ? null : d.open; S.scrollTo = !d.calc; if (!d.calc) remember(d.g, d.open);
     const target = "#g-"+d.g; if (location.hash===target) render(); else { location.hash = target; } if (d.calc) window.scrollTo(0,0); return; }
   if (d.lscs){ S.spOp="lscs"; S.open=null; location.hash="#g-spinal"; window.scrollTo(0,0); return; }
-  if (d.go){ S.open = null; location.hash = "#"+d.go; window.scrollTo(0,0); return; }
+  if (d.go){ S.open = null; S.openSet = new Set(); location.hash = "#"+d.go; window.scrollTo(0,0); return; }
   if (d.savename){ const v = cleanName(S.dname ?? doctorName()); store.set("doctor", v || "Dr X"); S.dname = undefined; location.hash = "#home"; return; }
   if (d.case){ const c = getCases().find(x=>x.id===d.case); if (c){ store.set("active", c.id); applyCase(c); } if ((location.hash||"#home")==="#cases") render(); else render(); return; }
   if (d.delcase){ const cs = getCases().filter(x=>x.id!==d.delcase); store.set("cases", cs); if (store.get("active",null)===d.delcase) store.set("active", null); render(); return; }
@@ -2092,12 +2141,23 @@ document.addEventListener("click", e => {
 });
 document.addEventListener("change", e => {
   const el = e.target; if (!el.dataset || !el.dataset.in) return;
-  const k = el.dataset.in; S.touched[k]=true; let v = parseFloat(el.value.replace(",", "."));
+  const k = el.dataset.in; let v = parseFloat(el.value.replace(",", "."));
+  if (!isNaN(v) && +S[k] === v && S.touched[k]) return;
+  S.touched[k]=true;
   if (isNaN(v)) v = S[k];
   S[k] = clamp(v, +el.dataset.min, +el.dataset.max); render();
 });
 function applyTheme(){ const t=store.get("theme","auto"); if (t==="auto") document.documentElement.removeAttribute("data-theme"); else document.documentElement.setAttribute("data-theme", t); }
 window.addEventListener("hashchange", render);
+let wideNow = isWide(); window.addEventListener("resize", () => { if (isWide() !== wideNow){ wideNow = isWide(); render(); } });
+document.addEventListener("keydown", e => {
+  const tag = (e.target.tagName||"").toLowerCase(), typing = tag==="input" || tag==="textarea";
+  if (e.key === "/" && !typing){ e.preventDefault(); if ((location.hash||"#home") !== "#home" && location.hash !== ""){ location.hash = "#home"; setTimeout(()=>{ const q=$("#q"); if(q) q.focus(); }, 50); } else { const q=$("#q"); if(q) q.focus(); } return; }
+  if (e.key === "Escape"){ if (typing){ e.target.blur(); return; }
+    const open = document.querySelectorAll("details.acc[open]"); if (open.length){ open[open.length-1].open = false; return; }
+    if ((location.hash||"#home") !== "#home") location.hash = "#home"; return; }
+  if (!typing && /^[1-5]$/.test(e.key)){ const tabs = document.querySelectorAll(".emtabs button"); const b = tabs[+e.key-1]; if (b) b.click(); }
+});
 applyTheme(); { const c = activeCase(); if (c) applyCase(c); } render();
 if ("serviceWorker" in navigator && (location.protocol==="https:" || location.hostname==="localhost" || location.hostname==="127.0.0.1")) {
   const hadController = !!navigator.serviceWorker.controller;
