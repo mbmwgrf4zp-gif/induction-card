@@ -367,7 +367,7 @@ a{color:var(--accent)}
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.15.3";
+const APP_VERSION = "2.16.0";
 const APP_DATE = "15 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
@@ -384,7 +384,7 @@ const store = {
 };
 // Inputs are not remembered between uses (per plan): state lives in memory only.
 const S = { ettMode:"adult", sex:"F", height:158, ageY:4, ageM:0, wt:3.0,
-            touched:{}, sc:{}, fastH:6, hbNow:12, hbLow:8, hbTarget:10, derm:"", abxSp:"general", spOp:"lscs", spHt:155, morWt:60, pw:10, pY:1, pM:0, pHt:75, pBE:-5, aw:70, emTab:"adult", obTab:"labour", pTab:"pre", gaTab:"pre", raTab:"safety", laA:[], laP:[], cSex:"F", cY:40, cM:0, cH:160, cW:60, cNick:"", laD:"bupi", laC:"0.5", laMl:15, laBi:"1", age:45, apfel:0, pump:"pcea_cse", topup:"lig", ventSc:"std", vfio:"", txTab:"pre", txck:{}, k:4.5, hb:100, todayWt:70, hdH:12 };
+            touched:{}, sc:{}, fastH:6, hbNow:12, hbLow:8, hbTarget:10, derm:"", abxSp:"general", spOp:"lscs", spHt:155, morWt:60, pw:10, pY:1, pM:0, pHt:75, pBE:-5, aw:70, emTab:"adult", obTab:"labour", pTab:"pre", gaTab:"pre", raTab:"safety", laA:[], laP:[], cSex:"F", cY:40, cM:0, cH:160, cW:60, cNick:"", laD:"bupi", laC:"0.5", laMl:15, laBi:"1", age:45, apfel:0, pump:"pcea_cse", topup:"lig", ventSc:"std", vfio:"", txTab:"pre", txck:{}, gaB:34, chW:6, k:4.5, hb:100, todayWt:70, hdH:12 };
 
 function src(text){ return `<div class="src">Source: ${text}</div>`; }
 function protoSrc(){
@@ -454,7 +454,7 @@ const PEARLS = [
   ["4/2/1: a 10 kg child needs 40 mL/h maintenance.","1. Fluids: maintenance & insensible loss","paeds","intra"],
   ["Apfel 2 risk factors = 39% PONV risk → give 2 agents.","2. PONV: Apfel score","ga","post"],
   ["SGLT2 inhibitors: stop 3 days before surgery (ertugliflozin 4).","2. Regular drugs: stop or continue","ga","pre"],
-  ["Laryngospasm: suxamethonium 0.5 mg/kg with atropine 0.02 mg/kg.","Laryngospasm","emerg","paeds"]];
+  ["Laryngospasm: suxamethonium 0.1–0.5 mg/kg IV with atropine 0.02 mg/kg.","Laryngospasm","emerg","paeds"]];
 const CAPNO = (() => { let d = "M0 40"; for (let i=0;i<6;i++){ const x=i*100; d += ` L${x+18} 40 L${x+23} 13 Q${x+40} 10 ${x+58} 8 L${x+63} 40 L${x+100} 40`; } return d; })();
 function greet(){ const h = new Date().getHours(); return h<5 ? "Night shift" : h<12 ? "Good morning" : h<17 ? "Good afternoon" : "Good evening"; }
 function clockTxt(){ const d = new Date(); return d.toLocaleTimeString("en-GB", {hour:"2-digit", minute:"2-digit", hour12:false}); }
@@ -737,8 +737,9 @@ const T = rows => `<div style="overflow-x:auto"><table><tr><th>Drug / item</th><
 const DR = (name, per, unit, note, max) => R(name, perTxt(per,unit), pk(per,unit,max), note);
 function unvP(what, why, prop){ return `<div class="unv"><b>UNVERIFIED — HIDDEN.</b> ${what}<br>${why}${prop?`<br><b>Proposed:</b> ${prop}`:""}</div>`; }
 const psrc = () => src(PSRC);
-const LA_MAX = {bupi:2.5, ropi:3, lido:3, lidoAdr:7};
-function laLine(){ const w=W(); return `<div class="lamax"><b>LA max for ${sig(w)} kg:</b> bupi / levobupi 2.5 mg/kg = <b>${sig(2.5*w)} mg</b> (${sig(w)} mL of 0.25%) · ropi 3 mg/kg = <b>${sig(3*w)} mg</b> · lignocaine 3 mg/kg = ${sig(3*w)} mg (7 with adrenaline = ${sig(7*w)} mg). <b>Doses from different blocks add up</b> — use "+ add" and the LA dose calculator (card 7).</div>`; }
+const pMaxFor = d => { const y4 = AGEM() < 4; return {bupi: y4?2:2.5, ropi: y4?2.5:3, lido: y4?3.5:4, lidoA:7}[d]; };
+const PBUP = () => pMaxFor("bupi");
+function laLine(){ const w=W(), b=pMaxFor("bupi"), r=pMaxFor("ropi"), l=pMaxFor("lido"); return `<div class="lamax"><b>LA max for ${sig(w)} kg${AGEM()<4?" (&lt; 4 months: 15% lower)":""}:</b> bupi / levobupi ${b} mg/kg = <b>${sig(b*w)} mg</b> (${sig(b*w/2.5)} mL of 0.25%) · ropi ${r} mg/kg = <b>${sig(r*w)} mg</b> · lignocaine ${l} mg/kg = ${sig(l*w)} mg (7 with adrenaline = ${sig(7*w)} mg). <b>Doses from different blocks add up</b> — use "+ add" and the LA dose calculator (card 7).</div>`; }
 // LA row: ml = [lo,hi] mL/kg, mgml = mg per mL, max = mg/kg, capml = absolute mL cap
 function LAR(name, ml, mgml, max, note, capml){
   const w = W(); let a = ml[0]*w, b = ml[1]*w, cap = false;
@@ -828,7 +829,11 @@ pCards.airway = () => {
   <div class="card"><h2>Bag</h2><p class="sub">3 × vital capacity (35 mL/kg) = <b>${sig(vc3)} mL</b> → <b>${bag} mL bag</b></p>
   <table><tr><th>Bag</th><th>Weight</th></tr><tr${hl(bag===500)}><td>500 mL</td><td>5 kg</td></tr><tr${hl(bag===1000)}><td>1000 mL</td><td>10–20 kg</td></tr><tr${hl(bag===1500)}><td>1500 mL</td><td>&gt; 20 kg</td></tr></table></div>
   <div class="card"><h2>One-lung ventilation (Storz)</h2><p class="sub">For ETT ${f1(ett)}: ${stz<0?"<b>no Storz scope fits</b> (needs ETT ≥ 3.5)":`largest fitting scope <b>Storz ${["2.2","2.8","4.0"][stz]}</b>`}</p><table><tr><th>Scope</th><th>ETT</th></tr>
-  <tr${hl(stz===0)}><td>Storz 2.2</td><td>ETT &gt; 3</td></tr><tr${hl(stz===1)}><td>Storz 2.8</td><td>ETT &gt; 3.5</td></tr><tr${hl(stz===2)}><td>Storz 4.0</td><td>ETT &gt; 4.5</td></tr></table>${psrc()}</div>`;
+  <tr${hl(stz===0)}><td>Storz 2.2</td><td>ETT &gt; 3</td></tr><tr${hl(stz===1)}><td>Storz 2.8</td><td>ETT &gt; 3.5</td></tr><tr${hl(stz===2)}><td>Storz 4.0</td><td>ETT &gt; 4.5</td></tr></table>
+  <h3>Lung isolation by age</h3>${(()=>{ const a=S.pY+S.pM/12, R2=[[0.5,1,"3.5–4.0","2",""," "],[1,2,"4.0–4.5","3","",""],[2,4,"4.5–5.0","5","",""],[4,6,"5.0–5.5","5","",""],[6,8,"5.5–6.0","5","3.5",""],[8,10,"6.0 cuffed","5","3.5","26"],[10,12,"6.5 cuffed","5","4.5","26–28"],[12,14,"6.5–7.0 cuffed","5","4.5","32"],[14,16,"7.0 cuffed","5, 7","6.0","35"],[16,18,"7.0–8.0 cuffed","7, 9","7.0","35, 37"]];
+    return `<div style="overflow-x:auto"><table><tr><th>Age (y)</th><th>ETT</th><th>Blocker (Fr)</th><th>Univent</th><th>DLT (Fr)</th></tr>${R2.map(r=>`<tr class="${a>=r[0]&&a<r[1]?"hl":""}"><td>${r[0]}–${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td><td>${r[4]||"—"}</td><td>${r[5].trim()||"—"}</td></tr>`).join("")}</table></div>
+    <p class="sub">DLT depth ≈ 12 + height/10 cm at teeth. Blocker coaxial: ETT ID ≥ blocker OD + scope OD + 1 mm (5 Fr = 1.7 mm, 9 Fr = 3.0 mm).</p>`; })()}
+  ${src("Coté, A Practice of Anesthesia for Infants and Children (thoracic chapter); "+PLOC+".")}</div>`;
 };
 
 pCards.vent = () => {
@@ -855,7 +860,15 @@ pCards.tiva = () => {
   const pf = (y>=1 && y<=16 && w>5), kt = (y>=3 && y<=16 && w>=15 && w<=60);
   const remiR = (a,b) => `${a}–${b} mcg/kg/min = <b>${mlh10(a,w)}–${mlh10(b,w)} mL/h</b>`;
   return `<div class="card"><h2>TCI model check</h2>
-  <p>Paedfusor (age 1–16 y, weight &gt; 5 kg): <b>${pf?"✓ eligible":"✗ not eligible"}</b><br>Kataria (age 3–16 y, 15–60 kg): <b>${kt?"✓ eligible":"✗ not eligible"}</b></p>
+  <p>Paedfusor (age 1–16 y, weight &gt; 5 kg): <b>${pf?"✓ eligible":"✗ not eligible"}</b><br>Kataria (age 3–16 y, 15–61 kg): <b>${kt?"✓ eligible":"✗ not eligible"}</b><br>Eleveld (27 weeks PMA – 88 y, 0.68–160 kg; needs height): <b>✓ eligible</b>${y<1||w<5?" — <b>use Eleveld</b> (&lt; 1 y or &lt; 5 kg)":""}</p>
+  <p class="sub">Remifentanil: Minto if ≥ 12 y and &gt; 30 kg, otherwise mass rate.</p>
+  <h3>Maintenance targets</h3><table><tr><th></th><th>Minor, spontaneous</th><th>Minor, IPPV</th><th>Major</th></tr>
+  <tr><td>Propofol (mcg/mL)</td><td>3–4</td><td>3–4</td><td>3–5</td></tr><tr><td>Remi TCI (ng/mL)</td><td>1–2</td><td>2–4</td><td>3–6</td></tr>
+  <tr><td>Remi (mcg/kg/min)</td><td>0.05–0.2</td><td>0.2–0.3</td><td>0.3–0.5</td></tr></table><p class="sub">Lower targets with a block. Purely IV induction: start 5–6 mcg/mL.</p>
+  <h3>No TCI pump: manual propofol (McFarlan, 3–11 y, ≈ 3 mcg/mL)</h3>
+  <table><tr><th>Time</th><th>mg/kg/h</th><th>1% propofol</th></tr><tr><td>Load</td><td>2.5 mg/kg</td><td class="hl">${sig(2.5*w)} mg = ${sig(0.25*w)} mL</td></tr>
+  ${[["0–15 min",15],["15–30 min",13],["30–60 min",11],["1–2 h",10],["2–4 h",9]].map(([t,r])=>`<tr><td>${t}</td><td>${r}</td><td class="hl">${sig(r*w/10)} mL/h</td></tr>`).join("")}</table>
+  <p class="sub">Avoid &gt; 4 mg/kg/h for &gt; 48 h (PRIS); avoid in mitochondrial / fatty-acid oxidation disease.</p>
   <h3>Propofol TCI (Paedfusor, Alaris)</h3><ul><li>GA induction: at least <b>5 mcg/mL</b> (high Vd)</li><li>GA maintenance: &gt; <b>3.5 mcg/mL</b></li><li>Spontaneous breathing (dynamic airway): 2.5–4 mcg/mL</li></ul></div>
   <div class="card"><h2>Remifentanil 10 mcg/mL</h2><p class="sub">1 mg in 100 mL NS; 20 mL syringe. ${w>30?"Weight &gt; 30 kg: <b>Minto</b>.":"Weight &lt; 30 kg: <b>mass rate</b>."}</p>
   <ul><li>Induction ${remiR(0.15,0.3)} over 90 s (neonate: no induction time). Faster = severe bradycardia.</li>
@@ -888,7 +901,7 @@ pCards.tiva = () => {
 pCards.drugs = () => {
   const w = W();
   return `<div class="card"><h2>Paeds induction drugs</h2>${T([
-    (()=>{ const mo=AGEM(), b = mo<1 ? ["neonate",[1,2]] : mo<12 ? ["infant 1–12 months",[3,5]] : ["child &gt; 1 y",[2.5,3.5]]; return R(`Propofol (${b[0]})`,`${b[1].join("–")} mg/kg`,`${pk(b[1],"mg")} = ${pk([b[1][0]/10,b[1][1]/10],"mL")}`,"neonate 1–2 · infant 3–5 · child 2.5–3.5"); })(),
+    (()=>{ const mo=AGEM(), b = mo<1 ? ["neonate",[2,2]] : ["healthy child",[4,5]]; return R(`Propofol (${b[0]})`,`${b[1][0]===b[1][1]?b[1][0]:b[1].join("–")} mg/kg`,`${pk(b[1],"mg")} = ${pk([b[1][0]/10,b[1][1]/10],"mL")}`,"local: healthy 4–5 · ill, liver transplant or neonate 2 mg/kg (titrate) · laryngospasm 1–2"); })(),
     DR("IV glycopyrrolate","4","mcg",null,200),
     R("Local anaesthetic (max)","bupivacaine 0.25% 1 mL/kg",pk(1,"mL"),"maximum for infiltration / blocks")])}
 
@@ -904,14 +917,6 @@ pCards.drugs = () => {
     R("Neb salbutamol (1 mL = 5 mg)","2.5 mg &lt; 20 kg; 5 mg &gt; 20 kg",w<20?"2.5 mg (0.5 mL + 0.5 mL saline)":"5 mg (1 mL + 1 mL saline)")])}
 
   <p><b>Albumin 5%:</b> 25 mL of 20% + 75 mL NS = 100 mL.</p>${psrc()}</div>
-  <div class="card"><h2>Paeds PONV</h2>${T([DR("Dexamethasone (PONV)","0.15","mg",null,4), DR("Ondansetron","0.15","mg",null,4), DR("Granisetron","0.04","mg",null,1)])}${psrc()}</div>
-  <div class="card"><h2>Paeds analgesia &amp; infusions</h2>${T([
-    R("Cocaine 10% (1 mL = 100 mg)","2 mg/kg",`${pk(2,"mg")} = ${sig(2*w/100)} mL`),
-    R("Morphine","lip 0.1 mg/kg; palate 0.15 mg/kg (max 10 mg)",`lip ${pk(0.1,"mg",10)} · palate ${pk(0.15,"mg",10)}`),
-    R("IVI morphine","½ × BW mg in 50 mL at 1–2 mL/h",`${sig(w/2)} mg in 50 mL`,"= 10–20 mcg/kg/h; separate IV line"),
-    R("IVI fentanyl","20 mcg/kg in 50 mL at 1–2 mL/h",`${sig(20*w)} mcg in 50 mL`,"= 0.4–0.8 mcg/kg/h"),
-    DR("Ketamine bolus",[0.2,0.5],"mg"),
-    R("Ketamine infusion","5 mg/kg in 50 mL, 0.2–2 mL/h",`${sig(5*w)} mg in 50 mL`,"1 mL/h = 0.1 mg/kg/h")])}${psrc()}</div>
   <div class="card"><h2>Inotropes (50 mL syringe)</h2>${T([
     R("Noradrenaline / adrenaline","0.3 mg/kg in 50 mL",`<b>${sig(0.3*w)} mg</b> in 50 mL`,"1 mL/h = 0.1 mcg/kg/min"),
     R("… neonate, fluid-limited (× 5)","1.5 mg/kg in 50 mL",`${sig(1.5*w)} mg in 50 mL`,"1 mL/h = 0.5 mcg/kg/min"),
@@ -977,10 +982,10 @@ pCards.regional = () => {
   return `<div class="card"><h2>Which block (paeds)</h2><ul><li>Palatoplasty: maxillary block (CT/US guided)</li><li>Lip repair: infraorbital block, 0.5 mL levo 0.25% each side</li><li>Inguinal hernia: ilioinguinal</li><li>Orchidopexy, appendix, lower limb: caudal</li><li>Higher level: caudal epidural</li></ul></div>
   <div class="card"><h2>Caudal block</h2><p>Up to 10 y · sacral hiatus · caudal needle: <b>${needle}</b> (&lt; 5 kg orange, 5–15 kg black, &gt; 15 kg yellow)${y>10?`<br><span class="warn" style="display:inline-block">Age &gt; 10 y</span>`:""}</p>
   ${laLine()}
-  ${T([LAR("Sacro-lumbar · bupi 0.25%",[0.5,0.5],2.5,2.5),
-    LAR("Upper abdominal · bupi 0.25%",[1,1],2.5,2.5),
-    LAR("Mid-thoracic · bupi 0.2%",[1.2,1.2],2,2.5,"0.2% = 4 mL 0.5% in 10 mL NS"),
-    LAR("Hypospadias · levobupi 0.25%",[0.75,1],2.5,2.5,null,20),
+  ${T([LAR("Sacro-lumbar · bupi 0.25%",[0.5,0.5],2.5,PBUP(),"groin, perineal, lower limb, hypospadias",20),
+    LAR("Lower abdominal (T10) · bupi 0.25%",[0.75,1],2.5,PBUP(),"herniotomy, orchidopexy",20),
+    LAR("Thoracolumbar (T6) · bupi 0.2%",[1,1.2],2,PBUP(),"0.2% = 4 mL 0.5% in 10 mL NS; gastrostomy, stoma",20),
+    LAR("Hypospadias · levobupi 0.25%",[0.75,1],2.5,PBUP(),null,20),
     R("+ morphine (preservative-free)","30–50 mcg/kg",pk([30,50],"mcg"),"monitor RR &amp; SpO₂ 24 h; avoid &lt; 6 months unless HDU"),
     DR("+ ketamine (additive)","1","mg"), DR("+ clonidine (additive)",[1,2],"mcg")])}
   <div class="danger"><b>&gt; 1.2 mL/kg of 0.25% = toxicity</b> (&gt; ${sig(1.2*w)} mL)</div>
@@ -988,15 +993,17 @@ pCards.regional = () => {
 
   <h3>Caudal with branula (sheath fully in)</h3><p>For ${sig(w)} kg: <b>${bran}</b> (&lt; 5 kg yellow, &lt; 15 kg blue, &lt; 40 kg pink, &gt; 40 kg green)</p>${psrc()}</div>
   <div class="card"><h2>Ilioinguinal block</h2><p>Levobupivacaine 0.25%. Less volume is better.<br>Landmark: 1 cm medial and caudal to ASIS, above panty line.<br>Double pop: 3 mL (internal oblique); 1st pop: 3 mL (external oblique); distribute laterally.</p>
-  ${laLine()}${T([LAR("Per side · levobupi 0.25%",[0.3,0.3],2.5,2.5,"US-guided: 0.1–0.2 mL/kg is enough"),LAR("Both sides",[0.6,0.6],2.5,2.5)])}${psrc()}</div>
+  ${laLine()}${T([LAR("Per side · levobupi 0.25%",[0.3,0.3],2.5,PBUP(),"US-guided: 0.1–0.2 mL/kg is enough"),LAR("Both sides",[0.6,0.6],2.5,PBUP())])}${psrc()}</div>
   <div class="card"><h2>Penile block</h2><p>Levobupivacaine 0.25%, max 10 mL. 0.1 mL/kg + 1 mL = <b>${sig(Math.min(0.1*w+1,10))} mL</b> (${sig(Math.min(0.1*w+1,10)*2.5/w)} mg/kg) ${laAddBtn("p","bupi","0.25",Math.min(0.1*w+1,10),1,"Penile block")}<br>Dorsum fan-like; ventral at 10 and 2 o'clock, 1st pop.</p>${psrc()}</div>
   <div class="card"><h2>Paeds lumbar / thoracic epidural</h2>
   <p>&gt; 3 months: consider lumbar/thoracic. &lt; 3 months: caudal epidural.</p>
-  ${laLine()}${T([R("Skin to space","1 mm/kg",`${sig(w)} mm`),R("Max air (LOR)","0.1 mL/kg",pk(0.1,"mL")),LAR("Bolus · levobupi 0.25%",[0.5,0.5],2.5,2.5)])}
+  ${laLine()}${T([R("Skin to space",AGEM()<1?"neonate ≈ 1 cm":AGEM()<6?"&lt; 6 months: 5–12 mm (not weight-related)":w<=25?"10–25 kg: 1 mm/kg":"&gt; 25 kg: 0.8 + 0.05 × kg cm",AGEM()<1?"≈ 10 mm":AGEM()<6?"5–12 mm":w<=25?`${sig(w)} mm`:`${sig(0.8+0.05*w)} cm`),R("Max air (LOR)","0.1 mL/kg",pk(0.1,"mL")),LAR("Bolus · levobupi 0.25%",[0.5,0.5],2.5,PBUP())])}
   <ul><li>Do not flush catheter (avoid confusion with CSF)</li><li>Anchor: dermatome level parallel to skin + skin-to-space; &lt; 3 months max anchor 12 cm</li></ul>
-  <h3>Infusion</h3>${(()=>{ const bands=[["&lt; 5 kg (neonate / &lt; 3 months)","0.1% LA, no opioid",[0.1,0.2],0.2,w<5],["5–10 kg","0.1% + fentanyl 1 mcg/mL",[0.2,0.3],0.4,w>=5&&w<=10],["&gt; 10 kg","0.1% + fentanyl 2 mcg/mL",[0.2,0.4],0.4,w>10]];
-    return `<div style="overflow-x:auto"><table><tr><th>Weight</th><th>Solution · rate</th><th>For ${sig(w)} kg</th></tr>${bands.map(([b,sol,r,mx,on])=>`<tr class="${on?"hl":""}"><td>${b}</td><td>${sol}<div class="sub">${r[0]}–${r[1]} mL/kg/h · max ${mx} mg/kg/h</div></td><td class="hl">${on?`${sig(r[0]*w)}–${sig(r[1]*w)} mL/h`:"—"}</td></tr>`).join("")}</table></div>
-    <div class="danger"><b>Never exceed ${w<5?"0.2":"0.4"} mg/kg/h</b> of LA = ${sig((w<5?0.2:0.4)*w)} mL/h of 0.1%.</div>`; })()}
+  <h3>Infusion (by age)</h3>${(()=>{ const mo=AGEM(), bands=[["Neonate","0.1% LA, no opioid",[0.1,0.2],mo<1],["1–3 months","0.1% + fentanyl 1 mcg/mL",[0.2,0.3],mo>=1&&mo<3],["3–12 months","0.1% + fentanyl 1 mcg/mL",[0.2,0.4],mo>=3&&mo<12],["&gt; 1 y","0.1% + fentanyl 2 mcg/mL",[0.2,0.4],mo>=12]];
+    return `<div style="overflow-x:auto"><table><tr><th>Age</th><th>Solution · rate</th><th>For ${sig(w)} kg</th></tr>${bands.map(([b,sol,r,on])=>`<tr class="${on?"hl":""}"><td>${b}</td><td>${sol}<div class="sub">${r[0]}–${r[1]} mL/kg/h</div></td><td class="hl">${on?`${sig(r[0]*w)}–${sig(r[1]*w)} mL/h`:""}</td></tr>`).join("")}</table></div>
+    <p>Start ≈ 30 min after the bolus. Bupi, levobupi or ropi 0.1%.</p>
+    <div class="danger"><b>Never exceed 0.4 mL/kg/h</b> = ${sig(0.4*w)} mL/h. Inadequate: bolus 0.25 mL/kg = ${sig(0.25*w)} mL, then +0.05–0.1 mL/kg/h; obs every 15 min × 1 h.</div>
+    <p class="sub">Infants ≤ 12 weeks: max 48 h. Caudal catheter ≤ 3 days. Removal by APS only.</p>`; })()}
   <p class="sub">0.1% = 10 mL of 0.5% (50 mg) in 50 mL NS = 1 mg/mL.</p>
   ${psrc()}</div>
   <div class="card"><h2>Intrapleural block</h2>
@@ -1006,7 +1013,7 @@ pCards.regional = () => {
 
 pCards.procs = () => {
   const w = W(), len = S.pHt/10 - 1;
-  return `<div class="card"><h2>Laryngospasm</h2>${T([DR("Propofol",[0.5,1],"mg"),DR("Suxamethonium","0.5","mg"),DR("+ atropine","0.02","mg",null,0.6),
+  return `<div class="card"><h2>Laryngospasm</h2>${T([DR("Propofol",[0.5,1],"mg"),DR("Suxamethonium IV",[0.1,0.5],"mg","or rocuronium 1.2 mg/kg"),DR("+ atropine","0.02","mg",null,0.6),
     R("Prevention: IV lignocaine before extubation","1–2 mg/kg",pk([1,2],"mg"),"also dexmedetomidine, clonidine")])}
   <ul><li>Remove airway device</li><li>Jaw thrust, Larson manoeuvre</li><li>Flutter the bag</li><li>Gentle thoracic pressure 20–25 compressions/min</li></ul>${psrc()}</div>
   <div class="card"><h2>Deep extubation (MAC 1)</h2><div class="danger"><b>DO NOT TRY IF NOT FAMILIAR</b></div>
@@ -1014,6 +1021,10 @@ pCards.procs = () => {
   <div class="card"><h2>Double-lumen CVC</h2>
   ${step("pHt","Height","cm",30,190,1)}<p>Length = height/10 − 1 = <b>${sig(len)} cm</b> · Arrow sizes 5, 8, 13 cm</p>
   <table><tr><td>4 Fr</td><td>5, 13 cm</td><td>&lt; 1 y, &lt; 10 kg</td></tr><tr><td>5 Fr</td><td>5, 8, 13 cm</td><td>&gt; 1 y, &gt; 10 kg</td></tr></table>
+  <p>Jugular length by weight: 0.13 × kg + 4.9 = <b>${sig(0.13*w+4.9)} cm</b></p>
+  ${(()=>{ const T2=[[2,3,"4 Fr","4","5"],[3,5,"4–4.5 Fr","5","8"],[5,7,"4–4.5 Fr","6","8"],[7,10,"4–4.5 Fr","7","8"],[10,13,"4.5–5.5 Fr","8","13"],[13,20,"4.5–5.5 Fr","9","13"],[20,30,"5.5–7 Fr","10","16"],[30,40,"5.5–7 Fr","11","16"],[40,50,"7–8.5 Fr","12","16–20"],[50,60,"7–8.5 Fr","13","16–20"],[60,70,"7–8.5 Fr","14","16–20"],[70,80,"7–8.5 Fr","15","16–20"],[80,999,"7–8.5 Fr","16","16–20"]];
+    return `<div style="overflow-x:auto"><table><tr><th>Weight</th><th>Size</th><th>Jugular (cm)</th><th>Femoral (cm)</th></tr>${T2.map(r=>`<tr class="${w>=r[0]&&w<r[1]?"hl":""}"><td>${r[1]===999?"≥ 80":r[0]+"–"+r[1]} kg</td><td>${r[2]}</td><td>${r[3]}</td><td>${r[4]}</td></tr>`).join("")}</table></div>
+    <p class="sub">Size by age: &lt; 6 months 4–5 Fr · 6 months–5 y 5 Fr · &gt; 5 y 7 Fr (check vessel on ultrasound). Confirm tip on X-ray.</p>`; })()}
   <ul><li>Femoral in &lt; 5 kg (neonate): consider single-lumen Arrow 22G — double lumen femoral can cause leg congestion</li><li>IJ: can use double lumen 4 Fr</li></ul>
   <h3>Preparation</h3><ul><li><b>Don't open the set first</b> (open only when guidewire confirmed in vessel)</li><li>Blue/yellow branula, Arrow guidewire, linear US probe</li></ul>
   <h3>Steps</h3><ol><li>US-guided vein scan</li><li>Puncture with blue/yellow (22G/24G), through-and-through; remove needle, leave catheter</li><li>Withdraw catheter slowly until venous backflow</li><li>Insert Arrow guidewire</li><li>Keep guidewire, remove cannula</li><li>Skin nick with needle tip, then dilator — follow anatomical direction, stretch skin</li><li>Remove Arrow guidewire, insert set guidewire</li><li>Remove dilator, insert double lumen</li><li>Remove guidewire</li><li>Anchor at 3 points</li></ol>${psrc()}</div>
@@ -1047,6 +1058,243 @@ pCards.special = () => {
   <div class="card"><h2>Ketamine anaesthesia</h2><p>Short, painless procedures (e.g. MRI, EUA). Consider contraindications.</p>
   ${T([DR("Induction","2","mg"), DR("Top-up",[0.5,1],"mg"), DR("Glycopyrrolate (give before)","4","mcg",null,200)])}<p>Sniffing position (roll under shoulder blades).</p>${psrc()}</div>`;
 };
+
+/* ---------- PAEDIATRIC — local protocol additions (Nov 2025) — DRAFT ---------- */
+const P3_CHECKED = false;
+const PLOC = "local paediatric anaesthesia manual & pain / regional protocol (Nov 2025)";
+const p3Draft = () => P3_CHECKED ? "" : `<div class="warn" style="margin-top:0">DRAFT — from the ${PLOC}. Not yet ticked by you.</div>`;
+const intl = t => `<p class="sub"><b>International:</b> ${t}</p>`;
+const tog = (id, k, label) => { const on = (S.sc[id]||{})[k] === 1; return `<button class="txci ${on?"on":""}" data-score="${id}:${k}:${on?0:1}" aria-pressed="${on}"><span class="box">${on?"✓":""}</span><span>${label}</span></button>`; };
+const cnt = (id, keys) => keys.filter(k => (S.sc[id]||{})[k] === 1).length;
+function pick(id, rows){ // rows: [key,label,[opt0,opt1,opt2]] scored 0/1/2
+  const st = S.sc[id] = S.sc[id] || {};
+  return rows.map(([k,l,o]) => `<div class="scrow"><div class="sclab">${l}</div><div class="scopts">${o.map((t,i)=>`<button class="scopt ${st[k]===i?"on":""}" data-score="${id}:${k}:${i}"><b>${i}</b> ${t}</button>`).join("")}</div></div>`).join("");
+}
+const sumOf = (id, rows) => rows.reduce((a,[k]) => a + ((S.sc[id]||{})[k] ?? 0), 0);
+const doneOf = (id, rows) => rows.every(([k]) => (S.sc[id]||{})[k] !== undefined);
+const reset = id => `<button class="linkbtn" data-screset="${id}">Reset</button>`;
+
+function pEndo(){ const w = W(), m = (k,c) => `${sig(Math.min(k*w,c))} mg`;
+  return `<details class="endo"><summary>Endocarditis prophylaxis (paeds, local)</summary>
+  <table><tr><th>Recommended — high risk</th><td>Prosthetic valve; previous endocarditis; complex cyanotic CHD; surgical systemic–pulmonary shunt or conduit</td></tr>
+  <tr><th>Recommended — moderate risk</th><td>Other congenital defects; acquired valve disease (rheumatic); HOCM; MVP with regurgitation</td></tr>
+  <tr><th>Not needed</th><td>Isolated secundum ASD; ASD/VSD/PDA repaired &gt; 6 months; MVP without regurgitation; functional murmur; pacemaker / ICD; Kawasaki or rheumatic fever without valve disease</td></tr></table>
+  <table><tr><td>Amoxicillin PO 50 mg/kg (max 2 g), 1 h before</td><td class="hl">${m(50,2000)}</td></tr>
+  <tr><td>or ampicillin IV/IM 50 mg/kg (max 2 g), 30 min before</td><td class="hl">${m(50,2000)}</td></tr>
+  <tr><th colspan="2">Penicillin allergy (any one)</th></tr>
+  <tr><td>Clindamycin PO or IV 20 mg/kg (max 600 mg)</td><td class="hl">${m(20,600)}</td></tr>
+  <tr><td>Cephalexin PO 50 mg/kg (max 2 g)</td><td class="hl">${m(50,2000)}</td></tr>
+  <tr><td>Azithromycin PO 15 mg/kg (max 500 mg)</td><td class="hl">${m(15,500)}</td></tr></table>
+  <p class="sub">Local: Paediatric Protocols for Malaysian Hospitals (3rd ed.). Its table prints azithromycin "50 mg/kg"; 15 mg/kg is the standard dose — shown here.</p>
+  ${intl("AHA 2021 — high-risk only; clindamycin no longer recommended.")}</details>`; }
+/* Pre-op */
+pCards.fast = () => `<div class="card"><h2>Paeds fasting</h2>${p3Draft()}
+  <table><tr><th>Solids (rice, biscuit, bread), yogurt, soya milk, Milo, juice with pulp</th><td class="hl">6 h</td></tr>
+  <tr><th>Formula milk</th><td class="hl">6 h</td></tr><tr><th>Breast milk</th><td class="hl">4 h</td></tr>
+  <tr><th>Clear fluids (water, Ribena, apple juice, glucose drink, juice without pulp)</th><td class="hl">1 h</td></tr></table>
+  <ul><li>Avoid unnecessary prolonged fasting; keep comfortable and hydrated</li><li>Not for high aspiration risk — specialist decides</li><li>Write fasting times in full (no abbreviations); tell parents clearly</li></ul>
+  ${intl("ESAIC / APA 2022 also allow clear fluids up to 1 h in children.")}${src(PLOC+".")}</div>`;
+pCards.premed = () => `<div class="card"><h2>Paeds premedication</h2>${p3Draft()}${T([
+  R("Oral midazolam","0.3–0.5 mg/kg, max 15 mg · 30–45 min",pk([0.3,0.5],"mg",15),"standard; may be given in the ward"),
+  R("Buccal midazolam","0.3–0.5 mg/kg, max 10–15 mg · 15–30 min",pk([0.3,0.5],"mg",15),"if oral not tolerated; waiting bay"),
+  R("Intranasal midazolam (atomiser)","0.2–0.3 mg/kg, max 10 mg · 15–30 min",pk([0.2,0.3],"mg",10),"may sting; waiting bay"),
+  R("Intranasal dexmedetomidine","2–2.5 mcg/kg · 30–45 min",pk([2,2.5],"mcg"),"no respiratory depression; good for autism / ADHD")])}
+  <ul><li>Tell parents and ward nurses: onset, drowsiness (transfer on trolley), supervise until OT</li><li>Parental presence at induction if appropriate — prepare them</li></ul>${src(PLOC+".")}</div>`;
+const PAAS = [["mp","Modified Mallampati (if cooperative)",["Class I–II","Class III","Class IV"]],["mo","Mouth opening",["&gt; 3 cm","2–3 cm","&lt; 2 cm"]],
+  ["mand","Mandibular protrusion",["Lower incisors ahead of upper","Edge-to-edge","Unable to protrude"]],["neck","Neck movement (atlanto-occipital)",["Full","Partial","Limited / nil"]],
+  ["face","Facial / craniofacial anomaly",["None","Mild (retrognathia, high palate)","Severe (Pierre Robin, Treacher Collins…)"]]];
+pCards.paas = () => { const t = sumOf("paas",PAAS), done = doneOf("paas",PAAS);
+  const v = t<=4 ? ["Low risk","Routine airway management"] : t<=7 ? ["Moderate risk","Prepare adjuncts (LMA, video laryngoscope)"] : ["High risk","Expect difficult mask and intubation; senior anaesthetist, advanced airway devices"];
+  return `<div class="card"><h2>Paeds airway score (PAAS)</h2>${p3Draft()}<p class="sub">&lt; 5 y: look for facial anomaly, mouth opening, neck. 5–10 y: modified Mallampati or PAAS. &gt; 10 y: PAAS (difficult intubation if ≥ 6).</p>
+  ${pick("paas",PAAS)}
+  <div class="${!done?"result":t>=8?"danger":t>=5?"warn":"result ok"}"><div class="big">${t} / 10</div>${done?`<b>${v[0]}</b> — ${v[1]}${t>=6?" · predicts difficult intubation (≥ 6)":""}`:"Tap every row."}</div>${reset("paas")}
+  ${src(PLOC+"; Badheka et al. Indian J Anaesth 2016.")}</div>`; };
+const STB = [["s","<b>S</b>noring &gt; 3 nights a week"],["t","<b>T</b>rouble breathing in sleep (laboured / noisy)"],["b","Un-refreshed on waking (tired, sleepy in the day)"],["u","Behaviour problems (irritable, hyperactive, poor attention)"],["r","<b>R</b>estless sleep"]];
+pCards.stbur = () => { const n = cnt("stb", STB.map(x=>x[0]));
+  const v = n<=2 ? ["result ok","Low risk","Routine airway management"] : n<5 ? ["warn","High risk (≈ 3× airway events)","Minimise opioids; consider HDU / PACU monitoring"] : ["danger","Very high risk (≈ 10×)","Consider postponing / optimising; formal sleep study"];
+  return `<div class="card"><h2>OSA screen (STBUR)</h2>${p3Draft()}<p class="sub">Ask the parent; age 2–18 y. Especially ENT, tonsillectomy, dental, craniofacial, obese. STOP-BANG is not validated in children.</p>
+  <div class="txck">${STB.map(([k,l])=>tog("stb",k,l)).join("")}</div>
+  <div class="${v[0]}" style="margin-top:var(--s2)"><b>${n} / 5 — ${v[1]}.</b> ${v[2]}</div>${reset("stb")}
+  <p class="sub">Also: tonsil size, neck circumference, baseline SpO₂ in sleep. OSA = more sensitive to opioids → multimodal, opioid-sparing.</p>
+  ${src(PLOC+"; Tait et al. Paediatr Anaesth 2013 (STBUR).")}</div>`; };
+pCards.urti = () => `<div class="card"><h2>URTI &amp; asthma: go or delay</h2>${p3Draft()}
+  <table><tr><th>Mild URTI</th><td>Clear runny nose ± dry cough → <b>may proceed with caution</b></td></tr>
+  <tr><th>Moderate–severe URTI</th><td>Moist cough, purulent sputum, wheeze, fever, unwell → <b>delay ≥ 2 weeks</b></td></tr>
+  <tr><th>Active infection</th><td>Onset &lt; 2 weeks with fever, congestion, productive cough, purulent discharge → postpone elective</td></tr>
+  <tr><th>Asthma</th><td>Check day/night symptoms, last attack, inhaler use; give bronchodilator pre-op. <b>Postpone if poorly controlled or attack &lt; 4 weeks</b></td></tr></table>
+  <p class="sub">Examine: coarse breath sounds, wheeze, SpO₂ on air. Do not proceed with URTI / asthma exacerbation without senior review.</p>${src(PLOC+".")}</div>`;
+const CONG = [["Pierre Robin / micrognathia","Severe airway obstruction; fibreoptic often needed; prone / lateral helps"],
+  ["Goldenhar","Difficult mask seal and laryngoscopy; cervical spine anomalies"],["Treacher Collins","Difficult mask and intubation; small mouth"],
+  ["Mucopolysaccharidoses (MPS I–VII)","Very difficult airway, unstable neck, thick secretions, CHD; worst in MPS I/II"],
+  ["Down syndrome","Difficult mask; avoid neck extension (atlanto-axial); bradycardia at induction; OSA; ASD/VSD"],
+  ["Craniosynostosis","Difficult mask; raised ICP; OSA"],["Beckwith–Wiedemann","Macroglossia; hypoglycaemia; difficult laryngoscopy"],
+  ["Russell–Silver","Difficult airway; hypoglycaemia"],["Turner","Difficult airway; coarctation — cardiac review; renal anomalies"],
+  ["Klippel–Feil","Fused cervical spine — neck cannot extend"],["CHARGE","Choanal atresia; complex CHD"],
+  ["VACTERL","Aspiration (TEF); difficult IV; renal dosing"],["DiGeorge","Hypocalcaemia → seizures / laryngospasm; immunodeficiency (irradiated blood)"],
+  ["Inherited metabolic disorders","Avoid prolonged fasting and hypoglycaemia; hydrate; no protein in organic acidaemia"],
+  ["Mitochondrial myopathy","Avoid propofol infusion; avoid long fasting; normothermia, normoglycaemia"],
+  ["Congenital myopathies (central core…)","Avoid sux; avoid volatiles if MH-susceptible; post-op ventilation risk"],
+  ["Duchenne muscular dystrophy","Avoid sux and volatiles (rhabdomyolysis); cardiomyopathy; post-op respiratory failure"],
+  ["Myotonic dystrophy","Avoid relaxants if possible; opioid-sensitive; aspiration"],["SMA / neuromuscular weakness","Avoid sux; sensitive to NMB; post-op ventilation"],
+  ["Endocrine (hypothyroid, adrenal)","Stress-dose steroids; airway in hypothyroidism; temperature"],["JIA / connective tissue","TMJ restriction; unstable C-spine"],
+  ["Epidermolysis bullosa","No adhesives; gentle airway; mucosal trauma"],["Osteogenesis imperfecta","Gentle handling; avoid neck hyperextension; difficult IV; MH-like hyperthermia"]];
+pCards.congen = () => `<div class="card"><h2>Congenital conditions (A–Z)</h2>${p3Draft()}
+  <table><tr><th>Condition</th><th>Anaesthetic notes</th></tr>${CONG.slice().sort((a,b)=>a[0].localeCompare(b[0])).map(([c,n])=>`<tr><td><b>${c}</b></td><td>${n}</td></tr>`).join("")}</table>
+  <p class="sub">Search works on any condition name. MH risk: central core disease, King–Denborough, some myopathies.</p>${src(PLOC+".")}</div>`;
+pCards.exprem = () => { const pma = S.gaB + S.chW, b = pma<44?0:pma<55?1:pma<=60?2:3; const h = i => i===b?' class="hl"':"";
+  return `<div class="card"><h2>Ex-prem: apnoea risk &amp; admission</h2>${p3Draft()}
+  ${step("gaB","Gestation at birth","wk",22,42,1)}${step("chW","Age since birth","wk",0,60,1)}
+  <div class="result"><div class="sub">Post-menstrual (post-conceptual) age</div><div class="big">${pma} wk</div><div class="sub">= gestation at birth + weeks since birth</div></div>
+  <table><tr><th>PMA</th><th>Risk</th><th>Plan</th></tr>
+  <tr${h(0)}><td>&lt; 44 wk</td><td>High</td><td>NICU ≥ 24 h continuous cardiorespiratory + SpO₂ monitoring</td></tr>
+  <tr${h(1)}><td>44–55 wk</td><td>Moderate–high</td><td>PACU, then ward bed with monitor ≥ 12–24 h (or PICU)</td></tr>
+  <tr${h(2)}><td>55–60 wk</td><td>Moderate</td><td>Mandatory 24-h admission</td></tr>
+  <tr${h(3)}><td>&gt; 60 wk</td><td>Low</td><td>Daycare if no other risk; 4–6 h observation</td></tr></table>
+  <p class="sub">Higher risk also with Hb &lt; 10 g/dL, apnoea of prematurity, BPD, CHD, recent URTI, opioids / sedatives. Apnoea = ≥ 20 s, or shorter with HR &lt; 100, SpO₂ &lt; 90%, cyanosis or hypotonia. Most occur in the first 2–4 h.</p>
+  <h3>To ward only if</h3><ul><li>No apnoea, no bradycardia, SpO₂ ≥ 94% on air (or baseline), no periodic breathing</li><li>Awake, normal tone and colour, not over-sedated</li><li>Stable HR / BP, no ventilatory support</li><li>Pain controlled with little opioid; ≥ 2 h stable breathing after any opioid; no ongoing sedatives</li></ul>
+  <div class="danger"><b>Do not send to ward:</b> any apnoea in PACU, SpO₂ &lt; 94% on air, recurrent bradycardia, poor feeding / aspiration risk, new O₂ need, excessive sleepiness → HDU / NICU / PICU.</div>
+  ${src(PLOC+".")}</div>`; };
+
+/* Intra-op: regional */
+pCards.nspin = () => { const w = W(), band = w<5?0:w<=15?1:2;
+  const rows = [["&lt; 5 kg","10","0.1–0.2 mL/kg (0.5–1 mg/kg)",[0.1,0.2],"0.1–0.2 mL/kg",[0.1,0.2]],["5–15 kg","4","0.08 mL/kg (0.4 mg/kg)",[0.08,0.08],"0.1 mL/kg",[0.1,0.1]],["&gt; 15 kg","3","0.06 mL/kg (0.3 mg/kg)",[0.06,0.06],"0.1 mL/kg",[0.1,0.1]]];
+  const r = rows[band], ml = v => v[0]===v[1] ? sig(v[0]*w) : `${sig(v[0]*w)}–${sig(v[1]*w)}`;
+  return `<div class="card"><h2>Neonatal / infant spinal</h2>${p3Draft()}
+  <table><tr><th>Weight</th><th>CSF mL/kg</th><th>Bupi / levobupi 0.5% isobaric</th><th>Ropivacaine 0.5%</th></tr>${rows.map((x,i)=>`<tr class="${i===band?"hl":""}"><td>${x[0]}</td><td>${x[1]}</td><td>${x[2]}</td><td>${x[4]}</td></tr>`).join("")}</table>
+  <div class="result"><div class="sub">For ${sig(w)} kg</div><div class="big">${ml(r[3])} mL</div><div class="sub">bupi / levobupi 0.5% + 0.1 mL dead space · ropi 0.5%: ${ml(r[5])} mL</div></div>
+  <p class="sub">Ropivacaine 0.5% for spinal: dilute 0.7 mL of 0.75% + 0.3 mL NS.</p>
+  <ul><li>Indications: inguinal hernia, lower limb, urology; ex-prems (less apnoea); high airway risk (BPD, recent URTI)</li>
+  <li>Contra: infection at site, coagulopathy, hypovolaemia, raised ICP, spinal anomaly (MMC, tethered cord)</li>
+  <li>Cord ends L3 → <b>L4–5 or L5–S1</b>; 25–27G pencil-point; lateral or sitting, avoid neck flexion</li>
+  <li>Minimal / no sedation (airway); sucrose pacifier; warm room</li>
+  <li>Onset ≈ 5 min; lasts 60–90 min (up to 120 in small infants)</li>
+  <li><b>Monitor for apnoea 12–24 h</b>, especially ex-prems; watch for high block (apnoea, bradycardia)</li></ul>
+  ${src(PLOC+"; Koszela & Sethna, WFSA Update in Anaesthesia.")}</div>`; };
+pCards.bvol = () => { const w = W(), ml = (a,b,c) => `${sig(a*w)}–${sig(b*w)} mL${c?` (max ${c} mL)`:""}`.replace(/(\d+(?:\.\d+)?) mL \(max (\d+)/, (m,x,y)=> (+x>+y?`${y} mL (max ${y}`:m));
+  return `<div class="card"><h2>Block volumes (paeds)</h2>${p3Draft()}${laLine()}
+  <table><tr><th>Block</th><th>Rule</th><th>For ${sig(w)} kg</th></tr>
+  <tr><td>Lumbar epidural (lumbar or caudal approach), loading</td><td class="sub">0.5 mL/kg</td><td class="hl">${sig(0.5*w)} mL</td></tr>
+  <tr><td>Thoracic epidural (thoracic or caudal approach), loading</td><td class="sub">0.3–0.5 mL/kg</td><td class="hl">${ml(0.3,0.5)}</td></tr>
+  <tr><td>Ilioinguinal / iliohypogastric</td><td class="sub">0.2–0.3 mL/kg each, max 10 mL (femoral spread)</td><td class="hl">${sig(Math.min(0.2*w,10))}–${sig(Math.min(0.3*w,10))} mL</td></tr>
+  <tr><td>Penile (dorsal nerve)</td><td class="sub">0.1 mL/kg each side, max 5 mL / side; ventral 0.5–1 mL</td><td class="hl">${sig(Math.min(0.1*w,5))} mL / side</td></tr>
+  <tr><td>Upper limb (axillary, infra-, supraclavicular, interscalene)</td><td class="sub">0.1–0.5 mL/kg each nerve; ropi 0.1–0.2% preferred</td><td class="hl">${ml(0.1,0.5)}</td></tr>
+  <tr><td>Lower limb (femoral, sciatic, popliteal, adductor)</td><td class="sub">0.5–1 mL/kg each nerve; ropi 0.1–0.2% preferred</td><td class="hl">${ml(0.5,1)}</td></tr>
+  <tr><td>Fascial plane (rectus sheath, TAP, QL, fascia iliaca)</td><td class="sub">0.25–0.75 mL/kg each side</td><td class="hl">${ml(0.25,0.75)} / side</td></tr>
+  <tr><td>Thoracic erector spinae</td><td class="sub">0.25–0.5 mL/kg each side</td><td class="hl">${ml(0.25,0.5)} / side</td></tr>
+  <tr><td>ESP / QL catheter</td><td class="sub">Pre-op ropi 0.375% 0.25–0.5 mL/kg; post-op ropi 0.2% 0.25–0.5 mL/kg 6-hourly</td><td class="hl">${ml(0.25,0.5)}</td></tr></table>
+  <div class="warn"><b>Always within the LA maximum</b> — volumes from several blocks add up. Dilute to fit (e.g. 10 kg, 10 mL, ropi max 30 mg → 4 mL 0.75% + 6 mL NS = 0.3%).</div>
+  ${src(PLOC+".")}</div>`; };
+
+/* Post-op: pain */
+const FLACC = [["f","Face",["No particular expression / smile","Occasional grimace, withdrawn","Frequent quivering chin, clenched jaw"]],["l","Legs",["Normal / relaxed","Uneasy, restless, tense","Kicking, legs drawn up"]],
+  ["a","Activity",["Lying quietly, moves easily","Squirming, shifting, tense","Arched, rigid or jerking"]],["c","Cry",["No cry","Moans, whimpers, occasional complaint","Crying steadily, screams"]],
+  ["co","Consolability",["Content, relaxed","Reassured by touch / talk","Difficult to console"]]];
+pCards.pscore = () => { const mo = AGEM(), y = S.pY, t = sumOf("flacc",FLACC), done = doneOf("flacc",FLACC);
+  const tool = mo < 1 ? 0 : y < 4 ? 1 : y < 7 ? 2 : 3; const h = i => i===tool?' class="hl"':"";
+  return `<div class="card"><h2>Paeds pain scores</h2>${p3Draft()}
+  <table><tr><th>Tool</th><th>Who</th><th>Scale</th></tr>
+  <tr${h(0)}><td>NIPS</td><td>Neonates (term &amp; preterm)</td><td>0–7 (mild 1–2, moderate 3–4, severe 5–7)</td></tr>
+  <tr${h(1)}><td>FLACC</td><td>1 month – 4 y; non-verbal</td><td>0–10</td></tr>
+  <tr${h(2)}><td>Faces (FPS-R)</td><td>4–7 y</td><td>0–10</td></tr>
+  <tr${h(3)}><td>Numerical</td><td>≥ 7 y</td><td>0–10</td></tr>
+  <tr><td>Revised FLACC</td><td>Cognitively impaired, any age</td><td>0–10</td></tr></table>
+  <p class="sub">Mild 1–3 · moderate 4–6 · severe 7–10. <b>Score &gt; 3 needs action.</b> Don't swap tools in the same child.</p>
+  <h3>FLACC — tap each row</h3>${pick("flacc",FLACC)}
+  <div class="${!done?"result":t>=7?"danger":t>=4?"warn":"result ok"}"><div class="big">${t} / 10</div>${done?(t===0?"No pain":t<=3?"Mild":t<=6?"Moderate":"Severe"):"Tap every row."}</div>${reset("flacc")}
+  <h3>NIPS (neonate)</h3><p class="sub">Face 0–1 · cry 0–2 · breathing 0–1 · arms 0–1 · legs 0–1 · arousal 0–1.</p>
+  ${src(PLOC+".")}</div>`; };
+pCards.pdrug = () => { const w = W(), mo = AGEM(), y = S.pY, neo = mo < 1, lt2 = w < 2;
+  const para = neo ? (lt2?"7.5 mg/kg 6–8-hourly (max 30 mg/kg/day)":"10 mg/kg 6–8-hourly (max 60 mg/kg/day)") : mo < 3 ? "15 mg/kg 6–8-hourly (max 60 mg/kg/day)" : "15 mg/kg 4–6-hourly (max 75 mg/kg/day, 4 g/day)";
+  const paraK = neo ? (lt2?7.5:10) : 15;
+  const ivPara = neo ? (lt2?"7.5 mg/kg 8-hourly (max 25 mg/kg/day)":"10 mg/kg 6–8-hourly (max 30 mg/kg/day)") : w < 50 ? "15 mg/kg 4–6-hourly (max 60 mg/kg/day; &lt; 33 kg max 2 g/day, 33–50 kg 3 g/day)" : "500 mg – 1 g 4–6-hourly (max 4 g/day)";
+  return `<div class="card"><h2>Paeds analgesia by age</h2>${p3Draft()}<p class="sub">Age ${y} y ${S.pM} m · ${sig(w)} kg. Obese: opioids on IBW; paracetamol and NSAIDs on adjusted weight (IBW + 0.4 × excess).</p>${T([
+  R("Paracetamol oral",para,pk(paraK,"mg",1000)),
+  R("Paracetamol IV (needs specialist OK)",ivPara,neo?pk(paraK,"mg"):w<50?pk(15,"mg",1000):"0.5–1 g"),
+  R("Paracetamol PR",mo<3?"Not recommended &lt; 3 months":"Loading 40 mg/kg, then 15–20 mg/kg 6-hourly (max 75 mg/kg/day)",mo<3?"—":`load ${pk(40,"mg",1000)}`),
+  R("Ibuprofen oral",mo<3?"Not &lt; 3 months":"5–10 mg/kg 6–8-hourly (max 30–40 mg/kg/day, 1.2 g/day)",mo<3?"—":pk([5,10],"mg",400)),
+  R("Diclofenac oral / PR",mo<6&&w<10?"Not &lt; 6 months":"Oral 0.3–1 mg/kg 8-hourly · PR ≥ 1 y 1 mg/kg 8–12-hourly (max 3 mg/kg/day, 150 mg/day)",mo<6&&w<10?"—":pk([0.3,1],"mg",50)),
+  R("Parecoxib IV",y<2?"Not &lt; 2 y":"&gt; 2 y: single dose 0.5–1 mg/kg (max 40 mg), in theatre; no NSAID for 24 h after",y<2?"—":pk([0.5,1],"mg",40)),
+  R("Tramadol oral / IV",mo<12?"Not &lt; 1 y":"0.5–1 mg/kg 4–6-hourly (max 100 mg/dose, 400 mg/day); tonsillectomy max 1 mg/kg 6–8-hourly, caution OSA",mo<12?"—":pk([0.5,1],"mg",100)),
+  R("Oxycodone IR oral",mo<1?"Not &lt; 1 month":"0.1–0.2 mg/kg 4–6-hourly PRN (max 5 mg/dose)",mo<1?"—":pk([0.1,0.2],"mg",5)),
+  R("IV morphine titration",neo?"Term: 0.05–0.1 mg/kg over 5 min, ≥ 4 h apart (preterm 0.025–0.05)":mo<6?"0.02 mg/kg each, max 0.1 mg/kg, ≥ 6 h apart":w<50?"0.05 mg/kg each, max 0.2 mg/kg, ≥ 4 h apart":"1–2 mg each, max 5–10 mg, ≥ 4 h apart",neo?pk([0.05,0.1],"mg"):mo<6?`${pk(0.02,"mg")} (max ${sig(0.1*w)})`:w<50?`${pk(0.05,"mg")} (max ${sig(0.2*w)})`:"1–2 mg"),
+  R("IV fentanyl",neo?"0.5–3 mcg/kg over 3–5 min, 2–4-hourly":"1–2 mcg/kg; total ≤ 4 mcg/kg (halve with sedatives)",neo?pk([0.5,3],"mcg"):pk([1,2],"mcg")),
+  R("IN fentanyl (no IV)",mo<12?"Not &lt; 1 y":"1–1.5 mcg/kg",mo<12?"—":pk([1,1.5],"mcg")),
+  R("Ketamine IV analgesia",mo<3?"Not &lt; 3 months by untrained staff":"0.2–0.5 mg/kg",pk([0.2,0.5],"mg")),
+  R("Clonidine oral / IV","1–2 mcg/kg 8-hourly (IV over 10 min); not if hypotensive",pk([1,2],"mcg")),
+  R("Naloxone","0.01 mg/kg, repeat every 2 min (max 0.4 mg)",pk(0.01,"mg",0.4))])}
+  <p class="sub">Review regular analgesia by 72 h. Avoid IM.</p>${src(PLOC+".")}</div>`; };
+pCards.pinf = () => { const w = W(), mo = AGEM(), big = w >= 50 || S.pY >= 12;
+  const mor = Math.min(0.5*w,50), fen = Math.min(20*w,1000), ket = Math.min(5*w,250);
+  const mrate = mo < 1 ? ["0.5–0.7 mL/h","max 1 mL/h"] : mo < 3 ? ["0.5–1 mL/h","max 2 mL/h"] : ["1–2 mL/h","max 4 mL/h"];
+  return `<div class="card"><h2>Paeds opioid / ketamine infusions &amp; PCA</h2>${p3Draft()}
+  <h3>Infusions (own IV line)</h3><table>
+  <tr><th>Morphine</th><td>0.5 mg/kg = <b>${sig(mor)} mg</b> in 50 mL NS (max 50 mg) → 1 mL/h = 10 mcg/kg/h<br>Run <b>${mrate[0]}</b> (${mrate[1]})</td></tr>
+  <tr><th>Fentanyl</th><td>20 mcg/kg = <b>${sig(fen)} mcg</b> in 50 mL NS (max 1000 mcg) → 1 mL/h = 0.4 mcg/kg/h<br>Run <b>0.5–2 mL/h</b> (max 4 mL/h)</td></tr>
+  <tr><th>Ketamine</th><td>5 mg/kg = <b>${sig(ket)} mg</b> in 50 mL NS (max 250 mg) → 1 mL/h = 0.1 mg/kg/h<br>Run <b>0.5–2 mL/h</b> (max 4 mL/h)${w>=50?" · ≥ 50 kg: 2.5–10 mg/h":""}</td></tr></table>
+  <h3>PCA (no loading dose; lockout 5 min)</h3><table>
+  <tr><th>Morphine</th><td>0.5 mg/kg in 50 mL (bigger child 1 mg/kg = 20 mcg/kg/mL). Bolus 10–20 mcg/kg = <b>${sig(10*w/1000)}–${sig(20*w/1000)} mg</b>; background 0–20 mcg/kg/h. 4-h max: ${big?"<b>40 mg</b> (≥ 12 y or ≥ 50 kg)":`0.4 mg/kg = <b>${sig(0.4*w)} mg</b>`}</td></tr>
+  <tr><th>Fentanyl</th><td>20 mcg/kg in 50 mL. Bolus 0.4–0.8 mcg/kg = <b>${sig(0.4*w)}–${sig(0.8*w)} mcg</b>; background 0–0.8 mcg/kg/h. 4-h max: ${big?"<b>400 mcg</b>":`20 mcg/kg = <b>${sig(20*w)} mcg</b>`}</td></tr>
+  ${S.pY>12?`<tr><th>Oxycodone (&gt; 12 y)</th><td>1 mg/kg in 50 mL (max 50 mg). Bolus 10–20 mcg/kg = <b>${sig(10*w/1000)}–${sig(20*w/1000)} mg</b>; background 0–20 mcg/kg/h; max 20 mg in 4 h</td></tr>`:""}</table>
+  <ul><li>Set up by a doctor only; dedicated line or anti-reflux tubing</li><li>No other opioid / sedative while PCA runs</li><li>Hypoventilation: stop infusion, O₂ ± bag, <b>naloxone 0.01 mg/kg = ${sig(Math.min(0.01*w,0.4))} mg</b></li></ul>
+  ${src(PLOC+".")}</div>`; };
+
+/* Emergencies — paeds */
+pCards.mtp = () => { const w = W(), pk2 = w<20 ? "1 unit adult PC + 1 unit adult FFP" : w<=40 ? "2 units adult PC + 2 units adult FFP" : "4 units adult PC + 4 units adult FFP";
+  return `<div class="card"><h2>Paeds massive transfusion</h2>${p3Draft()}<ol class="crisis">
+  <li><b>Activate</b> if haemorrhagic shock not responding to 20 mL/kg: blood loss &gt; 10% blood volume/min, ≥ 20 mL/kg PRBC in 2 h, or anticipated &gt; 50% blood volume in 3 h. Specialist activates; call blood bank.</li>
+  <li><b>Tranexamic acid</b> ${B("15 mg/kg = "+wk(w,15,"mg",1000))} IV/IO (within 3 h of injury), then ${B("2 mg/kg/h = "+wk(w,2,"mg"))}/h.</li>
+  <li>Send crossmatch, FBC, coag, RP, ABG, lactate, ionised Ca.</li>
+  <li>Pack for ${sig(w)} kg: <b>${pk2}</b> (1st pack group O Rh+ / AB plasma; then group-specific + cryo + platelets).</li>
+  <li>Give warmed PC and plasma in ${B("10 mL/kg = "+wk(w,10,"mL"))} aliquots, ratio 1 : 1. Platelets ${B("10 mL/kg")} (max 4 random units); cryo 1 unit / 10 kg or 10 mL/kg (max 10 units).</li>
+  <li><b>Calcium:</b> CaCl 10% ${B("0.2 mL/kg = "+wk(w,0.2,"mL",10))} or Ca gluconate 10% ${B("0.5 mL/kg = "+wk(w,0.5,"mL",20))}.</li>
+  <li>Control source · warm · correct acidosis · fibrinogen concentrate ${B("40 mg/kg = "+wk(w,40,"mg"))} if fibrinogen &lt; 1.5–2 g/L.</li>
+  <li>Still bleeding after all corrected (pH &gt; 7.2, T &gt; 35 °C, Ca normal, platelets &gt; 50–100, fibrinogen fixed): rFVIIa ${B("90 mcg/kg = "+wk(w,90,"mcg"))} (120 in severe cardiac). Haematology advice.</li></ol>
+  <table><tr><th>Target</th><td>Hb ≥ 8 g/dL · platelets ≥ 75 (≥ 100 head injury) · PT/APTT &lt; 1.5 × normal · fibrinogen &gt; 1.5 g/L · iCa &gt; 1.0 · pH &gt; 7.35 · T &gt; 36 °C</td></tr>
+  <tr><th>SBP goal</th><td>&lt; 1 month 60 · 1 month–1 y 70 · 1–10 y 70 + 2 × age = ${sig(70+2*S.pY)} · &gt; 10 y 90 mmHg (head injury: keep CPP)</td></tr></table>
+  ${src(PLOC+"; APLS 7th ed. 2023.")}</div>`; };
+pCards.pacuX = () => { const w = W();
+  return `<div class="card"><h2>Paeds PACU crises</h2>${p3Draft()}
+  <p class="sub">First 60 s: airway · breathing · SpO₂ ≥ 94% · perfusion · conscious level · pain.</p>${T([
+  R("Croup / airway oedema","Adrenaline 1:1000 neb 0.5 mL/kg (max 5 mL) + dexamethasone 0.15–0.6 mg/kg",`${pk(0.5,"mL",5)} neb · dex ${pk([0.15,0.6],"mg")}`),
+  R("Negative-pressure pulmonary oedema","Relieve obstruction, CPAP, furosemide 0.5–1 mg/kg",pk([0.5,1],"mg")),
+  R("Opioid apnoea","Naloxone 0.01 mg/kg",pk(0.01,"mg",0.4)),
+  R("Bronchospasm","Salbutamol neb 2.5 mg &lt; 20 kg / 5 mg; hydrocortisone 4 mg/kg; MgSO₄ 50 mg/kg",`${w<20?"2.5":"5"} mg · HC ${pk(4,"mg",200)} · Mg ${pk(50,"mg",2000)}`),
+  R("Hypotension","Treat hypoxia; fluid 10–20 mL/kg; adrenaline / noradrenaline 0.05–0.5 mcg/kg/min",pk([10,20],"mL")),
+  R("Bradycardia","Correct hypoxia; atropine 20 mcg/kg; CPR if HR &lt; 60 with poor perfusion",pk(20,"mcg",600)),
+  R("SVT","Vagal; adenosine 0.1 → 0.2 mg/kg; cardioversion 0.5–1 → 2 J/kg",`${pk(0.1,"mg",6)} → ${pk(0.2,"mg",12)}`),
+  R("Seizure","Midazolam 0.1–0.2 mg/kg IV or 0.3 mg/kg buccal; levetiracetam 20–40 mg/kg; D10 2 mL/kg",`IV ${pk([0.1,0.2],"mg",10)} · LEV ${pk([20,40],"mg",3000)}`),
+  R("Severe pain","Paracetamol 15 mg/kg; morphine 0.05–0.1; fentanyl 0.5–1 mcg/kg; ketamine 0.25 mg/kg",`fent ${pk([0.5,1],"mcg")} · ket ${pk(0.25,"mg")}`),
+  R("Emergence delirium","Dexmedetomidine 0.3–0.5 mcg/kg or clonidine 1–2 mcg/kg; propofol 0.5–1 mg/kg",`dex ${pk([0.3,0.5],"mcg")} · prop ${pk([0.5,1],"mg")}`),
+  R("PONV","Ondansetron 0.1 mg/kg; dexamethasone 0.15 mg/kg",pk(0.1,"mg",4))])}
+  <ul><li><b>Post-tonsillectomy bleed:</b> sit up, suction, call ENT + anaesthetist, RSI, activate MTP, back to OT</li>
+  <li><b>Delayed emergence:</b> vitals, glucose, ABG; reverse opioid / benzo / NMB; imaging if focal signs</li>
+  <li>Agitation: rule out hypoxia, hypotension, hypoglycaemia, full bladder (catheter if &gt; 15 mL/kg), pain</li>
+  <li>Compartment syndrome: remove cast, elevate, call ortho · Extravasation: stop, elevate, aspirate</li>
+  <li>Discharge: airway patent, RR normal, SpO₂ ≥ 94%, stable 30 min, awake, pain controlled; <b>infant &lt; 1 y ≥ 2 h in PACU</b>; OSA extended</li></ul>
+  ${src(PLOC+".")}</div>`; };
+pCards.latex = () => `<div class="card"><h2>Latex allergy</h2>${p3Draft()}
+  <h3>At risk</h3><ul><li>Rash, itch, swelling or wheeze with latex</li><li>&gt; 5 previous GAs; spina bifida; urology anomalies with repeated catheters</li><li>Avocado, banana, kiwi, chestnut, strawberry, pineapple allergy</li></ul>
+  <h3>Prepare</h3><ul><li>Label LATEX ALLERGY (patient, notes, consent, chart, bed); tell OT team</li><li><b>First case of the day</b>, or an OT free of powdered latex gloves ≥ 3 h; signage on doors; restrict traffic</li>
+  <li>Remove all latex items; wipe surfaces with non-latex gloves; cover table and arm boards with linen</li><li>Nitrile / neoprene gloves; latex-free airway, circuits, IV sets, 3-way taps, ECG leads, cuffs</li>
+  <li><b>Drug vials with rubber stoppers: remove the stopper</b> (don't pierce) — e.g. ketamine, thiopentone, rocuronium, sugammadex, remifentanil, parecoxib, bupivacaine, many antibiotics, heparin, hydrocortisone, methylprednisolone</li>
+  <li>Go straight to OT (skip holding bay); recover in OT if severe, or a latex-safe PACU</li></ul>
+  <div class="danger">Unexplained hypotension, bronchospasm, urticaria or collapse → <b>think latex anaphylaxis</b>.</div>
+  <button class="emlink" data-open="Paeds anaphylaxis" data-g="emerg" data-tab="paeds">⚠ Paeds anaphylaxis → Emergencies</button>
+  ${src(PLOC+".")}</div>`;
+/* PONV by risk (replaces old paeds PONV card) */
+const PPF = [["hx","Previous PONV / POV, motion sickness, or relative with PONV"],["surg","Strabismus, tonsillectomy, ENT, middle ear, dental, laparoscopic, GU"],["dur","Surgery ≥ 30 min"],["pub","Post-pubertal girl"]];
+pCards.ponv = () => { const w = W(), y = S.pY, n = cnt("pponv", PPF.map(x=>x[0]));
+  const lvl = y < 3 ? 0 : n === 0 ? 0 : n === 1 ? 1 : 2;
+  const box = [["result ok","Low risk","Wait and see — no routine prophylaxis"],["warn","Medium risk","One agent: ondansetron 0.15 mg/kg (max 4 mg) <b>or</b> dexamethasone 0.15 mg/kg (max 5 mg)"],["danger","High risk","≥ 2 interventions: ondansetron + dexamethasone; TIVA with propofol"]][lvl];
+  return `<div class="card"><h2>Paeds PONV by risk</h2>${p3Draft()}
+  <p class="sub">Age ${y} y — ${y<3?"<b>under 3: low risk</b>":"3 or older: count risk factors"}.</p>
+  <div class="txck">${PPF.map(([k,l])=>tog("pponv",k,l)).join("")}</div>
+  <div class="${box[0]}" style="margin-top:var(--s2)"><b>${box[1]}</b> (${y<3?"age &lt; 3":`age ≥ 3 + ${n} factor${n===1?"":"s"}`}). ${box[2]}.</div>${reset("pponv")}
+  ${T([DR("Ondansetron","0.15","mg",null,4), DR("Dexamethasone","0.15","mg",null,5), DR("Droperidol (if dex contraindicated)","0.025","mg",null,1.25)])}
+  <h3>Rescue (different class from prophylaxis)</h3>${T([DR("Ondansetron (if none given) 8-hourly","0.15","mg",null,4), DR("Metoclopramide 8-hourly","0.2","mg",null,10), DR("Promethazine 8-hourly","0.5","mg",null,25)])}
+  <p class="sub">Readminister only &gt; 6 h after PACU; never repeat dexamethasone. Document the risk level on the GA form. Reduce risk: regional, TIVA, avoid N₂O &gt; 1 h and neostigmine, minimise opioids, hydrate (30 mL/kg).</p>
+  <div class="warn">No dexamethasone if tumour-lysis risk. Ondansetron / droperidol: caution long QT. Metoclopramide: dystonia. Promethazine: sedation.</div>
+  ${src(PLOC+".")}</div>`; };
 
 /* ---------- EMERGENCIES (crisis cards, DRAFT from published guidelines) ---------- */
 const CRISIS_CHECKED = true;
@@ -1751,7 +1999,7 @@ function laWeight(lt){
   if (lt==="p") return {w:W(), why:`paeds weight ${sig(W())} kg`};
   const x = wts(); return x.bmi >= 30 ? {w:x.lbw, why:`LBW ${sig(x.lbw)} kg (BMI ${sig(x.bmi)} ≥ 30)`} : {w:x.tbw, why:`actual weight ${sig(x.tbw)} kg`};
 }
-function laMaxMg(d, lt){ const {w} = laWeight(lt), D = LAD[d]; return Math.min((lt==="p"?D.pmax:D.max)*w, D.cap); }
+function laMaxMg(d, lt){ const {w} = laWeight(lt), D = LAD[d]; return Math.min((lt==="p"?pMaxFor(d):D.max)*w, D.cap); }
 const laKey = lt => lt==="p" ? "laP" : "laA";
 function laAddBtn(lt, d, conc, ml, sides, label){
   const spec = esc(JSON.stringify({d, c:String(conc), ml:+sig(ml), bi:sides, l:label}));
@@ -1903,13 +2151,13 @@ function abxCard(paeds){
     <h3>Timing</h3><ul><li>IV within <b>60 min before incision</b> (vancomycin: start 60–120 min before)</li>
       <li>Redose: ${used.filter(k=>ABX[k].re!=="—").map(k=>`${ABX[k].n.split(" (")[0]} every ${ABX[k].re}`).join(" · ") || "single dose"}; and after blood loss &gt; ${paeds?"25 mL/kg":"1.5 L"}</li>
       <li>Stop within 24 h (most cases: single dose)</li></ul>
-    <details class="endo"><summary>Endocarditis prophylaxis (high-risk cardiac only)</summary>
+    ${paeds ? pEndo() : `<details class="endo"><summary>Endocarditis prophylaxis (high-risk cardiac only)</summary>
       <p class="sub">Prosthetic valve, previous endocarditis, some congenital heart disease — for dental work breaching gingiva.</p>
       <table><tr><td>Amoxicillin PO</td><td class="hl">${paeds?`${sig(Math.min(50*W(),2000))} mg (50 mg/kg)`:"2 g"}</td></tr>
       <tr><td>Ampicillin IV</td><td class="hl">${paeds?`${sig(Math.min(50*W(),2000))} mg (50 mg/kg)`:"2 g"}</td></tr>
       <tr><td>Cefazolin IV (allergy, not anaphylaxis)</td><td class="hl">${paeds?`${sig(Math.min(50*W(),1000))} mg (50 mg/kg)`:"1 g"}</td></tr>
       <tr><td>Azithromycin (severe allergy)</td><td class="hl">${paeds?`${sig(Math.min(15*W(),500))} mg (15 mg/kg)`:"500 mg"}</td></tr></table>
-      <p class="sub">30–60 min before. AHA 2021 (clindamycin no longer recommended).</p></details>
+      <p class="sub">30–60 min before. AHA 2021 (clindamycin no longer recommended).</p></details>`}
     ${src("Malaysian National Antimicrobial Guideline 2019; ASHP/IDSA/SIS/SHEA 2013; AHA 2021 · latest available, checked Nov 2026")}`;
 }
 gaCards.abx = () => `<div class="card"><h2>7. Antibiotic prophylaxis</h2>${abxDraft()}${abxCard(false)}</div>`;
@@ -2048,7 +2296,7 @@ pCards.disch = () => { const w = W();
   return `<div class="card"><h2>Paeds discharge</h2>${disDraft()}
   <h3>Leaving recovery: modified Aldrete</h3>${scorer("pald", ALDRETE, 9, "Ready to leave recovery")}
   <h3>Child-specific rules</h3><ul><li>Back to baseline behaviour, parent present</li><li>Drinking <b>not required</b> before discharge unless the surgeon asks</li>
-  <li><b>Ex-premature &lt; 60 weeks post-conceptual age:</b> overnight apnoea monitoring (your notes: CGA &lt; 48–52 w or Hb &lt; 7 → consider post-op ventilation)</li>
+  <li><b>Ex-premature:</b> &lt; 44 wk PMA NICU · 44–55 wk monitored bed 12–24 h · 55–60 wk 24-h admission · &gt; 60 wk daycare if well (see Pre-op › Ex-prem card)</li>
   <li><b>Tonsillectomy &lt; 3 y</b> or significant OSA: overnight stay</li></ul>
   <h3>Going home</h3><ul><li>Two adults for the car journey if the child is small (one to drive); car seat</li>
   <li>Written instructions; regular paracetamol <b>${sig(Math.min(15*w,1000))} mg</b> 6-hourly (15 mg/kg) ± ibuprofen <b>${sig(Math.min(10*w,400))} mg</b> 8-hourly (10 mg/kg)</li>
@@ -2231,6 +2479,23 @@ const VALUES = [
   "Fluid: saline if K⁺ ≥ 5.5 / unknown, else balanced; albumin 5% 250 mL; PACU replace previous hour's urine mL for mL",
   "Reversal: neostigmine 0.05 mg/kg IBW (max 5 mg) + glycopyrrolate 0.2 mg per mg",
   "Analgesia: paracetamol 1 g; tramadol 50 mg 12-hourly max 200 mg/day; fentanyl PCA preferred; no NSAIDs; ondansetron 4 mg, no extra dexamethasone"]],
+ ["Paediatric local protocol additions (DRAFT — tick to sign off)", [
+  "Fasting: solids, formula, milky drinks 6 h; breast milk 4 h; clear 1 h",
+  "Premed: oral / buccal midazolam 0.3–0.5 mg/kg (max 15); IN midazolam 0.2–0.3 (max 10); IN dexmedetomidine 2–2.5 mcg/kg",
+  "PAAS 0–4 low, 5–7 moderate, 8–10 high (≥ 6 predicts difficult intubation); STBUR ≥ 3 high, 5 very high",
+  "URTI mild proceed; moderate–severe delay ≥ 2 weeks; asthma attack < 4 weeks postpone",
+  "Ex-prem PMA < 44 NICU ≥ 24 h; 44–55 monitored 12–24 h; 55–60 admit 24 h; > 60 daycare",
+  "Propofol induction healthy 4–5 mg/kg, ill / neonate 2 mg/kg; laryngospasm sux 0.1–0.5 mg/kg (or roc 1.2)",
+  "LA max < 4 months: bupi / levobupi 2.0, ropi 2.5, lignocaine 3.5; ≥ 4 months 2.5 / 3 / 4 mg/kg",
+  "Caudal: T6 1–1.2, T10 0.75–1, groin / perineal 0.5 mL/kg, max 20 mL",
+  "Epidural infusion: neonate 0.1–0.2 plain; 1–3 months 0.2–0.3 + fentanyl 1; 3–12 months 0.2–0.4 + fentanyl 1; > 1 y 0.2–0.4 + fentanyl 2 mcg/mL; max 0.4 mL/kg/h; rescue 0.25 mL/kg",
+  "Neonatal spinal 0.5% bupi: < 5 kg 0.1–0.2 mL/kg; 5–15 kg 0.08; > 15 kg 0.06 mL/kg + 0.1 mL dead space",
+  "PONV: < 3 y none; ≥ 3 + 1 factor one agent; ≥ 3 + 2 two agents; ondansetron 0.15 (max 4), dex 0.15 (max 5), droperidol 0.025 (max 1.25); metoclopramide max 10 mg (local 20)",
+  "Pain infusions: morphine 0.5 mg/kg/50 mL; fentanyl 20 mcg/kg/50 mL; ketamine 5 mg/kg/50 mL; PCA 4-h max morphine 0.4 mg/kg (40 mg), fentanyl 20 mcg/kg (400 mcg)",
+  "Endocarditis (local): amoxicillin / ampicillin 50 mg/kg; allergy clindamycin 20 mg/kg (max 600), cephalexin 50 mg/kg, azithromycin 15 mg/kg",
+  "MTP: TXA 15 mg/kg then 2 mg/kg/h; PC:FFP 1:1 in 10 mL/kg; CaCl 0.2 mL/kg; fibrinogen 40 mg/kg; rFVIIa 90 mcg/kg",
+  "TIVA: Paedfusor 1–16 y > 5 kg; Kataria 3–16 y 15–61 kg; Eleveld < 1 y / < 5 kg; McFarlan 2.5 mg/kg then 15/13/11/10/9 mg/kg/h",
+  "CVC jugular 0.13 × kg + 4.9 cm; lung isolation sizes by age (Coté)"]],
  ["Sources — reviewed 14 Nov 2026 (next review Nov 2027)", [
   "UPDATED: RCUK Adult ALS 2025 (shock ≥ 150 J, lignocaine 100 mg alternative, isoprenaline 5 mcg/min) — read from the primary text",
   "UPDATED (verified): DAS 2025 intubation — CICO card: VL first-line, routine NMB, no blind SGA intubation, prepare FONA early",
@@ -2323,7 +2588,7 @@ screens.values = () => {
 /* ================= ROUTER & EVENTS ================= */
 /* ================= GROUPS (by situation) ================= */
 const EMERG_ADULT = ["High / total spinal","LA toxicity (LAST)","Anaphylaxis","Hypotension after spinal","Bradycardia & cardiac arrest","Bronchospasm","Malignant hyperthermia","Hyperkalaemia","Failed intubation / CICO","Massive obstetric haemorrhage","Eclampsia"];
-const EMERG_PAEDS = ["Laryngospasm","Paeds bronchospasm","Paeds cardiac arrest","Paeds LA toxicity (LAST)","Paeds anaphylaxis","Paeds malignant hyperthermia","Cyanotic heart disease / Fallot spell"];
+const EMERG_PAEDS = ["Laryngospasm","Paeds bronchospasm","Paeds cardiac arrest","Paeds LA toxicity (LAST)","Paeds anaphylaxis","Paeds malignant hyperthermia","Paeds massive transfusion","Paeds PACU crises","Latex allergy","Cyanotic heart disease / Fallot spell"];
 const GROUPS = [
  {id:"emerg", name:"Emergencies", sub:"Adult & obstetric · Paeds — crisis steps with doses", tabKey:"emTab", tabs:[
    {id:"adult", label:"Adult / Obstetric", input:()=>step("aw","Weight","kg",30,200,1), cards:EMERG_ADULT},
@@ -2356,10 +2621,11 @@ const GROUPS = [
     links:[["LA toxicity (LAST)","adult","LA toxicity"]]}], cards:[]},
  {id:"paeds", name:"Paediatric", sub:"Pre-op · Induction · Intra-op · Post-op", tabKey:"pTab", tabs:[
    {id:"pre", label:"Pre-op", input:()=>pInputs(), hint:"Plan the case: expected BP, then check for a special condition.",
-    cards:[["Estimated systolic BP","1. Expected BP for age / weight"],["Airway syndromes","2. Difficult airway syndromes"],["Down syndrome","3. Down syndrome"],
-      ["OSA for tonsillectomy — opioid-free","4. OSA / tonsillectomy (opioid-free)"],["Cyanotic heart disease / Fallot spell","5. Cyanotic heart disease / Fallot spell"],
-      ["Pyloric stenosis","6. Pyloric stenosis"],["Neonatal surgery","7. Neonatal surgery (PDA, TOF, CDH, NEC)"],["Hypospadias repair","8. Hypospadias repair (whole plan)"],
-      ["MRI under sedation","9. MRI / sedation outside theatre"],["Dynamic airway assessment (spontaneous breathing)","10. Dynamic airway / bronchoscopy"]],
+    cards:[["Paeds fasting","1. Fasting"],["Paeds premedication","2. Premedication"],["Paeds airway score (PAAS)","3. Airway score (PAAS)"],["OSA screen (STBUR)","4. OSA screen (STBUR)"],["URTI & asthma: go or delay","5. URTI & asthma: go or delay"],
+      ["Ex-prem: apnoea risk & admission","6. Ex-prem: apnoea risk & admission"],["Estimated systolic BP","7. Expected BP for age / weight"],["Congenital conditions (A–Z)","8. Congenital conditions (A–Z)"],["Airway syndromes","9. Difficult airway syndromes (my notes)"],["Down syndrome","10. Down syndrome"],
+      ["OSA for tonsillectomy — opioid-free","11. OSA / tonsillectomy (opioid-free)"],["Cyanotic heart disease / Fallot spell","12. Cyanotic heart disease / Fallot spell"],
+      ["Pyloric stenosis","13. Pyloric stenosis"],["Neonatal surgery","14. Neonatal surgery (PDA, TOF, CDH, NEC)"],["Hypospadias repair","15. Hypospadias repair (whole plan)"],
+      ["MRI under sedation","16. MRI / sedation outside theatre"],["Dynamic airway assessment (spontaneous breathing)","17. Dynamic airway / bronchoscopy"]],
     links:[["Cyanotic heart disease / Fallot spell","paeds","Fallot spell"]]},
    {id:"ind", label:"Induction", input:()=>pInputs(true), hint:"Airway kit → drugs → TIVA → ventilate → lines.",
     cards:[["Paeds ETT","1. Tube: size, depth, blade, suction"],["NPA","2. NPA"],["Micro HMEF","3. HMEF"],["Bag","4. Bag"],
@@ -2371,12 +2637,12 @@ const GROUPS = [
     cards:[["Maintenance (4/2/1)","1. Fluids: maintenance & insensible loss"],["Glucose (neonate / paeds)","2. Fluids: glucose"],["Blood products","3. Fluids: blood products"],
       ["Paeds intra-op drugs","4. Drugs: TXA, steroids, calcium…"],["Inotropes (50 mL syringe)","5. Drugs: inotropes"],["Paeds resuscitation","6. Drugs: resuscitation"],
       ["Paeds LA dose calculator","7. Block: LA dose calculator"],["Which block (paeds)","8. Block: which one"],["Caudal block","9. Block: caudal"],["Ilioinguinal block","10. Block: ilioinguinal"],["Penile block","11. Block: penile"],
-      ["Paeds lumbar / thoracic epidural","12. Block: lumbar / thoracic epidural"],["Intrapleural block","13. Block: intrapleural"],["Keeping warm","14. Keeping warm"]],
-    links:[["Paeds LA toxicity (LAST)","paeds","LA toxicity"],["Paeds malignant hyperthermia","paeds","Malignant hyperthermia"],["Paeds cardiac arrest","paeds","Cardiac arrest"]]},
+      ["Paeds lumbar / thoracic epidural","12. Block: lumbar / thoracic epidural"],["Neonatal / infant spinal","13. Block: neonatal / infant spinal"],["Block volumes (paeds)","14. Block: volumes for other blocks"],["Intrapleural block","15. Block: intrapleural"],["Keeping warm","16. Keeping warm"]],
+    links:[["Paeds massive transfusion","paeds","Massive transfusion"],["Paeds LA toxicity (LAST)","paeds","LA toxicity"],["Paeds malignant hyperthermia","paeds","Malignant hyperthermia"],["Paeds cardiac arrest","paeds","Cardiac arrest"]]},
    {id:"post", label:"Post-op", input:()=>pInputs(), hint:"Wake-up and after: PONV → extubation → delirium → analgesia.",
-    cards:[["Paeds PONV","1. PONV prophylaxis"],["Deep extubation (MAC 1)","2. Deep extubation"],["Laryngospasm","3. Laryngospasm: prevent & treat"],
-      ["Emergence delirium","4. Emergence delirium"],["Paeds analgesia & infusions","5. Analgesia & infusions"],["Paeds discharge","6. Discharge (recovery & home)"]],
-    links:[["Laryngospasm","paeds","Laryngospasm"],["Paeds bronchospasm","paeds","Bronchospasm"]]}], cards:[]},
+    cards:[["Paeds PONV by risk","1. PONV by risk"],["Deep extubation (MAC 1)","2. Deep extubation"],["Laryngospasm","3. Laryngospasm: prevent & treat"],
+      ["Emergence delirium","4. Emergence delirium"],["Paeds pain scores","5. Pain scores"],["Paeds analgesia by age","6. Analgesia by age"],["Paeds opioid / ketamine infusions & PCA","7. Infusions & PCA"],["Paeds discharge","8. Discharge (recovery & home)"]],
+    links:[["Laryngospasm","paeds","Laryngospasm"],["Paeds bronchospasm","paeds","Bronchospasm"],["Paeds PACU crises","paeds","PACU crises"]]}], cards:[]},
  {id:"obs", name:"Obstetric", sub:"Labour · Caesarean · After delivery", tabKey:"obTab", tabs:[
    {id:"labour", label:"Labour", hint:"Epidural, in the order you do it.",
     cards:["1. Start: test, bolus & loading","2. Maintain: infusion recipes","2b. Maintain: pump settings","3. Top-up: breakthrough pain","4. Problem: accidental dural puncture","4b. Problems: catheter troubleshooting","5. No epidural: IV PCA"],
@@ -2403,6 +2669,22 @@ const GROUPS = [
    {id:"don", label:"Donor", input:()=>donInputs(), hint:"Living donor nephrectomy.",
     cards:["1. Donor pre-op","2. Donor intra-op","3. Donor post-op"], links:[]}], cards:[]}];
 const SEARCH_EXTRA = {
+  "1. Fasting":"paeds child fasting clear fluid breast milk formula",
+  "2. Premedication":"premed premedication midazolam oral buccal intranasal dexmedetomidine anxiety",
+  "3. Airway score (PAAS)":"paas airway score difficult intubation mallampati paeds",
+  "4. OSA screen (STBUR)":"stbur osa sleep apnoea snoring tonsillectomy",
+  "5. URTI & asthma: go or delay":"urti cold cough asthma postpone delay cancel",
+  "6. Ex-prem: apnoea risk & admission":"ex-prem premature preterm apnoea pma pca post-conceptual post-menstrual admission nicu daycare",
+  "8. Congenital conditions (A–Z)":"syndrome congenital pierre robin goldenhar treacher collins mps mucopolysaccharidosis down craniosynostosis beckwith turner klippel charge vacterl digeorge mitochondrial myopathy duchenne myotonic sma epidermolysis osteogenesis",
+  "13. Block: neonatal / infant spinal":"neonatal spinal infant spinal ex-prem hernia subarachnoid",
+  "14. Block: volumes for other blocks":"block volume ilioinguinal penile axillary supraclavicular femoral sciatic tap rectus sheath erector spinae esp quadratus lumborum",
+  "1. PONV by risk":"ponv paeds vomiting ondansetron dexamethasone droperidol metoclopramide eberhart",
+  "5. Pain scores":"pain score flacc nips faces numerical",
+  "6. Analgesia by age":"analgesia paracetamol ibuprofen diclofenac parecoxib tramadol oxycodone morphine fentanyl ketamine clonidine naloxone",
+  "7. Infusions & PCA":"pca morphine fentanyl ketamine oxycodone infusion nca",
+  "Paeds massive transfusion":"massive transfusion mtp haemorrhage bleeding paeds tranexamic fibrinogen novoseven",
+  "Paeds PACU crises":"pacu recovery croup stridor seizure svt delirium tonsillectomy bleed",
+  "Latex allergy":"latex allergy anaphylaxis spina bifida",
   "1. Workup checklist":"kidney renal transplant ktx esrd dialysis hd workup hla crossmatch flow cytometry abo infection screen echo spirometry",
   "2. Dialysis & fluid status":"kidney renal transplant ktx esrd dialysis hd dry weight uf ultrafiltration last hd heparin potassium k+ residual urine",
   "3. Cardiac risk":"kidney renal transplant ktx esrd dialysis hd cardiac echo ef mets stress test coronary angiogram ctca",
