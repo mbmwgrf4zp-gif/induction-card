@@ -365,7 +365,7 @@ a{color:var(--accent)}
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.14.0";
+const APP_VERSION = "2.14.1";
 const APP_DATE = "15 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
@@ -1418,7 +1418,7 @@ gaCards.olv = () => { const d = dltSize(), dep = 12 + S.height/10;
   ${src("Thoracic anaesthesia OLV reviews (Lohser; Brassard Can J Anesth 2014); Asian DLT sizing studies incl. Malaysia; Cook Arndt IFU (draft).")}</div>`; };
 
 /* ---------- TRANSPLANT (kidney) — DRAFT: local renal transplant protocol 1st ed.; Mayhew BJA Educ 2016; Jaszczuk J Clin Med 2022 ---------- */
-const TX_CHECKED = false;
+const TX_CHECKED = true;
 const TXP = "local renal transplant protocol (1st ed.)";
 const txDraft = () => TX_CHECKED ? "" : `<div class="warn" style="margin-top:0">DRAFT — from the ${TXP}; extra drug notes verified from two sources each. Not yet ticked by you.</div>`;
 const txBox = () => `<div class="danger"><b>Immunosuppressants:</b> the nephrologist hands the renal box to the anaesthetist <b>doctor-to-doctor — never through nurses</b>.</div>`;
@@ -2096,7 +2096,7 @@ const VALUES = [
   "OLV: left DLT ♀ <160 cm 35 / ≥160 37 Fr; ♂ <170 cm 37 / ≥170 39 Fr; depth 12 + height/10 cm; confirm with fibreoptic",
   "Blocker 9 Fr: ETT ≥ 7.5 (8.0 easier); 7 Fr: ETT ≥ 6.0",
   "OLV settings: TV 4–6 mL/kg PBW, PEEP 5, FiO₂ 0.8–1.0 then lower, peak < 30, driving < 15; hypoxia: FiO₂ 1.0 → scope → suction → recruit/PEEP → CPAP 5–10 to non-ventilated lung → intermittent 2-lung → PA clamp"]],
- ["Kidney transplant + hyperkalaemia (DRAFT — tick to sign off)", [
+ ["Kidney transplant + hyperkalaemia (signed off 15 Nov 2026)", [
   "Recipient: RSI preferable; propofol 1–2 mg/kg; triple-lumen CVC R-IJV (scan first); no double-lumen unless nephrologist agrees; art line not on fistula arm; cefuroxime 1.5 g",
   "Bilateral IJV thrombosis / femoral line: MUST discuss with nephrologist / urologist",
   "BP: patient's baseline (often 140–150/80–90); noradrenaline first choice; fluids up to 30 mL/kg/h (donor 20 mL/kg/h); balanced crystalloid, saline if K⁺ high; albumin 5%",
