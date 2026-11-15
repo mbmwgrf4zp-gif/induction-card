@@ -367,7 +367,7 @@ a{color:var(--accent)}
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.18.0";
+const APP_VERSION = "2.18.1";
 const APP_DATE = "15 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
@@ -1902,7 +1902,7 @@ gaCards.mac = () => { const a = S.age, f = Math.pow(10, -0.00269*(a-40));
   <tr><td>Desflurane</td><td>6.6%</td><td class="hl">${r(6.6)}%</td></tr></table>
   <p class="sub">Mapleson age correction. Aim ~0.7–1.0 MAC with opioid. N₂O adds to MAC (MAC 104%).</p>${src("Mapleson 1996.")}</div>`; };
 /* ---------- INTRA-OP ANALGESIA (multimodal) — DRAFT ---------- */
-const IOA_CHECKED = false;
+const IOA_CHECKED = true;
 const ioaDraft = () => IOA_CHECKED ? "" : `<div class="warn" style="margin-top:0">DRAFT — intra-op multimodal analgesia: lignocaine consensus (Anaesthesia 2021), ASRA ketamine 2018, PROSPECT, product labels. Not yet ticked by you.</div>`;
 const IOA_MOD = [["renal","Kidney impairment"],["liver","Liver impairment"],["osa","OSA"],["tol","Opioid-tolerant"]];
 gaCards.opioid = () => {
@@ -1956,7 +1956,7 @@ gaCards.opioid = () => {
   <h3>5. Before waking</h3><ul><li>Long-acting opioid given if remifentanil was used</li><li>Infusions stopped (ketamine 30–60 min before; lignocaine at end unless continued on ward under protocol)</li>
   <li>Write PACU analgesia + PCA orders; PONV prophylaxis given</li></ul>
   <button class="homebtn" data-open="4. Analgesia ladder & PCA" data-g="ga" data-tab="post">Post-op ladder & PCA → General › Post-op ›</button>
-  ${src("Foo et al. Anaesthesia 2021 (IV lidocaine consensus); ASRA/AAPM/ASA ketamine guideline 2018; PROSPECT (ESRA) procedure recommendations; dexmedetomidine and magnesium trials; product labels (draft).")}</div>`; };
+  ${src("Foo et al. Anaesthesia 2021 (IV lidocaine consensus); ASRA/AAPM/ASA ketamine guideline 2018; PROSPECT (ESRA) procedure recommendations; dexmedetomidine and magnesium trials; product labels.")}</div>`; };
 gaCards.pressors = () => { const w = S.aw, rate = (lo,hi,conc) => `${sig(lo*w*60/conc)}–${sig(hi*w*60/conc)} mL/h`;
   return `<div class="card"><h2>6. Vasopressors &amp; inotropes</h2>${gaDraft()}
   <div style="overflow-x:auto"><table><tr><th>Drug · mix</th><th>Dose</th><th>For ${sig(w)} kg</th></tr>
@@ -2543,7 +2543,7 @@ const VALUES = [
   "MTP: TXA 15 mg/kg then 2 mg/kg/h; PC:FFP 1:1 in 10 mL/kg; CaCl 0.2 mL/kg; fibrinogen 40 mg/kg; rFVIIa 90 mcg/kg",
   "TIVA: Paedfusor 1–16 y > 5 kg; Kataria 3–16 y 15–61 kg; Eleveld < 1 y / < 5 kg; McFarlan 2.5 mg/kg then 15/13/11/10/9 mg/kg/h",
   "CVC jugular 0.13 × kg + 4.9 cm; lung isolation sizes by age (Coté)"]],
- ["Intra-op analgesia (DRAFT — tick to sign off)", [
+ ["Intra-op analgesia (signed off 15 Nov 2026)", [
   "Base: paracetamol 1 g (15 mg/kg < 50 kg, AdjBW if obese); parecoxib 40 mg (20 mg elderly / < 50 kg) or diclofenac PR 1 mg/kg max 100 mg; dexamethasone 0.1 mg/kg IBW max 8 mg",
   "Opioids: fentanyl 1–2 mcg/kg LBW then 0.5–1; morphine 0.1–0.15 mg/kg IBW; tramadol 1–2 mg/kg max 100 mg; halve if ≥ 65; remi → morphine 0.1 mg/kg or fentanyl 1–2 mcg/kg 30 min before stopping",
   "Ketamine 0.15–0.35 mg/kg then 0.1–0.5 mg/kg/h (max 1); 2 mg/mL",
