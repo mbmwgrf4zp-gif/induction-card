@@ -367,7 +367,7 @@ a{color:var(--accent)}
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.16.0";
+const APP_VERSION = "2.16.1";
 const APP_DATE = "15 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
@@ -1060,7 +1060,7 @@ pCards.special = () => {
 };
 
 /* ---------- PAEDIATRIC — local protocol additions (Nov 2025) — DRAFT ---------- */
-const P3_CHECKED = false;
+const P3_CHECKED = true;
 const PLOC = "local paediatric anaesthesia manual & pain / regional protocol (Nov 2025)";
 const p3Draft = () => P3_CHECKED ? "" : `<div class="warn" style="margin-top:0">DRAFT — from the ${PLOC}. Not yet ticked by you.</div>`;
 const intl = t => `<p class="sub"><b>International:</b> ${t}</p>`;
@@ -2479,7 +2479,7 @@ const VALUES = [
   "Fluid: saline if K⁺ ≥ 5.5 / unknown, else balanced; albumin 5% 250 mL; PACU replace previous hour's urine mL for mL",
   "Reversal: neostigmine 0.05 mg/kg IBW (max 5 mg) + glycopyrrolate 0.2 mg per mg",
   "Analgesia: paracetamol 1 g; tramadol 50 mg 12-hourly max 200 mg/day; fentanyl PCA preferred; no NSAIDs; ondansetron 4 mg, no extra dexamethasone"]],
- ["Paediatric local protocol additions (DRAFT — tick to sign off)", [
+ ["Paediatric local protocol additions (signed off 15 Nov 2026)", [
   "Fasting: solids, formula, milky drinks 6 h; breast milk 4 h; clear 1 h",
   "Premed: oral / buccal midazolam 0.3–0.5 mg/kg (max 15); IN midazolam 0.2–0.3 (max 10); IN dexmedetomidine 2–2.5 mcg/kg",
   "PAAS 0–4 low, 5–7 moderate, 8–10 high (≥ 6 predicts difficult intubation); STBUR ≥ 3 high, 5 very high",
