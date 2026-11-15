@@ -365,7 +365,7 @@ a{color:var(--accent)}
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.15.0";
+const APP_VERSION = "2.15.1";
 const APP_DATE = "15 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
@@ -1419,7 +1419,7 @@ gaCards.olv = () => { const d = dltSize(), dep = 12 + S.height/10;
 
 /* ---------- TRANSPLANT (kidney) — local renal transplant protocol 1st ed.; Mayhew BJA Educ 2016; Jaszczuk J Clin Med 2022 ---------- */
 const TX_CHECKED = true;    // v2.14 content (signed off 15 Nov 2026)
-const TX2_CHECKED = false;  // v2.15 expansion: GA-style calculations, detailed pre-op
+const TX2_CHECKED = true;  // v2.15 expansion: GA-style calculations, detailed pre-op
 const TXP = "local renal transplant protocol (1st ed.)";
 const txDraft = () => TX_CHECKED ? "" : `<div class="warn" style="margin-top:0">DRAFT — from the ${TXP}. Not yet ticked by you.</div>`;
 const tx2Draft = () => TX2_CHECKED ? "" : `<div class="warn" style="margin-top:0">DRAFT — kidney transplant expansion (Nov 2026): ${TXP} + GA calculations with renal adjustments, verified from two sources. Not yet ticked by you.</div>`;
@@ -2216,7 +2216,7 @@ const VALUES = [
   "Renal drugs: atracurium/cisatracurium preferred; sux single dose only if K⁺ normal; sugammadex not recommended CrCl < 30; fentanyl over morphine; no NSAIDs",
   "PACU: diuresis 500–1000 mL/h replace; CXR; graft ultrasound; paracetamol + tramadol ± PCA; antibiotic 5–7 days",
   "Hyperkalaemia (UKKA): ≥ 6.5 or ECG → CaCl 10% 10 mL / Ca gluconate 10% 30 mL; insulin 10 u + glucose 25 g (10% glucose 50 mL/h × 5 h if glucose < 7); salbutamol 10–20 mg neb; bicarbonate only if acidotic; dialysis"]],
- ["Kidney transplant expansion (DRAFT — tick to sign off)", [
+ ["Kidney transplant expansion (signed off 15 Nov 2026)", [
   "Phase tabs: Pre-op · Induction · Intra-op · Post-op · Donor; patient box adds K⁺, Hb, today's weight, hours since HD",
   "Discuss before proceeding: K⁺ ≥ 5.5 (5.0–5.4 dialyse if time / graft risk), pulmonary oedema, infection ≤ 2 weeks, cardiac event, Hb < 70 / platelets / clotting, both IJVs thrombosed; > 2 kg above dry weight; last HD > 24 h",
   "HD heparin within ~4 h: APTT before CVC; residual native urine noted",
