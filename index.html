@@ -358,8 +358,8 @@ a{color:var(--accent)}
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.12.0";
-const APP_DATE = "14 Nov 2026";
+const APP_VERSION = "2.13.0";
+const APP_DATE = "15 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
 /* ================= HELPERS ================= */
@@ -375,7 +375,7 @@ const store = {
 };
 // Inputs are not remembered between uses (per plan): state lives in memory only.
 const S = { ettMode:"adult", sex:"F", height:158, ageY:4, ageM:0, wt:3.0,
-            touched:{}, sc:{}, fastH:6, hbNow:12, hbLow:8, hbTarget:10, derm:"", abxSp:"general", spOp:"lscs", spHt:155, morWt:60, pw:10, pY:1, pM:0, pHt:75, pBE:-5, aw:70, emTab:"adult", obTab:"labour", pTab:"pre", gaTab:"pre", raTab:"safety", laA:[], laP:[], cSex:"F", cY:40, cM:0, cH:160, cW:60, cNick:"", laD:"bupi", laC:"0.5", laMl:15, laBi:"1", age:45, apfel:0, pump:"pcea_cse", topup:"lig" };
+            touched:{}, sc:{}, fastH:6, hbNow:12, hbLow:8, hbTarget:10, derm:"", abxSp:"general", spOp:"lscs", spHt:155, morWt:60, pw:10, pY:1, pM:0, pHt:75, pBE:-5, aw:70, emTab:"adult", obTab:"labour", pTab:"pre", gaTab:"pre", raTab:"safety", laA:[], laP:[], cSex:"F", cY:40, cM:0, cH:160, cW:60, cNick:"", laD:"bupi", laC:"0.5", laMl:15, laBi:"1", age:45, apfel:0, pump:"pcea_cse", topup:"lig", ventSc:"std", vfio:"" };
 
 function src(text){ return `<div class="src">Source: ${text}</div>`; }
 function protoSrc(){
@@ -1287,9 +1287,120 @@ gaCards.kit = () => { const w = S.aw;
   <h3>Video laryngoscope</h3><ul><li>Macintosh-type blade 3 or 4</li><li>Hyperangulated blade: use a pre-shaped stylet</li></ul>
   ${src("Manufacturer weight bands.")}</div>`; };
 
+/* ---------- VENTILATION STRATEGIES (adult) — DRAFT: Young BJA 2019 consensus; ARDSNet; BTF 4th ed.; thoracic reviews ---------- */
+const VENT_CHECKED = false;
+const ventDraft = () => VENT_CHECKED ? "" : `<div class="warn" style="margin-top:0">DRAFT — intra-op lung-protective ventilation consensus (BJA 2019), ARDSNet, Brain Trauma Foundation 4th ed., thoracic anaesthesia reviews. Not yet ticked by you.</div>`;
+const pbw = () => wts().ibwRaw;   // predicted body weight (ARDSNet = Devine), from sex + height only
+const mlr = (lo, hi) => `${Math.round(lo*pbw()/10)*10}–${Math.round(hi*pbw()/10)*10} mL`;
+const ARDS_TBL = [["0.3","5"],["0.4","5–8"],["0.5","8–10"],["0.6","10"],["0.7","10–14"],["0.8","14"],["0.9","14–18"],["1.0","18–24"]];
+const VENT_SC = {
+  std:{n:"Standard", tv:[6,8], peep:"5, then adjust", rr:"12–14", co2:"EtCO₂ 35–45 mmHg", li:[
+    "Recruit after intubation and after any disconnection if SpO₂ or compliance falls",
+    "Lowest FiO₂ for SpO₂ ≥ 94%; FiO₂ 0.8 or more for pre-oxygenation and emergence is fine"]},
+  lap:{n:"Laparoscopy / Trendelenburg", tv:[6,8], peep:"8–10 (higher if steep head-down)", rr:"14–18 as CO₂ rises", co2:"EtCO₂ 35–45 mmHg; accept to 50 if pressures high", li:[
+    "Re-check pressures and tube depth <b>after insufflation and every position change</b> (head-down pushes the tube toward the right main bronchus)",
+    "Raise RR before raising TV to clear CO₂",
+    "Recruit after insufflation; keep PEEP up afterwards",
+    "Sudden rise in EtCO₂ with surgical emphysema or falling SpO₂: think CO₂ embolism / capnothorax — tell the surgeon, release pneumoperitoneum"]},
+  obese:{n:"Obese", tv:[6,8], peep:"8–10", rr:"12–16", co2:"EtCO₂ 35–45 mmHg", li:[
+    "Tidal volume from <b>height</b> (PBW), never actual weight",
+    "Ramped / head-up 25–30° for pre-oxygenation and induction; CPAP / PEEP 5–10 during pre-oxygenation",
+    "Recruit after intubation, then keep PEEP (stopping PEEP loses the gain within minutes)",
+    "Extubate sitting up, fully reversed (TOF ratio ≥ 0.9)"]},
+  obst:{n:"Asthma / COPD", tv:[6,8], peep:"5 (or about 80% of measured auto-PEEP)", rr:"8–10", co2:"Accept higher CO₂ (pH ≥ 7.20)", li:[
+    "<b>I:E 1:3–1:4</b>: long expiration; low RR matters more than low TV",
+    "Watch the flow–time curve: expiratory flow should reach zero before the next breath",
+    "Gas trapping (auto-PEEP): rising pressure, falling BP → <b>disconnect for 10–30 s</b>, let the chest empty, then slower RR",
+    "Deep volatile; avoid light anaesthesia at intubation and emergence"]},
+  ards:{n:"Sick lungs / ARDS", tv:[4,6], peep:"By FiO₂ — table below", rr:"up to 30–35", co2:"Accept higher CO₂ (pH ≥ 7.25)", li:[
+    "<b>Plateau pressure &lt; 30</b> and <b>driving pressure &lt; 15</b> cmH₂O; drop TV towards 4 mL/kg to meet them",
+    "SpO₂ 88–95% (PaO₂ 55–80 mmHg) is acceptable",
+    "Avoid disconnections (clamp the tube); in-line suction",
+    "Bring the ICU ventilator settings to theatre and match them"]},
+  olv:{n:"One-lung ventilation", olv:true},
+  neuro:{n:"Raised ICP / neuro", tv:[6,8], peep:"5 (avoid high PEEP)", rr:"12–14", co2:"PaCO₂ 35–40 mmHg (4.7–5.3 kPa)", li:[
+    "<b>Normal CO₂.</b> No routine hyperventilation (never PaCO₂ ≤ 25 mmHg)",
+    "Brief hyperventilation only as a rescue for herniation / tight brain, while other measures start",
+    "Check an ABG: EtCO₂ under-reads PaCO₂ — set the target on PaCO₂",
+    "Head up 15–30°, neck neutral, tube ties not compressing the jugular veins; PaO₂ &gt; 80 mmHg"]},
+  preg:{n:"Pregnancy (GA for LSCS)", tv:[6,8], peep:"5", rr:"14–16", co2:"EtCO₂ 30–32 mmHg (4.0–4.3 kPa)", li:[
+    "Normal pregnancy PaCO₂ is about 30–32 mmHg: <b>do not over-ventilate</b> (low CO₂ reduces uterine blood flow)",
+    "Tidal volume from PBW (non-pregnant height formula)",
+    "Left uterine displacement until delivery",
+    "Rapid desaturation: high FiO₂ until airway secure"]}
+};
+function ventSettings(sc){
+  return `<table><tr><th>Tidal volume</th><td class="hl">${mlr(sc.tv[0],sc.tv[1])}<div class="sub">${sc.tv[0]}–${sc.tv[1]} mL/kg × PBW ${sig(pbw())} kg</div></td></tr>
+    <tr><th>PEEP</th><td>${sc.peep}${/table/.test(sc.peep)?"":" cmH₂O"}</td></tr><tr><th>Rate</th><td>${sc.rr} /min</td></tr><tr><th>CO₂ target</th><td>${sc.co2}</td></tr></table>`;
+}
+gaCards.vent = () => {
+  if (!VENT_SC[S.ventSc]) S.ventSc = "std";
+  const sc = VENT_SC[S.ventSc];
+  const body = sc.olv
+    ? `<button class="homebtn primary" data-open="2. One-lung ventilation" data-g="ga" data-tab="maint">Open 2. One-lung ventilation ›</button>`
+    : ventSettings(sc) + `<ul>${sc.li.map(t=>`<li>${t}</li>`).join("")}</ul>` + (S.ventSc==="ards" ? `<h3>PEEP by FiO₂ (ARDSNet lower-PEEP table)</h3><p class="sub">Tap the FiO₂ you are on.</p>
+      <table><tr><th>FiO₂</th><th>PEEP cmH₂O</th></tr>${ARDS_TBL.map(([f,p])=>`<tr class="${S.vfio===f?"hl":""}"><td><button class="linkish" data-seg="vfio" data-val="${f}">${f}</button></td><td>${p}</td></tr>`).join("")}</table>` : "");
+  return `<div class="card"><h2>1. Ventilation strategies</h2>${ventDraft()}
+  <p class="sub">Predicted body weight from sex + height: <b>PBW ${sig(pbw())} kg</b>. Tidal volume always from height, never actual weight.</p>
+  ${seg("ventSc", Object.entries(VENT_SC).map(([k,v])=>[k,v.n]))}
+  ${body}
+  <h3>Limits for every patient</h3><ul><li><b>Plateau &lt; 30</b> cmH₂O; <b>driving pressure (plateau − PEEP) &lt; 15</b></li><li>Lowest FiO₂ for SpO₂ ≥ 94% (88–95% in sick lungs)</li></ul>
+  <h3>Which mode</h3><table>
+    <tr><th>Volume control</th><td>Fixed volume; pressure climbs if compliance falls — set a pressure alarm</td></tr>
+    <tr><th>Pressure control</th><td>Fixed pressure; volume falls with pneumoperitoneum, position or bronchospasm — set a low-volume alarm</td></tr>
+    <tr><th>PCV-VG / PRVC</th><td class="hl">Default where available: delivers the set volume at the lowest pressure</td></tr></table>
+  <h3>Recruitment manoeuvre</h3>
+  <p class="sub">When: after intubation, after disconnection, after insufflation, falling SpO₂ or compliance. Tell the team; BP first.</p>
+  <ol><li><b>Breath-hold:</b> APL / CPAP 30–40 cmH₂O for 30 s (bag or ventilator)</li>
+  <li><b>Stepwise PEEP (gentler):</b> PCV with driving pressure 15; raise PEEP 5 → 10 → 15 (→ 20) every 3–5 breaths, then step back to the working PEEP</li>
+  <li>Use the lowest pressure and shortest time that works; <b>keep PEEP up afterwards</b></li></ol>
+  <div class="warn">Avoid or go gently: hypotension / hypovolaemia, pneumothorax or bullae, raised ICP, fresh bronchial stump.</div>
+  <h3>High pressure or low SpO₂ under GA</h3><ol>
+  <li><b>100% O₂, hand-ventilate</b> — feels stiff, or easy?</li>
+  <li><b>DOPES:</b> Displaced tube (endobronchial / out) · Obstruction (kink, secretions, cuff herniation) · Pneumothorax · Equipment (circuit, valve, O₂ supply) · Stacked breaths (auto-PEEP)</li>
+  <li>Capnography trace (shape, value), tube depth at mouth corner, listen both sides, pass a suction catheter</li>
+  <li>Bronchospasm? Anaphylaxis? Aspiration? Light anaesthesia? Surgical cause (packs, retractor, head-down, insufflation)?</li>
+  <li>Recruit once the cause is fixed; fibreoptic scope if still unclear</li></ol>
+  <button class="emlink" data-open="Bronchospasm" data-g="emerg" data-tab="adult">⚠ Bronchospasm → Emergencies</button>
+  <button class="emlink" data-open="Anaphylaxis" data-g="emerg" data-tab="adult">⚠ Anaphylaxis → Emergencies</button>
+  <button class="homebtn" data-open="9. Ventilation settings" data-g="paeds" data-tab="ind">Child? → Paediatric › Induction › Ventilation ›</button>
+  ${src("Young et al. BJA 2019 intra-op lung-protective ventilation consensus; ARDSNet; Brain Trauma Foundation 4th ed.; obstetric GA ventilation studies (draft).")}</div>`;
+};
+// left DLT starting size: Asian / Malaysian adults; confirm with fibreoptic
+function dltSize(){ const h = S.height; return S.sex==="F" ? (h<160 ? 35 : 37) : (h<170 ? 37 : 39); }
+gaCards.olv = () => { const d = dltSize(), dep = 12 + S.height/10;
+  return `<div class="card"><h2>2. One-lung ventilation</h2>${ventDraft()}
+  <h3>Left double-lumen tube (DLT)</h3>
+  <table><tr><th>Starting size</th><td class="hl">${d} Fr <span class="sub">(${S.sex==="F"?"♀":"♂"} ${S.height} cm)</span></td></tr>
+  <tr><th>Depth</th><td class="hl">≈ ${sig(dep)} cm at mouth corner <span class="sub">(12 + height/10)</span></td></tr></table>
+  <p class="sub">♀ &lt; 160 cm 35 Fr, ≥ 160 cm 37 Fr · ♂ &lt; 170 cm 37 Fr, ≥ 170 cm 39 Fr (41 rarely needed). Height predicts size poorly in Asian patients: have one size smaller ready, and <b>always confirm with a fibreoptic scope</b>.</p>
+  <p class="sub"><b>Right DLT</b> only if the left main bronchus can't be used: left pneumonectomy, tumour or stenosis of the left main bronchus.</p>
+  <h3>Bronchial blocker instead</h3><ul><li>Difficult airway, already intubated with a single-lumen tube, or post-op ventilation planned</li>
+  <li>9 Fr blocker: <b>ETT ≥ 7.5</b> (8.0 is easier with the fibreoptic scope); 7 Fr: ETT ≥ 6.0</li></ul>
+  <h3>Confirm isolation</h3><ol>
+  <li>Inflate tracheal cuff → ventilate → both sides move and sound equal</li>
+  <li>Inflate bronchial (blue) cuff with ≤ 2 mL</li>
+  <li>Clamp each side in turn and listen: only the expected lung moves</li>
+  <li>Fibreoptic via <b>tracheal lumen</b>: carina seen; top edge of the blue cuff just below it</li>
+  <li>Fibreoptic via <b>bronchial lumen</b>: left upper lobe opening clear</li>
+  <li><b>Check again after turning lateral</b> — tubes move</li></ol>
+  <h3>Settings on one lung</h3>
+  <table><tr><th>Tidal volume</th><td class="hl">${mlr(4,6)}<div class="sub">4–6 mL/kg × PBW ${sig(pbw())} kg</div></td></tr>
+  <tr><th>PEEP</th><td>5 cmH₂O to the ventilated lung (individualise 5–10)</td></tr>
+  <tr><th>FiO₂</th><td>Start 0.8–1.0, then lower for SpO₂ ≥ 92%</td></tr>
+  <tr><th>Pressures</th><td>Peak &lt; 30; driving pressure &lt; 15 cmH₂O</td></tr>
+  <tr><th>CO₂</th><td>Accept higher CO₂; raise RR rather than TV</td></tr></table>
+  <p class="sub">End of OLV: suction, then recruit the collapsed lung under vision before returning to two-lung ventilation.</p>
+  <h3>Low SpO₂ on one lung</h3>
+  <div class="danger">Severe or sudden fall → <b>back to two-lung ventilation now</b> (tell the surgeon).</div>
+  <ol><li>FiO₂ 1.0</li><li>Fibreoptic: tube or blocker moved?</li><li>Suction the ventilated lung</li>
+  <li>Recruit the ventilated lung; adjust its PEEP</li><li><b>CPAP 5–10</b> cmH₂O to the non-ventilated lung (warn the surgeon first)</li>
+  <li>Intermittent two-lung ventilation</li><li>Surgeon clamps the pulmonary artery of the operated lung</li></ol>
+  ${src("Thoracic anaesthesia OLV reviews (Lohser; Brassard Can J Anesth 2014); Asian DLT sizing studies incl. Malaysia; Cook Arndt IFU (draft).")}</div>`; };
+
 /* MAINTENANCE */
 gaCards.tiva = () => { const W2 = wts(), w = W2.lbw;
-  return `<div class="card"><h2>1. TIVA</h2>${gaDraft()}
+  return `<div class="card"><h2>3. TIVA</h2>${gaDraft()}
   <table><tr><th>Propofol — Marsh</th><td>Plasma target: induction <b>4–6 mcg/mL</b>, maintenance <b>3–6</b>. Obese: enter <b>AdjBW ${sig(W2.adj)} kg</b>.</td></tr>
   <tr><th>Propofol — Schnider</th><td>Effect-site target: induction <b>3–5 mcg/mL</b> (step up slowly), maintenance <b>2.5–5</b>. Needs age, height, weight, sex.</td></tr>
   <tr><th>Remifentanil — Minto</th><td>Effect-site target: intubation <b>4–6 ng/mL</b>, maintenance <b>2–8</b>.</td></tr></table>
@@ -1299,19 +1410,19 @@ gaCards.tiva = () => { const W2 = wts(), w = W2.lbw;
   ${src("Association of Anaesthetists / SIVA TIVA guidance.")}</div>`; };
 gaCards.mac = () => { const a = S.age, f = Math.pow(10, -0.00269*(a-40));
   const r = (m40) => sig(m40*f);
-  return `<div class="card"><h2>2. Volatile: MAC by age</h2><p class="sub">Age ${a} y (set in the patient box)</p>${gaDraft()}
+  return `<div class="card"><h2>4. Volatile: MAC by age</h2><p class="sub">Age ${a} y (set in the patient box)</p>${gaDraft()}
   <table><tr><th>Agent</th><th>MAC at 40 y</th><th>MAC at ${a} y</th></tr>
   <tr><td>Sevoflurane</td><td>2.1%</td><td class="hl">${r(2.1)}%</td></tr>
   <tr><td>Isoflurane</td><td>1.17%</td><td class="hl">${r(1.17)}%</td></tr>
   <tr><td>Desflurane</td><td>6.6%</td><td class="hl">${r(6.6)}%</td></tr></table>
   <p class="sub">Mapleson age correction. Aim ~0.7–1.0 MAC with opioid. N₂O adds to MAC (MAC 104%).</p>${src("Mapleson 1996.")}</div>`; };
-gaCards.opioid = () => `<div class="card"><h2>3. Intra-op opioids</h2>${gaDraft()}${GT([
+gaCards.opioid = () => `<div class="card"><h2>5. Intra-op opioids</h2>${gaDraft()}${GT([
   GD("Fentanyl (top-up)",[0.5,1],"mcg","lbw",50),
   GD("Morphine",[0.1,0.15],"mg","ibw",10,"Titrate; reduce in elderly / renal"),
   GD("Ketamine (analgesic)",[0.1,0.3],"mg","ibw",50),
   GD("Magnesium (adjunct)",[30,50],"mg","ibw",null,"Over 15–20 min")])}${src(GSRC)}</div>`;
 gaCards.pressors = () => { const w = S.aw, rate = (lo,hi,conc) => `${sig(lo*w*60/conc)}–${sig(hi*w*60/conc)} mL/h`;
-  return `<div class="card"><h2>4. Vasopressors &amp; inotropes</h2>${gaDraft()}
+  return `<div class="card"><h2>6. Vasopressors &amp; inotropes</h2>${gaDraft()}
   <div style="overflow-x:auto"><table><tr><th>Drug · mix</th><th>Dose</th><th>For ${sig(w)} kg</th></tr>
   <tr><td>Ephedrine<div class="sub">30 mg in 5 mL = 6 mg/mL</div></td><td>3–6 mg bolus</td><td class="hl">0.5–1 mL</td></tr>
   <tr><td>Phenylephrine<div class="sub">10 mg in 100 mL = 100 mcg/mL</div></td><td>50–100 mcg bolus; infusion 25–100 mcg/min</td><td class="hl">0.5–1 mL; 15–60 mL/h</td></tr>
@@ -1320,12 +1431,12 @@ gaCards.pressors = () => { const w = S.aw, rate = (lo,hi,conc) => `${sig(lo*w*60
   <tr><td>Dobutamine<div class="sub">250 mg in 50 mL = 5 mg/mL</div></td><td>2–20 mcg/kg/min</td><td class="hl">${rate(2,20,5000)}</td></tr></table></div>
   <p class="sub">Infusion rates use actual weight. Check your unit's standard concentrations.</p>${src("Common UK/Malaysian ICU concentrations.")}</div>`; };
 gaCards.abx = () => { const w = S.aw;
-  return `<div class="card"><h2>5. Antibiotic prophylaxis</h2>${gaDraft()}
+  return `<div class="card"><h2>7. Antibiotic prophylaxis</h2>${gaDraft()}
   <table><tr><th>Cefazolin</th><td><b>${w>=120?"3 g":"2 g"} IV</b> (${w>=120?"≥ 120 kg":"&lt; 120 kg"}) within 60 min before incision; redose every 4 h or blood loss &gt; 1.5 L</td></tr>
   <tr><th>Penicillin allergy / MRSA</th><td>Vancomycin 15 mg/kg TBW = <b>${sig(Math.min(15*w,2000))} mg</b> over ≥ 60 min, start 60–120 min before; or clindamycin 900 mg</td></tr>
   <tr><th>Colorectal / gynae</th><td>Add metronidazole 500 mg</td></tr></table>
   ${src("ASHP/IDSA/SIS 2013; MOH Malaysia antibiotic guideline. Follow local policy.")}</div>`; };
-gaCards.txa = () => `<div class="card"><h2>6. Tranexamic acid</h2>${gaDraft()}
+gaCards.txa = () => `<div class="card"><h2>8. Tranexamic acid</h2>${gaDraft()}
   <p><b>1 g IV</b> over 10 min at induction (or 15 mg/kg = ${sig(15*S.aw)} mg). Repeat 1 g if bleeding continues or long case.</p>
   <p class="sub">Caution: recent VTE, seizure history, severe renal impairment.</p>${src("Common practice.")}</div>`;
 
@@ -1560,7 +1671,7 @@ function abxCard(paeds){
       <p class="sub">30–60 min before. AHA 2021 (clindamycin no longer recommended).</p></details>
     ${src("Malaysian National Antimicrobial Guideline 2019; ASHP/IDSA/SIS/SHEA 2013; AHA 2021 · latest available, checked Nov 2026")}`;
 }
-gaCards.abx = () => `<div class="card"><h2>5. Antibiotic prophylaxis</h2>${abxDraft()}${abxCard(false)}</div>`;
+gaCards.abx = () => `<div class="card"><h2>7. Antibiotic prophylaxis</h2>${abxDraft()}${abxCard(false)}</div>`;
 pCards.abx = () => `<div class="card"><h2>Paeds antibiotic prophylaxis</h2>${abxDraft()}${abxCard(true)}</div>`;
 
 /* ---------- DISPLAY NAME (phone only) ---------- */
@@ -1844,6 +1955,17 @@ const VALUES = [
   "Spinal: voiding required only if high risk (hernia, anorectal, urology, pelvic, retention history)",
   "Nerve block: home with protected numb limb; oral analgesia before block wears off",
   "Paeds: drinking not required; ex-prem < 60 weeks PCA overnight; tonsillectomy < 3 y / OSA overnight; paracetamol 15 mg/kg 6-hourly, ibuprofen 10 mg/kg 8-hourly"]],
+ ["Ventilation strategies (DRAFT — tick to sign off)", [
+  "PBW (ARDSNet/Devine) from sex + height: ♂ 50, ♀ 45.5 + 0.91 × (height − 152.4); TV never from actual weight",
+  "Start: TV 6–8 mL/kg PBW, PEEP 5 then individualise, RR 12–14 to EtCO₂ 35–45 mmHg, lowest FiO₂ for SpO₂ ≥ 94%",
+  "Limits: plateau < 30, driving pressure < 15 cmH₂O; mode default PCV-VG / PRVC",
+  "Laparoscopy: PEEP 8–10, RR 14–18, re-check after insufflation / position; Obese: PEEP 8–10, recruit, ramped",
+  "Asthma/COPD: RR 8–10, I:E 1:3–1:4, auto-PEEP → disconnect 10–30 s; ARDS: TV 4–6, ARDSNet lower-PEEP table (0.3→5 … 1.0→18–24), pH ≥ 7.25",
+  "Neuro: PaCO₂ 35–40 mmHg, no prophylactic hyperventilation (≤ 25 mmHg); Pregnancy GA: EtCO₂ 30–32 mmHg",
+  "Recruitment: 30–40 cmH₂O × 30 s or stepwise PEEP 5→10→15(→20); caution hypotension, pneumothorax, ICP",
+  "OLV: left DLT ♀ <160 cm 35 / ≥160 37 Fr; ♂ <170 cm 37 / ≥170 39 Fr; depth 12 + height/10 cm; confirm with fibreoptic",
+  "Blocker 9 Fr: ETT ≥ 7.5 (8.0 easier); 7 Fr: ETT ≥ 6.0",
+  "OLV settings: TV 4–6 mL/kg PBW, PEEP 5, FiO₂ 0.8–1.0 then lower, peak < 30, driving < 15; hypoxia: FiO₂ 1.0 → scope → suction → recruit/PEEP → CPAP 5–10 to non-ventilated lung → intermittent 2-lung → PA clamp"]],
  ["Sources — reviewed 14 Nov 2026 (next review Nov 2027)", [
   "UPDATED: RCUK Adult ALS 2025 (shock ≥ 150 J, lignocaine 100 mg alternative, isoprenaline 5 mcg/min) — read from the primary text",
   "UPDATED (verified): DAS 2025 intubation — CICO card: VL first-line, routine NMB, no blind SGA intubation, prepare FONA early",
@@ -1948,9 +2070,9 @@ const GROUPS = [
    {id:"ind", label:"Induction", input:()=>gaInputs(), hint:"Drugs → RSI → relaxant → tube & airway kit.",
     cards:["1. Induction drugs","2. RSI","3. Muscle relaxants","4. Tube & airway kit"],
     links:[["Failed intubation / CICO","adult","Failed intubation / CICO"],["Anaphylaxis","adult","Anaphylaxis"],["Bronchospasm","adult","Bronchospasm"]]},
-   {id:"maint", label:"Intra-op", input:()=>gaInputs(), hint:"Keep them asleep and stable.",
-    cards:["1. TIVA","2. Volatile: MAC by age","3. Intra-op opioids","4. Vasopressors & inotropes","5. Antibiotic prophylaxis","6. Tranexamic acid"],
-    links:[["Anaphylaxis","adult","Anaphylaxis"],["Malignant hyperthermia","adult","Malignant hyperthermia"],["LA toxicity (LAST)","adult","LA toxicity"],["Bradycardia & cardiac arrest","adult","Bradycardia / arrest"]]},
+   {id:"maint", label:"Intra-op", input:()=>gaInputs(), hint:"Ventilate → keep them asleep and stable.",
+    cards:["1. Ventilation strategies","2. One-lung ventilation","3. TIVA","4. Volatile: MAC by age","5. Intra-op opioids","6. Vasopressors & inotropes","7. Antibiotic prophylaxis","8. Tranexamic acid"],
+    links:[["Bronchospasm","adult","Bronchospasm"],["Anaphylaxis","adult","Anaphylaxis"],["Malignant hyperthermia","adult","Malignant hyperthermia"],["LA toxicity (LAST)","adult","LA toxicity"],["Bradycardia & cardiac arrest","adult","Bradycardia / arrest"]]},
    {id:"post", label:"Post-op", input:()=>gaInputs(), hint:"Reverse → prevent PONV → extubate → analgesia.",
     cards:["1. Reversal","2. PONV: Apfel score","3. Extubation criteria","4. Analgesia ladder & PCA",["Discharge from recovery","5. Discharge from recovery"],["Discharge home (daycare)","6. Discharge home (daycare)"]],
     links:[["Bronchospasm","adult","Bronchospasm"],["Anaphylaxis","adult","Anaphylaxis"]]}], cards:[]},
@@ -2005,7 +2127,9 @@ const SEARCH_EXTRA = {
   "6. Discharge home (daycare)":"discharge home daycare day case padss escort void voiding driving",
   "6. Discharge (recovery & home)":"discharge paeds child aldrete home ex-prem apnoea tonsillectomy",
   "6. Dermatomes & block height":"dermatome dermatomes block height level t4 t10 nipple umbilicus xiphoid bromage sensory testing cold pinprick",
-  "5. Antibiotic prophylaxis":"antibiotic prophylaxis cefazolin unasyn ampicillin sulbactam augmentin metronidazole gentamicin clindamycin vancomycin cefuroxime azithromycin endocarditis uro gynae ortho dental hpb colorectal",
+  "1. Ventilation strategies":"ventilation ventilator ventilate lung protective tidal volume tv peep recruitment recruit driving pressure plateau pcv vcv pcv-vg prvc ards asthma copd auto-peep laparoscopy trendelenburg obese neuro icp hyperventilation pregnancy lscs dopes desaturation hypoxia high airway pressure",
+  "2. One-lung ventilation":"one-lung ventilation olv dlt double-lumen double lumen tube bronchial blocker arndt thoracic vats lung isolation thoracotomy cpap",
+  "7. Antibiotic prophylaxis":"antibiotic prophylaxis cefazolin unasyn ampicillin sulbactam augmentin metronidazole gentamicin clindamycin vancomycin cefuroxime azithromycin endocarditis uro gynae ortho dental hpb colorectal",
   "13. Antibiotic prophylaxis":"antibiotic prophylaxis cefazolin unasyn metronidazole gentamicin clindamycin vancomycin paeds endocarditis",
   "4. Tube & airway kit":"ett tube endotracheal chula lma igel i-gel supraglottic laryngoscope video adult",
   "Neuraxial & deep blocks: anticoagulant timing":"anticoagulant antiplatelet clopidogrel enoxaparin clexane heparin warfarin doac rivaroxaban apixaban dabigatran asra platelets",
