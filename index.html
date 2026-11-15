@@ -365,7 +365,7 @@ a{color:var(--accent)}
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.14.1";
+const APP_VERSION = "2.14.2";
 const APP_DATE = "15 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
@@ -472,7 +472,7 @@ screens.home = () => {
   const th = store.get("theme","auto"), thLabel = th==="auto" ? "◐" : th==="dark" ? "☾" : "☀";
   const pearl = PEARLS[Math.floor(Date.now()/86400000) % PEARLS.length];
   const secs = ["ga","regional","paeds","obs","tx"].map(id=>GROUPS.find(g=>g.id===id));
-  const short = {ga:"General anaesthesia", regional:"Regional anaesthesia", paeds:"Paediatric", obs:"Obstetric", tx:"Transplant"};
+  const short = {ga:"General", regional:"Regional", paeds:"Paediatric", obs:"Obstetric", tx:"Transplant"};
   return `<section class="hero">
     <svg class="capno" viewBox="0 0 400 48" preserveAspectRatio="none" aria-hidden="true"><g class="trace"><path d="${CAPNO}"/></g></svg>
     <div class="hero-top"><span class="brand">${svg("capno")} Induction Card</span>
@@ -751,7 +751,7 @@ function pInputs(forEtt){
   const est = mo < 1 ? null : y < 1 ? [0.5*mo+4, "0.5 × months + 4"] : y <= 5 ? [2*y+8, "2 × age + 8"] : y <= 12 ? [3*y+7, "3 × age + 7"] : null;
   return `${step("pw","Weight","kg",0.4,90,0.5)}${step("pY","Age","y",0,16,1)}${step("pM","+ months","m",0,11,1)}
     ${est?`<div class="sub">Estimated weight (APLS): ${est[1]} = <b>${sig(est[0])} kg</b> <button class="iconbtn" style="height:34px;min-width:0" data-setw="${sig(est[0])}">Use</button></div>`:""}
-    ${W()>40?`<div class="warn" style="margin-bottom:0">Weight &gt; 40 kg: doses are capped at adult maximums — consider the General anaesthesia (adult) section.</div>`:""}
+    ${W()>40?`<div class="warn" style="margin-bottom:0">Weight &gt; 40 kg: doses are capped at adult maximums — consider the General (adult) section.</div>`:""}
     ${forEtt?`<div class="sub" style="margin-top:4px">Neonate &lt; 28 days: set age 0 y 0 m and enter weight.</div>`:""}`;
 }
 
@@ -2036,7 +2036,7 @@ const VALUES = [
   "PPH: oxytocin 5 IU then 40 IU/500 mL at 125 mL/h; ergometrine 500 mcg IM; carboprost 250 mcg IM q15 min max 8; misoprostol 800 mcg; TXA 1 g, repeat once",
   "Eclampsia: MgSO4 4 g over 10–15 min then 1 g/h × 24 h; recurrent 2 g; toxicity Ca gluconate 10% 10 mL; labetalol 20/40/80 mg, hydralazine 5 mg",
   "Paeds arrest: adrenaline 0.1 mL/kg 1:10 000; 4 J/kg; amiodarone 5 mg/kg (max 300); fluid 10 mL/kg; D10 2 mL/kg; CaCl 0.2 mL/kg"]],
- ["General anaesthesia (standard references)", [
+ ["General (standard references)", [
   "Weights: IBW Devine; LBW Janmahasatian; AdjBW = IBW + 0.4 × (TBW − IBW); actual used if below ideal",
   "Fasting 2 h clear / 6 h light / 8 h fatty; GLP-1 weekly hold 1 week, daily hold on day",
   "Drugs: continue β-blocker/statin etc; omit ACEi/ARB, diuretics, SU on morning; SGLT2i stop 3 days (ertugliflozin 4); basal insulin 80%",
@@ -2052,7 +2052,7 @@ const VALUES = [
   "PONV: Apfel 10/21/39/61/79%; dex 4–8 mg, ondansetron 4 mg, granisetron 1 mg, droperidol 0.625–1.25 mg",
   "Analgesia: paracetamol 1 g (15 mg/kg <50 kg); parecoxib 40 mg; tramadol 50–100 mg; PCA morphine 1 mg/5 min; fentanyl 10–20 mcg/5 min",
   "Anticoagulant timing (ASRA 2018) table as shown in Regional › Anticoagulants; platelets ≥80 (obstetric ≥70)"]],
- ["Regional anaesthesia (standard sources)", [
+ ["Regional (standard sources)", [
   "LA max adult: lignocaine 3 mg/kg (200 mg), + adrenaline 7 mg/kg (500 mg), bupi/levobupi 2 mg/kg (150 mg), ropi 3 mg/kg (225 mg); LBW if BMI ≥ 30; paeds bupi 2.5 mg/kg",
   "Calculator combines drugs as % of each maximum; amber > 80%, red > 100%",
   "Block solution: bupi/levobupi 0.5% surgical, 0.25% analgesia",
@@ -2204,7 +2204,7 @@ const GROUPS = [
  {id:"emerg", name:"Emergencies", sub:"Adult & obstetric · Paeds — crisis steps with doses", tabKey:"emTab", tabs:[
    {id:"adult", label:"Adult / Obstetric", input:()=>step("aw","Weight","kg",30,200,1), cards:EMERG_ADULT},
    {id:"paeds", label:"Paeds", input:()=>pInputs(), cards:EMERG_PAEDS}], cards:[]},
- {id:"ga", name:"General anaesthesia", sub:"Pre-op · Induction · Intra-op · Post-op", tabKey:"gaTab", tabs:[
+ {id:"ga", name:"General", sub:"Pre-op · Induction · Intra-op · Post-op", tabKey:"gaTab", tabs:[
    {id:"pre", label:"Pre-op", input:()=>gaInputs(), hint:"Before the day: fasting, drugs, steroids, airway plan.",
     cards:["1. Fasting","2. Regular drugs: stop or continue","3. Steroid cover","4. Airway assessment & plan"],
     links:[["Failed intubation / CICO","adult","Failed intubation / CICO"]]},
@@ -2217,7 +2217,7 @@ const GROUPS = [
    {id:"post", label:"Post-op", input:()=>gaInputs(), hint:"Reverse → prevent PONV → extubate → analgesia.",
     cards:["1. Reversal","2. PONV: Apfel score","3. Extubation criteria","4. Analgesia ladder & PCA",["Discharge from recovery","5. Discharge from recovery"],["Discharge home (daycare)","6. Discharge home (daycare)"]],
     links:[["Bronchospasm","adult","Bronchospasm"],["Anaphylaxis","adult","Anaphylaxis"]]}], cards:[]},
- {id:"regional", name:"Regional anaesthesia", sub:"Safety · Neuraxial · Upper · Lower · Trunk", tabKey:"raTab", tabs:[
+ {id:"regional", name:"Regional", sub:"Safety · Neuraxial · Upper · Lower · Trunk", tabKey:"raTab", tabs:[
    {id:"safety", label:"Safety", input:()=>gaInputs(), hint:"Before every block: dose limits, checklist, anticoagulants.",
     cards:[["LA dose calculator","1. LA dose calculator"],["Stop Before You Block & safe injection","2. Stop Before You Block"],["Neuraxial & deep blocks: anticoagulant timing","3. Anticoagulant timing"]],
     links:[["LA toxicity (LAST)","adult","LA toxicity"]]},
@@ -2332,6 +2332,7 @@ function groupScreen(g){
   return head(g.name,"home",g.id) + (g.calc ? g.calc() : "") + (g.weight ? `<div class="card">${pInputs()}</div>` : "") +
     (g.cards.length?`<div class="hint">Tap a heading to open it.</div>`:"") + acc(g.cards) + disc;
 }
+const GKW = {ga:" ga general anaesthesia anesthesia", regional:" ra regional anaesthesia anesthesia block"};
 function searchIndex(){
   if (searchIndex.cache) return searchIndex.cache;
   const m = cardMap(), idx = [], seen = {};
@@ -2339,7 +2340,7 @@ function searchIndex(){
   for (const g of order){
     if (CALC_TITLES[g.id]) idx.push({t:CALC_TITLES[g.id], g:g.id, calc:true, tab:g.id==="regional"?"neuraxial":(g.tabs?g.tabs[0].id:null), text:(CALC_TITLES[g.id]+" "+CALC_KW[g.id]).toLowerCase()});
     const lists = g.tabs ? g.tabs.map(t=>[t.id,t.cards]) : [[null,g.cards]];
-    for (const [tab,list] of lists) for (const it of list){ const [o,t] = Array.isArray(it) ? it : [it,it]; if (seen[t] || !m[o]) continue; seen[t]=1; idx.push({t, g:g.id, tab, text:(t+" "+o+" "+m[o].textContent+" "+(SEARCH_EXTRA[t]||"")+(g.id==="emerg"?" emergency crisis":"")).toLowerCase()}); }
+    for (const [tab,list] of lists) for (const it of list){ const [o,t] = Array.isArray(it) ? it : [it,it]; if (seen[t] || !m[o]) continue; seen[t]=1; idx.push({t, g:g.id, tab, text:(t+" "+o+" "+m[o].textContent+" "+(SEARCH_EXTRA[t]||"")+(g.id==="emerg"?" emergency crisis":"")+(GKW[g.id]||"")).toLowerCase()}); }
   }
   return (searchIndex.cache = idx);
 }
@@ -2370,7 +2371,7 @@ function renderNow(){
   const app = $("#app"), active = document.activeElement && document.activeElement.dataset ? document.activeElement.dataset.in : null;
   const y = window.scrollY;
   app.dataset.group = h.startsWith("g-") ? h.slice(2) : "";
-  const navItems = [["home","Home","search","home"],["g-emerg","Emergencies","emerg","emerg"],["g-ga","General anaesthesia","ga","ga"],["g-regional","Regional anaesthesia","regional","regional"],["g-paeds","Paediatric","paeds","paeds"],["g-obs","Obstetric","obs","obs"],["g-tx","Transplant","tx","tx"],["values","Values sheet","values","values"]];
+  const navItems = [["home","Home","search","home"],["g-emerg","Emergencies","emerg","emerg"],["g-ga","General","ga","ga"],["g-regional","Regional","regional","regional"],["g-paeds","Paediatric","paeds","paeds"],["g-obs","Obstetric","obs","obs"],["g-tx","Transplant","tx","tx"],["values","Values sheet","values","values"]];
   const nav = `<nav class="sidenav" aria-label="Sections"><div class="snbrand">${svg("capno")} Induction Card</div>${navItems.map(([hh,l,ic,cls])=>`<button class="snitem sn-${cls} ${h===hh||(hh==="home"&&!h.startsWith("g-")&&h!=="values")?"on":""}" data-go="${hh}"><span class="snico">${svg(ic)}</span>${l}</button>`).join("")}
     <div class="snkeys">Keys: <b>/</b> search · <b>Esc</b> back · <b>1–5</b> tabs</div></nav>`;
   app.innerHTML = `<div class="shell">${nav}<div class="content">${html}</div></div>`;
