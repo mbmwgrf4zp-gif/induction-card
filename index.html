@@ -90,6 +90,8 @@
 [data-group="regional"]{--gc:var(--g-spinal);--gc-soft:var(--g-spinal-soft)}
 
 *{box-sizing:border-box}
+html{touch-action:manipulation}
+button,input,select,summary,a,label{touch-action:manipulation}
 html,body{margin:0;background:var(--bg);color:var(--ink);
   font:400 var(--fs-base)/1.5 var(--font-sans);-webkit-text-size-adjust:100%}
 body{padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom)}
@@ -405,7 +407,7 @@ a{color:var(--accent)}
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.20.1";
+const APP_VERSION = "2.20.2";
 const APP_DATE = "15 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
