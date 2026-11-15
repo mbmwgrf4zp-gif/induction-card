@@ -365,7 +365,7 @@ a{color:var(--accent)}
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.14.2";
+const APP_VERSION = "2.15.0";
 const APP_DATE = "15 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
@@ -382,7 +382,7 @@ const store = {
 };
 // Inputs are not remembered between uses (per plan): state lives in memory only.
 const S = { ettMode:"adult", sex:"F", height:158, ageY:4, ageM:0, wt:3.0,
-            touched:{}, sc:{}, fastH:6, hbNow:12, hbLow:8, hbTarget:10, derm:"", abxSp:"general", spOp:"lscs", spHt:155, morWt:60, pw:10, pY:1, pM:0, pHt:75, pBE:-5, aw:70, emTab:"adult", obTab:"labour", pTab:"pre", gaTab:"pre", raTab:"safety", laA:[], laP:[], cSex:"F", cY:40, cM:0, cH:160, cW:60, cNick:"", laD:"bupi", laC:"0.5", laMl:15, laBi:"1", age:45, apfel:0, pump:"pcea_cse", topup:"lig", ventSc:"std", vfio:"", txTab:"rec", txck:{} };
+            touched:{}, sc:{}, fastH:6, hbNow:12, hbLow:8, hbTarget:10, derm:"", abxSp:"general", spOp:"lscs", spHt:155, morWt:60, pw:10, pY:1, pM:0, pHt:75, pBE:-5, aw:70, emTab:"adult", obTab:"labour", pTab:"pre", gaTab:"pre", raTab:"safety", laA:[], laP:[], cSex:"F", cY:40, cM:0, cH:160, cW:60, cNick:"", laD:"bupi", laC:"0.5", laMl:15, laBi:"1", age:45, apfel:0, pump:"pcea_cse", topup:"lig", ventSc:"std", vfio:"", txTab:"pre", txck:{}, k:4.5, hb:100, todayWt:70, hdH:12 };
 
 function src(text){ return `<div class="src">Source: ${text}</div>`; }
 function protoSrc(){
@@ -395,7 +395,7 @@ function seg(key, opts){
   return `<div class="seg">` + opts.map(([v,l]) =>
     `<button aria-pressed="${S[key]===v}" data-seg="${key}" data-val="${v}">${l}</button>`).join("") + `</div>`;
 }
-const SAMPLE_KEYS = ["height","aw","age","pw","pY","pM","spHt","morWt","sex"];
+const SAMPLE_KEYS = ["height","aw","age","pw","pY","pM","spHt","morWt","sex","k","hb","todayWt","hdH"];
 const isSample = k => SAMPLE_KEYS.includes(k) && !S.touched[k];
 function step(key, label, unit, min, max, stp){
   return `<div class="step ${isSample(key)?"sample":""}"><label for="in-${key}">${label}${isSample(key)?` <span class="stag">sample</span>`:""}</label>
@@ -1417,67 +1417,158 @@ gaCards.olv = () => { const d = dltSize(), dep = 12 + S.height/10;
   <li>Intermittent two-lung ventilation</li><li>Surgeon clamps the pulmonary artery of the operated lung</li></ol>
   ${src("Thoracic anaesthesia OLV reviews (Lohser; Brassard Can J Anesth 2014); Asian DLT sizing studies incl. Malaysia; Cook Arndt IFU (draft).")}</div>`; };
 
-/* ---------- TRANSPLANT (kidney) — DRAFT: local renal transplant protocol 1st ed.; Mayhew BJA Educ 2016; Jaszczuk J Clin Med 2022 ---------- */
-const TX_CHECKED = true;
+/* ---------- TRANSPLANT (kidney) — local renal transplant protocol 1st ed.; Mayhew BJA Educ 2016; Jaszczuk J Clin Med 2022 ---------- */
+const TX_CHECKED = true;    // v2.14 content (signed off 15 Nov 2026)
+const TX2_CHECKED = false;  // v2.15 expansion: GA-style calculations, detailed pre-op
 const TXP = "local renal transplant protocol (1st ed.)";
-const txDraft = () => TX_CHECKED ? "" : `<div class="warn" style="margin-top:0">DRAFT — from the ${TXP}; extra drug notes verified from two sources each. Not yet ticked by you.</div>`;
+const txDraft = () => TX_CHECKED ? "" : `<div class="warn" style="margin-top:0">DRAFT — from the ${TXP}. Not yet ticked by you.</div>`;
+const tx2Draft = () => TX2_CHECKED ? "" : `<div class="warn" style="margin-top:0">DRAFT — kidney transplant expansion (Nov 2026): ${TXP} + GA calculations with renal adjustments, verified from two sources. Not yet ticked by you.</div>`;
 const txBox = () => `<div class="danger"><b>Immunosuppressants:</b> the nephrologist hands the renal box to the anaesthetist <b>doctor-to-doctor — never through nurses</b>.</div>`;
 const txW = () => S.aw;
+const kHigh = () => isSample("k") || S.k >= 5.5;           // unknown counts as high
+const kTxt = () => isSample("k") ? "K⁺ not entered" : `K⁺ ${S.k}`;
 const mann = w => `${sig(0.5*w)} g = <b>${sig(2.5*w)} mL</b> of 20%`;
 const txCards = {};
-function txInputs(){ return step("aw","Dry weight (post-HD)","kg",30,200,1); }
-txCards.pre = () => { const w = txW();
-  return `<div class="card"><h2>1. Pre-op check</h2>${txDraft()}
-  <ul><li><b>Last dialysis</b>: when, how much fluid off (UF), dry weight; ideally dialysed close to theatre</li>
-  <li><b>K⁺</b>, Hb, acid–base, glucose; fluid status; residual urine from native kidneys</li>
-  <li><b>AV fistula arm</b>: no cuff, no lines, pad and protect</li>
-  <li><b>Venous access</b>: scan the neck veins. Both IJVs thrombosed / femoral line needed → <b>MUST discuss with nephrologist / urologist</b> (side opposite the graft). Interventional radiology if access is hard</li>
-  <li>No URTI / UTI / infection in the preceding 2 weeks</li>
-  <li>Comorbidity: hypertension, coronary disease, vascular disease, diabetes; anaemia; delayed gastric emptying</li>
-  <li>Drugs: usual medications <b>except oral hypoglycaemics</b>; antihypertensives may be held (per ward BP). Immunosuppression usually started by the transplant team</li>
-  <li>Cross-match still needed (rarely transfused)</li></ul>
-  <h3>Deceased-donor (cadaveric) recipient</h3>
+function txInputs(pre){
+  const W2 = wts();
+  return seg("sex",[["F","♀ Female"],["M","♂ Male"]]) + step("height","Height","cm",130,210,1) + step("aw","Dry weight (post-HD)","kg",30,200,1) + step("age","Age","y",16,100,1)
+    + step("k","K⁺","mmol/L",2.5,8,0.1) + step("hb","Hb","g/L",40,180,1)
+    + (pre ? step("todayWt","Today's weight","kg",30,220,0.5) + step("hdH","Hours since last HD","h",0,120,1) : "")
+    + `<div class="chips" style="margin-top:var(--s2)"><span class="chip" style="cursor:default">BMI <b>${sig(W2.bmi)}</b></span>
+      <span class="chip" style="cursor:default">IBW <b>${sig(W2.ibw)}</b> kg</span><span class="chip" style="cursor:default">LBW <b>${sig(W2.lbw)}</b> kg</span>
+      <span class="chip" style="cursor:default">AdjBW <b>${sig(W2.adj)}</b> kg</span></div>`
+    + (!isSample("k") && S.k >= 5.5 ? `<div class="danger" style="margin:var(--s2) 0 0">K⁺ ${S.k} ≥ 5.5: no suxamethonium · 0.9% saline · discuss dialysis.</div>` : "")
+    + (!isSample("hb") && S.hb < 70 ? `<div class="danger" style="margin:var(--s2) 0 0">Hb ${S.hb} &lt; 70: discuss transfusion with nephrology (leucocyte filter).</div>` : "");
+}
+/* Pre-op top: discuss-before-proceeding */
+function txFlags(){
+  const f = [], gain = S.todayWt - S.aw;
+  if (!isSample("k") && S.k >= 5.5) f.push(`K⁺ ${S.k} mmol/L (≥ 5.5): dialyse / discuss before induction`);
+  else if (!isSample("k") && S.k >= 5) f.push(`K⁺ ${S.k} mmol/L (5.0–5.4): dialyse if there is time or delayed-graft-function risk`);
+  if (!isSample("hb") && S.hb < 70) f.push(`Hb ${S.hb} g/L (&lt; 70): discuss transfusion with nephrology`);
+  if (S.touched.todayWt && S.touched.aw && gain > 2) f.push(`${sig(gain)} kg above dry weight: likely fluid overloaded`);
+  if (S.touched.hdH && S.hdH > 24) f.push(`Last HD ${S.hdH} h ago: repeat K⁺, discuss dialysis`);
+  return `<div class="danger"><b>Discuss before proceeding</b>${f.length ? `<ul style="margin:6px 0 0">${f.map(x=>`<li><b>${x}</b></li>`).join("")}</ul>` : ""}
+    <div style="margin-top:6px;font-size:var(--fs-sm)">K⁺ ≥ 5.5 · pulmonary oedema / needs O₂ · active infection or URTI/UTI in last 2 weeks · recent chest pain, new ECG change or cardiac event · Hb &lt; 70, low platelets or abnormal clotting · both IJVs thrombosed</div></div>`;
+}
+const TX_WORKUP = [
+  ["Immunology","HLA crossmatch, HLA typing, T-cell flow cytometry, ABO; transfusion history"],
+  ["Infection","HBV, HCV, HIV, VDRL, CMV, toxo, EBV, VZV, HSV 1/2, TB QuantiFERON, parvovirus"],
+  ["Cardiac","CXR, ECG, echo, exercise test / CTCA or coronary angiogram, cardiologist input"],
+  ["Respiratory","Spirometry"],["Imaging","USG KUB, Doppler pelvis, MCUG, CTU"],
+  ["Bloods","FBC, coagulation, FBS, HbA1c, lipids, RP, uric acid, LFT, Ca, PO₄, iPTH, T4/TSH, ferritin, TIBC, TSAT, FBP (if indicated)"],
+  ["Other","Psychiatry and dental clearance, OGDS"],["Crossmatch","Group & crossmatch sent (rarely transfused)"]];
+txCards.work = () => { const n = TX_WORKUP.filter((_,i)=>S.txck["w"+i]).length;
+  return `<div class="card"><h2>Kidney: workup checklist</h2>${tx2Draft()}
+  <div class="txck">${TX_WORKUP.map(([h,t],i)=>{ const on = S.txck["w"+i]; return `<button class="txci ${on?"on":""}" data-txck="w${i}" aria-pressed="${!!on}"><span class="box">${on?"✓":""}</span><span><b>${h}</b> — ${t}</span></button>`; }).join("")}</div>
+  <div class="${n===TX_WORKUP.length?"result ok":"sub"}" style="margin-top:var(--s2)">${n} / ${TX_WORKUP.length} done${n===TX_WORKUP.length?" ✓":""}. Ticks clear when you leave this section.</div>
+  <p class="sub">No URTI / UTI / infection in the preceding 2 weeks.</p>${src(TXP+" (draft).")}</div>`; };
+txCards.dial = () => { const gain = S.todayWt - S.aw;
+  return `<div class="card"><h2>Kidney: dialysis &amp; fluid status</h2>${tx2Draft()}
+  <table><tr><th>Above dry weight</th><td class="${gain>2?"hl":""}">${S.touched.todayWt?`<b>${gain>=0?"+":""}${sig(gain)} kg</b> (today ${sig(S.todayWt)} − dry ${sig(S.aw)})${gain>2?" — <b>&gt; 2 kg: likely overloaded, careful fluids</b>":""}`:"Enter today's weight in the patient box"}</td></tr>
+  <tr><th>Last HD</th><td>${S.touched.hdH?`<b>${S.hdH} h ago</b>${S.hdH>24?" — <b>&gt; 24 h: repeat K⁺, discuss dialysis</b>":""}`:"Enter hours since last HD"}</td></tr>
+  <tr><th>K⁺</th><td>${isSample("k")?"<b>Not entered — treat as unknown/high</b>":`<b>${S.k}</b> mmol/L ${S.k>=5.5?"— dialyse / discuss first":S.k>=5?"— dialyse if time or graft risk":"— acceptable"}`}</td></tr></table>
+  <ul><li>Ideally dialysed close to theatre time; well hydrated, not dry</li>
+  <li>Volume removed (UF) at last HD; post-HD K⁺ if available</li>
+  <li><b>Heparin during HD?</b> If within the last ~4 h: check APTT before the CVC; scan-guided, compressible site</li>
+  <li><b>Residual urine</b> (mL/day) from native kidneys — so PACU urine isn't all credited to the graft</li>
+  <li>Acid–base: low bicarbonate / pH raises K⁺ risk intra-op</li></ul>
+  ${src(TXP+"; Edinburgh renal unit ESKD surgery guidance; Frontiers Surg 2025 (intra-op hyperkalaemia risk) (draft).")}</div>`; };
+txCards.cardiac = () => `<div class="card"><h2>Kidney: cardiac risk</h2>${tx2Draft()}
+  <p class="sub">End-stage kidney disease = high risk of silent coronary disease.</p>
+  <table><tr><th>Functional capacity</th><td>≥ 4 METs (2 flights of stairs)? Diabetics may have no angina</td></tr>
+  <tr><th>Echo</th><td>EF, LVH, valves (calcification), pericardial effusion, PA pressure. <b>EF &lt; 40% or pulmonary hypertension → cardiac-output monitoring, slow fluids</b></td></tr>
+  <tr><th>Ischaemia</th><td>Exercise test / CTCA / coronary angiogram result; cardiologist input (protocol)</td></tr>
+  <tr><th>Continue</th><td>Beta-blocker, statin</td></tr></table>
+  <p class="sub">ECG: LVH, ischaemia, hyperkalaemia changes (peaked T, wide QRS).</p>
+  ${src(TXP+"; Mayhew BJA Education 2016 (draft).")}</div>`;
+txCards.asp = () => `<div class="card"><h2>Kidney: airway &amp; aspiration</h2>${tx2Draft()}
+  <ul><li>Diabetic / uraemic gastric delay → <b>RSI</b></li>
+  <li>Fasting per GA rules (deceased-donor recipients often arrive non-fasted: RSI)</li>
+  <li>Antacid: <b>omeprazole 20 mg PO</b> morning, or ranitidine <b>150 mg once</b> (renal dose — not twice daily)</li>
+  <li>Fistula arm marked and protected; IV access difficulty noted (scan, interventional radiology)</li></ul>
+  <button class="homebtn" data-open="1. Fasting" data-g="ga" data-tab="pre">Fasting → General › Pre-op ›</button>
+  <button class="homebtn" data-open="4. Airway assessment & plan" data-g="ga" data-tab="pre">Airway assessment → General › Pre-op ›</button>
+  ${src(TXP+"; BNF ranitidine renal dosing; standard references (draft).")}</div>`;
+txCards.meds = () => `<div class="card"><h2>Kidney: drugs stop or continue</h2>${tx2Draft()}
+  <table><tr><th>Stop</th><td><b>Oral hypoglycaemics</b> (protocol); SGLT2 inhibitors 3 days before (ertugliflozin 4)</td></tr>
+  <tr><th>Antihypertensives</th><td>Per ward BP — usually given until the day before (protocol). ACEi / ARB: omit on the morning</td></tr>
+  <tr><th>Continue</th><td>Beta-blocker, statin</td></tr>
+  <tr><th>Insulin</th><td>Basal: <b>80%</b> of usual dose; short-acting omitted while fasting; glucose 6–10 mmol/L (VRII if needed)</td></tr>
+  <tr><th>Antiplatelets / anticoagulants</th><td>Discuss with transplant team</td></tr>
+  <tr><th>Omit morning</th><td>EPO, phosphate binders, calcium tablets</td></tr>
+  <tr><th>Immunosuppression</th><td>Started by the transplant team — not by us</td></tr></table>
+  <button class="homebtn" data-open="2. Regular drugs: stop or continue" data-g="ga" data-tab="pre">Full drug list → General › Pre-op ›</button>
+  ${src(TXP+"; CPOC 2021; FDA SGLT2i advice (draft).")}</div>`;
+txCards.dd = () => `<div class="card"><h2>Kidney: deceased-donor / emergency recipient</h2>${tx2Draft()}
   <ul><li>Same plan as living-donor recipient</li><li>On-call MO reviews <b>all listed recipients</b>; discuss with the OT specialist on call</li>
-  <li>Emergency: may not be fully worked up — check new or worse comorbidity, time of last dialysis, K⁺, fasting</li>
-  <li>Note donor factors (e.g. donor hypertension → graft expects a higher MAP)</li></ul>
-  <button class="emlink" data-open="Hyperkalaemia" data-g="emerg" data-tab="adult">⚠ Hyperkalaemia → Emergencies</button>
-  ${src(TXP+"; Mayhew BJA Education 2016 (draft).")}</div>`; };
-txCards.ind = () => { const w = txW();
-  return `<div class="card"><h2>2. Induction &amp; lines</h2>${txDraft()}
-  <table><tr><th>Induction</th><td>Standard; <b>RSI preferable</b> (delayed gastric emptying). Propofol 1–2 mg/kg titrated = <b>${sig(w)}–${sig(2*w)} mg</b></td></tr>
-  <tr><th>Relaxant</th><td><b>Atracurium</b> (Hofmann elimination). Suxamethonium: single dose only if K⁺ normal — avoid if K⁺ raised</td></tr>
-  <tr><th>Airway</th><td>ETT, IPPV, NG tube</td></tr>
-  <tr><th>CVC</th><td>Triple-lumen, <b>right IJV preferred — scan for thrombosis first</b>. No double-lumen unless discussed with nephrologist</td></tr>
-  <tr><th>Arterial line</th><td>Invasive BP; <b>not on the fistula arm</b></td></tr>
+  <li>May not be fully worked up: new or worse comorbidity, last dialysis, K⁺, fasting</li>
+  <li>Donor factors: donor hypertension → graft expects a higher MAP; long cold ischaemia → delayed graft function likely</li></ul>
+  ${src(TXP+" (draft).")}</div>`;
+/* Induction */
+txCards.drugs = () => `<div class="card"><h2>Kidney: induction drugs</h2>${tx2Draft()}${GT([
+  GD("Propofol 1%",[1,2],"mg","lbw",10,"Protocol: 1–2 mg/kg, titrate"),
+  GD("Fentanyl",[1,3],"mcg","lbw",50),
+  GD("Ketamine",[1,2],"mg","lbw",50,"If unstable"),
+  GD("Midazolam",0.02,"mg","lbw",1,"Small dose only — active metabolite accumulates",2)])}
+  <p class="sub">Uraemia, anaemia and acidosis increase sensitivity: titrate slowly.</p>${src(GSRC+" Renal: midazolam metabolite accumulation (draft).")}</div>`;
+txCards.rsi = () => { const W2 = wts(), hi = kHigh();
+  return `<div class="card"><h2>Kidney: RSI &amp; relaxant plan</h2>${tx2Draft()}
+  <p class="sub">${kTxt()} — ${hi?"<b>rocuronium RSI</b>":"suxamethonium acceptable"}</p>
+  <div class="row">
+    <div class="result" style="margin:0;${hi?"opacity:.45":""}"><div class="sub">Suxamethonium 1.5 mg/kg · TBW ${sig(W2.tbw)} kg ${hi?"— <b>NOT if K⁺ ≥ 5.5 / unknown</b>":""}</div><div class="big">${sig(1.5*W2.tbw)} mg</div><div class="sub">${sig(1.5*W2.tbw/50)} mL of 50 mg/mL · raises K⁺ ≈ 0.5 · single dose only</div></div>
+    <div class="result" style="margin:0"><div class="sub">Rocuronium 1.2 mg/kg · IBW ${sig(W2.ibw)} kg</div><div class="big">${sig(1.2*W2.ibw)} mg</div><div class="sub">${sig(1.2*W2.ibw/10)} mL of 10 mg/mL</div>
+      <div class="danger" style="margin-bottom:0">Sugammadex not recommended in kidney failure — <b>CICO rescue only</b>: 16 mg/kg TBW = ${sig(16*W2.tbw)} mg (${sig(16*W2.tbw/100)} mL)</div></div></div>
+  ${GT([GD("Atracurium (intubation, non-RSI)",0.5,"mg","ibw",10,"Hofmann — not prolonged in renal failure"),
+        GD("Atracurium top-up",[0.1,0.15],"mg","ibw",10),
+        GD("Cisatracurium",0.15,"mg","ibw",2,"Alternative")])}
+  <p class="sub">Infusion: see Intra-op › Syringes. <b>Avoid vecuronium and pancuronium</b> (renal clearance). Keep fully relaxed during the anastomosis and retractor removal.</p>
+  ${src(GSRC+" Suxamethonium and sugammadex UK product labels (draft).")}</div>`; };
+txCards.tube = () => { const pe = sig(S.height/10);
+  return `<div class="card"><h2>Kidney: tube, NG &amp; CVC</h2>${tx2Draft()}${ettCalc(true, true)}
+  <h3>Also</h3><table><tr><th>NG tube</th><td>Size 14–16 Fr after intubation</td></tr>
+  <tr><th>CVC (triple-lumen, R-IJV)</th><td class="hl">≈ ${pe} cm at skin <span class="sub">(Peres: height/10)</span></td></tr></table>
+  <p class="sub">Scan the IJV for thrombosis first. Formula tends to over-insert (less accurate in women and BMI &gt; 35): <b>confirm tip on CXR</b>. No double-lumen unless discussed with nephrologist.</p>
+  ${src("Chula formula; Peres 1990 + validation studies (Cureus 2022, BJA 2017) (draft).")}</div>`; };
+txCards.lines = () => `<div class="card"><h2>Kidney: lines, monitoring &amp; antibiotic</h2>${tx2Draft()}
+  <table><tr><th>Arterial line</th><td>Invasive BP; <b>not on the fistula arm</b></td></tr>
+  <tr><th>CVC</th><td>Triple-lumen, R-IJV preferred (scan); both IJVs thrombosed → <b>discuss with nephrologist / urologist</b> (femoral on the side opposite the graft)</td></tr>
+  <tr><th>Monitoring</th><td>Standard + temperature, urine output, ± TOF, ± BIS (uraemic patients are sensitive)</td></tr>
+  <tr><th>Fistula arm</th><td>No cuff, no lines; pad and protect; check thrill at end</td></tr>
   <tr><th>Antibiotic</th><td>Cefuroxime <b>1.5 g IV</b> (sent from ward) or equivalent</td></tr></table>
-  <h3>Drugs in kidney failure</h3><ul>
-  <li><b>Atracurium / cisatracurium</b> preferred — not prolonged in end-stage renal failure</li>
-  <li><b>Suxamethonium</b> raises K⁺ ≈ 0.5 mmol/L: single dose acceptable only if K⁺ normal; no repeat doses</li>
-  <li><b>Sugammadex</b>: not recommended if CrCl &lt; 30 mL/min or on dialysis (product label)</li>
-  <li><b>Morphine</b>: active metabolites accumulate → fentanyl preferred; small doses only</li>
-  <li><b>No NSAIDs</b>; avoid nephrotoxins (gentamicin, contrast) unless agreed with nephrology</li></ul>
-  ${src(TXP+"; suxamethonium and sugammadex UK product labels; Hofmann-elimination reviews (draft).")}</div>`; };
-txCards.maint = () => { const w = txW(), nor = (lo,hi) => `${sig(lo*w*60/80)}–${sig(hi*w*60/80)} mL/h`;
-  return `<div class="card"><h2>3. Maintenance &amp; syringes</h2>${txDraft()}
-  <ul><li>Standard monitoring + temperature, urine output, invasive BP, ± neuromuscular monitoring</li>
-  <li><b>Good muscle relaxation</b>, especially during the vascular anastomosis and retractor removal</li>
-  <li>Analgesia: fentanyl infusion ± morphine</li><li>Position supine (Gibson incision)</li></ul>
-  <h3>Standard syringes (dry weight ${sig(w)} kg)</h3>
-  <table><tr><th>Fentanyl</th><td>10 mcg/mL, 50 mL syringe</td></tr>
-  <tr><th>Atracurium</th><td>10 mg/mL, 20 mL — infusion 0.3–0.6 mg/kg/h = <b>${sig(0.03*w)}–${sig(0.06*w)} mL/h</b></td></tr>
-  <tr><th>Noradrenaline</th><td>4 mg / 50 mL (80 mcg/mL) — 0.05–0.3 mcg/kg/min = <b>${nor(0.05,0.3)}</b></td></tr>
-  <tr><th>Mannitol 20%</th><td>0.5 g/kg = ${mann(w)} via infusion pump (see card 5)</td></tr></table>
-  ${src(TXP+"; atracurium product label (draft).")}</div>`; };
-txCards.haem = () => { const w = txW();
-  return `<div class="card"><h2>4. BP &amp; fluids</h2>${txDraft()}
-  <table><tr><th>BP target</th><td class="hl">Patient's own baseline (often 140–150 / 80–90). Highest need at <b>reperfusion</b></td></tr>
-  <tr><th>Pressor</th><td><b>Noradrenaline first choice</b>; boluses / infusion as needed after optimising depth and volume</td></tr>
-  <tr><th>Fluid ceiling</th><td class="hl">Up to 30 mL/kg/h = <b>${sig(30*w)} mL/h</b></td></tr>
-  <tr><th>Which fluid</th><td>Balanced crystalloid (Sterofundin) if K⁺ normal; <b>0.9% saline if K⁺ high</b>. Human albumin 5% if hypoalbuminaemic / during resuscitation</td></tr></table>
-  <ul><li>The graft is cold, ischaemic and vasospastic: it needs a <b>high perfusion pressure</b>; a hypertensive donor's kidney expects a higher MAP</li>
-  <li><b>As much as required, as little as possible.</b> Caution with poor cardiac function; consider cardiac-output monitoring for goal-directed fluids</li>
-  <li>Large saline volumes: hyperchloraemic acidosis can raise K⁺ and reduce graft perfusion</li></ul>
-  <div class="danger"><b>Blood: discuss with nephrology first.</b> Transfuse through a <b>leucocyte filter</b> (available in OT); irradiated if available. Rarely needed unless Hb &lt; 70 g/L.</div>
+  ${src(TXP+" (draft).")}</div>`;
+/* Intra-op */
+txCards.maint = () => { const a = S.age, f = Math.pow(10, -0.00269*(a-40)), r = m => sig(m*f);
+  return `<div class="card"><h2>Kidney: maintenance</h2>${tx2Draft()}
+  <h3>Volatile (MAC at ${a} y)</h3><table><tr><td>Sevoflurane</td><td class="hl">${r(2.1)}%</td><td class="sub">Fine with fresh gas ≥ 1 L/min</td></tr>
+  <tr><td>Isoflurane</td><td class="hl">${r(1.17)}%</td><td></td></tr><tr><td>Desflurane</td><td class="hl">${r(6.6)}%</td><td></td></tr></table>
+  <h3>or TIVA</h3><p>Propofol TCI (Marsh / Schnider) — targets as General › Intra-op › TIVA. Use processed EEG.</p>
+  <ul><li>Fentanyl infusion (see Syringes) ± small morphine</li><li>Good relaxation throughout the vascular anastomosis</li><li>Supine, Gibson incision; warm (forced air, fluid warmer)</li></ul>
+  <button class="homebtn" data-open="3. TIVA" data-g="ga" data-tab="maint">TIVA targets → General › Intra-op ›</button>
+  ${src("Mapleson 1996; "+TXP+" (draft).")}</div>`; };
+txCards.syr = () => { const w = txW(), W2 = wts(), nor = (lo,hi) => `${sig(lo*w*60/80)}–${sig(hi*w*60/80)} mL/h`;
+  return `<div class="card"><h2>Kidney: syringes &amp; infusions</h2>${tx2Draft()}
+  <table><tr><th>Fentanyl 10 mcg/mL (50 mL)</th><td>0.5–2 mcg/kg/h · LBW ${sig(W2.lbw)} kg = <b>${sig(0.05*W2.lbw)}–${sig(0.2*W2.lbw)} mL/h</b></td></tr>
+  <tr><th>Atracurium 10 mg/mL (20 mL)</th><td>0.3–0.6 mg/kg/h = <b>${sig(0.03*w)}–${sig(0.06*w)} mL/h</b></td></tr>
+  <tr><th>Noradrenaline 4 mg/50 mL (80 mcg/mL)</th><td>0.05–0.3 mcg/kg/min = <b>${nor(0.05,0.3)}</b></td></tr>
+  <tr><th>Mannitol 20%</th><td>0.5 g/kg = ${mann(w)} via infusion pump</td></tr></table>
+  <p class="sub">Dry weight ${sig(w)} kg unless stated.</p>${src(TXP+"; atracurium product label; standard fentanyl infusion ranges (draft).")}</div>`; };
+txCards.bp = () => `<div class="card"><h2>Kidney: BP target &amp; pressors</h2>${tx2Draft()}
+  <table><tr><th>Target</th><td class="hl">Patient's own baseline (often 140–150 / 80–90); highest need at <b>reperfusion</b></td></tr>
+  <tr><th>First choice</th><td><b>Noradrenaline</b> (bolus or infusion) after depth and volume are optimised</td></tr>
+  <tr><th>Why</th><td>Cold, ischaemic, vasospastic graft needs high perfusion pressure; a hypertensive donor's kidney expects a higher MAP</td></tr></table>
+  <button class="homebtn" data-open="6. Vasopressors & inotropes" data-g="ga" data-tab="maint">Pressor doses → General › Intra-op ›</button>
+  ${src(TXP+"; Mayhew BJA Education 2016 (draft).")}</div>`;
+txCards.fluid = () => { const w = txW(), hi = kHigh();
+  return `<div class="card"><h2>Kidney: fluids &amp; blood</h2>${tx2Draft()}
+  <table><tr><th>Fluid now</th><td class="hl">${hi?`<b>0.9% saline</b> (${kTxt()}${isSample("k")?"":" ≥ 5.5"})`:`<b>Sterofundin / balanced</b> (${kTxt()})`}</td></tr>
+  <tr><th>Ceiling</th><td>Up to 30 mL/kg/h = <b>${sig(30*w)} mL/h</b></td></tr>
+  <tr><th>Albumin 5%</th><td>250 mL bolus if hypoalbuminaemic / during resuscitation</td></tr>
+  <tr><th>Urine output aim</th><td>&gt; 1 mL/kg/h = <b>${sig(w)} mL/h</b></td></tr></table>
+  <ul><li><b>As much as required, as little as possible</b>; EF &lt; 40% / pulmonary hypertension → cardiac-output-guided</li>
+  <li>Large saline volumes: hyperchloraemic acidosis raises K⁺ and lowers graft perfusion — check ABG</li></ul>
+  ${!isSample("hb") && S.hb < 70 ? `<div class="danger">Hb ${S.hb} g/L — discuss transfusion with nephrology now.</div>` : ""}
+  <div class="danger"><b>Blood: discuss with nephrology first.</b> Leucocyte filter (available in OT); irradiated if available. Rarely needed unless Hb &lt; 70 g/L.</div>
   ${src(TXP+"; Mayhew BJA Education 2016; Jaszczuk J Clin Med 2022 (draft).")}</div>`; };
 txCards.reperf = () => { const w = txW();
   return `<div class="card"><h2>5. Anastomosis &amp; reperfusion</h2>${txDraft()}${txBox()}
@@ -1489,28 +1580,45 @@ txCards.reperf = () => { const w = txW();
   <tr><th>Basiliximab ±</th><td>By nephrologist (usually given in the ward)</td></tr></table>
   <h3>At reperfusion</h3><ul><li>BP at or above baseline <b>before</b> clamps come off</li><li>Watch for <b>K⁺ rise</b> and hypotension from washout; ABG after reperfusion</li>
   <li>Keep the patient fully relaxed until retractors are out</li><li>Expect / allow a raised arterial pressure after graft reperfusion</li></ul>
-  ${src(TXP+" (draft).")}</div>`; };
+  <button class="emlink" data-open="Hyperkalaemia" data-g="emerg" data-tab="adult">⚠ Hyperkalaemia → Emergencies</button>
+  ${src(TXP+".")}</div>`; };
+/* Post-op */
+txCards.rev = () => { const W2 = wts(), neo = Math.min(0.05*W2.ibw, 5);
+  return `<div class="card"><h2>Kidney: reversal</h2>${tx2Draft()}
+  <p>Atracurium: <b>neostigmine 0.05 mg/kg</b> · IBW ${sig(W2.ibw)} kg = <b>${sig(neo)} mg</b> (${sig(neo/2.5)} mL of 2.5 mg/mL, max 5 mg) + glycopyrrolate <b>${sig(neo*0.2)} mg</b></p>
+  <p class="sub">Only when TOF ≥ 2–4 twitches; confirm TOF ratio ≥ 0.9 before extubation. Neostigmine is renally cleared (longer action) — no need to change the dose.</p>
+  <div class="warn">Sugammadex: not recommended if CrCl &lt; 30 / on dialysis — rescue use only (rocuronium CICO).</div>
+  ${src(GSRC+" Sugammadex UK product labels (draft).")}</div>`; };
+txCards.analg = () => { const w = S.aw, W2 = wts();
+  return `<div class="card"><h2>Kidney: analgesia &amp; PONV</h2>${tx2Draft()}
+  <table><tr><th>Paracetamol</th><td>${w<50?`15 mg/kg = <b>${sig(15*w)} mg</b>`:"<b>1 g</b>"} IV/PO 6-hourly</td></tr>
+  <tr><th>Tramadol</th><td><b>50 mg</b>, 12-hourly in kidney failure (CrCl &lt; 30), <b>max 200 mg/day</b></td></tr>
+  <tr><th>PCA</th><td><b>Fentanyl 10 mcg/mL preferred</b>: bolus 10–20 mcg, lockout 5 min, no background. Morphine PCA only with caution (metabolites accumulate)</td></tr>
+  <tr><th>PACU titration</th><td>Fentanyl 10–25 mcg IV every 5 min</td></tr>
+  <tr><th>NSAIDs</th><td><b>None</b></td></tr>
+  <tr><th>PONV</th><td>Ondansetron 4 mg. <b>No extra dexamethasone</b> — methylprednisolone 500 mg already given</td></tr></table>
+  ${src(TXP+"; tramadol product label (renal dosing); acute pain service protocols (draft).")}</div>`; };
 txCards.pacu = () => { const w = txW();
-  return `<div class="card"><h2>6. PACU</h2>${txDraft()}
+  return `<div class="card"><h2>Kidney: PACU &amp; urine output</h2>${tx2Draft()}
   <ul><li>Nurse in PACU; CXR for CVC position; ultrasound of graft perfusion in PACU</li>
-  <li><b>Diuresis can be 500–1000 mL/h</b> — replace volume for volume</li>
+  <li><b>Diuresis can be 500–1000 mL/h</b> — replace the previous hour's urine output mL for mL (e.g. 600 mL out → 600 mL in next hour)</li>
+  <li>Subtract residual native urine when judging the graft</li>
   <li>Watch for <b>pulmonary oedema</b> from over-zealous fluid (cardiac dysfunction)</li>
-  <li>Analgesia: paracetamol + tramadol ± fentanyl / morphine PCA if uncontrolled; no NSAIDs</li>
   <li>Antibiotic 5–7 days</li></ul>
-  <h3>Urine output falls or stops</h3><ul><li>Check catheter (blocked / clots) → BP vs baseline → volume status → tell the transplant team early (Doppler for graft vessels)</li></ul>
+  <h3>Urine output falls or stops (&lt; ${sig(w)} mL/h)</h3><ul><li>Check catheter (blocked / clots) → BP vs baseline → volume status → tell the transplant team early (Doppler for graft vessels)</li></ul>
   ${src(TXP+" (draft).")}</div>`; };
 const TX_CK = ["Pre-op electrolytes, Hb, last HD, UF","Protection of AV fistula","Venous access","Any requests from nephrology team? (communicate)","Methylprednisolone ± thymoglobulin","Mannitol before reperfusion, furosemide after","Good muscle relaxation (anastomosis, retractor removal)","Raised arterial pressure after graft reperfusion"];
 txCards.check = () => { const n = TX_CK.filter((_,i)=>S.txck[i]).length;
   return `<div class="card"><h2>7. Checklist</h2>${txDraft()}
   <div class="txck">${TX_CK.map((t,i)=>`<button class="txci ${S.txck[i]?"on":""}" data-txck="${i}" aria-pressed="${!!S.txck[i]}"><span class="box">${S.txck[i]?"✓":""}</span>${t}</button>`).join("")}</div>
   <div class="${n===TX_CK.length?"result ok":"sub"}" style="margin-top:var(--s2)">${n} / ${TX_CK.length} done${n===TX_CK.length?" ✓":""}. Ticks clear when you leave this section.</div>
-  ${src(TXP+" (draft).")}</div>`; };
+  ${src(TXP+".")}</div>`; };
 /* donor */
 txCards.dpre = () => `<div class="card"><h2>1. Donor pre-op</h2>${txDraft()}
   <ul><li>Usually <b>laparoscopic nephrectomy</b> (open if needed); side decided at MDT</li>
   <li>Workup done? Infection screen, CVS (ECG, echo, exercise test), spirometry, DTPA, CT angiogram, bloods, psychiatric and independent donor-advocate clearance</li>
   <li>No URTI / UTI / infection in the preceding 2 weeks</li></ul>
-  ${src(TXP+" (draft).")}</div>`;
+  ${src(TXP+".")}</div>`;
 txCards.dintra = () => { const w = txW();
   return `<div class="card"><h2>2. Donor intra-op</h2>${txDraft()}
   <table><tr><th>Anaesthesia</th><td>Standard induction and intubation, IPPV, NG tube, 2 venous access, catheter; ± invasive BP</td></tr>
@@ -1521,12 +1629,13 @@ txCards.dintra = () => { const w = txW();
   <tr><th>Mannitol 20%</th><td class="hl">0.5 g/kg = ${mann(w)} — start after induction, <b>complete before arterial clamping</b></td></tr>
   <tr><th>Urine output aim</th><td>&gt; 1 mL/kg/h = <b>${sig(w)} mL/h</b></td></tr>
   <tr><th>Analgesia</th><td>Opioid + paracetamol</td></tr></table>
-  <p class="sub">Weight box = donor's weight on this tab.</p>
-  ${src(TXP+" (draft).")}</div>`; };
+  <p class="sub">Weight box = donor's weight on this tab. Drug doses: General section.</p>
+  ${src(TXP+".")}</div>`; };
 txCards.dpost = () => `<div class="card"><h2>3. Donor post-op</h2>${txDraft()}
   <ul><li>Reverse and extubate; nurse in ward</li><li><b>Open:</b> ± PCA morphine · <b>Laparoscopic:</b> ± SC morphine</li>
   <li>Paracetamol + tramadol</li><li>Antibiotic 5–7 days</li></ul>
-  ${src(TXP+" (draft).")}</div>`;
+  ${src(TXP+".")}</div>`;
+function donInputs(){ return step("aw","Donor weight","kg",30,200,1); }
 
 /* MAINTENANCE */
 gaCards.tiva = () => { const W2 = wts(), w = W2.lbw;
@@ -2107,6 +2216,19 @@ const VALUES = [
   "Renal drugs: atracurium/cisatracurium preferred; sux single dose only if K⁺ normal; sugammadex not recommended CrCl < 30; fentanyl over morphine; no NSAIDs",
   "PACU: diuresis 500–1000 mL/h replace; CXR; graft ultrasound; paracetamol + tramadol ± PCA; antibiotic 5–7 days",
   "Hyperkalaemia (UKKA): ≥ 6.5 or ECG → CaCl 10% 10 mL / Ca gluconate 10% 30 mL; insulin 10 u + glucose 25 g (10% glucose 50 mL/h × 5 h if glucose < 7); salbutamol 10–20 mg neb; bicarbonate only if acidotic; dialysis"]],
+ ["Kidney transplant expansion (DRAFT — tick to sign off)", [
+  "Phase tabs: Pre-op · Induction · Intra-op · Post-op · Donor; patient box adds K⁺, Hb, today's weight, hours since HD",
+  "Discuss before proceeding: K⁺ ≥ 5.5 (5.0–5.4 dialyse if time / graft risk), pulmonary oedema, infection ≤ 2 weeks, cardiac event, Hb < 70 / platelets / clotting, both IJVs thrombosed; > 2 kg above dry weight; last HD > 24 h",
+  "HD heparin within ~4 h: APTT before CVC; residual native urine noted",
+  "Cardiac: ≥ 4 METs; EF < 40% or pulmonary hypertension → cardiac-output monitoring; continue beta-blocker, statin",
+  "Drugs: stop OHA, SGLT2i 3 days; ACEi/ARB omit morning; basal insulin 80%; omit EPO / binders / calcium morning; omeprazole 20 mg or ranitidine 150 mg once",
+  "Induction (LBW): propofol 1–2 mg/kg, fentanyl 1–3 mcg/kg, ketamine 1–2 mg/kg, midazolam 0.02 mg/kg max 2 mg",
+  "RSI: K⁺ ≥ 5.5 or unknown → rocuronium 1.2 mg/kg IBW, sugammadex 16 mg/kg CICO rescue only; else sux 1.5 mg/kg TBW single dose; atracurium 0.5 mg/kg IBW, top-up 0.1–0.15; avoid vecuronium / pancuronium",
+  "CVC R-IJV depth ≈ height/10 cm (Peres; confirm CXR); NG 14–16 Fr",
+  "Fentanyl infusion 0.5–2 mcg/kg/h LBW; atracurium 0.3–0.6 mg/kg/h; noradrenaline 0.05–0.3 mcg/kg/min",
+  "Fluid: saline if K⁺ ≥ 5.5 / unknown, else balanced; albumin 5% 250 mL; PACU replace previous hour's urine mL for mL",
+  "Reversal: neostigmine 0.05 mg/kg IBW (max 5 mg) + glycopyrrolate 0.2 mg per mg",
+  "Analgesia: paracetamol 1 g; tramadol 50 mg 12-hourly max 200 mg/day; fentanyl PCA preferred; no NSAIDs; ondansetron 4 mg, no extra dexamethasone"]],
  ["Sources — reviewed 14 Nov 2026 (next review Nov 2027)", [
   "UPDATED: RCUK Adult ALS 2025 (shock ≥ 150 J, lignocaine 100 mg alternative, isoprenaline 5 mcg/min) — read from the primary text",
   "UPDATED (verified): DAS 2025 intubation — CICO card: VL first-line, routine NMB, no blind SGA intubation, prepare FONA early",
@@ -2162,9 +2284,9 @@ function applyCase(c){
   if (c.y < 16){ S.pw = c.w; S.pY = c.y; S.pM = c.m; S.pHt = c.h; }
   if (c.sex === "F") S.spHt = Math.min(200, Math.max(140, c.h));
 }
-const SAMPLE_BY = {emerg:{adult:["aw"], paeds:["pw","pY"]}, ga:{"*":["height","aw"]}, regional:{"*":["height","aw"]}, paeds:{"*":["pw","pY"]}, obs:{lscs:["spHt"], post:["morWt"]}, tx:{"*":["aw"]}};
+const SAMPLE_BY = {emerg:{adult:["aw"], paeds:["pw","pY"]}, ga:{"*":["height","aw"]}, regional:{"*":["height","aw"]}, paeds:{"*":["pw","pY"]}, obs:{lscs:["spHt"], post:["morWt"]}, tx:{pre:["aw","height","k","hb"], ind:["aw","height","k"], intra:["aw","k","hb"], post:["aw","height"], don:["aw"]}};
 function sampleWarn(keys){ const k = keys.filter(isSample); if (!k.length) return "";
-  const names = {height:"height", aw:"weight", pw:"weight", pY:"age", spHt:"height", morWt:"weight"};
+  const names = {k:"K⁺", hb:"Hb", height:"height", aw:"weight", pw:"weight", pY:"age", spHt:"height", morWt:"weight"};
   return `<div class="samplewarn"><b>Sample values</b> — ${[...new Set(k.map(x=>names[x]))].join(" and ")} not entered. Enter the patient or tap a case.</div>`; }
 function activeBar(){ const c = activeCase(); return c ? `<button class="activebar" data-go="cases"><span>Active: <b>${caseName(c)}</b> · ${caseLine(c)}</span><span class="sub">change ›</span></button>` : ""; }
 function caseStrip(){
@@ -2263,20 +2385,41 @@ const GROUPS = [
    {id:"post", label:"After delivery", hint:"Analgesia, then ward problems.",
     cards:["1. Analgesia by technique","2. NSAID yes / no","3. PCA morphine (after GA)","4. Ward (OAS) problems & catheter care"],
     links:[["Eclampsia","adult","Eclampsia"],["Massive obstetric haemorrhage","adult","Massive haemorrhage"]]}], cards:[]},
- {id:"tx", name:"Transplant", sub:"Kidney recipient · Kidney donor", tabKey:"txTab", tabs:[
-   {id:"rec", label:"Kidney recipient", input:()=>txInputs(), top:()=>txBox(), hint:"Pre-op → induction → maintain → BP & fluids → reperfusion → PACU.",
-    cards:[["1. Pre-op check","1. Pre-op check"],["2. Induction & lines","2. Induction & lines"],["3. Maintenance & syringes","3. Maintenance & syringes"],["4. BP & fluids","4. BP & fluids"],["5. Anastomosis & reperfusion","5. Anastomosis & reperfusion"],["6. PACU","6. PACU"],["7. Checklist","7. Checklist"]],
+ {id:"tx", name:"Transplant", sub:"Kidney: Pre-op · Induction · Intra-op · Post-op · Donor", tabKey:"txTab", tabs:[
+   {id:"pre", label:"Pre-op", input:()=>txInputs(true), top:()=>txBox()+txFlags(), hint:"Kidney recipient: workup → dialysis → heart → airway → drugs.",
+    cards:[["Kidney: workup checklist","1. Workup checklist"],["Kidney: dialysis & fluid status","2. Dialysis & fluid status"],["Kidney: cardiac risk","3. Cardiac risk"],["Kidney: airway & aspiration","4. Airway & aspiration"],["Kidney: drugs stop or continue","5. Drugs: stop or continue"],["Kidney: deceased-donor / emergency recipient","6. Deceased-donor / emergency"]],
+    links:[["Hyperkalaemia","adult","Hyperkalaemia"]]},
+   {id:"ind", label:"Induction", input:()=>txInputs(false), hint:"Drugs → RSI plan by K⁺ → tube, NG, CVC → lines.",
+    cards:[["Kidney: induction drugs","1. Drugs, renal-adjusted"],["Kidney: RSI & relaxant plan","2. RSI & relaxant plan"],["Kidney: tube, NG & CVC","3. Tube, NG & CVC"],["Kidney: lines, monitoring & antibiotic","4. Lines, monitoring & antibiotic"]],
+    links:[["Failed intubation / CICO","adult","Failed intubation / CICO"],["Hyperkalaemia","adult","Hyperkalaemia"],["Anaphylaxis","adult","Anaphylaxis"]]},
+   {id:"intra", label:"Intra-op", input:()=>txInputs(false), top:()=>txBox(), hint:"Maintain → infusions → BP → fluids → reperfusion.",
+    cards:[["Kidney: maintenance","1. Maintenance: volatile or TIVA"],["Kidney: syringes & infusions","2. Syringes & infusions"],["Kidney: BP target & pressors","3. BP target & pressors"],["Kidney: fluids & blood","4. Fluids & blood"],["5. Anastomosis & reperfusion","5. Anastomosis & reperfusion"]],
     links:[["Hyperkalaemia","adult","Hyperkalaemia"],["Anaphylaxis","adult","Anaphylaxis"],["Bradycardia & cardiac arrest","adult","Bradycardia / arrest"]]},
-   {id:"don", label:"Kidney donor", input:()=>txInputs(), top:()=>txBox(), hint:"Living donor nephrectomy.",
+   {id:"post", label:"Post-op", input:()=>txInputs(false), hint:"Reverse → analgesia → PACU → checklist.",
+    cards:[["Kidney: reversal","1. Reversal (atracurium)"],["Kidney: analgesia & PONV","2. Analgesia & PONV, renal"],["Kidney: PACU & urine output","3. PACU & urine output"],["7. Checklist","4. Theatre checklist"]],
+    links:[["Hyperkalaemia","adult","Hyperkalaemia"]]},
+   {id:"don", label:"Donor", input:()=>donInputs(), top:()=>txBox(), hint:"Living donor nephrectomy.",
     cards:["1. Donor pre-op","2. Donor intra-op","3. Donor post-op"], links:[]}], cards:[]}];
 const SEARCH_EXTRA = {
-  "1. Pre-op check":"kidney renal transplant ktx esrd dialysis hd recipient pre-op fistula av potassium k+ cadaveric deceased donor",
-  "2. Induction & lines":"kidney renal transplant ktx esrd dialysis hd recipient induction rsi cvc ijv arterial line atracurium suxamethonium sugammadex",
-  "3. Maintenance & syringes":"kidney renal transplant ktx esrd dialysis hd recipient fentanyl atracurium noradrenaline syringe infusion",
-  "4. BP & fluids":"kidney renal transplant ktx esrd dialysis hd recipient map blood pressure fluid sterofundin saline albumin transfusion leucocyte filter",
-  "5. Anastomosis & reperfusion":"kidney renal transplant ktx esrd dialysis hd recipient methylprednisolone mannitol furosemide frusemide thymoglobulin basiliximab immunosuppressant reperfusion",
-  "6. PACU":"kidney renal transplant ktx esrd dialysis hd recipient pacu diuresis urine output",
-  "7. Checklist":"kidney renal transplant ktx esrd dialysis hd recipient checklist",
+  "1. Workup checklist":"kidney renal transplant ktx esrd dialysis hd workup hla crossmatch flow cytometry abo infection screen echo spirometry",
+  "2. Dialysis & fluid status":"kidney renal transplant ktx esrd dialysis hd dry weight uf ultrafiltration last hd heparin potassium k+ residual urine",
+  "3. Cardiac risk":"kidney renal transplant ktx esrd dialysis hd cardiac echo ef mets stress test coronary angiogram ctca",
+  "4. Airway & aspiration":"kidney renal transplant ktx esrd dialysis hd rsi fasting omeprazole ranitidine gastroparesis fistula",
+  "5. Drugs: stop or continue":"kidney renal transplant ktx esrd dialysis hd medications stop continue oral hypoglycaemic sglt2 ace arb insulin epo binder",
+  "6. Deceased-donor / emergency":"kidney renal transplant ktx esrd dialysis hd cadaveric deceased donor emergency recipient",
+  "1. Drugs, renal-adjusted":"kidney renal transplant ktx esrd dialysis hd induction propofol fentanyl ketamine midazolam",
+  "2. RSI & relaxant plan":"kidney renal transplant ktx esrd dialysis hd rsi suxamethonium rocuronium atracurium cisatracurium sugammadex relaxant",
+  "3. Tube, NG & CVC":"kidney renal transplant ktx esrd dialysis hd ett tube ng cvc central line peres ijv depth",
+  "4. Lines, monitoring & antibiotic":"kidney renal transplant ktx esrd dialysis hd arterial line fistula bis cefuroxime",
+  "1. Maintenance: volatile or TIVA":"kidney renal transplant ktx esrd dialysis hd volatile sevoflurane isoflurane desflurane mac tiva",
+  "2. Syringes & infusions":"kidney renal transplant ktx esrd dialysis hd fentanyl atracurium noradrenaline mannitol infusion syringe",
+  "3. BP target & pressors":"kidney renal transplant ktx esrd dialysis hd map blood pressure noradrenaline",
+  "4. Fluids & blood":"kidney renal transplant ktx esrd dialysis hd fluid sterofundin saline albumin transfusion leucocyte filter",
+  "5. Anastomosis & reperfusion":"kidney renal transplant ktx esrd dialysis hd methylprednisolone mannitol furosemide frusemide thymoglobulin basiliximab immunosuppressant reperfusion",
+  "1. Reversal (atracurium)":"kidney renal transplant ktx esrd dialysis hd reversal neostigmine glycopyrrolate sugammadex",
+  "2. Analgesia & PONV, renal":"kidney renal transplant ktx esrd dialysis hd analgesia paracetamol tramadol pca fentanyl ondansetron ponv",
+  "3. PACU & urine output":"kidney renal transplant ktx esrd dialysis hd pacu diuresis urine output",
+  "4. Theatre checklist":"kidney renal transplant ktx esrd dialysis hd checklist",
   "1. Donor pre-op":"kidney renal transplant ktx esrd dialysis hd living donor nephrectomy",
   "2. Donor intra-op":"kidney renal transplant ktx esrd dialysis hd living donor nephrectomy mannitol lateral cefuroxime",
   "3. Donor post-op":"kidney renal transplant ktx esrd dialysis hd living donor nephrectomy pca analgesia",
