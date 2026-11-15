@@ -1,5 +1,16 @@
 # Induction Card
 
-Personal offline memory aid for anaesthesia (ETT size and depth, spinal doses, regional, paediatric and obstetric reference cards, emergency crisis steps).
+Offline anaesthesia reference with weight-based doses — emergencies, general, regional, paediatric, obstetric and transplant — adapted to Malaysian practice.
 
-Memory aid only — clinical judgement decides. No patient data is stored on any server; anonymous cases stay on the user's phone and delete themselves after 36 hours.
+## Sections
+
+- **Emergencies** — adult / obstetric and paediatric crisis steps with doses for the patient's weight
+- **General** — pre-op, induction, intra-op (ventilation, TIVA, drugs) and post-op
+- **Regional** — LA dose calculator, neuraxial, upper limb, lower limb and trunk blocks
+- **Paediatric** — pre-op, induction, intra-op, blocks, post-op and case plans
+- **Obstetric** — labour, caesarean and after delivery
+- **Transplant** — kidney recipient (pre-op to PACU) and living donor
+
+Works offline once opened (installable to the home screen). Anonymous cases (sex, age, height, weight only) stay on the phone and delete themselves after 36 hours.
+
+Memory aid only — clinical judgement decides. No patient data is stored on any server.
