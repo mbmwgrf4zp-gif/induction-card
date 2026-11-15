@@ -47,6 +47,7 @@
   --g-spinal:#0e7490; --g-spinal-soft:#cffafe;
   --g-airway:#b45309; --g-airway-soft:#fef3c7;
   --g-values:#5a6866; --g-values-soft:#eceff0;
+  --dim:#e3e7e8; --dim2:#eceff0;
   --gc:var(--accent); --gc-soft:var(--accent-soft);
 }
 @media (prefers-color-scheme: dark){
@@ -63,6 +64,7 @@
     --g-spinal:#22d3ee; --g-spinal-soft:#08303a;
     --g-airway:#fbbf24; --g-airway-soft:#3a2a06;
     --g-values:#9db0ad; --g-values-soft:#1f2a29;
+    --dim:#24302f; --dim2:#1d2827;
     color-scheme:dark;
   }
 }
@@ -79,6 +81,7 @@
   --g-spinal:#22d3ee; --g-spinal-soft:#08303a;
   --g-airway:#fbbf24; --g-airway-soft:#3a2a06;
   --g-values:#9db0ad; --g-values-soft:#1f2a29;
+    --dim:#24302f; --dim2:#1d2827;
   color-scheme:dark;
 }
 [data-group="emerg"]{--gc:var(--g-emerg);--gc-soft:var(--g-emerg-soft)}
@@ -337,18 +340,24 @@ details.endo{margin-top:var(--s3);border:1px solid var(--line);border-radius:var
 details.endo summary{cursor:pointer;font-weight:600;font-size:var(--fs-sm)}
 .dwrap{display:grid;grid-template-columns:1fr 1fr;gap:var(--s2);margin:var(--s2) 0}
 .dfig{margin:0;text-align:center}.dfig svg{width:100%;height:auto;max-height:300px}.dfig figcaption{font-size:var(--fs-xs);color:var(--muted)}
-.dfig .body{fill:var(--line)}
-.dfig .band{stroke:var(--card);stroke-width:.6;transition:opacity .15s}
+.dfig .body{fill:var(--dim)}
+.dfig .edge{fill:none;stroke:var(--muted);stroke-width:1.6;opacity:.6;stroke-linejoin:round}.dfig .body{stroke:none}
+.dfig .band{stroke:none;cursor:pointer;transition:fill .18s ease,opacity .18s ease}
 .dfig .r-c{fill:#f59e0b}.dfig .r-c.alt{fill:#fbbf24}.dfig .r-t{fill:#0891b2}.dfig .r-t.alt{fill:#22d3ee}
 .dfig .r-l{fill:#16a34a}.dfig .r-l.alt{fill:#4ade80}.dfig .r-s{fill:#db2777}.dfig .r-s.alt{fill:#f472b6}
-.dfig .band.off{opacity:.18}.dfig .band.on{opacity:1;stroke:var(--ink);stroke-width:1.2}
-.dfig .kp{fill:var(--ink)}.dfig .kp.on{fill:var(--danger-ink);stroke:var(--card);stroke-width:1}
+.dfig .band.off{fill:var(--dim2)}.dfig .band.off.alt{fill:var(--dim)}
+.dfig .topline{stroke:var(--danger-ink);stroke-width:1.6;stroke-dasharray:4 2.5;pointer-events:none}
+.dfig .lmk{font:600 6.4px var(--font-sans);fill:var(--ink);paint-order:stroke;stroke:var(--card);stroke-width:2.4px;stroke-linejoin:round;pointer-events:none}
+.dfig .kp{fill:var(--danger-ink);stroke:var(--card);stroke-width:1.2;pointer-events:none}
+.dkey{display:flex;flex-wrap:wrap;align-items:center;gap:4px 10px;font-size:var(--fs-xs);color:var(--muted);margin:0 0 var(--s2)}.dkey .k{width:10px;height:10px;border-radius:3px;margin-right:-6px}
+.dkey .r-c{background:#f59e0b}.dkey .r-t{background:#0891b2}.dkey .r-l{background:#16a34a}.dkey .r-s{background:#db2777}
+.dsel .dok{margin-top:4px;color:var(--ink)}.dsel .dno{margin-top:2px;color:var(--muted);font-size:var(--fs-xs)}
 @media (prefers-reduced-motion: reduce){.dfig .band{transition:none}}
 .dsel{font-size:var(--fs-sm);background:var(--gc-soft);border-radius:var(--r-sm);padding:var(--s2) var(--s3);min-height:2.6em}
 .dchips{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin:var(--s2) 0}
 .dchip{min-height:36px;border-radius:8px;border:1px solid var(--line);background:var(--card);font-family:var(--font-mono);font-size:var(--fs-xs);font-weight:600;cursor:pointer;padding:0}
 .dchip.r-c{border-bottom:3px solid #f59e0b}.dchip.r-t{border-bottom:3px solid #0891b2}.dchip.r-l{border-bottom:3px solid #16a34a}.dchip.r-s{border-bottom:3px solid #db2777}
-.dchip.on{background:var(--ink);color:var(--card)}
+.dchip.on{background:var(--ink);color:var(--card)}.dchip.in{background:var(--gc-soft)}
 .linkish{background:none;border:0;padding:0;color:var(--accent);font-weight:700;font-family:var(--font-mono);cursor:pointer;font-size:inherit}
 .dermlink{display:block;box-sizing:border-box;margin:var(--s2) 0 0;padding:var(--s2) var(--s3);border-radius:var(--r-sm);border:1px solid var(--line);background:var(--card);color:var(--ink);font-weight:600;font-size:var(--fs-sm);text-align:left;cursor:pointer}
 .scrow{padding:var(--s2) 0;border-bottom:1px solid var(--line)}
@@ -407,7 +416,7 @@ a{color:var(--accent)}
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.20.2";
+const APP_VERSION = "2.21.0";
 const APP_DATE = "15 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
@@ -424,7 +433,7 @@ const store = {
 };
 // Inputs are not remembered between uses (per plan): state lives in memory only.
 const S = { ettMode:"adult", sex:"F", height:158, ageY:4, ageM:0, wt:3.0,
-            touched:{}, sc:{}, fastH:6, hbNow:12, hbLow:8, hbTarget:10, derm:"", abxSp:"general", spOp:"lscs", spHt:155, morWt:60, pw:10, pY:1, pM:0, pHt:75, pBE:-5, aw:70, emTab:"adult", obTab:"labour", pTab:"pre", gaTab:"pre", raTab:"safety", laA:[], laP:[], cSex:"F", cY:40, cM:0, cH:160, cW:60, cNick:"", laD:"bupi", laC:"0.5", laMl:15, laBi:"1", age:45, apfel:0, pump:"pcea_cse", topup:"lig", ventSc:"std", vfio:"", txTab:"pre", txck:{}, gaB:34, chW:6, k:4.5, hb:100, todayWt:70, hdH:12 };
+            touched:{}, sc:{}, fastH:6, hbNow:12, hbLow:8, hbTarget:10, derm:"", abxSp:"general", spOp:"lscs", spHt:155, morWt:60, pw:10, pY:1, pM:0, pHt:75, pBE:-5, aw:70, emTab:"adult", obTab:"labour", pTab:"pre", gaTab:"pre", raTab:"safety", laA:[], laP:[], cSex:"F", cY:40, cM:0, cH:160, cW:60, cNick:"", laD:"bupi", laC:"0.5", laMl:15, laBi:"1", age:45, apfel:0, pump:"pcea_cse", topup:"lig", ventSc:"std", vfio:"", txTab:"pre", txck:{}, gaB:34, chW:6, dermMode:"block", k:4.5, hb:100, todayWt:70, hdH:12 };
 
 function src(text){ return `<div class="src">Source: ${text}</div>`; }
 function protoSrc(){
@@ -2274,55 +2283,100 @@ const dermRegion = l => l[0]==="C" ? "c" : l[0]==="T" ? "t" : l[0]==="L" ? "l" :
 const dermIdx = l => DERM_LEVELS.indexOf(l);
 function dermExpand(v){ if (!v) return []; const [a,b] = String(v).split("–"); const i = dermIdx(a), j = b ? dermIdx(b) : i; return i<0 ? [] : DERM_LEVELS.slice(i, (j<0?i:j)+1); }
 // torso outline (front and back identical)
-const TORSO = [[60,58],[68,100],[72,150],[66,172]];
-function tx(y){ for (let i=0;i<TORSO.length-1;i++){ const [x1,y1]=TORSO[i],[x2,y2]=TORSO[i+1]; if (y>=y1&&y<=y2) return x1+(x2-x1)*(y-y1)/(y2-y1); } return TORSO[TORSO.length-1][0]; }
-function tband(y1,y2){ const ys=[y1,...TORSO.map(p=>p[1]).filter(y=>y>y1&&y<y2),y2]; const L=ys.map(y=>[tx(y),y]), R=ys.slice().reverse().map(y=>[200-tx(y),y]); return [...L,...R]; }
 const pts = a => a.map(p=>p.join(",")).join(" ");
 const mir = a => a.map(([x,y])=>[200-x,y]);
-const TRUNK = {C4:[58,66],T2:[66,78],T3:[78,86],T4:[86,96],T5:[96,104],T6:[104,114],T7:[114,122],T8:[122,130],T9:[130,138],T10:[138,150],T11:[150,158],T12:[158,166]};
-// limb shapes (viewer-left side, mirrored for the other side)
-const FRONT_LIMB = {
-  C5:[[58,62],[44,70],[34,120],[43,121],[50,95],[60,76]], T2:[[60,76],[50,95],[43,121],[52,122],[64,92]],
-  C6:[[34,120],[28,170],[24,204],[29,206],[36,171],[43,121]], T1:[[43,121],[38,150],[47,150],[52,122]],
-  C8:[[38,150],[36,171],[44,171],[47,150]], C7:[[29,206],[36,171],[38,206]], C8b:[[36,171],[44,171],[42,205],[38,206]],
-  L1:[[66,172],[100,182],[100,188],[67,180]], L2:[[67,180],[100,188],[97,205],[68,200]], L3:[[68,200],[97,205],[96,242],[70,240]],
-  L5:[[70,240],[83,240],[84,290],[73,290]], L4:[[83,240],[96,242],[93,290],[84,290]], L5f:[[73,290],[93,290],[95,302],[74,302]], S1f:[[69,290],[73,290],[74,302],[68,302]]};
-const BACK_LIMB = {
-  C5:FRONT_LIMB.C5, T2:FRONT_LIMB.T2, C6:FRONT_LIMB.C6, T1:FRONT_LIMB.T1, C8:FRONT_LIMB.C8, C7:FRONT_LIMB.C7, C8b:FRONT_LIMB.C8b,
-  L1:[[66,166],[100,166],[100,172],[66,172]], L2:[[66,172],[86,172],[86,178],[66,178]], L3:[[66,178],[84,178],[80,190],[67,190]],
-  S3:[[84,174],[100,174],[100,192],[80,192]], S2:[[67,190],[100,192],[96,240],[70,240]], S1:[[70,240],[84,240],[84,302],[68,302]], L4:[[84,240],[96,242],[93,290],[84,290]]};
-const FRONT_DOTS = {C3:[82,61],C4:[64,62],C5:[39,118],C6:[25,203],C7:[33,205],C8:[41,203],T1:[50,123],T2:[62,82],T3:[84,82],T4:[84,91],T5:[85,100],T6:[86,109],T7:[86,118],T8:[86,126],T9:[86,134],T10:[86,144],T11:[86,154],T12:[78,165],L1:[80,178],L2:[86,194],L3:[92,236],L4:[90,286],L5:[84,297]};
-const BACK_DOTS = {C2:[100,32],S1:[73,298],S2:[83,236],S3:[92,186],["S4-5"]:[100,186]};
+/* Silhouette (viewer-left side; mirrored for the other side) */
+const SIL = {
+  head:'<ellipse cx="100" cy="24" rx="14" ry="17"/>',
+  neck:'<path d="M92 34 L108 34 L109 56 L91 56 Z"/>',
+  torso:'<path d="M64 52 Q100 45 136 52 Q147 56 141 72 L136 82 Q132 112 130 138 Q134 152 134 168 L66 168 Q66 152 70 138 Q68 112 64 82 L59 72 Q53 56 64 52 Z"/>',
+  arm:'M52 56 Q44 92 38 128 Q33 160 29 190 L43 192 Q46 160 52 130 Q58 104 64 80 Z',
+  hand:'M30 180 Q24 194 22 206 Q23 211 27 209 Q28 205 30 203 L30 221 Q36 231 43 222 L45 182 Z',
+  leg:'M66 164 L100 164 L100 178 Q96 210 94 238 Q92 266 90 292 L78 292 Q74 266 71 238 Q66 205 66 164 Z',
+  foot:'M77 282 L91 282 Q96 299 93 306 Q84 310 74 306 Q71 296 77 282 Z'};
+const mirPath = d => d.replace(/(-?\d+(?:\.\d+)?) (-?\d+(?:\.\d+)?)/g, (m,x,y) => `${200-+x} ${y}`);
+const TRUNK = {C4:[46,64],T2:[64,76],T3:[76,84],T4:[84,94],T5:[94,102],T6:[102,112],T7:[112,120],T8:[120,128],T9:[128,136],T10:[136,148],T11:[148,156],T12:[156,164]};
+const axX = (y, a, b) => a[0] + (b[0]-a[0]) * (y-a[1]) / (b[1]-a[1]);   // x on a line at height y
+// arm regions (viewer-left arm; lateral = smaller x)
+const SH = [57,60], EL = [45,130], WR = [36,191];
+const ARM = [
+  ["C5", [[0,40],[SH[0],SH[1]-10],SH,EL,[0,EL[1]]]],
+  ["T2", [SH,[SH[0],SH[1]-10],[95,40],[95,100],[axX(100,SH,EL),100]]],
+  ["T1", [[axX(100,SH,EL),100],[95,100],[95,158],[axX(158,EL,WR),158],EL]],
+  ["C6", [[0,EL[1]],EL,WR,[31.5,WR[1]],[31.5,240],[0,240]]],
+  ["C8", [[axX(158,EL,WR),158],[95,158],[95,240],[39,240],[39,WR[1]],WR]],
+  ["C7", [[31.5,WR[1]],[39,WR[1]],[39,240],[31.5,240]]]];
+// leg regions (viewer-left leg; medial = larger x)
+const KN = [82,246], AN = [84,292];
+const LEG_F = [
+  ["L1", [[40,150],[110,150],[110,174],[100,184],[40,172]]],
+  ["L2", [[40,172],[100,184],[110,184],[110,212],[40,212]]],
+  ["L3", [[40,212],[110,212],[110,KN[1]],[40,KN[1]]]],
+  ["L5", [[40,KN[1]],KN,AN,[91,AN[1]],[91,320],[40,320]]],
+  ["L4", [KN,[110,KN[1]],[110,320],[91,320],[91,AN[1]],AN]],
+  ["S1", [[40,AN[1]+2],[77,AN[1]+2],[77,320],[40,320]]]];
+const LEG_B = [
+  ["L1", [[40,150],[110,150],[110,172],[40,172]]],
+  ["L2", [[40,172],[86,172],[86,180],[40,180]]],
+  ["L3", [[40,180],[84,180],[80,193],[40,193]]],
+  ["S3", [[86,172],[110,172],[110,195],[80,193],[84,180]]],
+  ["S2", [[40,193],[80,193],[110,195],[110,KN[1]],[40,KN[1]]]],
+  ["S1", [[40,KN[1]],KN,AN,[AN[0],320],[40,320]]],
+  ["L4", [KN,[110,KN[1]],[110,AN[1]],AN]],
+  ["S1", [[40,AN[1]-6],[110,AN[1]-6],[110,320],[40,320]]]];
+const FRONT_DOTS = {C3:[84,58],C4:[64,56],C5:[40,126],C6:[23,207],C7:[36,227],C8:[42,219],T1:[52,128],T2:[64,82],T3:[86,80],T4:[86,89],T5:[86,98],T6:[86,107],T7:[86,116],T8:[86,124],T9:[86,132],T10:[90,142],T11:[86,152],T12:[80,162],L1:[84,176],L2:[84,198],L3:[93,236],L4:[89,288],L5:[84,300]};
+const BACK_DOTS = {C2:[100,32],S1:[78,304],S2:[84,240],S3:[90,186],"S4-5":[100,186]};
+const LANDMARKS = [["T4","nipple",89],["T6","xiphoid",107],["T10","umbilicus",142],["L1","groin",171]];
+function dermState(){
+  const mode = S.dermMode || "block", sel = dermExpand(S.derm), top = sel[0];
+  const on = mode==="block" && top ? new Set(DERM_LEVELS.slice(dermIdx(top))) : new Set(sel);
+  return {mode, sel, top, on, any: on.size>0};
+}
 function dermSVG(view){
-  const on = new Set(dermExpand(S.derm)), any = on.size>0;
-  const cls = l => `band r-${dermRegion(l)} ${dermIdx(l)%2?"alt":""} ${any?(on.has(l)?"on":"off"):""}`;
-  const limb = view==="F" ? FRONT_LIMB : BACK_LIMB;
-  let g = "";
-  g += `<ellipse class="body" cx="100" cy="28" rx="18" ry="22"/><rect class="body" x="91" y="46" width="18" height="14"/>`;
-  g += `<polygon class="body" points="${pts(tband(58,172))}"/>`;
-  const armL=[[58,62],[44,70],[34,120],[28,170],[24,204],[42,206],[44,171],[52,122],[64,92]], legL=[[66,172],[100,182],[96,242],[93,290],[95,302],[68,302],[73,290],[70,240],[67,180]];
-  [armL,legL].forEach(a=>{ g += `<polygon class="body" points="${pts(a)}"/><polygon class="body" points="${pts(mir(a))}"/>`; });
-  if (view==="B") g += `<path class="${cls("C2")}" data-l="C2" d="M82 34 Q100 52 118 34 L118 44 Q100 54 82 44Z"/>`;
-  g += `<rect class="${cls("C3")}" data-l="C3" x="91" y="46" width="18" height="12"/>`;
-  Object.entries(TRUNK).forEach(([l,[a,b]]) => g += `<polygon class="${cls(l)}" data-l="${l}" points="${pts(tband(a,b))}"/>`);
-  if (view==="F") g += `<polygon class="${cls("L1")}" data-l="L1" points="${pts([[66,166],[134,166],[134,172],[100,182],[66,172]])}"/>`;
-  Object.entries(limb).forEach(([k,a]) => { const l = k.replace(/[bf]$/,""); g += `<polygon class="${cls(l)}" data-l="${l}" points="${pts(a)}"/><polygon class="${cls(l)}" data-l="${l}" points="${pts(mir(a))}"/>`; });
-  if (view==="B") g += `<circle class="${cls("S4-5")}" data-l="S4-5" cx="100" cy="186" r="5"/>`;
-  const dots = view==="F" ? FRONT_DOTS : BACK_DOTS;
-  Object.entries(dots).forEach(([l,[x,y]]) => g += `<circle class="kp ${on.has(l)?"on":""}" cx="${x}" cy="${y}" r="${on.has(l)?3.2:2}"/>`);
-  return `<figure class="dfig"><svg viewBox="16 0 168 306" role="img" aria-label="${view==="F"?"Front":"Back"} dermatome schematic">${g}</svg><figcaption>${view==="F"?"Front":"Back"}</figcaption></figure>`;
+  const st = dermState(), id = "dm" + view;
+  const cls = l => `band r-${dermRegion(l)} ${dermIdx(l)%2?"alt":""} ${st.any?(st.on.has(l)?"on":"off"):""}`;
+  const poly = (l, a, clip) => `<polygon class="${cls(l)}" data-dl="${l}" points="${pts(a)}" clip-path="url(#${id}-${clip})"/><polygon class="${cls(l)}" data-dl="${l}" points="${pts(mir(a))}" clip-path="url(#${id}-${clip})"/>`;
+  const defs = `<defs><clipPath id="${id}-torso">${SIL.torso}</clipPath>
+    <clipPath id="${id}-arm"><path d="${SIL.arm}"/><path d="${mirPath(SIL.arm)}"/><path d="${SIL.hand}"/><path d="${mirPath(SIL.hand)}"/></clipPath>
+    <clipPath id="${id}-leg"><path d="${SIL.leg}"/><path d="${mirPath(SIL.leg)}"/><path d="${SIL.foot}"/><path d="${mirPath(SIL.foot)}"/></clipPath>
+    <clipPath id="${id}-head">${SIL.head}</clipPath></defs>`;
+  const parts = `${SIL.head}${SIL.neck}${SIL.torso}<path d="${SIL.arm}"/><path d="${mirPath(SIL.arm)}"/><path d="${SIL.hand}"/><path d="${mirPath(SIL.hand)}"/><path d="${SIL.leg}"/><path d="${mirPath(SIL.leg)}"/><path d="${SIL.foot}"/><path d="${mirPath(SIL.foot)}"/>`;
+  let g = `<g class="edge">${parts}</g><g class="body">${parts}</g>`;
+  if (view==="B") g += `<rect class="${cls("C2")}" data-dl="C2" x="80" y="28" width="40" height="14" clip-path="url(#${id}-head)"/>`;
+  g += `<path class="${cls("C3")}" data-dl="C3" d="M92 34 L108 34 L109 50 L91 50 Z"/>`;
+  Object.entries(TRUNK).forEach(([l,[a,b]]) => g += `<rect class="${cls(l)}" data-dl="${l}" x="40" y="${a}" width="120" height="${b-a}" clip-path="url(#${id}-torso)"/>`);
+  ARM.forEach(([l,a]) => g += poly(l, a, "arm"));
+  (view==="F" ? LEG_F : LEG_B).forEach(([l,a]) => g += poly(l, a, "leg"));
+  if (view==="B") g += `<circle class="${cls("S4-5")}" data-dl="S4-5" cx="100" cy="186" r="5"/>`;
+  // block top line (trunk levels)
+  if (st.mode==="block" && st.top && TRUNK[st.top]){ const y = TRUNK[st.top][0]; g += `<line class="topline" x1="56" y1="${y}" x2="144" y2="${y}"/>`; }
+  // landmarks (front only)
+  if (view==="F") LANDMARKS.forEach(([l,t,y]) => g += `<text class="lmk" x="103" y="${y+2.2}">${t} ${l}</text>`);
+  // key points: only selected (single) or block top
+  const dots = view==="F" ? FRONT_DOTS : BACK_DOTS, show = st.mode==="block" ? new Set(st.top?[st.top]:[]) : new Set(st.sel);
+  Object.entries(dots).forEach(([l,[x,y]]) => { if (show.has(l)) g += `<circle class="kp on" cx="${x}" cy="${y}" r="3.4"/>` + (/^T([2-9]|1[0-2])$/.test(l) || x===100 ? "" : `<circle class="kp on" cx="${200-x}" cy="${y}" r="3.4"/>`); });
+  return `<figure class="dfig"><svg viewBox="12 0 176 312" role="img" aria-label="${view==="F"?"Front":"Back"} dermatome diagram">${defs}${g}</svg><figcaption>${view==="F"?"Front":"Back"}</figcaption></figure>`;
 }
 const DERM_SURG = [["LSCS","T4"],["Upper abdominal","T4–T6"],["Lower abdominal / inguinal hernia","T8–T10"],["TURP / vaginal / cervix","T10"],["Testes","T10"],["Hip / knee","T10–L1"],["Foot / ankle","L2"],["Perineal / haemorrhoids (saddle)","S1–S4-5"]];
 function dermCard(){
-  const sel = dermExpand(S.derm), top = sel[0];
+  const st = dermState(), {mode, sel, top} = st;
+  let info;
+  if (!top) info = mode==="block" ? "Tap a level, the body, or an operation to set the block height." : "Tap a level, the body, or an operation to highlight it.";
+  else if (mode==="single") info = `<b>${S.derm}</b> — ${sel.map(l=>(sel.length>1?`${l}: `:"")+DERM_INFO[l]).join(" · ")}`;
+  else { const ok = [], no = [];
+    DERM_SURG.forEach(([s,l]) => { const need = dermExpand(l)[0]; (dermIdx(top) <= dermIdx(need) ? ok : no).push([s,need]); });
+    info = `<b>Block to ${top}</b> — ${DERM_INFO[top]}${ok.length?`<div class="dok">Enough for: ${ok.map(([s])=>`${s} ✓`).join(" · ")}</div>`:""}${no.length?`<div class="dno">Not enough for: ${no.map(([s,n])=>`${s} (needs ${n})`).join(" · ")}</div>`:""}`; }
   return `${DERM_CHECKED?"":`<div class="warn" style="margin-top:0">DRAFT — ASIA/ISNCSCI 2019 key points; Miller / OAA. Not yet ticked by you.</div>`}
+  ${seg("dermMode",[["block","Block up to"],["single","Single level"]])}
   <div class="dwrap">${dermSVG("F")}${dermSVG("B")}</div>
-  <div class="dsel">${top ? `<b>${S.derm}</b> — ${sel.map(l=>`${l}: ${DERM_INFO[l]}`).join(" · ")}` : "Tap a level or an operation to highlight it."}</div>
-  <div class="dchips">${DERM_LEVELS.map(l=>`<button class="dchip r-${dermRegion(l)} ${sel.includes(l)?"on":""}" data-derm="${l}">${l}</button>`).join("")}</div>
+  <div class="dkey"><span class="k r-c"></span>Cervical<span class="k r-t"></span>Thoracic<span class="k r-l"></span>Lumbar<span class="k r-s"></span>Sacral</div>
+  <div class="dsel">${info}</div>
+  ${mode==="block" ? `<p class="sub" style="margin-top:var(--s2)"><b>Cold</b> is usually lost 1–2 levels higher than <b>pinprick</b>; <b>light touch</b> is lowest. LSCS: aim for touch at T5–T4.</p>` : ""}
+  <div class="dchips">${DERM_LEVELS.map(l=>`<button class="dchip r-${dermRegion(l)} ${l===top||(mode==="single"&&sel.includes(l))?"on":mode==="block"&&st.on.has(l)?"in":""}" data-derm="${l}">${l}</button>`).join("")}</div>
   <h3>Landmarks</h3>
-  <table>${[["C6","Thumb"],["T4","Nipple"],["T6","Xiphoid"],["T10","Umbilicus"],["L1","Groin / inguinal ligament"],["L3","Knee"],["L5","Dorsum of foot, big toe"],["S1","Lateral foot, heel"],["S4-5","Perianal"]].map(([l,t])=>`<tr class="${sel.includes(l)?"hl":""}"><td><button class="linkish" data-derm="${l}">${l}</button></td><td>${t}</td></tr>`).join("")}</table>
+  <table>${[["C6","Thumb"],["T4","Nipple"],["T6","Xiphoid"],["T10","Umbilicus"],["L1","Groin / inguinal ligament"],["L3","Knee"],["L5","Dorsum of foot, big toe"],["S1","Lateral foot, heel"],["S4-5","Perianal"]].map(([l,t])=>`<tr class="${l===top?"hl":""}"><td><button class="linkish" data-derm="${l}">${l}</button></td><td>${t}</td></tr>`).join("")}</table>
   <h3>Block height needed</h3>
-  <table>${DERM_SURG.map(([s,l])=>`<tr class="${S.derm===l?"hl":""}"><td>${s}</td><td><button class="linkish" data-derm="${l}">${l}</button></td></tr>`).join("")}</table>
+  <table>${DERM_SURG.map(([s,l])=>{ const need = dermExpand(l)[0], ok = mode==="block" && top && dermIdx(top) <= dermIdx(need); return `<tr class="${S.derm===l||(mode==="block"&&top===need)?"hl":""}"><td>${s}${mode==="block"&&top?` <span class="sub">${ok?"✓":"✗"}</span>`:""}</td><td><button class="linkish" data-derm="${l}">${l}</button></td></tr>`; }).join("")}</table>
   <h3>Testing the block</h3>
   <ul><li><b>Cold</b> (ice / ethyl chloride) is lost 1–2 segments higher than <b>pinprick</b>, which is higher than <b>light touch</b></li>
   <li><b>LSCS:</b> aim <b>T4</b> bilaterally; light touch to T5–T4 is the best predictor of a comfortable section</li>
@@ -2330,7 +2384,7 @@ function dermCard(){
   <h3>Bromage score (motor block)</h3>
   <table><tr><td class="hl">0</td><td>Full movement of legs and feet</td></tr><tr><td class="hl">1</td><td>Cannot raise extended leg; can move knees and feet</td></tr>
   <tr><td class="hl">2</td><td>Cannot raise leg or flex knee; can move feet</td></tr><tr><td class="hl">3</td><td>Cannot move legs or feet (complete)</td></tr></table>
-  <p class="sub">Schematic: band shapes are simplified; dots are the ASIA key sensory points (patient's right on the left of each figure).</p>
+  <p class="sub">Schematic diagram: band shapes are simplified; dots are the ASIA key sensory points (patient's right on the left of each figure). Tap the body to pick a level.</p>
   ${src("ASIA/ISNCSCI 2019; Bromage 1965; Miller's Anesthesia; OAA.")}`;
 }
 raCards.derm = () => `<div class="card"><h2>Dermatomes &amp; block height</h2>${dermCard()}</div>`;
@@ -2995,6 +3049,7 @@ document.addEventListener("toggle", e => {
     if (!isWide()) document.querySelectorAll("details.acc[open]").forEach(o => { if (o!==d){ if (user && !reduceMotion() && o.dataset.g !== "emerg") collapseAcc(o); else o.open = false; } }); }
   else { S.openSet.delete(d.dataset.t); if (S.open === d.dataset.t) S.open = null; }
 }, true);
+document.addEventListener("click", e => { const t = e.target.closest && e.target.closest("[data-dl]"); if (!t) return; S.derm = t.getAttribute("data-dl"); render(); });
 document.addEventListener("input", e => { if (e.target.id==="q") runSearch(e.target.value); if (e.target.id==="cNick") S.cNick = e.target.value.slice(0,12); if (e.target.id==="dname") S.dname = e.target.value.slice(0,24); });
 function clamp(v,min,max){ return Math.min(max, Math.max(min, v)); }
 document.addEventListener("click", e => {
