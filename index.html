@@ -221,8 +221,49 @@ b.dose{font-weight:700;background:var(--gc-soft);padding:0 .28em;border-radius:5
 .ptbar{display:flex;align-items:center;justify-content:space-between;gap:var(--s2);width:100%;box-sizing:border-box;text-align:left;padding:var(--s3) var(--s4);border:1px solid var(--line);border-left:4px solid var(--gc);border-radius:var(--r);background:var(--card);color:var(--ink);font:inherit;font-weight:700;font-variant-numeric:tabular-nums;cursor:pointer}
 .ptbar .sub{font-weight:600;white-space:nowrap}
 @media (max-width:699px){.gside.slim{position:sticky;top:0;z-index:5;background:var(--bg);padding:var(--s1) 0}}
-details.acc.anim>:not(summary){animation:accIn .16s ease-out}
-@keyframes accIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
+@keyframes accIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
+/* motion */
+.sq,.qbtn,.tile,.seg button,.homebtn,.emlink,.ptbar,.hit,.snitem,.chip,.iconbtn,.pearl,.rellink,.txci,.scopt{transition:transform .14s cubic-bezier(.2,.8,.2,1),box-shadow .2s ease,background-color .15s ease}
+.sq:active,.qbtn:active,.tile:active,.seg button:active,.homebtn:active,.emlink:active,.ptbar:active,.hit:active,.snitem:active,.chip:active,.iconbtn:active,.pearl:active,.rellink:active,.txci:active,.scopt:active{transform:scale(.97)}
+details.acc>summary{transition:transform .14s cubic-bezier(.2,.8,.2,1)} details.acc>summary:active{transform:scale(.99)}
+details.acc>summary::after{transition:transform .23s cubic-bezier(.2,.8,.2,1)}
+@media (hover:hover){.sq:hover,.qbtn:hover,.tile:hover,.pearl:hover{transform:translateY(-2px);box-shadow:0 8px 22px rgba(0,0,0,.08)}}
+details.acc.anim>:not(summary){animation:accIn .24s cubic-bezier(.2,.8,.2,1) .04s both}
+details.acc[data-g="emerg"].anim>:not(summary){animation-duration:.1s;animation-delay:0s}
+::view-transition-old(root),::view-transition-new(root){animation-duration:.28s;animation-timing-function:cubic-bezier(.2,.8,.2,1)}
+::view-transition-group(*){animation-duration:.32s;animation-timing-function:cubic-bezier(.2,.8,.2,1)}
+:root[data-nav="fwd"]::view-transition-old(root){animation-name:vtOutL}
+:root[data-nav="fwd"]::view-transition-new(root){animation-name:vtInR}
+:root[data-nav="back"]::view-transition-old(root){animation-name:vtOutR}
+:root[data-nav="back"]::view-transition-new(root){animation-name:vtInL}
+:root[data-nav="fast"]::view-transition-old(root),:root[data-nav="fast"]::view-transition-new(root){animation-duration:.1s}
+:root[data-nav^="tab"]::view-transition-old(root),:root[data-nav^="tab"]::view-transition-new(root){animation:none}
+:root[data-nav^="tab"] .gmain{view-transition-name:main}
+:root[data-nav="tab-l"]::view-transition-old(main){animation:vtOutLs .22s cubic-bezier(.2,.8,.2,1) both}
+:root[data-nav="tab-l"]::view-transition-new(main){animation:vtInRs .22s cubic-bezier(.2,.8,.2,1) both}
+:root[data-nav="tab-r"]::view-transition-old(main){animation:vtOutRs .22s cubic-bezier(.2,.8,.2,1) both}
+:root[data-nav="tab-r"]::view-transition-new(main){animation:vtInLs .22s cubic-bezier(.2,.8,.2,1) both}
+:root[data-nav="fwd"] .sq.t-ga .qi,:root[data-nav="back"] .sq.t-ga .qi,:root[data-nav="fwd"] #app[data-group="ga"] header .hico,:root[data-nav="back"] #app[data-group="ga"] header .hico{view-transition-name:ic-ga}
+:root[data-nav="fwd"] .sq.t-regional .qi,:root[data-nav="back"] .sq.t-regional .qi,:root[data-nav="fwd"] #app[data-group="regional"] header .hico,:root[data-nav="back"] #app[data-group="regional"] header .hico{view-transition-name:ic-regional}
+:root[data-nav="fwd"] .sq.t-paeds .qi,:root[data-nav="back"] .sq.t-paeds .qi,:root[data-nav="fwd"] #app[data-group="paeds"] header .hico,:root[data-nav="back"] #app[data-group="paeds"] header .hico{view-transition-name:ic-paeds}
+:root[data-nav="fwd"] .sq.t-obs .qi,:root[data-nav="back"] .sq.t-obs .qi,:root[data-nav="fwd"] #app[data-group="obs"] header .hico,:root[data-nav="back"] #app[data-group="obs"] header .hico{view-transition-name:ic-obs}
+:root[data-nav="fwd"] .sq.t-tx .qi,:root[data-nav="back"] .sq.t-tx .qi,:root[data-nav="fwd"] #app[data-group="tx"] header .hico,:root[data-nav="back"] #app[data-group="tx"] header .hico{view-transition-name:ic-tx}
+:root[data-nav="fwd"] .sq.t-ga .sqt,:root[data-nav="back"] .sq.t-ga .sqt,:root[data-nav="fwd"] #app[data-group="ga"] header h1>span:last-child,:root[data-nav="back"] #app[data-group="ga"] header h1>span:last-child{view-transition-name:tt-ga}
+:root[data-nav="fwd"] .sq.t-regional .sqt,:root[data-nav="back"] .sq.t-regional .sqt,:root[data-nav="fwd"] #app[data-group="regional"] header h1>span:last-child,:root[data-nav="back"] #app[data-group="regional"] header h1>span:last-child{view-transition-name:tt-regional}
+:root[data-nav="fwd"] .sq.t-paeds .sqt,:root[data-nav="back"] .sq.t-paeds .sqt,:root[data-nav="fwd"] #app[data-group="paeds"] header h1>span:last-child,:root[data-nav="back"] #app[data-group="paeds"] header h1>span:last-child{view-transition-name:tt-paeds}
+:root[data-nav="fwd"] .sq.t-obs .sqt,:root[data-nav="back"] .sq.t-obs .sqt,:root[data-nav="fwd"] #app[data-group="obs"] header h1>span:last-child,:root[data-nav="back"] #app[data-group="obs"] header h1>span:last-child{view-transition-name:tt-obs}
+:root[data-nav="fwd"] .sq.t-tx .sqt,:root[data-nav="back"] .sq.t-tx .sqt,:root[data-nav="fwd"] #app[data-group="tx"] header h1>span:last-child,:root[data-nav="back"] #app[data-group="tx"] header h1>span:last-child{view-transition-name:tt-tx}
+@media (min-width:1100px){.sidenav{view-transition-name:sidenav}}
+@keyframes vtOutL{60%{opacity:0}to{opacity:0;transform:translateX(-10%) scale(.98)}}
+@keyframes vtInR{from{opacity:0;transform:translateX(18%)}35%{opacity:1}}
+@keyframes vtOutR{60%{opacity:0}to{opacity:0;transform:translateX(18%)}}
+@keyframes vtInL{from{opacity:0;transform:translateX(-10%) scale(.98)}35%{opacity:1}}
+@keyframes vtOutLs{to{opacity:0;transform:translateX(-24px)}}
+@keyframes vtInRs{from{opacity:0;transform:translateX(24px)}}
+@keyframes vtOutRs{to{opacity:0;transform:translateX(24px)}}
+@keyframes vtInLs{from{opacity:0;transform:translateX(-24px)}}
+@media (prefers-reduced-motion: reduce){*,::view-transition-group(*),::view-transition-old(*),::view-transition-new(*){animation:none!important;transition:none!important}}
+
 @media (prefers-reduced-motion: reduce){details.acc.anim>:not(summary){animation:none}}
 
 .emlink{display:block;box-sizing:border-box;text-align:left;margin:var(--s2) 0;padding:var(--s3);border-radius:var(--r-sm);border:1px solid var(--danger-line);background:var(--danger-bg);color:var(--danger-ink);font-weight:700;font-size:var(--fs-sm);cursor:pointer}
@@ -378,7 +419,7 @@ a{color:var(--accent)}
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.19.0";
+const APP_VERSION = "2.20.0";
 const APP_DATE = "15 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
@@ -2906,17 +2947,64 @@ function renderNow(){
     <div class="snkeys">Keys: <b>/</b> search · <b>Esc</b> back · <b>1–6</b> tabs</div></nav>`;
   app.innerHTML = `<div class="shell">${nav}<div class="content">${html}</div></div>`;
   app.querySelectorAll('.big').forEach(el => { el.innerHTML = el.innerHTML.replace(/(\d)\s+(mg|mcg|mL\/h|mL|g|kg|mmHg|wk|cm|mmol|units?|J)(?=\s|<|$)/g, '$1<span class="bu"> $2</span>'); });
+  restoredAt = performance.now();
   if (isWide() && S.openSet) S.openSet.forEach(t => { const d = app.querySelector(`details[data-t="${CSS.escape(t)}"]`); if (d) d.open = true; });
   if (S.open){ const d = app.querySelector(`details[data-t="${CSS.escape(S.open)}"]`); if (d){ d.open = true; if (S.scrollTo){ d.scrollIntoView({block:"start"}); } } }
   if (!S.scrollTo) window.scrollTo(0, y);
   S.scrollTo = false;
   if (active){ const el = app.querySelector(`[data-in="${active}"]`); if (el){ el.focus(); const v=el.value; el.value=""; el.value=v; } }
 }
+/* ---------- MOTION ---------- */
+const EASE = "cubic-bezier(.2,.8,.2,1)";
+const reduceMotion = () => window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+let lastHash = location.hash || "#home", restoredAt = 0;
+const depth = h => (!h || h==="#home") ? 0 : 1;
+function navKind(from, to){
+  if (to==="#g-emerg" || from==="#g-emerg") return "fast";
+  return depth(to) < depth(from) ? "back" : depth(to) > depth(from) ? "fwd" : "fade";
+}
+function transition(kind, update){
+  if (!document.startViewTransition || reduceMotion()){ update(); return; }
+  const root = document.documentElement; root.dataset.nav = kind;
+  try { const t = document.startViewTransition(update); const noop = () => {}; t.ready.catch(noop); t.updateCallbackDone.catch(noop); t.finished.catch(noop).finally(() => { if (root.dataset.nav===kind) delete root.dataset.nav; }); }
+  catch(e){ delete root.dataset.nav; update(); }
+}
+function onHash(){
+  const to = location.hash || "#home", kind = navKind(lastHash, to); lastHash = to;
+  transition(kind, () => { render(); if (S.navTop){ window.scrollTo(0,0); S.navTop = false; } });
+}
+function summaryH(d){ return d.querySelector(":scope > summary").offsetHeight; }
+function animH(d, from, to, dur, done){
+  d.style.overflow = "hidden"; d.style.height = from + "px";
+  const a = d.animate([{height: from+"px"}, {height: to+"px"}], {duration: dur, easing: EASE});
+  d._anim = a;
+  a.onfinish = a.oncancel = () => { d.style.height = ""; d.style.overflow = ""; d._anim = null; if (done) done(); };
+}
+function expandAcc(d){
+  const start = d.offsetHeight; d._userOpen = true; d.open = true;
+  const end = d.scrollHeight;
+  animH(d, start, end, 230, () => {
+    const r = d.getBoundingClientRect(), slim = document.querySelector(".gside.slim"), off = (slim && !isWide() ? slim.offsetHeight : 0) + 8;
+    if (r.top < off || r.top > window.innerHeight * 0.62) window.scrollTo({top: window.scrollY + r.top - off, behavior: "smooth"});
+  });
+}
+function collapseAcc(d){
+  if (d._anim) d._anim.cancel();
+  animH(d, d.offsetHeight, summaryH(d), 200, () => { d.open = false; });
+}
+document.addEventListener("click", e => {
+  const sm = e.target.closest && e.target.closest("details.acc > summary"); if (!sm) return;
+  const d = sm.parentElement; if (reduceMotion() || d.dataset.g === "emerg") return;   // emergencies: instant
+  e.preventDefault(); if (d._anim) return;
+  if (d.open) collapseAcc(d); else expandAcc(d);
+}, true);
 document.addEventListener("toggle", e => {
   const d = e.target; if (!d.matches || !d.matches("details.acc")) return;
   S.openSet = S.openSet || new Set();
-  if (d.open){ d.classList.add("anim"); setTimeout(()=>d.classList.remove("anim"), 250); S.open = d.dataset.t; S.openSet.add(d.dataset.t); remember(d.dataset.g, d.dataset.t);
-    if (!isWide()) document.querySelectorAll("details.acc[open]").forEach(o => { if (o!==d) o.open = false; }); }
+  if (d.open){ const user = d._userOpen || performance.now() - restoredAt > 80; d._userOpen = false;
+    if (user && !reduceMotion()){ d.classList.add("anim"); setTimeout(()=>d.classList.remove("anim"), 260); }
+    S.open = d.dataset.t; S.openSet.add(d.dataset.t); remember(d.dataset.g, d.dataset.t);
+    if (!isWide()) document.querySelectorAll("details.acc[open]").forEach(o => { if (o!==d){ if (user && !reduceMotion() && o.dataset.g !== "emerg") collapseAcc(o); else o.open = false; } }); }
   else { S.openSet.delete(d.dataset.t); if (S.open === d.dataset.t) S.open = null; }
 }, true);
 document.addEventListener("input", e => { if (e.target.id==="q") runSearch(e.target.value); if (e.target.id==="cNick") S.cNick = e.target.value.slice(0,12); if (e.target.id==="dname") S.dname = e.target.value.slice(0,24); });
@@ -2932,7 +3020,7 @@ document.addEventListener("click", e => {
     S.open = d.calc ? null : d.open; S.scrollTo = !d.calc; if (!d.calc) remember(d.g, d.open);
     const target = "#g-"+d.g; if (location.hash===target) render(); else { location.hash = target; } if (d.calc) window.scrollTo(0,0); return; }
   if (d.lscs){ S.spOp="lscs"; S.open=null; location.hash="#g-spinal"; window.scrollTo(0,0); return; }
-  if (d.go){ S.ptEditing = false; S.open = null; S.openSet = new Set(); S.txck = {}; location.hash = "#"+d.go; window.scrollTo(0,0); return; }
+  if (d.go){ S.ptEditing = false; S.open = null; S.openSet = new Set(); S.txck = {}; if ((location.hash||"#home")==="#"+d.go){ render(); window.scrollTo(0,0); } else { S.navTop = true; location.hash = "#"+d.go; } return; }
   if (d.savename){ const v = cleanName(S.dname ?? doctorName()); store.set("doctor", v || "Dr X"); S.dname = undefined; location.hash = "#home"; return; }
   if (d.case){ const c = getCases().find(x=>x.id===d.case); if (c){ store.set("active", c.id); applyCase(c); } if ((location.hash||"#home")==="#cases") render(); else render(); return; }
   if (d.delcase){ const cs = getCases().filter(x=>x.id!==d.delcase); store.set("cases", cs); if (store.get("active",null)===d.delcase) store.set("active", null); render(); return; }
@@ -2951,6 +3039,7 @@ document.addEventListener("click", e => {
   if (d.setw){ S.pw = parseFloat(d.setw); render(); return; }
   if (d.ptedit){ S.ptEditing = true; render(); return; }
   if (d.ptdone){ S.ptEditing = false; render(); return; }
+  if (d.seg && GROUPS.some(x=>x.tabKey===d.seg) && S[d.seg] !== d.val){ const og = GROUPS.find(x=>x.tabKey===d.seg), ids = og.tabs.map(t=>t.id), dir = ids.indexOf(d.val) > ids.indexOf(S[d.seg]) ? "tab-l" : "tab-r"; S.ptEditing = false; S.touched[d.seg]=true; S[d.seg] = d.val; transition(og.id==="emerg" ? "fast" : dir, () => render()); return; }
   if (d.seg){ if (GROUPS.some(x=>x.tabKey===d.seg)) S.ptEditing = false; else if (d.seg==='sex') S.ptEditing = true; S.touched[d.seg]=true; S[d.seg] = d.val; render(); return; }
   if (d.step){ S.ptEditing = true; S.touched[d.step]=true; const k=d.step, st=parseFloat(d.d); let v=parseFloat(S[k])||0; v=clamp(Math.round((v+st)*10)/10, +d.min, +d.max); S[k]=v; render(); return; }
   if (d.tick!==undefined){ const t=store.get("ticks",{}); t[d.tick]=b.checked; store.set("ticks",t); render(); return; }
@@ -2965,7 +3054,7 @@ document.addEventListener("change", e => {
   S[k] = clamp(v, +el.dataset.min, +el.dataset.max); render();
 });
 function applyTheme(){ const t=store.get("theme","auto"); if (t==="auto") document.documentElement.removeAttribute("data-theme"); else document.documentElement.setAttribute("data-theme", t); }
-window.addEventListener("hashchange", render);
+window.addEventListener("hashchange", onHash);
 let wideNow = isWide(); window.addEventListener("resize", () => { if (isWide() !== wideNow){ wideNow = isWide(); render(); } });
 document.addEventListener("keydown", e => {
   const tag = (e.target.tagName||"").toLowerCase(), typing = tag==="input" || tag==="textarea";
