@@ -27,7 +27,7 @@
 /* Layout: one phone-width column; home = list of section tiles, each section has its own hue. */
 :root{
   /* type scale (6 steps) */
-  --fs-xs:.8125rem; --fs-sm:.875rem; --fs-base:1rem; --fs-md:1.0625rem; --fs-lg:1.25rem; --fs-xl:1.5rem; --big:clamp(2rem,9vw,2.75rem);
+  --fs-xs:.8125rem; --fs-sm:.875rem; --fs-body:.9375rem; --fs-base:1rem; --fs-md:1.0625rem; --fs-lg:1.25rem; --fs-xl:1.5rem; --big:clamp(2rem,9vw,2.75rem);
   /* spacing & radius */
   --font-sans:"IBM Plex Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif; --font-mono:"IBM Plex Mono",ui-monospace,"SF Mono",Menlo,monospace;
   --mon-bg:#0b1517; --mon-ink:#e6f1ef; --mon-muted:#8fa7a3; --mon-grid:rgba(255,255,255,.06); --etco2:#facc15;
@@ -179,12 +179,13 @@ header h1{font-size:var(--fs-lg);font-weight:700;margin:0;flex:1;display:flex;al
 .src{color:var(--muted);font-size:var(--fs-xs);margin-top:var(--s3);line-height:1.4}
 .warn,.danger,.unv{border-radius:var(--r-sm);padding:var(--s2) var(--s3);margin:var(--s2) 0;font-size:var(--fs-sm);line-height:1.45}
 .warn{background:var(--warn-bg);color:var(--warn-ink);border:1px solid var(--warn-line)}
-.danger{background:var(--danger-bg);color:var(--danger-ink);border:1px solid var(--danger-line);font-weight:700}
+.danger{background:var(--danger-bg);color:var(--danger-ink);border:1px solid var(--danger-line);font-weight:400}
 .unv{background:var(--unv-bg);color:var(--unv-ink);border:1px dashed var(--line)}
 .unv b{letter-spacing:.03em}
 
 /* tables & lists */
-table{width:100%;border-collapse:collapse;font-size:var(--fs-sm);line-height:1.4}
+table{width:100%;border-collapse:collapse;font-size:var(--fs-body);line-height:1.4}
+.card ul:not(.crisis) li,.card ol:not(.crisis) li{font-size:var(--fs-body);line-height:1.45}
 th,td{border-bottom:1px solid var(--line);padding:var(--s2) var(--s1);text-align:left;vertical-align:top;font-variant-numeric:tabular-nums}
 th{color:var(--muted);font-weight:600}
 td.hl{font-weight:700}
@@ -366,7 +367,7 @@ a{color:var(--accent)}
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.15.2";
+const APP_VERSION = "2.15.3";
 const APP_DATE = "15 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
@@ -537,7 +538,7 @@ const lscsBody = () => {
     <div class="big">${rng(row[1],row[2])} mL</div>
     <div class="sub">= ${rng(row[1]*5,row[2]*5)} mg</div>
     <h3>+ IT opioids (0.3 mL)</h3>
-    <ul><li><b>Morphine 0.1 mg (0.1 mL)</b> — <span class="danger" style="display:inline;padding:1px 6px">1 mg/mL DILUTED, not 10 mg/mL</span></li>
+    <ul><li><b>Morphine 0.1 mg (0.1 mL)</b> — <span class="danger" style="display:inline;padding:1px 6px;font-weight:700">1 mg/mL DILUTED, not 10 mg/mL</span></li>
     <li><b>Fentanyl 10 mcg (0.2 mL</b> of 50 mcg/mL)</li></ul>
     <div class="sub">Total volume: <b>${rng(row[3],row[4])} mL</b></div>
     <table style="margin-top:10px"><tr><th>Height</th><th>Bupi mL</th><th>Total mL</th></tr>
@@ -585,7 +586,7 @@ obsCards.lStart = () => `<div class="card"><h2>1. Start: test, bolus &amp; loadi
     <p><b>Bloods:</b> FBC / PT / APTT for severe PE; group &amp; screen if indicated</p></details>
   <h3>Epidural</h3>
   <p><b>Bolus — ropivacaine 0.25% 3 mL</b> (1 mL ropi 0.75% diluted to 3 mL).</p>
-  <p><b>Loading — ropi 0.15% + fentanyl 100 mcg, 10 mL, run at 40 mL/hr</b><br>2 mL ropi 0.75% + fentanyl 2 mL, dilute to 10 mL — or use 10 mL of the infusion preparation.</p>
+  <p><b>Loading</b> — ropi 0.15% + fentanyl 100 mcg, 10 mL, run at <b>40 mL/hr</b><br>2 mL ropi 0.75% + fentanyl 2 mL, dilute to 10 mL — or use 10 mL of the infusion preparation.</p>
   ${src(MINE)}
   <h3>CSE / single-shot spinal</h3>
   <p><b>Fentanyl 10–25 mcg</b> diluted to 1 mL NS, 27G pencil-point, aseptic.</p>${protoSrc()}</div>`;
@@ -616,11 +617,11 @@ obsCards.lTopup = () => `<div class="card"><h2>3. Top-up: breakthrough pain</h2>
   <p><b>Protocol:</b> 3 mL lignocaine 1% OR 10 mL of cocktail.</p>${protoSrc()}</div>`;
 
 obsCards.lAdp = () => `<div class="card"><h2>4. Problem: accidental dural puncture</h2>
-  <div class="danger" style="text-align:center">INTRATHECAL CATHETER — SPINAL DOSES ONLY</div>
+  <div class="danger" style="text-align:center"><b>INTRATHECAL CATHETER — SPINAL DOSES ONLY</b></div>
   <p><b>IT bolus:</b> fentanyl 10–25 mcg + NS to 1 mL total.</p>
   <p><b>Top-up:</b> cocktail 3 mL every 1–2 hours — assess first.</p>
   <p><b>Going for Caesarean:</b> see Caesarean tab, route C.</p>
-  <div class="danger">Do NOT flush the catheter before removal (residual LA).</div>${src(MINE)}
+  <div class="danger"><b>Do NOT flush</b> the catheter before removal (residual LA).</div>${src(MINE)}
   <h3>Departmental protocol</h3>${locNote()}
   <ul><li>Replace the stylet; <b>inform the specialist in charge</b></li><li>Either withdraw and re-site <b>one space above</b>, or thread the catheter intrathecally (label it <b>"intrathecal"</b>)</li>
   <li>Top-ups by anaesthetic doctor only; document fully</li><li><b>Keep the catheter ≥ 24 h</b> after delivery; OAS / pain team follow-up for PDPH</li></ul>${protoSrc()}</div>`;
@@ -681,7 +682,7 @@ obsCards.cTopup = () => { const t = TOPUP[S.topup] || TOPUP.lig;
   <b>Block present but inadequate:</b> GA, or single-shot spinal by consultant — may need lower dose.</p>
   <div class="warn">Keep epidural catheter in situ &amp; stoppered post-op.</div>${protoSrc()}</div>`; };
 obsCards.cAdp = () => `<div class="card"><h2>C. Dural puncture catheter: LSCS dosing</h2>
-  <div class="danger" style="text-align:center">INTRATHECAL CATHETER — SPINAL DOSES ONLY</div>
+  <div class="danger" style="text-align:center"><b>INTRATHECAL CATHETER — SPINAL DOSES ONLY</b></div>
   <ol><li>Give the <b>intended spinal dose by height</b> (A1) through the catheter, in small amounts, testing as you go.</li>
   <li>Further top-ups: <b>0.2 mL of 0.5% heavy bupivacaine</b> at a time, checking the block before each.</li>
   <li>Keep the catheter <b>≥ 24 h</b>. Do NOT flush it before removal (residual LA).</li></ol>${locNote()}
@@ -744,7 +745,7 @@ function LAR(name, ml, mgml, max, note, capml){
   if (capml!=null){ if (a>capml){a=capml;cap=true;} if (b>capml){b=capml;cap=true;} }
   const mgkg = b*mgml/w, over = mgkg > max + 1e-9;
   const add = `<button class="addla mini" data-addla="${esc(JSON.stringify({d:"bupi",c:String(mgml/10),ml:+sig(b),bi:1,l:name.split(" · ")[0]}))}" data-lt="p">+ add</button>`;
-  return `<tr class="${over?"over":""}"><td>${name}${note?`<div class="sub">${note}</div>`:""}${add}</td><td class="sub">${ml[0]===ml[1]?ml[0]:ml.join("–")} mL/kg · ${sig(mgkg)} mg/kg</td><td class="hl">${a===b?sig(a):sig(a)+"–"+sig(b)} mL${cap?` <span class="sub">(max ${capml} mL)</span>`:""}${over?`<div class="danger" style="margin:4px 0 0">Above max ${max} mg/kg</div>`:""}</td></tr>`;
+  return `<tr class="${over?"over":""}"><td>${name}${note?`<div class="sub">${note}</div>`:""}${add}</td><td class="sub">${ml[0]===ml[1]?ml[0]:ml.join("–")} mL/kg · ${sig(mgkg)} mg/kg</td><td class="hl">${a===b?sig(a):sig(a)+"–"+sig(b)} mL${cap?` <span class="sub">(max ${capml} mL)</span>`:""}${over?`<div class="danger" style="margin:4px 0 0;font-weight:700">Above max ${max} mg/kg</div>`:""}</td></tr>`;
 }
 
 function pInputs(forEtt){
@@ -982,7 +983,7 @@ pCards.regional = () => {
     LAR("Hypospadias · levobupi 0.25%",[0.75,1],2.5,2.5,null,20),
     R("+ morphine (preservative-free)","30–50 mcg/kg",pk([30,50],"mcg"),"monitor RR &amp; SpO₂ 24 h; avoid &lt; 6 months unless HDU"),
     DR("+ ketamine (additive)","1","mg"), DR("+ clonidine (additive)",[1,2],"mcg")])}
-  <div class="danger">&gt; 1.2 mL/kg of 0.25% = toxicity (&gt; ${sig(1.2*w)} mL)</div>
+  <div class="danger"><b>&gt; 1.2 mL/kg of 0.25% = toxicity</b> (&gt; ${sig(1.2*w)} mL)</div>
   ${dermLink("L1","Sacro-lumbar ≈ L1")}${dermLink("T10","Upper abdominal ≈ T10")}${dermLink("T6","Mid-thoracic ≈ T6")}
 
   <h3>Caudal with branula (sheath fully in)</h3><p>For ${sig(w)} kg: <b>${bran}</b> (&lt; 5 kg yellow, &lt; 15 kg blue, &lt; 40 kg pink, &gt; 40 kg green)</p>${psrc()}</div>
@@ -995,7 +996,7 @@ pCards.regional = () => {
   <ul><li>Do not flush catheter (avoid confusion with CSF)</li><li>Anchor: dermatome level parallel to skin + skin-to-space; &lt; 3 months max anchor 12 cm</li></ul>
   <h3>Infusion</h3>${(()=>{ const bands=[["&lt; 5 kg (neonate / &lt; 3 months)","0.1% LA, no opioid",[0.1,0.2],0.2,w<5],["5–10 kg","0.1% + fentanyl 1 mcg/mL",[0.2,0.3],0.4,w>=5&&w<=10],["&gt; 10 kg","0.1% + fentanyl 2 mcg/mL",[0.2,0.4],0.4,w>10]];
     return `<div style="overflow-x:auto"><table><tr><th>Weight</th><th>Solution · rate</th><th>For ${sig(w)} kg</th></tr>${bands.map(([b,sol,r,mx,on])=>`<tr class="${on?"hl":""}"><td>${b}</td><td>${sol}<div class="sub">${r[0]}–${r[1]} mL/kg/h · max ${mx} mg/kg/h</div></td><td class="hl">${on?`${sig(r[0]*w)}–${sig(r[1]*w)} mL/h`:"—"}</td></tr>`).join("")}</table></div>
-    <div class="danger">Never exceed ${w<5?"0.2":"0.4"} mg/kg/h of LA = ${sig((w<5?0.2:0.4)*w)} mL/h of 0.1%.</div>`; })()}
+    <div class="danger"><b>Never exceed ${w<5?"0.2":"0.4"} mg/kg/h</b> of LA = ${sig((w<5?0.2:0.4)*w)} mL/h of 0.1%.</div>`; })()}
   <p class="sub">0.1% = 10 mL of 0.5% (50 mg) in 50 mL NS = 1 mg/mL.</p>
   ${psrc()}</div>
   <div class="card"><h2>Intrapleural block</h2>
@@ -1008,7 +1009,7 @@ pCards.procs = () => {
   return `<div class="card"><h2>Laryngospasm</h2>${T([DR("Propofol",[0.5,1],"mg"),DR("Suxamethonium","0.5","mg"),DR("+ atropine","0.02","mg",null,0.6),
     R("Prevention: IV lignocaine before extubation","1–2 mg/kg",pk([1,2],"mg"),"also dexmedetomidine, clonidine")])}
   <ul><li>Remove airway device</li><li>Jaw thrust, Larson manoeuvre</li><li>Flutter the bag</li><li>Gentle thoracic pressure 20–25 compressions/min</li></ul>${psrc()}</div>
-  <div class="card"><h2>Deep extubation (MAC 1)</h2><div class="danger">DO NOT TRY IF NOT FAMILIAR</div>
+  <div class="card"><h2>Deep extubation (MAC 1)</h2><div class="danger"><b>DO NOT TRY IF NOT FAMILIAR</b></div>
   <ul><li>Choose the correct patient</li><li>Rule out airway / aspiration risk / difficult mask ventilation</li><li>Consider lateral position</li></ul></div>
   <div class="card"><h2>Double-lumen CVC</h2>
   ${step("pHt","Height","cm",30,190,1)}<p>Length = height/10 − 1 = <b>${sig(len)} cm</b> · Arrow sizes 5, 8, 13 cm</p>
@@ -1286,7 +1287,7 @@ gaCards.rsi = () => { const W2 = wts();
   <div class="row" style="margin-top:var(--s3)">
     <div class="result" style="margin:0"><div class="sub">Suxamethonium 1.5 mg/kg · TBW ${sig(W2.tbw)} kg</div><div class="big">${sig(1.5*W2.tbw)} mg</div><div class="sub">${sig(1.5*W2.tbw/50)} mL of 50 mg/mL</div></div>
     <div class="result" style="margin:0"><div class="sub">Rocuronium 1.2 mg/kg · IBW ${sig(W2.ibw)} kg</div><div class="big">${sig(1.2*W2.ibw)} mg</div><div class="sub">${sig(1.2*W2.ibw/10)} mL of 10 mg/mL</div>
-      <div class="danger" style="margin-bottom:0">Rescue: sugammadex 16 mg/kg TBW = ${sig(16*W2.tbw)} mg (${sig(16*W2.tbw/100)} mL)</div></div></div>
+      <div class="danger" style="margin-bottom:0"><b>Rescue:</b> sugammadex 16 mg/kg TBW = <b>${sig(16*W2.tbw)} mg</b> (${sig(16*W2.tbw/100)} mL)</div></div></div>
   <p class="sub">Sux: avoid in hyperkalaemia, burns &gt; 48 h, denervation, MH history.</p>${src(GSRC)}</div>`; };
 gaCards.relax = () => `<div class="card"><h2>3. Muscle relaxants</h2>${gaDraft()}${GT([
   GD("Suxamethonium",[1,1.5],"mg","tbw",50),
@@ -1368,7 +1369,7 @@ gaCards.vent = () => {
   <h3>Which mode</h3><table>
     <tr><th>Volume control</th><td>Fixed volume; pressure climbs if compliance falls — set a pressure alarm</td></tr>
     <tr><th>Pressure control</th><td>Fixed pressure; volume falls with pneumoperitoneum, position or bronchospasm — set a low-volume alarm</td></tr>
-    <tr><th>PCV-VG / PRVC</th><td class="hl">Default where available: delivers the set volume at the lowest pressure</td></tr></table>
+    <tr><th>PCV-VG / PRVC</th><td><b>Default where available</b>: delivers the set volume at the lowest pressure</td></tr></table>
   <h3>Recruitment manoeuvre</h3>
   <p class="sub">When: after intubation, after disconnection, after insufflation, falling SpO₂ or compliance. Tell the team; BP first.</p>
   <ol><li><b>Breath-hold:</b> APL / CPAP 30–40 cmH₂O for 30 s (bag or ventilator)</li>
@@ -1438,8 +1439,8 @@ function txInputs(pre){
     + `<div class="chips" style="margin-top:var(--s2)"><span class="chip" style="cursor:default">BMI <b>${sig(W2.bmi)}</b></span>
       <span class="chip" style="cursor:default">IBW <b>${sig(W2.ibw)}</b> kg</span><span class="chip" style="cursor:default">LBW <b>${sig(W2.lbw)}</b> kg</span>
       <span class="chip" style="cursor:default">AdjBW <b>${sig(W2.adj)}</b> kg</span></div>`
-    + (!isSample("k") && S.k >= 5.5 ? `<div class="danger" style="margin:var(--s2) 0 0">K⁺ ${S.k} ≥ 5.5: no suxamethonium · 0.9% saline · discuss dialysis.</div>` : "")
-    + (!isSample("hb") && S.hb < 70 ? `<div class="danger" style="margin:var(--s2) 0 0">Hb ${S.hb} &lt; 70: discuss transfusion with nephrology (leucocyte filter).</div>` : "");
+    + (!isSample("k") && S.k >= 5.5 ? `<div class="danger" style="margin:var(--s2) 0 0"><b>K⁺ ${S.k} ≥ 5.5:</b> no suxamethonium · 0.9% saline · discuss dialysis.</div>` : "")
+    + (!isSample("hb") && S.hb < 70 ? `<div class="danger" style="margin:var(--s2) 0 0"><b>Hb ${S.hb} &lt; 70:</b> discuss transfusion with nephrology (leucocyte filter).</div>` : "");
 }
 /* Pre-op top: discuss-before-proceeding */
 function txFlags(){
@@ -1478,7 +1479,7 @@ txCards.dial = () => { const gain = S.todayWt - S.aw;
 txCards.cardiac = () => `<div class="card"><h2>Kidney: cardiac risk</h2>${tx2Draft()}
   <p class="sub">End-stage kidney disease = high risk of silent coronary disease.</p>
   <table><tr><th>Functional capacity</th><td>≥ 4 METs (2 flights of stairs)? Diabetics may have no angina</td></tr>
-  <tr><th>Echo</th><td>EF, LVH, valves (calcification), pericardial effusion, PA pressure. <b>EF &lt; 40% or pulmonary hypertension → cardiac-output monitoring, slow fluids</b></td></tr>
+  <tr><th>Echo</th><td>EF, LVH, valves (calcification), pericardial effusion, PA pressure. <b>EF &lt; 40% or pulmonary hypertension</b> → cardiac-output monitoring, slow fluids</td></tr>
   <tr><th>Ischaemia</th><td>Exercise test / CTCA / coronary angiogram result; cardiologist input (protocol)</td></tr>
   <tr><th>Continue</th><td>Beta-blocker, statin</td></tr></table>
   <p class="sub">ECG: LVH, ischaemia, hyperkalaemia changes (peaked T, wide QRS).</p>
@@ -1555,7 +1556,7 @@ txCards.syr = () => { const w = txW(), W2 = wts(), nor = (lo,hi) => `${sig(lo*w*
   <tr><th>Mannitol 20%</th><td>0.5 g/kg = ${mann(w)} via infusion pump</td></tr></table>
   <p class="sub">Dry weight ${sig(w)} kg unless stated.</p>${src(TXP+"; atracurium product label; standard fentanyl infusion ranges.")}</div>`; };
 txCards.bp = () => `<div class="card"><h2>Kidney: BP target &amp; pressors</h2>${tx2Draft()}
-  <table><tr><th>Target</th><td class="hl">Patient's own baseline (often 140–150 / 80–90); highest need at <b>reperfusion</b></td></tr>
+  <table><tr><th>Target</th><td>Patient's own baseline (often 140–150 / 80–90); highest need at <b>reperfusion</b></td></tr>
   <tr><th>First choice</th><td><b>Noradrenaline</b> (bolus or infusion) after depth and volume are optimised</td></tr>
   <tr><th>Why</th><td>Cold, ischaemic, vasospastic graft needs high perfusion pressure; a hypertensive donor's kidney expects a higher MAP</td></tr></table>
   <button class="homebtn" data-open="6. Vasopressors & inotropes" data-g="ga" data-tab="maint">Pressor doses → General › Intra-op ›</button>
@@ -1568,14 +1569,14 @@ txCards.fluid = () => { const w = txW(), hi = kHigh();
   <tr><th>Urine output aim</th><td>&gt; 1 mL/kg/h = <b>${sig(w)} mL/h</b></td></tr></table>
   <ul><li><b>As much as required, as little as possible</b>; EF &lt; 40% / pulmonary hypertension → cardiac-output-guided</li>
   <li>Large saline volumes: hyperchloraemic acidosis raises K⁺ and lowers graft perfusion — check ABG</li></ul>
-  ${!isSample("hb") && S.hb < 70 ? `<div class="danger">Hb ${S.hb} g/L — discuss transfusion with nephrology now.</div>` : ""}
+  ${!isSample("hb") && S.hb < 70 ? `<div class="danger"><b>Hb ${S.hb} g/L</b> — discuss transfusion with nephrology now.</div>` : ""}
   <div class="danger"><b>Blood: discuss with nephrology first.</b> Leucocyte filter (available in OT); irradiated if available. Rarely needed unless Hb &lt; 70 g/L.</div>
   ${src(TXP+"; Mayhew BJA Education 2016; Jaszczuk J Clin Med 2022.")}</div>`; };
 txCards.reperf = () => { const w = txW();
   return `<div class="card"><h2>5. Anastomosis &amp; reperfusion</h2>${txDraft()}${txBox()}
-  <table><tr><th>Methylprednisolone</th><td class="hl"><b>500 mg IV</b> slow infusion — start during renal artery anastomosis, <b>complete before reperfusion</b></td></tr>
-  <tr><th>Mannitol 20%</th><td class="hl">0.5 g/kg = ${mann(w)} — start after induction, <b>complete before reperfusion</b></td></tr>
-  <tr><th>Furosemide</th><td class="hl">0.5–1 mg/kg = <b>${sig(0.5*w)}–${sig(w)} mg</b> after reperfusion</td></tr>
+  <table><tr><th>Methylprednisolone</th><td><b>500 mg IV</b> slow infusion — start during renal artery anastomosis, <b>complete before reperfusion</b></td></tr>
+  <tr><th>Mannitol 20%</th><td>0.5 g/kg = ${mann(w)} — start after induction, <b>complete before reperfusion</b></td></tr>
+  <tr><th>Furosemide</th><td>0.5–1 mg/kg = <b>${sig(0.5*w)}–${sig(w)} mg</b> after reperfusion</td></tr>
   <tr><th>Urine output aim</th><td>&gt; 1 mL/kg/h = <b>${sig(w)} mL/h</b></td></tr>
   <tr><th>Thymoglobulin ±</th><td><b>Drug and dose by nephrologist.</b> Protocol example: 75 mg in NS 500 mL, start after induction over 4–6 h, <b>light-protected tubing</b>; may finish in PACU. Fast infusion → cytokine release / allergic reaction: watch BP, HR, temperature</td></tr>
   <tr><th>Basiliximab ±</th><td>By nephrologist (usually given in the ward)</td></tr></table>
@@ -1626,8 +1627,8 @@ txCards.dintra = () => { const w = txW();
   <tr><th>Position</th><td>Left / right lateral (pad, check eyes, pressure points)</td></tr>
   <tr><th>Antibiotic</th><td>Cefuroxime <b>1.5 g IV</b> or equivalent</td></tr>
   <tr><th>BP</th><td>Maintain baseline MAP; vasopressor boluses as needed</td></tr>
-  <tr><th>Fluid</th><td class="hl">Crystalloid / colloid up to 20 mL/kg/h = <b>${sig(20*w)} mL/h</b></td></tr>
-  <tr><th>Mannitol 20%</th><td class="hl">0.5 g/kg = ${mann(w)} — start after induction, <b>complete before arterial clamping</b></td></tr>
+  <tr><th>Fluid</th><td>Crystalloid / colloid up to 20 mL/kg/h = <b>${sig(20*w)} mL/h</b></td></tr>
+  <tr><th>Mannitol 20%</th><td>0.5 g/kg = ${mann(w)} — start after induction, <b>complete before arterial clamping</b></td></tr>
   <tr><th>Urine output aim</th><td>&gt; 1 mL/kg/h = <b>${sig(w)} mL/h</b></td></tr>
   <tr><th>Analgesia</th><td>Opioid + paracetamol</td></tr></table>
   <p class="sub">Weight box = donor's weight on this tab. Drug doses: General section.</p>
@@ -1731,7 +1732,7 @@ gaCards.anticoag = () => `<div class="card"><h2>Neuraxial &amp; deep blocks: ant
   <tr><td>Enoxaparin high dose (treatment)</td><td class="hl">24 h</td><td>24 h; 4 h after catheter removal</td></tr>
   <tr><td>Fondaparinux</td><td class="hl">36–42 h; avoid catheters</td><td>6 h after removal</td></tr>
   <tr><td>Rivaroxaban, apixaban, edoxaban</td><td class="hl">72 h</td><td>6 h after catheter removal</td></tr>
-  <tr><td>Dabigatran</td><td class="hl">72–120 h by CrCl (≥ 80: 72 h; 50–79: 96 h; 30–49: 120 h)</td><td>6 h after catheter removal</td></tr>
+  <tr><td>Dabigatran</td><td><b>72–120 h</b> by CrCl (≥ 80: 72 h; 50–79: 96 h; 30–49: 120 h)</td><td>6 h after catheter removal</td></tr>
   <tr><td>Thrombolytics</td><td class="hl">48 h; avoid</td><td>—</td></tr></table></div>
   <p><b>Platelets:</b> ≥ 80 × 10⁹/L for neuraxial (obstetric ≥ 70 if stable).</p>
   <p class="sub">ASRA 5th edition: "low / high dose" replaces "prophylactic / therapeutic"; DOAC intervals are individualised by kidney function and thrombosis risk. The 72 h shown is the standard interval.</p>
@@ -1815,7 +1816,7 @@ raCards.cse = () => `<div class="card"><h2>CSE (combined spinal–epidural)</h2>
   <li>Catheter can pass through the dural hole: test carefully, give top-ups in small increments</li></ul>${src(RSRC)}</div>`;
 raCards.pdph = () => `<div class="card"><h2>Post-dural puncture headache</h2>${raDraft()}
   ${updNote("2024 multisociety PDPH guideline","ASRA announcement + AAFP practice-guideline summary")}
-  <ul><li>Suspect PDPH with <b>any headache or neurological symptom within 5 days</b> of a neuraxial procedure (typically worse upright)</li>
+  <ul><li>Suspect PDPH with any headache or neurological symptom <b>within 5 days</b> of a neuraxial procedure (typically worse upright)</li>
   <li><b>Image</b> if non-orthostatic, late onset or neurological signs (subdural, cerebral venous thrombosis)</li>
   <li><b>Conservative:</b> paracetamol + NSAID; opioids short-term only; <b>caffeine only in the first 24 h</b></li>
   <li><b>Epidural blood patch</b> if refractory and impairing daily life: <b>15–20 mL</b> autologous blood, slow, aseptic; <b>never &gt; 30 mL</b>; a repeat may be needed if done within 48 h of puncture</li>
