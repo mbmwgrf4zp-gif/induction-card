@@ -160,7 +160,7 @@ header h1{font-size:var(--fs-lg);font-weight:700;margin:0;flex:1;display:flex;al
 .emtabs{margin-top:0;flex-wrap:nowrap}
 .emtabs button{flex:1 1 0;padding:0 var(--s1);min-width:0}
 .emtabs button{min-height:48px;font-size:var(--fs-base)}
-.emtabs.five{gap:4px}.emtabs.five button{font-size:var(--fs-xs);padding:0 2px;letter-spacing:-.01em}
+.emtabs.six{flex-wrap:wrap}@media (min-width:700px){.emtabs.six{flex-wrap:nowrap}.emtabs.five.six button{flex:1 1 0}}.emtabs.five.six button{flex:1 1 30%;font-size:var(--fs-sm);padding:0 var(--s1)}.acchead{margin:var(--s4) 2px var(--s1)}.rellink{display:block;width:calc(100% - 2*var(--s4));box-sizing:border-box;text-align:left;margin-top:var(--s3);padding:var(--s2) var(--s3);border:1px dashed var(--line);border-radius:var(--r-sm);background:none;color:var(--muted);font:inherit;font-size:var(--fs-sm);font-weight:600;cursor:pointer}.emtabs.five{gap:4px}.emtabs.five button{font-size:var(--fs-xs);padding:0 2px;letter-spacing:-.01em}
 .step{display:flex;align-items:center;gap:var(--s2);margin:var(--s2) 0}
 .step label{flex:1;font-weight:600;font-size:var(--fs-base);min-width:0}
 .step button{width:48px;height:48px;border-radius:var(--r-sm);border:1px solid var(--line);background:var(--card);font-size:var(--fs-xl);line-height:1;cursor:pointer}
@@ -367,7 +367,7 @@ a{color:var(--accent)}
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.16.1";
+const APP_VERSION = "2.17.0";
 const APP_DATE = "15 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
@@ -445,14 +445,14 @@ const PEARLS = [
   ["Rocuronium is dosed on ideal weight; suxamethonium on total weight.","3. Muscle relaxants","ga","ind"],
   ["Chula formula: oral ETT depth = 4 + height/10 cm.","4. Tube & airway kit","ga","ind"],
   ["Paeds ETT anchor: term 9 cm, 1 year 12 cm, then age/2 + 12.","1. Tube: size, depth, blade, suction","paeds","ind"],
-  ["Caudal: more than 1.2 mL/kg of 0.25% bupivacaine = toxicity.","9. Block: caudal","paeds","intra"],
-  ["Neonatal epidural: never exceed 0.2 mg/kg/h of local anaesthetic.","12. Block: lumbar / thoracic epidural","paeds","intra"],
+  ["Caudal: more than 1.2 mL/kg of 0.25% bupivacaine = toxicity.","3. Caudal","paeds","blocks"],
+  ["Neonatal epidural: never exceed 0.2 mg/kg/h of local anaesthetic.","4. Lumbar / thoracic epidural","paeds","blocks"],
   ["LAST: Intralipid 20% 1.5 mL/kg over 1 min, then 15 mL/kg/h.","LA toxicity (LAST)","emerg","adult"],
   ["It is easier to manage hypotension than an inadequate block.","A1. Spinal: dose by height","obs","lscs"],
-  ["Do NOT flush a dural-puncture catheter before removal — residual LA.","4. Problem: accidental dural puncture","obs","labour"],
-  ["Remi PCA not working? Adjust the background rate, not the bolus.","5. No epidural: IV PCA","obs","labour"],
+  ["Do NOT flush a dural-puncture catheter before removal — residual LA.","5. Problem: accidental dural puncture","obs","labour"],
+  ["Remi PCA not working? Adjust the background rate, not the bolus.","7. No epidural: IV PCA","obs","labour"],
   ["4/2/1: a 10 kg child needs 40 mL/h maintenance.","1. Fluids: maintenance & insensible loss","paeds","intra"],
-  ["Apfel 2 risk factors = 39% PONV risk → give 2 agents.","2. PONV: Apfel score","ga","post"],
+  ["Apfel 2 risk factors = 39% PONV risk → give 2 agents.","3. PONV: Apfel score","ga","post"],
   ["SGLT2 inhibitors: stop 3 days before surgery (ertugliflozin 4).","2. Regular drugs: stop or continue","ga","pre"],
   ["Laryngospasm: suxamethonium 0.1–0.5 mg/kg IV with atropine 0.02 mg/kg.","Laryngospasm","emerg","paeds"]];
 const CAPNO = (() => { let d = "M0 40"; for (let i=0;i<6;i++){ const x=i*100; d += ` L${x+18} 40 L${x+23} 13 Q${x+40} 10 ${x+58} 8 L${x+63} 40 L${x+100} 40`; } return d; })();
@@ -739,7 +739,7 @@ function unvP(what, why, prop){ return `<div class="unv"><b>UNVERIFIED — HIDDE
 const psrc = () => src(PSRC);
 const pMaxFor = d => { const y4 = AGEM() < 4; return {bupi: y4?2:2.5, ropi: y4?2.5:3, lido: y4?3.5:4, lidoA:7}[d]; };
 const PBUP = () => pMaxFor("bupi");
-function laLine(){ const w=W(), b=pMaxFor("bupi"), r=pMaxFor("ropi"), l=pMaxFor("lido"); return `<div class="lamax"><b>LA max for ${sig(w)} kg${AGEM()<4?" (&lt; 4 months: 15% lower)":""}:</b> bupi / levobupi ${b} mg/kg = <b>${sig(b*w)} mg</b> (${sig(b*w/2.5)} mL of 0.25%) · ropi ${r} mg/kg = <b>${sig(r*w)} mg</b> · lignocaine ${l} mg/kg = ${sig(l*w)} mg (7 with adrenaline = ${sig(7*w)} mg). <b>Doses from different blocks add up</b> — use "+ add" and the LA dose calculator (card 7).</div>`; }
+function laLine(){ const w=W(), b=pMaxFor("bupi"), r=pMaxFor("ropi"), l=pMaxFor("lido"); return `<div class="lamax"><b>LA max for ${sig(w)} kg${AGEM()<4?" (&lt; 4 months: 15% lower)":""}:</b> bupi / levobupi ${b} mg/kg = <b>${sig(b*w)} mg</b> (${sig(b*w/2.5)} mL of 0.25%) · ropi ${r} mg/kg = <b>${sig(r*w)} mg</b> · lignocaine ${l} mg/kg = ${sig(l*w)} mg (7 with adrenaline = ${sig(7*w)} mg). <b>Doses from different blocks add up</b> — use "+ add" and the LA dose calculator (Blocks › card 1).</div>`; }
 // LA row: ml = [lo,hi] mL/kg, mgml = mg per mL, max = mg/kg, capml = absolute mL cap
 function LAR(name, ml, mgml, max, note, capml){
   const w = W(); let a = ml[0]*w, b = ml[1]*w, cap = false;
@@ -1035,11 +1035,7 @@ pCards.procs = () => {
 pCards.special = () => {
   const w = W(), y = S.pY;
   const parec = y<5 ? 0.9 : y<10 ? 0.75 : 0.65;
-  return `<div class="card"><h2>Airway syndromes</h2><ul>
-  <li><b>Apert</b> — airway + coagulopathy</li><li><b>Pierre Robin sequence</b></li><li><b>Treacher Collins</b> — small mouth, limited TMJ</li><li><b>Goldenhar</b> — small mouth, limited TMJ</li><li><b>Klippel-Feil</b> — limited neck extension</li>
-  <li><b>Mucopolysaccharidoses</b> — difficult mask/LMA, need enzyme therapy, may need tracheostomy first, asleep FOI</li></ul></div>
-  <div class="card"><h2>Down syndrome</h2><ul><li>OSA</li><li>Unstable C-spine — CMAC</li><li>Tracheal stenosis / malacia</li><li>AVSD</li></ul></div>
-  <div class="card"><h2>OSA for tonsillectomy — opioid-free</h2>${T([DR("Supp paracetamol","40","mg"),
+  return `<div class="card"><h2>OSA for tonsillectomy — opioid-free</h2>${T([DR("Supp paracetamol","40","mg"),
     R("Parecoxib","0.9 mg/kg (2 y) · 0.75 (7 y) · 0.65 (12 y)",`${sig(parec*w)} mg`,`using ${parec} mg/kg for age ${y}`),
     DR("Ketamine",[0.3,0.5],"mg"), DR("Dexmedetomidine","1","mcg")])}${psrc()}</div>
   <div class="card"><h2>Hypospadias repair</h2><h3>Intra-op</h3>${T([
@@ -1123,13 +1119,13 @@ pCards.urti = () => `<div class="card"><h2>URTI &amp; asthma: go or delay</h2>${
   <tr><th>Active infection</th><td>Onset &lt; 2 weeks with fever, congestion, productive cough, purulent discharge → postpone elective</td></tr>
   <tr><th>Asthma</th><td>Check day/night symptoms, last attack, inhaler use; give bronchodilator pre-op. <b>Postpone if poorly controlled or attack &lt; 4 weeks</b></td></tr></table>
   <p class="sub">Examine: coarse breath sounds, wheeze, SpO₂ on air. Do not proceed with URTI / asthma exacerbation without senior review.</p>${src(PLOC+".")}</div>`;
-const CONG = [["Pierre Robin / micrognathia","Severe airway obstruction; fibreoptic often needed; prone / lateral helps"],
-  ["Goldenhar","Difficult mask seal and laryngoscopy; cervical spine anomalies"],["Treacher Collins","Difficult mask and intubation; small mouth"],
-  ["Mucopolysaccharidoses (MPS I–VII)","Very difficult airway, unstable neck, thick secretions, CHD; worst in MPS I/II"],
-  ["Down syndrome","Difficult mask; avoid neck extension (atlanto-axial); bradycardia at induction; OSA; ASD/VSD"],
+const CONG = [["Pierre Robin / micrognathia","Severe airway obstruction; fibreoptic often needed; prone / lateral helps <span class='sub'><b>My notes:</b> Pierre Robin sequence</span>"],
+  ["Goldenhar","Difficult mask seal and laryngoscopy; cervical spine anomalies <span class='sub'><b>My notes:</b> small mouth, limited TMJ</span>"],["Treacher Collins","Difficult mask and intubation; small mouth <span class='sub'><b>My notes:</b> small mouth, limited TMJ</span>"],["Apert","Craniosynostosis syndrome: difficult airway <span class='sub'><b>My notes:</b> airway + coagulopathy</span>"],
+  ["Mucopolysaccharidoses (MPS I–VII)","Very difficult airway, unstable neck, thick secretions, CHD; worst in MPS I/II <span class='sub'><b>My notes:</b> difficult mask / LMA; needs enzyme therapy; may need tracheostomy first; asleep FOI</span>"],
+  ["Down syndrome","Difficult mask; avoid neck extension (atlanto-axial); bradycardia at induction; OSA; ASD/VSD <span class='sub'><b>My notes:</b> OSA; unstable C-spine — CMAC; tracheal stenosis / malacia; AVSD</span>"],
   ["Craniosynostosis","Difficult mask; raised ICP; OSA"],["Beckwith–Wiedemann","Macroglossia; hypoglycaemia; difficult laryngoscopy"],
   ["Russell–Silver","Difficult airway; hypoglycaemia"],["Turner","Difficult airway; coarctation — cardiac review; renal anomalies"],
-  ["Klippel–Feil","Fused cervical spine — neck cannot extend"],["CHARGE","Choanal atresia; complex CHD"],
+  ["Klippel–Feil","Fused cervical spine — neck cannot extend <span class='sub'><b>My notes:</b> limited neck extension</span>"],["CHARGE","Choanal atresia; complex CHD"],
   ["VACTERL","Aspiration (TEF); difficult IV; renal dosing"],["DiGeorge","Hypocalcaemia → seizures / laryngospasm; immunodeficiency (irradiated blood)"],
   ["Inherited metabolic disorders","Avoid prolonged fasting and hypoglycaemia; hydrate; no protein in organic acidaemia"],
   ["Mitochondrial myopathy","Avoid propofol infusion; avoid long fasting; normothermia, normoglycaemia"],
@@ -2587,8 +2583,8 @@ screens.values = () => {
 
 /* ================= ROUTER & EVENTS ================= */
 /* ================= GROUPS (by situation) ================= */
-const EMERG_ADULT = ["High / total spinal","LA toxicity (LAST)","Anaphylaxis","Hypotension after spinal","Bradycardia & cardiac arrest","Bronchospasm","Malignant hyperthermia","Hyperkalaemia","Failed intubation / CICO","Massive obstetric haemorrhage","Eclampsia"];
-const EMERG_PAEDS = ["Laryngospasm","Paeds bronchospasm","Paeds cardiac arrest","Paeds LA toxicity (LAST)","Paeds anaphylaxis","Paeds malignant hyperthermia","Paeds massive transfusion","Paeds PACU crises","Latex allergy","Cyanotic heart disease / Fallot spell"];
+const EMERG_ADULT = ["§Airway & breathing","Failed intubation / CICO","Bronchospasm","Anaphylaxis","Latex allergy","§Circulation & drugs","Bradycardia & cardiac arrest","High / total spinal","Hypotension after spinal","LA toxicity (LAST)","Malignant hyperthermia","Hyperkalaemia","§Obstetric","Massive obstetric haemorrhage","Eclampsia"];
+const EMERG_PAEDS = ["§Airway","Laryngospasm","Paeds bronchospasm","§Circulation","Paeds cardiac arrest","Paeds anaphylaxis","Cyanotic heart disease / Fallot spell","Paeds massive transfusion","§Drugs","Paeds LA toxicity (LAST)","Paeds malignant hyperthermia","Latex allergy","§Recovery","Paeds PACU crises"];
 const GROUPS = [
  {id:"emerg", name:"Emergencies", sub:"Adult & obstetric · Paeds — crisis steps with doses", tabKey:"emTab", tabs:[
    {id:"adult", label:"Adult / Obstetric", input:()=>step("aw","Weight","kg",30,200,1), cards:EMERG_ADULT},
@@ -2603,8 +2599,8 @@ const GROUPS = [
    {id:"maint", label:"Intra-op", input:()=>gaInputs(), hint:"Ventilate → keep them asleep and stable.",
     cards:["1. Ventilation strategies","2. One-lung ventilation","3. TIVA","4. Volatile: MAC by age","5. Intra-op opioids","6. Vasopressors & inotropes","7. Antibiotic prophylaxis","8. Tranexamic acid"],
     links:[["Bronchospasm","adult","Bronchospasm"],["Anaphylaxis","adult","Anaphylaxis"],["Malignant hyperthermia","adult","Malignant hyperthermia"],["LA toxicity (LAST)","adult","LA toxicity"],["Bradycardia & cardiac arrest","adult","Bradycardia / arrest"]]},
-   {id:"post", label:"Post-op", input:()=>gaInputs(), hint:"Reverse → prevent PONV → extubate → analgesia.",
-    cards:["1. Reversal","2. PONV: Apfel score","3. Extubation criteria","4. Analgesia ladder & PCA",["Discharge from recovery","5. Discharge from recovery"],["Discharge home (daycare)","6. Discharge home (daycare)"]],
+   {id:"post", label:"Post-op", input:()=>gaInputs(), hint:"Reverse → extubate → prevent PONV → analgesia → discharge.",
+    cards:["1. Reversal",["3. Extubation criteria","2. Extubation criteria"],["2. PONV: Apfel score","3. PONV: Apfel score"],"4. Analgesia ladder & PCA",["Discharge from recovery","5. Discharge from recovery"],["Discharge home (daycare)","6. Discharge home (daycare)"]],
     links:[["Bronchospasm","adult","Bronchospasm"],["Anaphylaxis","adult","Anaphylaxis"]]}], cards:[]},
  {id:"regional", name:"Regional", sub:"Safety · Neuraxial · Upper · Lower · Trunk", tabKey:"raTab", tabs:[
    {id:"safety", label:"Safety", input:()=>gaInputs(), hint:"Before every block: dose limits, checklist, anticoagulants.",
@@ -2619,33 +2615,40 @@ const GROUPS = [
     links:[["LA toxicity (LAST)","adult","LA toxicity"]]},
    {id:"trunk", label:"Trunk", input:()=>gaInputs(), hint:"Chest → abdomen. Bilateral blocks: check the calculator.", cards:[["Erector spinae (ESP)","1. Erector spinae (ESP)"],["Serratus anterior","2. Serratus anterior"],["Rectus sheath","3. Rectus sheath"],["TAP","4. TAP"]],
     links:[["LA toxicity (LAST)","adult","LA toxicity"]]}], cards:[]},
- {id:"paeds", name:"Paediatric", sub:"Pre-op · Induction · Intra-op · Post-op", tabKey:"pTab", tabs:[
-   {id:"pre", label:"Pre-op", input:()=>pInputs(), hint:"Plan the case: expected BP, then check for a special condition.",
-    cards:[["Paeds fasting","1. Fasting"],["Paeds premedication","2. Premedication"],["Paeds airway score (PAAS)","3. Airway score (PAAS)"],["OSA screen (STBUR)","4. OSA screen (STBUR)"],["URTI & asthma: go or delay","5. URTI & asthma: go or delay"],
-      ["Ex-prem: apnoea risk & admission","6. Ex-prem: apnoea risk & admission"],["Estimated systolic BP","7. Expected BP for age / weight"],["Congenital conditions (A–Z)","8. Congenital conditions (A–Z)"],["Airway syndromes","9. Difficult airway syndromes (my notes)"],["Down syndrome","10. Down syndrome"],
-      ["OSA for tonsillectomy — opioid-free","11. OSA / tonsillectomy (opioid-free)"],["Cyanotic heart disease / Fallot spell","12. Cyanotic heart disease / Fallot spell"],
-      ["Pyloric stenosis","13. Pyloric stenosis"],["Neonatal surgery","14. Neonatal surgery (PDA, TOF, CDH, NEC)"],["Hypospadias repair","15. Hypospadias repair (whole plan)"],
-      ["MRI under sedation","16. MRI / sedation outside theatre"],["Dynamic airway assessment (spontaneous breathing)","17. Dynamic airway / bronchoscopy"]],
-    links:[["Cyanotic heart disease / Fallot spell","paeds","Fallot spell"]]},
+ {id:"paeds", name:"Paediatric", sub:"Pre-op · Induction · Intra-op · Blocks · Post-op · Cases", tabKey:"pTab", tabs:[
+   {id:"pre", label:"Pre-op", input:()=>pInputs(), hint:"Assess the child: fasting, premed, airway, OSA, URTI, ex-prem, BP, syndromes.",
+    cards:[["Paeds fasting","1. Fasting (child)"],["Paeds premedication","2. Premedication"],["Paeds airway score (PAAS)","3. Airway score (PAAS)"],["OSA screen (STBUR)","4. OSA screen (STBUR)"],["URTI & asthma: go or delay","5. URTI & asthma: go or delay"],
+      ["Ex-prem: apnoea risk & admission","6. Ex-prem: apnoea risk & admission"],["Estimated systolic BP","7. Expected BP for age / weight"],["Congenital conditions (A–Z)","8. Congenital conditions (A–Z)"]],
+    links:[]},
    {id:"ind", label:"Induction", input:()=>pInputs(true), hint:"Airway kit → drugs → TIVA → ventilate → lines.",
-    cards:[["Paeds ETT","1. Tube: size, depth, blade, suction"],["NPA","2. NPA"],["Micro HMEF","3. HMEF"],["Bag","4. Bag"],
-      ["Paeds induction drugs","5. Induction drugs"],["Ketamine anaesthesia","6. Ketamine induction (short cases)"],
-      ["TCI model check","7. TIVA: model check & propofol targets"],["Remifentanil 10 mcg/mL","8. TIVA: remifentanil"],
-      ["Paeds ventilation","9. Ventilation settings"],["One-lung ventilation (Storz)","10. One-lung ventilation (Storz)"],["T-tube","11. T-tube"],["Double-lumen CVC","12. Lines: double-lumen CVC"],["Paeds antibiotic prophylaxis","13. Antibiotic prophylaxis"]],
+    cards:["§Airway",["Paeds ETT","1. Tube: size, depth, blade, suction"],["NPA","2. NPA"],["Micro HMEF","3. HMEF"],["Bag","4. Bag"],
+      "§Drugs",["Paeds induction drugs","5. Induction drugs"],["Ketamine anaesthesia","6. Ketamine induction (short cases)"],
+      "§TIVA",["TCI model check","7. TIVA: model check & propofol targets"],["Remifentanil 10 mcg/mL","8. TIVA: remifentanil"],
+      "§Ventilation",["Paeds ventilation","9. Ventilation settings"],["One-lung ventilation (Storz)","10. One-lung ventilation (Storz)"],
+      "§Lines",["Double-lumen CVC","11. Lines: double-lumen CVC"]],
     links:[["Laryngospasm","paeds","Laryngospasm"],["Paeds bronchospasm","paeds","Bronchospasm"],["Paeds anaphylaxis","paeds","Anaphylaxis"]]},
-   {id:"intra", label:"Intra-op", input:()=>pInputs(), hint:"Keep them stable: fluids → drugs → blocks → warmth.",
-    cards:[["Maintenance (4/2/1)","1. Fluids: maintenance & insensible loss"],["Glucose (neonate / paeds)","2. Fluids: glucose"],["Blood products","3. Fluids: blood products"],
-      ["Paeds intra-op drugs","4. Drugs: TXA, steroids, calcium…"],["Inotropes (50 mL syringe)","5. Drugs: inotropes"],["Paeds resuscitation","6. Drugs: resuscitation"],
-      ["Paeds LA dose calculator","7. Block: LA dose calculator"],["Which block (paeds)","8. Block: which one"],["Caudal block","9. Block: caudal"],["Ilioinguinal block","10. Block: ilioinguinal"],["Penile block","11. Block: penile"],
-      ["Paeds lumbar / thoracic epidural","12. Block: lumbar / thoracic epidural"],["Neonatal / infant spinal","13. Block: neonatal / infant spinal"],["Block volumes (paeds)","14. Block: volumes for other blocks"],["Intrapleural block","15. Block: intrapleural"],["Keeping warm","16. Keeping warm"]],
-    links:[["Paeds massive transfusion","paeds","Massive transfusion"],["Paeds LA toxicity (LAST)","paeds","LA toxicity"],["Paeds malignant hyperthermia","paeds","Malignant hyperthermia"],["Paeds cardiac arrest","paeds","Cardiac arrest"]]},
+   {id:"intra", label:"Intra-op", input:()=>pInputs(), hint:"Keep them stable: fluids → drugs → warmth.",
+    cards:["§Fluids",["Maintenance (4/2/1)","1. Fluids: maintenance & insensible loss"],["Glucose (neonate / paeds)","2. Fluids: glucose"],["Blood products","3. Fluids: blood products"],
+      "§Drugs",["Paeds intra-op drugs","4. Drugs: TXA, steroids, calcium…"],["Inotropes (50 mL syringe)","5. Drugs: inotropes"],["Paeds resuscitation","6. Drugs: resuscitation"],["Paeds antibiotic prophylaxis","7. Antibiotic prophylaxis (child)"],
+      "§Other",["Keeping warm","8. Keeping warm"]],
+    links:[["Paeds massive transfusion","paeds","Massive transfusion"],["Paeds malignant hyperthermia","paeds","Malignant hyperthermia"],["Paeds cardiac arrest","paeds","Cardiac arrest"]]},
+   {id:"blocks", label:"Blocks", input:()=>pInputs(), hint:"Check the LA maximum first; doses from several blocks add up.",
+    cards:["§Plan",["Paeds LA dose calculator","1. LA dose calculator (child)"],["Which block (paeds)","2. Which block"],
+      "§Central",["Caudal block","3. Caudal"],["Paeds lumbar / thoracic epidural","4. Lumbar / thoracic epidural"],["Neonatal / infant spinal","5. Neonatal / infant spinal"],
+      "§Peripheral",["Ilioinguinal block","6. Ilioinguinal"],["Penile block","7. Penile"],["Block volumes (paeds)","8. Volumes for other blocks"],["Intrapleural block","9. Intrapleural"]],
+    links:[["Paeds LA toxicity (LAST)","paeds","LA toxicity"]]},
    {id:"post", label:"Post-op", input:()=>pInputs(), hint:"Wake-up and after: PONV → extubation → delirium → analgesia.",
     cards:[["Paeds PONV by risk","1. PONV by risk"],["Deep extubation (MAC 1)","2. Deep extubation"],["Laryngospasm","3. Laryngospasm: prevent & treat"],
       ["Emergence delirium","4. Emergence delirium"],["Paeds pain scores","5. Pain scores"],["Paeds analgesia by age","6. Analgesia by age"],["Paeds opioid / ketamine infusions & PCA","7. Infusions & PCA"],["Paeds discharge","8. Discharge (recovery & home)"]],
-    links:[["Laryngospasm","paeds","Laryngospasm"],["Paeds bronchospasm","paeds","Bronchospasm"],["Paeds PACU crises","paeds","PACU crises"]]}], cards:[]},
+    links:[["Laryngospasm","paeds","Laryngospasm"],["Paeds bronchospasm","paeds","Bronchospasm"],["Paeds PACU crises","paeds","PACU crises"]]},
+   {id:"cases", label:"Cases", input:()=>pInputs(), hint:"Whole plans for specific operations and procedures.",
+    cards:[["OSA for tonsillectomy — opioid-free","1. OSA / tonsillectomy (opioid-free)"],["Cyanotic heart disease / Fallot spell","2. Cyanotic heart disease / Fallot spell"],
+      ["Pyloric stenosis","3. Pyloric stenosis"],["Neonatal surgery","4. Neonatal surgery (PDA, TOF, CDH, NEC)"],["Hypospadias repair","5. Hypospadias repair (whole plan)"],
+      ["MRI under sedation","6. MRI / sedation outside theatre"],["Dynamic airway assessment (spontaneous breathing)","7. Dynamic airway / bronchoscopy"],["T-tube","8. T-tube"]],
+    links:[["Cyanotic heart disease / Fallot spell","paeds","Fallot spell"],["Laryngospasm","paeds","Laryngospasm"]]}], cards:[]},
  {id:"obs", name:"Obstetric", sub:"Labour · Caesarean · After delivery", tabKey:"obTab", tabs:[
    {id:"labour", label:"Labour", hint:"Epidural, in the order you do it.",
-    cards:["1. Start: test, bolus & loading","2. Maintain: infusion recipes","2b. Maintain: pump settings","3. Top-up: breakthrough pain","4. Problem: accidental dural puncture","4b. Problems: catheter troubleshooting","5. No epidural: IV PCA"],
+    cards:["1. Start: test, bolus & loading","2. Maintain: infusion recipes",["2b. Maintain: pump settings","3. Maintain: pump settings"],["3. Top-up: breakthrough pain","4. Top-up: breakthrough pain"],["4. Problem: accidental dural puncture","5. Problem: accidental dural puncture"],["4b. Problems: catheter troubleshooting","6. Problems: catheter troubleshooting"],["5. No epidural: IV PCA","7. No epidural: IV PCA"]],
     links:[["High / total spinal","adult","High block"],["LA toxicity (LAST)","adult","LA toxicity"]]},
    {id:"lscs", label:"Caesarean", hint:"Pick your route: A spinal · B epidural top-up · C dural puncture catheter.",
     cards:["0. Before theatre: aspiration prophylaxis","A1. Spinal: dose by height","A2. Spinal: IT morphine & fentanyl","A3. Spinal: phenylephrine","B. Epidural top-up for LSCS","C. Dural puncture catheter: LSCS dosing"],
@@ -2669,15 +2672,15 @@ const GROUPS = [
    {id:"don", label:"Donor", input:()=>donInputs(), hint:"Living donor nephrectomy.",
     cards:["1. Donor pre-op","2. Donor intra-op","3. Donor post-op"], links:[]}], cards:[]}];
 const SEARCH_EXTRA = {
-  "1. Fasting":"paeds child fasting clear fluid breast milk formula",
+  "1. Fasting (child)":"paeds child fasting clear fluid breast milk formula",
   "2. Premedication":"premed premedication midazolam oral buccal intranasal dexmedetomidine anxiety",
   "3. Airway score (PAAS)":"paas airway score difficult intubation mallampati paeds",
   "4. OSA screen (STBUR)":"stbur osa sleep apnoea snoring tonsillectomy",
   "5. URTI & asthma: go or delay":"urti cold cough asthma postpone delay cancel",
   "6. Ex-prem: apnoea risk & admission":"ex-prem premature preterm apnoea pma pca post-conceptual post-menstrual admission nicu daycare",
   "8. Congenital conditions (A–Z)":"syndrome congenital pierre robin goldenhar treacher collins mps mucopolysaccharidosis down craniosynostosis beckwith turner klippel charge vacterl digeorge mitochondrial myopathy duchenne myotonic sma epidermolysis osteogenesis",
-  "13. Block: neonatal / infant spinal":"neonatal spinal infant spinal ex-prem hernia subarachnoid",
-  "14. Block: volumes for other blocks":"block volume ilioinguinal penile axillary supraclavicular femoral sciatic tap rectus sheath erector spinae esp quadratus lumborum",
+  "5. Neonatal / infant spinal":"neonatal spinal infant spinal ex-prem hernia subarachnoid",
+  "8. Volumes for other blocks":"block volume ilioinguinal penile axillary supraclavicular femoral sciatic tap rectus sheath erector spinae esp quadratus lumborum",
   "1. PONV by risk":"ponv paeds vomiting ondansetron dexamethasone droperidol metoclopramide eberhart",
   "5. Pain scores":"pain score flacc nips faces numerical",
   "6. Analgesia by age":"analgesia paracetamol ibuprofen diclofenac parecoxib tramadol oxycodone morphine fentanyl ketamine clonidine naloxone",
@@ -2715,13 +2718,13 @@ const SEARCH_EXTRA = {
   "1. Ventilation strategies":"ventilation ventilator ventilate lung protective tidal volume tv peep recruitment recruit driving pressure plateau pcv vcv pcv-vg prvc ards asthma copd auto-peep laparoscopy trendelenburg obese neuro icp hyperventilation pregnancy lscs dopes desaturation hypoxia high airway pressure",
   "2. One-lung ventilation":"one-lung ventilation olv dlt double-lumen double lumen tube bronchial blocker arndt thoracic vats lung isolation thoracotomy cpap",
   "7. Antibiotic prophylaxis":"antibiotic prophylaxis cefazolin unasyn ampicillin sulbactam augmentin metronidazole gentamicin clindamycin vancomycin cefuroxime azithromycin endocarditis uro gynae ortho dental hpb colorectal",
-  "13. Antibiotic prophylaxis":"antibiotic prophylaxis cefazolin unasyn metronidazole gentamicin clindamycin vancomycin paeds endocarditis",
+  "7. Antibiotic prophylaxis (child)":"antibiotic prophylaxis cefazolin unasyn metronidazole gentamicin clindamycin vancomycin paeds endocarditis",
   "4. Tube & airway kit":"ett tube endotracheal chula lma igel i-gel supraglottic laryngoscope video adult",
   "Neuraxial & deep blocks: anticoagulant timing":"anticoagulant antiplatelet clopidogrel enoxaparin clexane heparin warfarin doac rivaroxaban apixaban dabigatran asra platelets",
   "A1. Spinal: dose by height":"lscs caesarean cesarean c-section sab spinal heavy bupivacaine marcaine dose height obstetric",
   "A2. Spinal: IT morphine & fentanyl":"lscs caesarean intrathecal it opioid",
   "A3. Spinal: phenylephrine":"lscs caesarean vasopressor hypotension",
-  "2b. Maintain: pump settings":"pcea pieb cse labour epidural pump",
+  "3. Maintain: pump settings":"pcea pieb cse labour epidural pump",
   "1. Start: test, bolus & loading":"labour epidural initiate loading cse",
   "2. Maintain: infusion recipes":"labour epidural cocktail ropivacaine levobupivacaine infusion"};
 const CALC_KW = {ga:"ett tube endotracheal depth size cuffed plain anchor intubation neonate chula suction laryngoscope", regional:"spinal sab heavy bupivacaine marcaine height dose turp urology hernia perineal saddle lower limb hip knee ortho"};
@@ -2735,23 +2738,41 @@ function cardMap(){
     const h = c.querySelector("h2"); if (h && h.parentElement===c) m[h.textContent.trim()] = c; });
   return m;
 }
+/* "Same topic elsewhere" links */
+const REL_PAIRS = [
+  [["ga","pre","1. Fasting"],["paeds","pre","1. Fasting (child)"]],
+  [["ga","maint","1. Ventilation strategies"],["paeds","ind","9. Ventilation settings"]],
+  [["ga","maint","2. One-lung ventilation"],["paeds","ind","10. One-lung ventilation (Storz)"]],
+  [["ga","maint","3. TIVA"],["paeds","ind","7. TIVA: model check & propofol targets"]],
+  [["ga","maint","7. Antibiotic prophylaxis"],["paeds","intra","7. Antibiotic prophylaxis (child)"]],
+  [["ga","post","3. PONV: Apfel score"],["paeds","post","1. PONV by risk"]],
+  [["ga","post","4. Analgesia ladder & PCA"],["paeds","post","6. Analgesia by age"]],
+  [["ga","post","5. Discharge from recovery"],["paeds","post","8. Discharge (recovery & home)"]],
+  [["regional","safety","1. LA dose calculator"],["paeds","blocks","1. LA dose calculator (child)"]],
+  [["regional","neuraxial","1. Epidural"],["paeds","blocks","4. Lumbar / thoracic epidural"]]];
+const GNAME = {ga:"General", regional:"Regional", paeds:"Paediatric"};
+function relLinks(gid, t){
+  const out = [];
+  REL_PAIRS.forEach(([a,b]) => { if (a[0]===gid && a[2]===t) out.push(b); else if (b[0]===gid && b[2]===t) out.push(a); });
+  return out.map(([g,tab,l]) => { const tb = GROUPS.find(x=>x.id===g).tabs.find(x=>x.id===tab); return `<button class="rellink" data-open="${esc(l)}" data-g="${g}" data-tab="${tab}">Same topic: ${GNAME[g]} › ${tb?tb.label:""} › ${esc(l.replace(/^\d+\.\s*/,""))} ›</button>`; }).join("");
+}
 const isWide = () => window.matchMedia("(min-width: 1100px)").matches;
 function accordion(c, t, gid, label){
   const cl = c.cloneNode(true), h = cl.querySelector("h2"), sum = label ? esc(label) : h.innerHTML; h.remove();
   const mm = sum.match(/^([A-C]?\d+[a-z]?)\.\s+(.*)$/s);
   const summ = mm ? `<span class="stepno">${mm[1]}</span><span class="st">${mm[2]}</span>` : `<span class="st">${sum}</span>`;
-  return `<details class="card acc" ${isWide()?"":'name="acc"'} data-t="${esc(t)}" data-g="${gid}"><summary>${summ}</summary>${cl.innerHTML}</details>`;
+  return `<details class="card acc" ${isWide()?"":'name="acc"'} data-t="${esc(t)}" data-g="${gid}"><summary>${summ}</summary>${cl.innerHTML}${relLinks(gid, t)}</details>`;
 }
 function groupScreen(g){
   const m = cardMap();
-  const acc = list => list.map(it => { const [o,l] = Array.isArray(it) ? it : [it,it];
+  const acc = list => list.map(it => { if (typeof it==="string" && it[0]==="§") return `<div class="label acchead">${esc(it.slice(1))}</div>`; const [o,l] = Array.isArray(it) ? it : [it,it];
     return m[o] ? accordion(m[o], l, g.id, l!==o ? l : null) : `<div class="danger">Missing card: ${esc(o)}</div>`; }).join("");
   if (g.tabs){
     const tab = g.tabs.find(t=>t.id===S[g.tabKey]) || g.tabs[0];
     const ab = (g.id==="paeds" && !PREV_CHECKED ? `<div class="warn">DRAFT — paediatric revisions (Nov 2026): auto-calculations and dose caps. Tick on the Values sheet.</div>` : "") + activeBar() + sampleWarn(SAMPLE_BY[g.id] ? (SAMPLE_BY[g.id][tab.id] || SAMPLE_BY[g.id]["*"] || []) : []);
     const links = (tab.links||[]).map(([t,tb,label])=>`<button class="emlink" data-open="${esc(t)}" data-g="emerg" data-tab="${tb}">⚠ ${esc(label)} → Emergencies</button>`).join("");
     const side = ab + (tab.input ? `<div class="card">${tab.input()}</div>` : "");
-    return head(g.name,"home",g.id) + (g.tabs.length>1 ? `<div class="seg emtabs${g.tabs.length>=5?" five":""}">${g.tabs.map(t=>`<button aria-pressed="${t===tab}" data-seg="${g.tabKey}" data-val="${t.id}">${t.label}</button>`).join("")}</div>` : `<div class="label" style="margin-top:0">${tab.label}</div>`) +
+    return head(g.name,"home",g.id) + (g.tabs.length>1 ? `<div class="seg emtabs${g.tabs.length>=6?" five six":g.tabs.length>=5?" five":""}">${g.tabs.map(t=>`<button aria-pressed="${t===tab}" data-seg="${g.tabKey}" data-val="${t.id}">${t.label}</button>`).join("")}</div>` : `<div class="label" style="margin-top:0">${tab.label}</div>`) +
       `<div class="gwrap${side.trim()?"":" noside"}"><aside class="gside">${side}</aside><div class="gmain">` + (tab.top ? tab.top() : "") +
       (tab.cards.length ? `<div class="hint">${tab.hint || "Tap a heading to open it."}${isWide()?" Several can be open at once.":""}</div>` + acc(tab.cards) : "") +
       (links ? `<div class="card emlinks"><div class="sub">If it goes wrong</div>${links}</div>` : "") + `</div></div>` + disc;
@@ -2800,7 +2821,7 @@ function renderNow(){
   app.dataset.group = h.startsWith("g-") ? h.slice(2) : "";
   const navItems = [["home","Home","search","home"],["g-emerg","Emergencies","emerg","emerg"],["g-ga","General","ga","ga"],["g-regional","Regional","regional","regional"],["g-paeds","Paediatric","paeds","paeds"],["g-obs","Obstetric","obs","obs"],["g-tx","Transplant","tx","tx"],["values","Values sheet","values","values"]];
   const nav = `<nav class="sidenav" aria-label="Sections"><div class="snbrand">${svg("capno")} Induction Card</div>${navItems.map(([hh,l,ic,cls])=>`<button class="snitem sn-${cls} ${h===hh||(hh==="home"&&!h.startsWith("g-")&&h!=="values")?"on":""}" data-go="${hh}"><span class="snico">${svg(ic)}</span>${l}</button>`).join("")}
-    <div class="snkeys">Keys: <b>/</b> search · <b>Esc</b> back · <b>1–5</b> tabs</div></nav>`;
+    <div class="snkeys">Keys: <b>/</b> search · <b>Esc</b> back · <b>1–6</b> tabs</div></nav>`;
   app.innerHTML = `<div class="shell">${nav}<div class="content">${html}</div></div>`;
   if (isWide() && S.openSet) S.openSet.forEach(t => { const d = app.querySelector(`details[data-t="${CSS.escape(t)}"]`); if (d) d.open = true; });
   if (S.open){ const d = app.querySelector(`details[data-t="${CSS.escape(S.open)}"]`); if (d){ d.open = true; if (S.scrollTo){ d.scrollIntoView({block:"start"}); } } }
@@ -2867,7 +2888,7 @@ document.addEventListener("keydown", e => {
   if (e.key === "Escape"){ if (typing){ e.target.blur(); return; }
     const open = document.querySelectorAll("details.acc[open]"); if (open.length){ open[open.length-1].open = false; return; }
     if ((location.hash||"#home") !== "#home") location.hash = "#home"; return; }
-  if (!typing && /^[1-5]$/.test(e.key)){ const tabs = document.querySelectorAll(".emtabs button"); const b = tabs[+e.key-1]; if (b) b.click(); }
+  if (!typing && /^[1-6]$/.test(e.key)){ const tabs = document.querySelectorAll(".emtabs button"); const b = tabs[+e.key-1]; if (b) b.click(); }
 });
 applyTheme(); { const c = activeCase(); if (c) applyCase(c); } render();
 if ("serviceWorker" in navigator && (location.protocol==="https:" || location.hostname==="localhost" || location.hostname==="127.0.0.1")) {
