@@ -358,7 +358,7 @@ a{color:var(--accent)}
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.13.0";
+const APP_VERSION = "2.13.1";
 const APP_DATE = "15 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
@@ -1288,7 +1288,7 @@ gaCards.kit = () => { const w = S.aw;
   ${src("Manufacturer weight bands.")}</div>`; };
 
 /* ---------- VENTILATION STRATEGIES (adult) — DRAFT: Young BJA 2019 consensus; ARDSNet; BTF 4th ed.; thoracic reviews ---------- */
-const VENT_CHECKED = false;
+const VENT_CHECKED = true;
 const ventDraft = () => VENT_CHECKED ? "" : `<div class="warn" style="margin-top:0">DRAFT — intra-op lung-protective ventilation consensus (BJA 2019), ARDSNet, Brain Trauma Foundation 4th ed., thoracic anaesthesia reviews. Not yet ticked by you.</div>`;
 const pbw = () => wts().ibwRaw;   // predicted body weight (ARDSNet = Devine), from sex + height only
 const mlr = (lo, hi) => `${Math.round(lo*pbw()/10)*10}–${Math.round(hi*pbw()/10)*10} mL`;
@@ -1955,7 +1955,7 @@ const VALUES = [
   "Spinal: voiding required only if high risk (hernia, anorectal, urology, pelvic, retention history)",
   "Nerve block: home with protected numb limb; oral analgesia before block wears off",
   "Paeds: drinking not required; ex-prem < 60 weeks PCA overnight; tonsillectomy < 3 y / OSA overnight; paracetamol 15 mg/kg 6-hourly, ibuprofen 10 mg/kg 8-hourly"]],
- ["Ventilation strategies (DRAFT — tick to sign off)", [
+ ["Ventilation strategies & one-lung ventilation (signed off 15 Nov 2026)", [
   "PBW (ARDSNet/Devine) from sex + height: ♂ 50, ♀ 45.5 + 0.91 × (height − 152.4); TV never from actual weight",
   "Start: TV 6–8 mL/kg PBW, PEEP 5 then individualise, RR 12–14 to EtCO₂ 35–45 mmHg, lowest FiO₂ for SpO₂ ≥ 94%",
   "Limits: plateau < 30, driving pressure < 15 cmH₂O; mode default PCV-VG / PRVC",
