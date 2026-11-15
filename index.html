@@ -189,7 +189,7 @@ table{width:100%;border-collapse:collapse;font-size:var(--fs-body);line-height:1
 th,td{border-bottom:1px solid var(--line);padding:var(--s2) var(--s1);text-align:left;vertical-align:top;font-variant-numeric:tabular-nums}
 th{color:var(--muted);font-weight:600}
 td.hl{font-weight:700}
-.mono,b.dose,.trio span{font-family:var(--font-mono)}
+.mono,.trio span{font-family:var(--font-mono)}
 tr.hl td{background:var(--gc-soft);font-weight:700}
 ol,ul{margin:var(--s1) 0;padding-left:22px}
 li{margin:var(--s1) 0}
@@ -212,8 +212,19 @@ details.acc[open]{padding-bottom:var(--s3)}
 ol.crisis{padding-left:26px;margin:var(--s2) 0}
 ol.crisis li{margin:var(--s2) 0;font-size:var(--fs-md);line-height:1.45;padding-left:2px}
 ol.crisis li::marker{font-weight:800;color:var(--g-emerg)}
-b.dose{font-weight:800}
+b.dose{font-weight:700;background:var(--gc-soft);padding:0 .28em;border-radius:5px;-webkit-box-decoration-break:clone;box-decoration-break:clone}
 .emlinks{padding:var(--s3) var(--s4)}
+.sx{width:1em;height:1em;vertical-align:-.14em;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.bu{font-size:.5em;font-weight:600;letter-spacing:0}
+.emlinks{display:grid;grid-template-columns:1fr 1fr;gap:var(--s2)}.emlinks .sub{grid-column:1/-1}.emlinks .emlink{margin:0;display:flex;align-items:center}
+@media (max-width:359px){.emlinks{grid-template-columns:1fr}}
+.ptbar{display:flex;align-items:center;justify-content:space-between;gap:var(--s2);width:100%;box-sizing:border-box;text-align:left;padding:var(--s3) var(--s4);border:1px solid var(--line);border-left:4px solid var(--gc);border-radius:var(--r);background:var(--card);color:var(--ink);font:inherit;font-weight:700;font-variant-numeric:tabular-nums;cursor:pointer}
+.ptbar .sub{font-weight:600;white-space:nowrap}
+@media (max-width:699px){.gside.slim{position:sticky;top:0;z-index:5;background:var(--bg);padding:var(--s1) 0}}
+details.acc.anim>:not(summary){animation:accIn .16s ease-out}
+@keyframes accIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion: reduce){details.acc.anim>:not(summary){animation:none}}
+
 .emlink{display:block;box-sizing:border-box;text-align:left;margin:var(--s2) 0;padding:var(--s3);border-radius:var(--r-sm);border:1px solid var(--danger-line);background:var(--danger-bg);color:var(--danger-ink);font-weight:700;font-size:var(--fs-sm);cursor:pointer}
 
 .themebtn{min-width:44px;width:44px;padding:0;font-size:var(--fs-lg)}
@@ -258,7 +269,7 @@ tr.over td{background:var(--danger-bg)}
 .qans small{display:block;font-family:var(--font-sans);font-size:var(--fs-xs);font-weight:500;color:var(--muted);margin-top:2px}
 /* pearl */
 .pearl{display:block;width:100%;text-align:left;margin-top:var(--s3);background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:var(--s3) var(--s4);cursor:pointer;color:var(--ink);position:relative}
-.pearl::before{content:"";position:absolute;left:var(--s4);top:0;width:28px;height:3px;border-radius:0 0 3px 3px;background:var(--etco2)}
+.pearl::before{content:"";position:absolute;left:0;top:var(--s3);bottom:var(--s3);width:4px;border-radius:0 4px 4px 0;background:var(--etco2)}
 .plab{display:block;font-size:var(--fs-xs);font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:2px 0 4px}
 .ptxt{display:block;font-size:var(--fs-base);line-height:1.45}
 .pgo{display:block;font-size:var(--fs-xs);color:var(--accent);font-weight:600;margin-top:6px}
@@ -367,7 +378,7 @@ a{color:var(--accent)}
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.18.1";
+const APP_VERSION = "2.19.0";
 const APP_DATE = "15 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
@@ -426,6 +437,8 @@ const ICONS = {
   search:'<circle cx="11" cy="11" r="6.5"/><path d="m16 16 4.5 4.5"/>'};
 ICONS.tx = '<path d="M14.5 3.5c-3.4 0-6 3.7-6 8.5s2.6 8.5 6 8.5c2.6 0 4.5-2 4.5-4.5 0-1.7-1-2.8-2.3-3.6.1-.3.1-.6 0-.8C18 10.8 19 9.7 19 8c0-2.5-1.9-4.5-4.5-4.5z"/><path d="M8.7 12H6c-1.1 0-2 .9-2 2v7"/>';
 ICONS.ga = ICONS.airway; ICONS.regional = ICONS.spinal;
+const SXI = {F:'<svg class="sx" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="9" r="5.5"/><path d="M12 14.5V22M8.5 18.5h7"/></svg>', M:'<svg class="sx" viewBox="0 0 24 24" aria-hidden="true"><circle cx="10" cy="14" r="5.5"/><path d="M14 10l6-6M14.5 4H20v5.5"/></svg>'};
+const sxi = f => SXI[f==="F"?"F":"M"];
 const svg = k => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS[k]}</svg>`;
 function head(title, back, icon){
   const th = store.get("theme","auto");
@@ -467,7 +480,7 @@ function quickLive(){
   const na = why => `—<small>${why}</small>`;
   return [
     ["obs","LSCS spinal",`${h} cm`,(child||male) ? na(child?"not for a child case":"male case") : `${row[1]===row[2]?fmt(row[1]):fmt(row[1])+"–"+fmt(row[2])}<small>mL heavy bupi</small>`,"A1. Spinal: dose by height","obs","lscs","t-obs"],
-    ["airway","Adult ETT",`${S.sex==="F"?"♀":"♂"} ${ah} cm`,child ? na("child case — see Paeds") : `${sz}<small>${f1(depth)} cm at mouth corner</small>`,"4. Tube & airway kit","ga","ind","t-ga"],
+    ["airway","Adult ETT",`${sxi(S.sex)} ${ah} cm`,child ? na("child case — see Paeds") : `${sz}<small>${f1(depth)} cm at mouth corner</small>`,"4. Tube & airway kit","ga","ind","t-ga"],
     ["paeds","Paeds ETT",`${sig(S.pw)} kg · ${S.pY} y${S.pM?` ${S.pM} m`:""}`,(ac && !child) ? na("adult case") : `${main}<small>${e.useCuff?"cuffed · ":""}${fmt(e.depth)} cm</small>`,"1. Tube: size, depth, blade, suction","paeds","ind","t-paeds"]];
 }
 screens.home = () => {
@@ -490,7 +503,7 @@ screens.home = () => {
   ${caseStrip()}
   <button class="pearl" data-open="${esc(pearl[1])}" data-g="${pearl[2]}" data-tab="${pearl[3]}"><span class="plab">Pearl of the day</span><span class="ptxt">${pearl[0]}</span><span class="pgo">Open card ›</span></button>
   <div class="label">Sections</div>
-  <div class="grid2">${secs.map(g=>`<button class="sq t-${g.id}" data-go="g-${g.id}"><span class="qi">${svg(g.id)}</span><span class="sqt">${short[g.id]}</span><span class="sqs">${g.tabs.map(t=>t.label).join(" · ")}</span></button>`).join("")}</div>
+  <div class="grid2">${secs.map(g=>`<button class="sq t-${g.id}" data-go="g-${g.id}"><span class="qi">${svg(g.id)}</span><span class="sqt">${short[g.id]}</span><span class="sqs">${({paeds:"Pre-op · Induction · Blocks · Cases",tx:"Kidney recipient &amp; donor"})[g.id] || g.tabs.map(t=>t.label).join(" · ")}</span></button>`).join("")}</div>
   <button class="linkbtn" data-go="values">${svg("values")} Values sheet</button>` + disc;
 };
 setInterval(() => { const c = document.getElementById("clock"); if (c) c.textContent = clockTxt(); }, 30000);
@@ -501,7 +514,7 @@ const ettCalc = (adultOnly, noInputs) => {
   let inputs = adultOnly ? "" : seg("ettMode",[["adult","Adult"],["child","Child / infant / neonate"]]);
   let out = "";
   if (S.ettMode==="adult"){
-    inputs += seg("sex",[["F","♀ Female"],["M","♂ Male"]]) + step("height","Height","cm",130,210,1);
+    inputs += seg("sex",[["F",sxi("F")+" Female"],["M",sxi("M")+" Male"]]) + step("height","Height","cm",130,210,1);
     const h = S.height, depth = r05(4 + h/10);
     const sz = S.sex==="F" ? ["6.0","6.5 – 7.0","7.5"] : ["6.5","7.0 – 7.5","8.0"];
     out = `<div class="result"><div class="row">
@@ -1478,7 +1491,7 @@ const GSRC = "Standard references: BNF, Association of Anaesthetists / SOBA obes
 
 function gaInputs(){
   const W2 = wts();
-  return seg("sex",[["F","♀ Female"],["M","♂ Male"]]) + step("height","Height","cm",130,210,1) + step("aw","Weight","kg",30,250,1) + step("age","Age","y",16,100,1) +
+  return seg("sex",[["F",sxi("F")+" Female"],["M",sxi("M")+" Male"]]) + step("height","Height","cm",130,210,1) + step("aw","Weight","kg",30,250,1) + step("age","Age","y",16,100,1) +
     `<div class="chips" style="margin-top:var(--s2)">
       <span class="chip" style="cursor:default">BMI <b>${sig(W2.bmi)}</b></span>
       <span class="chip" style="cursor:default">IBW <b>${sig(W2.ibw)}</b> kg</span>
@@ -1636,9 +1649,9 @@ function dltSize(){ const h = S.height; return S.sex==="F" ? (h<160 ? 35 : 37) :
 gaCards.olv = () => { const d = dltSize(), dep = 12 + S.height/10;
   return `<div class="card"><h2>2. One-lung ventilation</h2>${ventDraft()}
   <h3>Left double-lumen tube (DLT)</h3>
-  <table><tr><th>Starting size</th><td class="hl">${d} Fr <span class="sub">(${S.sex==="F"?"♀":"♂"} ${S.height} cm)</span></td></tr>
+  <table><tr><th>Starting size</th><td class="hl">${d} Fr <span class="sub">(${sxi(S.sex)} ${S.height} cm)</span></td></tr>
   <tr><th>Depth</th><td class="hl">≈ ${sig(dep)} cm at mouth corner <span class="sub">(12 + height/10)</span></td></tr></table>
-  <p class="sub">♀ &lt; 160 cm 35 Fr, ≥ 160 cm 37 Fr · ♂ &lt; 170 cm 37 Fr, ≥ 170 cm 39 Fr (41 rarely needed). Height predicts size poorly in Asian patients: have one size smaller ready, and <b>always confirm with a fibreoptic scope</b>.</p>
+  <p class="sub">${sxi("F")} &lt; 160 cm 35 Fr, ≥ 160 cm 37 Fr · ${sxi("M")} &lt; 170 cm 37 Fr, ≥ 170 cm 39 Fr (41 rarely needed). Height predicts size poorly in Asian patients: have one size smaller ready, and <b>always confirm with a fibreoptic scope</b>.</p>
   <p class="sub"><b>Right DLT</b> only if the left main bronchus can't be used: left pneumonectomy, tumour or stenosis of the left main bronchus.</p>
   <h3>Bronchial blocker instead</h3><ul><li>Difficult airway, already intubated with a single-lumen tube, or post-op ventilation planned</li>
   <li>9 Fr blocker: <b>ETT ≥ 7.5</b> (8.0 is easier with the fibreoptic scope); 7 Fr: ETT ≥ 6.0</li></ul>
@@ -1677,7 +1690,7 @@ const mann = w => `${sig(0.5*w)} g = <b>${sig(2.5*w)} mL</b> of 20%`;
 const txCards = {};
 function txInputs(pre){
   const W2 = wts();
-  return seg("sex",[["F","♀ Female"],["M","♂ Male"]]) + step("height","Height","cm",130,210,1) + step("aw","Dry weight (post-HD)","kg",30,200,1) + step("age","Age","y",16,100,1)
+  return seg("sex",[["F",sxi("F")+" Female"],["M",sxi("M")+" Male"]]) + step("height","Height","cm",130,210,1) + step("aw","Dry weight (post-HD)","kg",30,200,1) + step("age","Age","y",16,100,1)
     + step("k","K⁺","mmol/L",2.5,8,0.1) + step("hb","Hb","g/L",40,180,1)
     + (pre ? step("todayWt","Today's weight","kg",30,220,0.5) + step("hdH","Hours since last HD","h",0,120,1) : "")
     + `<div class="chips" style="margin-top:var(--s2)"><span class="chip" style="cursor:default">BMI <b>${sig(W2.bmi)}</b></span>
@@ -2492,14 +2505,14 @@ const VALUES = [
   "Nerve block: home with protected numb limb; oral analgesia before block wears off",
   "Paeds: drinking not required; ex-prem < 60 weeks PCA overnight; tonsillectomy < 3 y / OSA overnight; paracetamol 15 mg/kg 6-hourly, ibuprofen 10 mg/kg 8-hourly"]],
  ["Ventilation strategies & one-lung ventilation (signed off 15 Nov 2026)", [
-  "PBW (ARDSNet/Devine) from sex + height: ♂ 50, ♀ 45.5 + 0.91 × (height − 152.4); TV never from actual weight",
+  "PBW (ARDSNet/Devine) from sex + height: male 50, female 45.5 + 0.91 × (height − 152.4); TV never from actual weight",
   "Start: TV 6–8 mL/kg PBW, PEEP 5 then individualise, RR 12–14 to EtCO₂ 35–45 mmHg, lowest FiO₂ for SpO₂ ≥ 94%",
   "Limits: plateau < 30, driving pressure < 15 cmH₂O; mode default PCV-VG / PRVC",
   "Laparoscopy: PEEP 8–10, RR 14–18, re-check after insufflation / position; Obese: PEEP 8–10, recruit, ramped",
   "Asthma/COPD: RR 8–10, I:E 1:3–1:4, auto-PEEP → disconnect 10–30 s; ARDS: TV 4–6, ARDSNet lower-PEEP table (0.3→5 … 1.0→18–24), pH ≥ 7.25",
   "Neuro: PaCO₂ 35–40 mmHg, no prophylactic hyperventilation (≤ 25 mmHg); Pregnancy GA: EtCO₂ 30–32 mmHg",
   "Recruitment: 30–40 cmH₂O × 30 s or stepwise PEEP 5→10→15(→20); caution hypotension, pneumothorax, ICP",
-  "OLV: left DLT ♀ <160 cm 35 / ≥160 37 Fr; ♂ <170 cm 37 / ≥170 39 Fr; depth 12 + height/10 cm; confirm with fibreoptic",
+  "OLV: left DLT female <160 cm 35 / ≥160 37 Fr; male <170 cm 37 / ≥170 39 Fr; depth 12 + height/10 cm; confirm with fibreoptic",
   "Blocker 9 Fr: ETT ≥ 7.5 (8.0 easier); 7 Fr: ETT ≥ 6.0",
   "OLV settings: TV 4–6 mL/kg PBW, PEEP 5, FiO₂ 0.8–1.0 then lower, peak < 30, driving < 15; hypoxia: FiO₂ 1.0 → scope → suction → recruit/PEEP → CPAP 5–10 to non-ventilated lung → intermittent 2-lung → PA clamp"]],
  ["Kidney transplant + hyperkalaemia (signed off 15 Nov 2026)", [
@@ -2598,7 +2611,7 @@ function validCase(c){ return c && typeof c==="object" && /^\d{1,16}$/.test(Stri
 function getCases(){ const now = Date.now(); let all = store.get("cases",[]); if (!Array.isArray(all)) all = []; const live = all.filter(c => validCase(c) && now - c.created < CASE_TTL && c.created <= now + 60000); if (live.length !== all.length) store.set("cases", live); return live; }
 const caseName = c => c.nick ? `${esc(c.label)} · ${esc(c.nick)}` : esc(c.label);
 const caseAge = c => c.y < 1 ? `${c.m} m` : c.y < 16 && c.m ? `${c.y} y ${c.m} m` : `${c.y} y`;
-const caseLine = c => `${c.sex==="F"?"♀":"♂"} ${sig(c.w)} kg · ${c.h} cm · ${caseAge(c)}`;
+const caseLine = c => `${sxi(c.sex)} ${sig(c.w)} kg · ${c.h} cm · ${caseAge(c)}`;
 function activeCase(){ const id = store.get("active", null); return getCases().find(c => c.id === id) || null; }
 function applyCase(c){
   ["sex","height","aw","age","morWt"].forEach(k=>S.touched[k]=true); if (c.y<16) ["pw","pY","pM"].forEach(k=>S.touched[k]=true); if (c.sex==="F") S.touched.spHt=true;
@@ -2613,7 +2626,7 @@ function sampleWarn(keys){ const k = keys.filter(isSample); if (!k.length) retur
 function activeBar(){ const c = activeCase(); return c ? `<button class="activebar" data-go="cases"><span>Active: <b>${caseName(c)}</b> · ${caseLine(c)}</span><span class="sub">change ›</span></button>` : ""; }
 function caseStrip(){
   const cs = getCases(), act = store.get("active", null);
-  return `<div class="label">Today's list</div><div class="chips">${cs.map(c => `<button class="chip ${c.id===act?"on":""}" data-case="${c.id}">${caseName(c)} · ${c.sex==="F"?"♀":"♂"} ${sig(c.w)} kg</button>`).join("")}
+  return `<div class="label">Today's list</div><div class="chips">${cs.map(c => `<button class="chip ${c.id===act?"on":""}" data-case="${c.id}">${caseName(c)} · ${sxi(c.sex)} ${sig(c.w)} kg</button>`).join("")}
     ${cs.length < CASE_MAX ? `<button class="chip add" data-go="cases">+ Add case</button>` : ""}${cs.length ? `<button class="chip ghost" data-go="cases">Edit</button>` : ""}</div>`;
 }
 screens.cases = () => {
@@ -2626,7 +2639,7 @@ screens.cases = () => {
     <label class="sub" for="cNick">Nickname (optional, max 12)</label>
     <input id="cNick" class="search" style="padding-left:12px" maxlength="12" autocomplete="off" placeholder="e.g. Bed 4, LSCS am" value="${esc(S.cNick||"")}">
     <div class="warn">No names, IC or MRN — anonymous only.</div>
-    ${seg("cSex",[["F","♀ Female"],["M","♂ Male"]])}${step("cY","Age","y",0,100,1)}${S.cY<16?step("cM","+ months","m",0,11,1):""}${step("cH","Height","cm",30,210,1)}${step("cW","Weight","kg",0.5,250,0.5)}
+    ${seg("cSex",[["F",sxi("F")+" Female"],["M",sxi("M")+" Male"]])}${step("cY","Age","y",0,100,1)}${S.cY<16?step("cM","+ months","m",0,11,1):""}${step("cH","Height","cm",30,210,1)}${step("cW","Weight","kg",0.5,250,0.5)}
     <button class="homebtn primary" data-savecase="1">Save case</button></div>`;
   return head("Today's list","home") + `<p class="sub">Saved on this phone only. Each case deletes itself 36 h after it is added.</p>` + list + form + disc;
 };
@@ -2823,6 +2836,13 @@ function accordion(c, t, gid, label){
   const summ = mm ? `<span class="stepno">${mm[1]}</span><span class="st">${mm[2]}</span>` : `<span class="st">${sum}</span>`;
   return `<details class="card acc" ${isWide()?"":'name="acc"'} data-t="${esc(t)}" data-g="${gid}"><summary>${summ}</summary>${cl.innerHTML}${relLinks(gid, t)}</details>`;
 }
+function ptBar(gid, tab){
+  const W2 = wts(); let t;
+  if (gid==="paeds" || (gid==="emerg" && tab==="paeds")) t = `${sig(S.pw)} kg · ${S.pY} y${S.pM?` ${S.pM} m`:""}`;
+  else if (gid==="emerg" || (gid==="tx" && tab==="don")) t = `${sig(S.aw)} kg`;
+  else { t = `${sxi(S.sex)} ${S.height} cm · ${sig(S.aw)} kg · ${S.age} y · BMI ${sig(W2.bmi)}`; if (gid==="tx") t += ` · K⁺ ${S.k} · Hb ${S.hb}`; }
+  return `<button class="ptbar" data-ptedit="1"><span>${t}</span><span class="sub">edit ✎</span></button>`;
+}
 function groupScreen(g){
   const m = cardMap();
   const acc = list => list.map(it => { if (typeof it==="string" && it[0]==="§") return `<div class="label acchead">${esc(it.slice(1))}</div>`; const [o,l] = Array.isArray(it) ? it : [it,it];
@@ -2830,10 +2850,12 @@ function groupScreen(g){
   if (g.tabs){
     const tab = g.tabs.find(t=>t.id===S[g.tabKey]) || g.tabs[0];
     const ab = (g.id==="paeds" && !PREV_CHECKED ? `<div class="warn">DRAFT — paediatric revisions (Nov 2026): auto-calculations and dose caps. Tick on the Values sheet.</div>` : "") + activeBar() + sampleWarn(SAMPLE_BY[g.id] ? (SAMPLE_BY[g.id][tab.id] || SAMPLE_BY[g.id]["*"] || []) : []);
-    const links = (tab.links||[]).map(([t,tb,label])=>`<button class="emlink" data-open="${esc(t)}" data-g="emerg" data-tab="${tb}">⚠ ${esc(label)} → Emergencies</button>`).join("");
-    const side = ab + (tab.input ? `<div class="card">${tab.input()}</div>` : "");
+    const links = (tab.links||[]).map(([t,tb,label])=>`<button class="emlink" data-open="${esc(t)}" data-g="emerg" data-tab="${tb}">⚠ ${esc(label)} ›</button>`).join("");
+    const keys = SAMPLE_BY[g.id] ? (SAMPLE_BY[g.id][tab.id] || SAMPLE_BY[g.id]["*"] || []) : [];
+    const filled = !!tab.input && keys.length > 0 && !keys.some(isSample), slim = filled && !S.ptEditing;
+    const side = ab + (tab.input ? (slim ? ptBar(g.id, tab.id) : `<div class="card">${tab.input()}${filled?`<button class="linkbtn" data-ptdone="1">Done ✓</button>`:""}</div>`) : "");
     return head(g.name,"home",g.id) + (g.tabs.length>1 ? `<div class="seg emtabs${g.tabs.length>=6?" five six":g.tabs.length>=5?" five":""}">${g.tabs.map(t=>`<button aria-pressed="${t===tab}" data-seg="${g.tabKey}" data-val="${t.id}">${t.label}</button>`).join("")}</div>` : `<div class="label" style="margin-top:0">${tab.label}</div>`) +
-      `<div class="gwrap${side.trim()?"":" noside"}"><aside class="gside">${side}</aside><div class="gmain">` + (tab.top ? tab.top() : "") +
+      `<div class="gwrap${side.trim()?"":" noside"}"><aside class="gside${slim?" slim":""}">${side}</aside><div class="gmain">` + (tab.top ? tab.top() : "") +
       (tab.cards.length ? `<div class="hint">${tab.hint || "Tap a heading to open it."}${isWide()?" Several can be open at once.":""}</div>` + acc(tab.cards) : "") +
       (links ? `<div class="card emlinks"><div class="sub">If it goes wrong</div>${links}</div>` : "") + `</div></div>` + disc;
   }
@@ -2883,6 +2905,7 @@ function renderNow(){
   const nav = `<nav class="sidenav" aria-label="Sections"><div class="snbrand">${svg("capno")} Induction Card</div>${navItems.map(([hh,l,ic,cls])=>`<button class="snitem sn-${cls} ${h===hh||(hh==="home"&&!h.startsWith("g-")&&h!=="values")?"on":""}" data-go="${hh}"><span class="snico">${svg(ic)}</span>${l}</button>`).join("")}
     <div class="snkeys">Keys: <b>/</b> search · <b>Esc</b> back · <b>1–6</b> tabs</div></nav>`;
   app.innerHTML = `<div class="shell">${nav}<div class="content">${html}</div></div>`;
+  app.querySelectorAll('.big').forEach(el => { el.innerHTML = el.innerHTML.replace(/(\d)\s+(mg|mcg|mL\/h|mL|g|kg|mmHg|wk|cm|mmol|units?|J)(?=\s|<|$)/g, '$1<span class="bu"> $2</span>'); });
   if (isWide() && S.openSet) S.openSet.forEach(t => { const d = app.querySelector(`details[data-t="${CSS.escape(t)}"]`); if (d) d.open = true; });
   if (S.open){ const d = app.querySelector(`details[data-t="${CSS.escape(S.open)}"]`); if (d){ d.open = true; if (S.scrollTo){ d.scrollIntoView({block:"start"}); } } }
   if (!S.scrollTo) window.scrollTo(0, y);
@@ -2892,7 +2915,7 @@ function renderNow(){
 document.addEventListener("toggle", e => {
   const d = e.target; if (!d.matches || !d.matches("details.acc")) return;
   S.openSet = S.openSet || new Set();
-  if (d.open){ S.open = d.dataset.t; S.openSet.add(d.dataset.t); remember(d.dataset.g, d.dataset.t);
+  if (d.open){ d.classList.add("anim"); setTimeout(()=>d.classList.remove("anim"), 250); S.open = d.dataset.t; S.openSet.add(d.dataset.t); remember(d.dataset.g, d.dataset.t);
     if (!isWide()) document.querySelectorAll("details.acc[open]").forEach(o => { if (o!==d) o.open = false; }); }
   else { S.openSet.delete(d.dataset.t); if (S.open === d.dataset.t) S.open = null; }
 }, true);
@@ -2909,7 +2932,7 @@ document.addEventListener("click", e => {
     S.open = d.calc ? null : d.open; S.scrollTo = !d.calc; if (!d.calc) remember(d.g, d.open);
     const target = "#g-"+d.g; if (location.hash===target) render(); else { location.hash = target; } if (d.calc) window.scrollTo(0,0); return; }
   if (d.lscs){ S.spOp="lscs"; S.open=null; location.hash="#g-spinal"; window.scrollTo(0,0); return; }
-  if (d.go){ S.open = null; S.openSet = new Set(); S.txck = {}; location.hash = "#"+d.go; window.scrollTo(0,0); return; }
+  if (d.go){ S.ptEditing = false; S.open = null; S.openSet = new Set(); S.txck = {}; location.hash = "#"+d.go; window.scrollTo(0,0); return; }
   if (d.savename){ const v = cleanName(S.dname ?? doctorName()); store.set("doctor", v || "Dr X"); S.dname = undefined; location.hash = "#home"; return; }
   if (d.case){ const c = getCases().find(x=>x.id===d.case); if (c){ store.set("active", c.id); applyCase(c); } if ((location.hash||"#home")==="#cases") render(); else render(); return; }
   if (d.delcase){ const cs = getCases().filter(x=>x.id!==d.delcase); store.set("cases", cs); if (store.get("active",null)===d.delcase) store.set("active", null); render(); return; }
@@ -2926,14 +2949,16 @@ document.addEventListener("click", e => {
   if (d.apf!==undefined){ S.apfel = (S.apfel||0) ^ (1<<(+d.apf)); render(); return; }
   if (d.goTab){ const [gid,tid] = d.goTab.split(":"); const og = GROUPS.find(x=>x.id===gid); if (og) S[og.tabKey]=tid; S.open=null; const tg="#g-"+gid; if (location.hash===tg) render(); else location.hash=tg; window.scrollTo(0,0); return; }
   if (d.setw){ S.pw = parseFloat(d.setw); render(); return; }
-  if (d.seg){ S.touched[d.seg]=true; S[d.seg] = d.val; render(); return; }
-  if (d.step){ S.touched[d.step]=true; const k=d.step, st=parseFloat(d.d); let v=parseFloat(S[k])||0; v=clamp(Math.round((v+st)*10)/10, +d.min, +d.max); S[k]=v; render(); return; }
+  if (d.ptedit){ S.ptEditing = true; render(); return; }
+  if (d.ptdone){ S.ptEditing = false; render(); return; }
+  if (d.seg){ if (GROUPS.some(x=>x.tabKey===d.seg)) S.ptEditing = false; else if (d.seg==='sex') S.ptEditing = true; S.touched[d.seg]=true; S[d.seg] = d.val; render(); return; }
+  if (d.step){ S.ptEditing = true; S.touched[d.step]=true; const k=d.step, st=parseFloat(d.d); let v=parseFloat(S[k])||0; v=clamp(Math.round((v+st)*10)/10, +d.min, +d.max); S[k]=v; render(); return; }
   if (d.tick!==undefined){ const t=store.get("ticks",{}); t[d.tick]=b.checked; store.set("ticks",t); render(); return; }
   if (b.hasAttribute("data-theme-toggle")){ const cur=store.get("theme","auto"); const nxt = cur==="auto"?"dark":cur==="dark"?"light":"auto"; store.set("theme",nxt); applyTheme(); render(); }
 });
 document.addEventListener("change", e => {
   const el = e.target; if (!el.dataset || !el.dataset.in) return;
-  const k = el.dataset.in; let v = parseFloat(el.value.replace(",", "."));
+  const k = el.dataset.in; S.ptEditing = true; let v = parseFloat(el.value.replace(",", "."));
   if (!isNaN(v) && +S[k] === v && S.touched[k]) return;
   S.touched[k]=true;
   if (isNaN(v)) v = S[k];
