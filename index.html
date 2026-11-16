@@ -429,6 +429,11 @@ details.endo summary{cursor:pointer;font-weight:600;font-size:var(--fs-sm)}
 .aboutlink{background:none;border:0;padding:0;font:inherit;color:var(--accent);font-weight:700;cursor:pointer;text-decoration:underline}
 .srcl a{color:var(--accent);text-decoration:none;font-weight:600}.srcl li{margin:6px 0}
 .presum{border-left:4px solid var(--gc)}.psline{font-weight:700;margin:4px 0 var(--s2);line-height:1.4}.psbtns{display:flex;gap:var(--s2)}.psbtns .iconbtn{height:36px}
+.wideonly{display:none}@media (min-width:1100px){.wideonly{display:block}}
+.nolabel{height:var(--s4)}.tr-emerg .t-emerg{margin-top:var(--s2)}@media (min-width:1100px){.tr-emerg .t-emerg{margin-top:0}}
+:root{--tile-grid:color-mix(in srgb,var(--ink) 5.5%,transparent)}
+.grid2 .sq,.pearl{background-image:linear-gradient(var(--tile-grid) 1px,transparent 1px),linear-gradient(90deg,var(--tile-grid) 1px,transparent 1px);background-size:12px 12px}
+.tile.t-emerg{background-image:linear-gradient(rgba(255,255,255,.09) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.09) 1px,transparent 1px);background-size:12px 12px}
 .vtap{cursor:default;-webkit-user-select:none;user-select:none}
 .disc{color:var(--muted);font-size:11px;text-align:center;margin-top:var(--s4);line-height:1.45;opacity:.9}.disc b{font-weight:600}
 a{color:var(--accent)}
@@ -443,7 +448,7 @@ a{color:var(--accent)}
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.28.1";
+const APP_VERSION = "2.28.2";
 const APP_DATE = "16 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
@@ -622,13 +627,13 @@ screens.home = () => {
     <div class="date">${dateTxt()}</div>
   </section>
   <div class="searchbox">${svg("search")}<input id="q" class="search" type="search" placeholder="Search caudal, remi, LSCS…" autocomplete="off" aria-label="Search cards"></div><div id="results"></div>
-  <div class="toprow"><div class="tr-emerg"><div class="label">Emergency</div>${tile("t-emerg","emerg","Emergencies","Crisis steps with doses",'data-go="g-emerg"')}</div><div class="tr-quick">
+  <div class="toprow"><div class="tr-emerg"><div class="label wideonly" aria-hidden="true">&nbsp;</div>${tile("t-emerg","emerg","Emergencies","Crisis steps with doses",'data-go="g-emerg"')}</div><div class="tr-quick">
   <div class="label qhead"><span>Quick</span><button class="aboutlink" data-go="quick">Edit</button></div>
   <div class="quick">${quickIds().map(quickTile).join("")}</div>
   </div></div>
   ${caseStrip()}
   <button class="pearl" data-open="${esc(pearl[1])}" data-g="${pearl[2]}" data-tab="${pearl[3]}"><span class="plab">Pearl of the day</span><span class="ptxt">${pearl[0]}</span><span class="pgo">Open card ›</span></button>
-  <div class="label">Sections</div>
+  <div class="nolabel"></div>
   <div class="grid2">${secs.map(g=>`<button class="sq t-${g.id}" data-go="g-${g.id}"><span class="qi">${svg(g.id)}</span><span class="sqt">${short[g.id]}</span><span class="sqs">${({paeds:"Pre-op · Induction · Blocks · Cases",tx:"Kidney recipient &amp; donor"})[g.id] || g.tabs.map(t=>t.label).join(" · ")}</span></button>`).join("")}</div>` + disc;
 };
 setInterval(() => { const c = document.getElementById("clock"); if (c){ c.textContent = clockTxt(); seg1(c.parentElement); } }, 30000);
