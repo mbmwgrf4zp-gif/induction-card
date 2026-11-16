@@ -420,6 +420,7 @@ details.endo summary{cursor:pointer;font-weight:600;font-size:var(--fs-sm)}
   .hero .capno{height:56px}
   .date{margin-bottom:56px}
 }
+.vtap{cursor:default;-webkit-user-select:none;user-select:none}
 .disc{color:var(--muted);font-size:var(--fs-xs);text-align:center;margin-top:var(--s5);line-height:1.5}
 a{color:var(--accent)}
 .vs label{display:flex;gap:var(--s3);align-items:flex-start;padding:var(--s2) 0;border-bottom:1px solid var(--line);font-size:var(--fs-sm)}
@@ -433,7 +434,7 @@ a{color:var(--accent)}
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.24.0";
+const APP_VERSION = "2.24.1";
 const APP_DATE = "15 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
@@ -473,7 +474,7 @@ function step(key, label, unit, min, max, stp){
     <span class="unit">${unit}</span></div>`;
 }
 function trio(a,b,c){ return `<div class="trio"><span>${a}</span><span class="main">${b}</span><span>${c}</span></div>`; }
-const disc = `<div class="disc">${VALUES_CHECKED ? `Values checked ${VALUES_CHECKED}` : `<b>DRAFT – values not checked</b>`}<br>Memory aid only — clinical judgement decides. Cases are anonymous, kept on this phone only, auto-deleted after 36 h.<br><b>Version ${APP_VERSION} · updated ${APP_DATE}</b><br>Sources reviewed Nov 2026 · next review Nov 2027</div>`;
+const disc = `<div class="disc">${VALUES_CHECKED ? `Values reviewed by the author Nov 2026` : `<b>DRAFT – values not checked</b>`}<br>Memory aid only — clinical judgement decides. Cases are anonymous, kept on this phone only, auto-deleted after 36 h.<br><b class="vtap">Version ${APP_VERSION} · updated ${APP_DATE}</b><br>Sources reviewed Nov 2026 · next review Nov 2027</div>`;
 
 /* ================= SCREENS ================= */
 function banner(){
@@ -563,8 +564,7 @@ screens.home = () => {
   ${caseStrip()}
   <button class="pearl" data-open="${esc(pearl[1])}" data-g="${pearl[2]}" data-tab="${pearl[3]}"><span class="plab">Pearl of the day</span><span class="ptxt">${pearl[0]}</span><span class="pgo">Open card ›</span></button>
   <div class="label">Sections</div>
-  <div class="grid2">${secs.map(g=>`<button class="sq t-${g.id}" data-go="g-${g.id}"><span class="qi">${svg(g.id)}</span><span class="sqt">${short[g.id]}</span><span class="sqs">${({paeds:"Pre-op · Induction · Blocks · Cases",tx:"Kidney recipient &amp; donor"})[g.id] || g.tabs.map(t=>t.label).join(" · ")}</span></button>`).join("")}</div>
-  <button class="linkbtn" data-go="values">${svg("values")} Values sheet</button>` + disc;
+  <div class="grid2">${secs.map(g=>`<button class="sq t-${g.id}" data-go="g-${g.id}"><span class="qi">${svg(g.id)}</span><span class="sqt">${short[g.id]}</span><span class="sqs">${({paeds:"Pre-op · Induction · Blocks · Cases",tx:"Kidney recipient &amp; donor"})[g.id] || g.tabs.map(t=>t.label).join(" · ")}</span></button>`).join("")}</div>` + disc;
 };
 setInterval(() => { const c = document.getElementById("clock"); if (c){ c.textContent = clockTxt(); seg1(c.parentElement); } }, 30000);
 
@@ -1756,7 +1756,7 @@ gaCards.olv = () => { const d = dltSize(), dep = 12 + S.height/10;
   ${src("Thoracic anaesthesia OLV reviews (Lohser; Brassard Can J Anesth 2014); Asian DLT sizing studies incl. Malaysia; Cook Arndt IFU.")}</div>`; };
 
 /* ---------- TRANSPLANT (kidney) — local renal transplant protocol 1st ed.; Mayhew BJA Educ 2016; Jaszczuk J Clin Med 2022 ---------- */
-const TX_CHECKED = true;    // v2.14 content (signed off 15 Nov 2026)
+const TX_CHECKED = true;    // v2.14 content (checked by author 15 Nov 2026)
 const TX2_CHECKED = true;  // v2.15 expansion: GA-style calculations, detailed pre-op
 const TXP = "local renal transplant protocol (1st ed.)";
 const txDraft = () => TX_CHECKED ? "" : `<div class="warn" style="margin-top:0">DRAFT — from the ${TXP}. Not yet ticked by you.</div>`;
@@ -2628,7 +2628,7 @@ const VALUES = [
   "Spinal: voiding required only if high risk (hernia, anorectal, urology, pelvic, retention history)",
   "Nerve block: home with protected numb limb; oral analgesia before block wears off",
   "Paeds: drinking not required; ex-prem < 60 weeks PCA overnight; tonsillectomy < 3 y / OSA overnight; paracetamol 15 mg/kg 6-hourly, ibuprofen 10 mg/kg 8-hourly"]],
- ["Ventilation strategies & one-lung ventilation (signed off 15 Nov 2026)", [
+ ["Ventilation strategies & one-lung ventilation (checked by author 15 Nov 2026)", [
   "PBW (ARDSNet/Devine) from sex + height: male 50, female 45.5 + 0.91 × (height − 152.4); TV never from actual weight",
   "Start: TV 6–8 mL/kg PBW, PEEP 5 then individualise, RR 12–14 to EtCO₂ 35–45 mmHg, lowest FiO₂ for SpO₂ ≥ 94%",
   "Limits: plateau < 30, driving pressure < 15 cmH₂O; mode default PCV-VG / PRVC",
@@ -2639,7 +2639,7 @@ const VALUES = [
   "OLV: left DLT female <160 cm 35 / ≥160 37 Fr; male <170 cm 37 / ≥170 39 Fr; depth 12 + height/10 cm; confirm with fibreoptic",
   "Blocker 9 Fr: ETT ≥ 7.5 (8.0 easier); 7 Fr: ETT ≥ 6.0",
   "OLV settings: TV 4–6 mL/kg PBW, PEEP 5, FiO₂ 0.8–1.0 then lower, peak < 30, driving < 15; hypoxia: FiO₂ 1.0 → scope → suction → recruit/PEEP → CPAP 5–10 to non-ventilated lung → intermittent 2-lung → PA clamp"]],
- ["Kidney transplant + hyperkalaemia (signed off 15 Nov 2026)", [
+ ["Kidney transplant + hyperkalaemia (checked by author 15 Nov 2026)", [
   "Recipient: RSI preferable; propofol 1–2 mg/kg; triple-lumen CVC R-IJV (scan first); no double-lumen unless nephrologist agrees; art line not on fistula arm; cefuroxime 1.5 g",
   "Bilateral IJV thrombosis / femoral line: MUST discuss with nephrologist / urologist",
   "BP: patient's baseline (often 140–150/80–90); noradrenaline first choice; fluids up to 30 mL/kg/h (donor 20 mL/kg/h); balanced crystalloid, saline if K⁺ high; albumin 5%",
@@ -2650,7 +2650,7 @@ const VALUES = [
   "Renal drugs: atracurium/cisatracurium preferred; sux single dose only if K⁺ normal; sugammadex not recommended CrCl < 30; fentanyl over morphine; no NSAIDs",
   "PACU: diuresis 500–1000 mL/h replace; CXR; graft ultrasound; paracetamol + tramadol ± PCA; antibiotic 5–7 days",
   "Hyperkalaemia (UKKA): ≥ 6.5 or ECG → CaCl 10% 10 mL / Ca gluconate 10% 30 mL; insulin 10 u + glucose 25 g (10% glucose 50 mL/h × 5 h if glucose < 7); salbutamol 10–20 mg neb; bicarbonate only if acidotic; dialysis"]],
- ["Kidney transplant expansion (signed off 15 Nov 2026)", [
+ ["Kidney transplant expansion (checked by author 15 Nov 2026)", [
   "Phase tabs: Pre-op · Induction · Intra-op · Post-op · Donor; patient box adds K⁺, Hb, today's weight, hours since HD",
   "Discuss before proceeding: K⁺ ≥ 5.5 (5.0–5.4 dialyse if time / graft risk), pulmonary oedema, infection ≤ 2 weeks, cardiac event, Hb < 70 / platelets / clotting, both IJVs thrombosed; > 2 kg above dry weight; last HD > 24 h",
   "HD heparin within ~4 h: APTT before CVC; residual native urine noted",
@@ -2663,7 +2663,7 @@ const VALUES = [
   "Fluid: saline if K⁺ ≥ 5.5 / unknown, else balanced; albumin 5% 250 mL; PACU replace previous hour's urine mL for mL",
   "Reversal: neostigmine 0.05 mg/kg IBW (max 5 mg) + glycopyrrolate 0.2 mg per mg",
   "Analgesia: paracetamol 1 g; tramadol 50 mg 12-hourly max 200 mg/day; fentanyl PCA preferred; no NSAIDs; ondansetron 4 mg, no extra dexamethasone"]],
- ["Paediatric local protocol additions (signed off 15 Nov 2026)", [
+ ["Paediatric local protocol additions (checked by author 15 Nov 2026)", [
   "Fasting: solids, formula, milky drinks 6 h; breast milk 4 h; clear 1 h",
   "Premed: oral / buccal midazolam 0.3–0.5 mg/kg (max 15); IN midazolam 0.2–0.3 (max 10); IN dexmedetomidine 2–2.5 mcg/kg",
   "PAAS 0–4 low, 5–7 moderate, 8–10 high (≥ 6 predicts difficult intubation); STBUR ≥ 3 high, 5 very high",
@@ -2680,7 +2680,7 @@ const VALUES = [
   "MTP: TXA 15 mg/kg then 2 mg/kg/h; PC:FFP 1:1 in 10 mL/kg; CaCl 0.2 mL/kg; fibrinogen 40 mg/kg; rFVIIa 90 mcg/kg",
   "TIVA: Paedfusor 1–16 y > 5 kg; Kataria 3–16 y 15–61 kg; Eleveld < 1 y / < 5 kg; McFarlan 2.5 mg/kg then 15/13/11/10/9 mg/kg/h",
   "CVC jugular 0.13 × kg + 4.9 cm; lung isolation sizes by age (Coté)"]],
- ["Intra-op analgesia (signed off 15 Nov 2026)", [
+ ["Intra-op analgesia (checked by author 15 Nov 2026)", [
   "Base: paracetamol 1 g (15 mg/kg < 50 kg, AdjBW if obese); parecoxib 40 mg (20 mg elderly / < 50 kg) or diclofenac PR 1 mg/kg max 100 mg; dexamethasone 0.1 mg/kg IBW max 8 mg",
   "Opioids: fentanyl 1–2 mcg/kg LBW then 0.5–1; morphine 0.1–0.15 mg/kg IBW; tramadol 1–2 mg/kg max 100 mg; halve if ≥ 65; remi → morphine 0.1 mg/kg or fentanyl 1–2 mcg/kg 30 min before stopping",
   "Ketamine 0.15–0.35 mg/kg then 0.1–0.5 mg/kg/h (max 1); 2 mg/mL",
@@ -2688,7 +2688,7 @@ const VALUES = [
   "Magnesium 30–50 mg/kg then 10–15 mg/kg/h; dexmedetomidine 0.5–1 mcg/kg then 0.2–0.7 mcg/kg/h; clonidine 1–2 mcg/kg max 150 mcg",
   "Modifiers: kidney → no NSAID, fentanyl not morphine; liver → paracetamol ≤ 2–3 g/day, reduce lignocaine; OSA → opioid-sparing; tolerant → continue baseline + ketamine",
   "PROSPECT table: lap chole port-site; laparotomy epidural / rectus sheath / TAP; hernia II-IH block; TKA adductor canal + LIA; THA LIA or fascia iliaca / PENG; spine infiltration / ESP; breast PECS II / paravertebral"]],
- ["Drawable-dose rounding (signed off 15 Nov 2026)", [
+ ["Drawable-dose rounding (checked by author 15 Nov 2026)", [
   "Strength known: volume rounded first (0.01 mL under 1 mL · 0.1 mL under 10 mL · 0.5 mL to 100 mL), mg shown = that volume × strength (e.g. sux 73.5 → 1.5 mL = 75 mg; roc 58.8 → 5.9 mL = 59 mg)",
   "No strength: mg steps 5 (≥ 50) · 1 (≥ 10) · 0.5 (≥ 1) · 0.05 (≥ 0.1) · 0.01; mcg steps 5 (≥ 20) · 1 (≥ 2) · 0.1",
   "Pump rates 0.1 mL/h (whole ≥ 100); fluids 5 mL steps ≥ 100 mL; g 0.1/0.5; mmol 0.5/1",
@@ -2704,7 +2704,7 @@ const VALUES = [
   "NOT YET VERIFIED: RCUK paediatric life support 2025 — doses could not be confirmed; paeds arrest still RCUK 2021 (flagged)",
   "LATEST AVAILABLE: RCOG PPH 2016; ASA PACU 2013; ASHP/IDSA 2013; Malaysian NAG 2019 (ask pharmacy re newer MOH policy); CPOC diabetes 2021; Association day-case 2019 (update pending); steroid 2020; LAST v3 (reviewed 2025); ESAIC 2022; AHA 2021; ASIA/ISNCSCI 2019; DAS ATI 2020",
   "CLASSIC VALIDATED TOOLS (still current): Aldrete 1995, PADSS 1995, Apfel 1999, Mapleson 1996, Bromage 1965, Chula formula 2005"]],
- ["Guideline updates Nov 2026 (signed off 14 Nov 2026)", [
+ ["Guideline updates Nov 2026 (checked by author 14 Nov 2026)", [
   "GLP-1: most continue; high risk → 24 h clear-liquid diet, adjust plan, consider holding; symptomatic → full stomach",
   "PONV: 0 factors risk reduction ± 1 agent; 1–2 factors 2 agents; ≥ 3 factors 3–4 agents + TIVA; PDNV long-acting antiemetic",
   "PDPH: suspect ≤ 5 days; paracetamol + NSAID; caffeine first 24 h only; EBP 15–20 mL, never > 30 mL; no prophylactic EBP",
@@ -2712,7 +2712,7 @@ const VALUES = [
   "CICO: VL first-line; routine NMB; peroxygenation; 3 + 1 attempts; 2nd-gen SGA max 3, no blind intubation; prepare FONA if SGA difficult",
   "MH: dantrolene 2–2.5 mg/kg actual weight, max 300 mg per dose, repeat every 10 min; max 10 mg/kg may be exceeded; charcoal filters; chilled crystalloid 2–3 L; stop cooling < 38.5 °C",
   "Adult ALS (RCUK 2025): first shock ≥ 150 J; lignocaine 100 mg alternative; isoprenaline 5 mcg/min for bradycardia"]],
- ["Departmental protocol additions (signed off 14 Nov 2026)", [
+ ["Departmental protocol additions (checked by author 14 Nov 2026)", [
   "Labour epidural contraindications (absolute / relative) and bloods (FBC/PT/APTT for severe PE)",
   "Dural puncture: inform specialist; re-site one space above or intrathecal catheter; keep catheter ≥ 24 h; LSCS top-ups 0.2 mL 0.5% heavy bupivacaine",
   "Catheter troubleshooting table (withdraw 0.5–1 cm for patchy block; 3 cm in space; severed / knotted catheter steps)",
@@ -2720,7 +2720,7 @@ const VALUES = [
   "Post-natal: PCA morphine 1 mg/mL 100–200 mL; SC morphine 7.5–10 mg 4-hourly regular",
   "IT morphine ward obs hourly × 4 h then 4-hourly; call if RR < 8, sedation > 2, VAS > 50%, SBP < 90; pruritus naloxone 0.1–0.4 mg or nalbuphine 2.5–5 mg",
   "PDPH practical steps: blood patch prerequisites and aftercare; SPG block with lignocaine 2%; local caffeine 300–500 mg/day × 3 days noted"]],
- ["Paediatric revisions Nov 2026 (signed off 14 Nov 2026)", [
+ ["Paediatric revisions Nov 2026 (checked by author 14 Nov 2026)", [
   "Estimated weight (APLS): < 1 y 0.5 × months + 4; 1–5 y 2 × age + 8; 6–12 y 3 × age + 7; banner > 40 kg",
   "Cuffed ETT (Microcuff): term–8 months 3.0; 8 months–2 y 3.5; then age/4 + 3.5",
   "NPA ≈ plain ETT size; length nose tip → tragus",
@@ -3030,7 +3030,7 @@ function renderNow(){
   const app = $("#app"), active = document.activeElement && document.activeElement.dataset ? document.activeElement.dataset.in : null;
   const y = window.scrollY;
   app.dataset.group = h.startsWith("g-") ? h.slice(2) : "";
-  const navItems = [["home","Home","search","home"],["g-emerg","Emergencies","emerg","emerg"],["g-ga","General","ga","ga"],["g-regional","Regional","regional","regional"],["g-paeds","Paediatric","paeds","paeds"],["g-obs","Obstetric","obs","obs"],["g-tx","Transplant","tx","tx"],["values","Values sheet","values","values"]];
+  const navItems = [["home","Home","search","home"],["g-emerg","Emergencies","emerg","emerg"],["g-ga","General","ga","ga"],["g-regional","Regional","regional","regional"],["g-paeds","Paediatric","paeds","paeds"],["g-obs","Obstetric","obs","obs"],["g-tx","Transplant","tx","tx"]];
   const nav = `<nav class="sidenav" aria-label="Sections"><div class="snbrand">${svg("capno")} Induction Card</div>${navItems.map(([hh,l,ic,cls])=>`<button class="snitem sn-${cls} ${h===hh||(hh==="home"&&!h.startsWith("g-")&&h!=="values")?"on":""}" data-go="${hh}"><span class="snico">${svg(ic)}</span>${l}</button>`).join("")}
     <div class="snkeys">Keys: <b>/</b> search · <b>Esc</b> back · <b>1–6</b> tabs</div></nav>`;
   app.innerHTML = `<div class="shell">${nav}<div class="content">${html}</div></div>`;
@@ -3097,6 +3097,8 @@ document.addEventListener("toggle", e => {
   else { S.openSet.delete(d.dataset.t); if (S.open === d.dataset.t) S.open = null; }
 }, true);
 document.addEventListener("click", e => { const t = e.target.closest && e.target.closest("[data-dl]"); if (!t) return; S.derm = t.getAttribute("data-dl"); render(); });
+let vtaps = 0, vtimer = null;
+document.addEventListener("click", e => { if (!e.target.closest || !e.target.closest(".vtap")) return; vtaps++; clearTimeout(vtimer); vtimer = setTimeout(()=>vtaps=0, 1500); if (vtaps >= 5){ vtaps = 0; location.hash = "#values"; window.scrollTo(0,0); } });
 document.addEventListener("input", e => { if (e.target.id==="q") runSearch(e.target.value); if (e.target.id==="cNick") S.cNick = e.target.value.slice(0,12); if (e.target.id==="dname") S.dname = e.target.value.slice(0,24); });
 function clamp(v,min,max){ return Math.min(max, Math.max(min, v)); }
 document.addEventListener("click", e => {
