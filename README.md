@@ -14,3 +14,5 @@ Offline anaesthesia reference with weight-based doses — emergencies, general, 
 Works offline once opened (installable to the home screen). Anonymous cases (sex, age, height, weight only) stay on the phone and delete themselves after 36 hours.
 
 Memory aid only — clinical judgement decides. No patient data is stored on any server.
+
+Seven-segment digits: DSEG font by keshikan, SIL Open Font License 1.1 (see fonts/DSEG-LICENSE.txt). Text font: IBM Plex (SIL OFL 1.1).

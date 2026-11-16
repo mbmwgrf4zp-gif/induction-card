@@ -18,6 +18,7 @@
 <link rel="icon" href="icon-192.png">
 <style>
 /* IBM Plex (SIL Open Font License), bundled for privacy and offline use */
+@font-face{font-family:'DSEG7';font-style:normal;font-weight:400;font-display:swap;src:url(fonts/DSEG7Classic-Italic.woff2) format('woff2')}
 @font-face{font-family:'IBM Plex Mono';font-style:normal;font-weight:500;font-display:swap;src:url(fonts/plex-mono-db14f4.woff2) format('woff2');unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD}
 @font-face{font-family:'IBM Plex Mono';font-style:normal;font-weight:600;font-display:swap;src:url(fonts/plex-mono-ed96d0.woff2) format('woff2');unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD}
 @font-face{font-family:'IBM Plex Sans';font-style:normal;font-weight:400;font-display:swap;src:url(fonts/plex-sans-118b75.woff2) format('woff2');unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD}
@@ -174,7 +175,7 @@ header h1{font-size:var(--fs-lg);font-weight:700;margin:0;flex:1;display:flex;al
 
 /* results */
 .result{background:var(--gc-soft);border-radius:var(--r);padding:var(--s4);margin:var(--s3) 0}
-.big{font-family:var(--font-mono);font-size:var(--big);font-weight:600;line-height:1.1;font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+.big{font-family:'DSEG7',var(--font-mono);font-size:calc(var(--big)*.92);font-weight:600;line-height:1.1;font-variant-numeric:tabular-nums;letter-spacing:-.01em}
 .sub{color:var(--muted);font-size:var(--fs-sm);line-height:1.4}
 .row{display:flex;gap:var(--s4);flex-wrap:wrap}
 .row>div{flex:1 1 140px;min-width:0}
@@ -220,7 +221,9 @@ ol.crisis li::marker{font-weight:800;color:var(--g-emerg)}
 b.dose{font-weight:700;background:var(--gc-soft);padding:0 .28em;border-radius:5px;-webkit-box-decoration-break:clone;box-decoration-break:clone}
 .emlinks{padding:var(--s3) var(--s4)}
 .sx{width:1em;height:1em;vertical-align:-.14em;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;flex:none}
-.bu{font-size:.5em;font-weight:600;letter-spacing:0}
+.bu{font-size:.5em;font-weight:600;letter-spacing:0;font-family:var(--font-sans)}
+.qans small{font-family:var(--font-sans);letter-spacing:0}
+.seg1{display:inline-block;margin-left:-.42em}.big,.qans{font-weight:400}
 .emlinks{display:grid;grid-template-columns:1fr 1fr;gap:var(--s2)}.emlinks .sub{grid-column:1/-1}.emlinks .emlink{margin:0;display:flex;align-items:center}
 @media (max-width:359px){.emlinks{grid-template-columns:1fr}}
 .ptbar{display:flex;align-items:center;justify-content:space-between;gap:var(--s2);width:100%;box-sizing:border-box;text-align:left;padding:var(--s3) var(--s4);border:1px solid var(--line);border-left:4px solid var(--gc);border-radius:var(--r);background:var(--card);color:var(--ink);font:inherit;font-weight:700;font-variant-numeric:tabular-nums;cursor:pointer}
@@ -287,7 +290,7 @@ tr.over td{background:var(--danger-bg)}
 .brand{display:flex;align-items:center;gap:6px;font-size:var(--fs-xs);font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--mon-muted)}
 .brand svg{width:18px;height:18px;color:var(--etco2)}
 .hero-r{display:flex;align-items:center;gap:var(--s2)}
-.clock{font-family:var(--font-mono);font-size:var(--fs-sm);color:var(--etco2);font-weight:600}
+.clock{font-family:'DSEG7',var(--font-mono);letter-spacing:.02em;font-size:var(--fs-sm);color:var(--etco2);font-weight:600}
 .herobtn{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.14);color:var(--mon-ink);height:36px;min-width:36px;width:36px}
 .hello{position:relative;font-size:var(--fs-xl);font-weight:600;line-height:1.2;margin:var(--s3) 0 2px}
 .date{position:relative;font-size:var(--fs-sm);color:var(--mon-muted);margin-bottom:40px}
@@ -297,7 +300,7 @@ tr.over td{background:var(--danger-bg)}
 .quick .qmini{position:absolute;top:8px;right:8px;width:24px;height:24px;border-radius:7px}.quick .qmini svg{width:16px;height:16px}
 .qlab{font-size:var(--fs-xs);font-weight:700;color:var(--t);letter-spacing:.02em;padding-right:26px;line-height:1.2;min-height:2.4em}
 .qin{font-size:var(--fs-xs);color:var(--muted)}
-.qans{font-family:var(--font-mono);font-size:var(--fs-lg);font-weight:600;line-height:1.15;margin-top:2px}
+.qans{font-family:'DSEG7',var(--font-mono);font-size:calc(var(--fs-lg)*.95);font-weight:400;letter-spacing:.02em;line-height:1.15;margin-top:2px}
 .qans small{display:block;font-family:var(--font-sans);font-size:var(--fs-xs);font-weight:500;color:var(--muted);margin-top:2px}
 /* pearl */
 .pearl{display:block;width:100%;text-align:left;margin-top:var(--s3);background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:var(--s3) var(--s4);cursor:pointer;color:var(--ink);position:relative}
@@ -416,7 +419,7 @@ a{color:var(--accent)}
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.22.1";
+const APP_VERSION = "2.23.0";
 const APP_DATE = "15 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
@@ -508,6 +511,11 @@ const PEARLS = [
   ["Laryngospasm: suxamethonium 0.1–0.5 mg/kg IV with atropine 0.02 mg/kg.","Laryngospasm","emerg","paeds"]];
 const CAPNO = (() => { let d = "M0 40"; for (let i=0;i<6;i++){ const x=i*100; d += ` L${x+18} 40 L${x+23} 13 Q${x+40} 10 ${x+58} 8 L${x+63} 40 L${x+100} 40`; } return d; })();
 function greet(){ const h = new Date().getHours(); return h<5 ? "Night shift" : h<12 ? "Good morning" : h<17 ? "Good afternoon" : "Good evening"; }
+/* seven-segment "1" is full-width: tuck it in so 61 does not read as "6 1" */
+function seg1(root){ (root||document).querySelectorAll('.big,.qans,.clock').forEach(el => {
+  const w = document.createTreeWalker(el, NodeFilter.SHOW_TEXT), ns = []; while (w.nextNode()) ns.push(w.currentNode);
+  ns.forEach(n => { if (!/1/.test(n.data) || (n.parentElement && n.parentElement.closest('.bu,small,.seg1'))) return;
+    const t = document.createElement('span'); t.innerHTML = esc(n.data).replace(/1/g, '<span class="seg1">1</span>'); n.replaceWith(...t.childNodes); }); }); }
 function clockTxt(){ const d = new Date(); return d.toLocaleTimeString("en-GB", {hour:"2-digit", minute:"2-digit", hour12:false}); }
 function dateTxt(){ return new Date().toLocaleDateString("en-GB", {weekday:"long", day:"numeric", month:"long"}); }
 function quickLive(){
@@ -544,7 +552,7 @@ screens.home = () => {
   <div class="grid2">${secs.map(g=>`<button class="sq t-${g.id}" data-go="g-${g.id}"><span class="qi">${svg(g.id)}</span><span class="sqt">${short[g.id]}</span><span class="sqs">${({paeds:"Pre-op · Induction · Blocks · Cases",tx:"Kidney recipient &amp; donor"})[g.id] || g.tabs.map(t=>t.label).join(" · ")}</span></button>`).join("")}</div>
   <button class="linkbtn" data-go="values">${svg("values")} Values sheet</button>` + disc;
 };
-setInterval(() => { const c = document.getElementById("clock"); if (c) c.textContent = clockTxt(); }, 30000);
+setInterval(() => { const c = document.getElementById("clock"); if (c){ c.textContent = clockTxt(); seg1(c.parentElement); } }, 30000);
 
 /* ---------- ETT ---------- */
 const ettCalc = (adultOnly, noInputs) => {
@@ -3013,6 +3021,7 @@ function renderNow(){
     <div class="snkeys">Keys: <b>/</b> search · <b>Esc</b> back · <b>1–6</b> tabs</div></nav>`;
   app.innerHTML = `<div class="shell">${nav}<div class="content">${html}</div></div>`;
   app.querySelectorAll('.big').forEach(el => { el.innerHTML = el.innerHTML.replace(/(\d)\s+(mg|mcg|mL\/h|mL|g|kg|mmHg|wk|cm|mmol|units?|J)(?=\s|<|$)/g, '$1<span class="bu"> $2</span>'); });
+  seg1(app);
   restoredAt = performance.now();
   if (isWide() && S.openSet) S.openSet.forEach(t => { const d = app.querySelector(`details[data-t="${CSS.escape(t)}"]`); if (d) d.open = true; });
   if (S.open){ const d = app.querySelector(`details[data-t="${CSS.escape(S.open)}"]`); if (d){ d.open = true; if (S.scrollTo){ d.scrollIntoView({block:"start"}); } } }
