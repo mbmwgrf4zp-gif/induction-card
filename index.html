@@ -428,7 +428,7 @@ details.endo summary{cursor:pointer;font-weight:600;font-size:var(--fs-sm)}
 .aboutlink{background:none;border:0;padding:0;font:inherit;color:var(--accent);font-weight:700;cursor:pointer;text-decoration:underline}
 .srcl a{color:var(--accent);text-decoration:none;font-weight:600}.srcl li{margin:6px 0}
 .vtap{cursor:default;-webkit-user-select:none;user-select:none}
-.disc{color:var(--muted);font-size:var(--fs-xs);text-align:center;margin-top:var(--s5);line-height:1.5}
+.disc{color:var(--muted);font-size:11px;text-align:center;margin-top:var(--s4);line-height:1.45;opacity:.9}.disc b{font-weight:600}
 a{color:var(--accent)}
 .vs label{display:flex;gap:var(--s3);align-items:flex-start;padding:var(--s2) 0;border-bottom:1px solid var(--line);font-size:var(--fs-sm)}
 .vs input{width:22px;height:22px;flex:none;margin-top:1px}
@@ -441,8 +441,8 @@ a{color:var(--accent)}
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.26.1";
-const APP_DATE = "15 Nov 2026";
+const APP_VERSION = "2.26.2";
+const APP_DATE = "16 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
 /* ================= HELPERS ================= */
@@ -481,7 +481,7 @@ function step(key, label, unit, min, max, stp){
     <span class="unit">${unit}</span></div>`;
 }
 function trio(a,b,c){ return `<div class="trio"><span>${a}</span><span class="main">${b}</span><span>${c}</span></div>`; }
-const disc = `<div class="disc">${VALUES_CHECKED ? `Values reviewed by the author Nov 2026` : `<b>DRAFT – values not checked</b>`}<br>Memory aid only — clinical judgement decides. Cases are anonymous, kept on this phone only, auto-deleted after 36 h.<br><b class="vtap">Version ${APP_VERSION} · updated ${APP_DATE}</b> · <button class="aboutlink" data-go="about">About</button><br>Sources reviewed Nov 2026 · next review Nov 2027</div>`;
+const disc = `<div class="disc">Memory aid only — clinical judgement decides. Cases stay on this phone, deleted after 36 h.<br><b class="vtap">Version ${APP_VERSION} · ${APP_DATE}</b> · <button class="aboutlink" data-go="about">About</button><br>${VALUES_CHECKED ? "Values &amp; sources reviewed Nov 2026" : "<b>DRAFT – values not checked</b>"} · next review Nov 2027</div>`;
 
 /* ================= SCREENS ================= */
 function banner(){
