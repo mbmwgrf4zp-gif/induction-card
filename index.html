@@ -306,9 +306,10 @@ tr.over td{background:var(--danger-bg)}
 /* quick tiles as mini monitors */
 .quick .qbtn.lcd{background:var(--mon-bg);border-color:#1f2c2e;color:var(--mon-ink);overflow:hidden;--lcd:var(--etco2)}
 .quick .qbtn.lcd::before{content:"";position:absolute;inset:0;background-image:linear-gradient(var(--mon-grid) 1px,transparent 1px),linear-gradient(90deg,var(--mon-grid) 1px,transparent 1px);background-size:12px 12px;pointer-events:none}
+.quick .qbtn.lcd.t-regional{--lcd:#22d3ee}.quick .qbtn.lcd.t-tx{--lcd:#a78bfa}.quick .qbtn.lcd.t-emerg{--lcd:#ff9b93}.qhead{display:flex;justify-content:space-between;align-items:center}.qhead .aboutlink{text-transform:none;letter-spacing:0;font-size:var(--fs-xs)}
 .quick .qbtn.lcd.t-obs{--lcd:#f472b6}.quick .qbtn.lcd.t-ga{--lcd:#fbbf24}.quick .qbtn.lcd.t-paeds{--lcd:#4ade80}
 .quick .lcd .qlab{color:var(--lcd);text-transform:uppercase;font-size:11px;letter-spacing:.06em;min-height:2.3em}
-.quick .lcd .qmini{background:rgba(255,255,255,.07);color:var(--lcd)}
+.quick .lcd .qmini{background:rgba(255,255,255,.07);color:var(--lcd);position:static;float:right;margin:-2px -2px 2px 6px}.quick .lcd .qlab{display:block;padding-right:0;width:100%}
 .quick .lcd .qans{color:var(--lcd);font-size:clamp(18px,6.2vw,26px);white-space:nowrap;letter-spacing:-.01em;margin-top:4px;text-shadow:0 0 10px color-mix(in srgb,var(--lcd) 45%,transparent);transition:opacity .2s}
 .quick .lcd .qans small{color:var(--mon-muted);text-shadow:none;font-size:11px;margin-top:4px;white-space:normal;letter-spacing:0}
 .quick .lcd .qin{color:var(--mon-muted);font-size:11px;margin-top:auto;padding-top:6px;display:flex;align-items:center;flex-wrap:wrap;gap:4px}
@@ -441,7 +442,7 @@ a{color:var(--accent)}
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.26.2";
+const APP_VERSION = "2.27.0";
 const APP_DATE = "16 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
@@ -541,17 +542,72 @@ function seg1(root){ (root||document).querySelectorAll('.big,.qans,.clock').forE
     const t = document.createElement('span'); t.innerHTML = esc(n.data).replace(/1/g, '<span class="seg1">1</span>'); n.replaceWith(...t.childNodes); }); }); }
 function clockTxt(){ const d = new Date(); return d.toLocaleTimeString("en-GB", {hour:"2-digit", minute:"2-digit", hour12:false}); }
 function dateTxt(){ return new Date().toLocaleDateString("en-GB", {weekday:"long", day:"numeric", month:"long"}); }
-function quickLive(){
-  const h = Math.round(S.spHt), row = LSCS.find(r => h <= r[0]);
-  const ah = S.height, depth = r05(4 + ah/10), sz = S.sex==="F" ? "6.5–7.0" : "7.0–7.5";
-  const e = paedEtt(), main = e.useCuff ? f1(e.cuffed) : e.plainTxt;
-  const ac = activeCase(), child = ac && ac.y < 16, male = ac && ac.sex === "M";
+/* ---------- QUICK TILES (user picks 3; numbers reuse the card formulas) ---------- */
+const QDEF = ["lscs","aett","pett"];
+const QT = (() => {
+  const A = ["height","aw"], Pk = ["pw","pY"];
+  const pAge = () => `${sig(S.pw)} kg · ${S.pY} y${S.pM?` ${S.pM} m`:""}`, aHt = () => `${sxi(S.sex)} ${S.height} cm`, aWt = () => `${sig(S.aw)} kg`, aBoth = () => `${S.height} cm · ${sig(S.aw)} kg`;
+  const sm = (main, small) => `${main}<small>${small}</small>`;
+  return {
+  lscs:{lab:"LSCS spinal", ic:"obs", cls:"t-obs", kind:"obs", keys:["spHt"], inp:()=>`${Math.round(S.spHt)} cm`, open:["A1. Spinal: dose by height","obs","lscs"],
+    ans:()=>{ const h=Math.round(S.spHt), row=LSCS.find(r=>h<=r[0]); return sm(row[1]===row[2]?fmt(row[1]):fmt(row[1])+"–"+fmt(row[2]),"mL heavy bupi"); }},
+  aett:{lab:"Adult ETT", ic:"airway", cls:"t-ga", kind:"adult", keys:["height"], inp:aHt, open:["4. Tube & airway kit","ga","ind"],
+    ans:()=>sm(S.sex==="F"?"6.5–7.0":"7.0–7.5",`${f1(r05(4+S.height/10))} cm at mouth corner`)},
+  pett:{lab:"Paeds ETT", ic:"paeds", cls:"t-paeds", kind:"paeds", keys:Pk, inp:pAge, open:["1. Tube: size, depth, blade, suction","paeds","ind"],
+    ans:()=>{ const e=paedEtt(); return sm(e.useCuff?f1(e.cuffed):e.plainTxt,`${e.useCuff?"cuffed · ":""}${fmt(e.depth)} cm`); }},
+  rsi:{lab:"RSI drugs", ic:"airway", cls:"t-ga", kind:"adult", keys:A, inp:aBoth, open:["2. RSI","ga","ind"],
+    ans:()=>{ const W2=wts(); return sm(sig(dz(1.5*W2.tbw/50,"mL")*50),`mg sux · roc ${sig(dz(1.2*W2.ibw/10,"mL")*10)} mg`); }},
+  tv:{lab:"Tidal volume", ic:"airway", cls:"t-ga", kind:"adult", keys:["height"], inp:aHt, open:["1. Ventilation strategies","ga","maint"],
+    ans:()=>sm(mlr(6,8).replace(" mL",""),`mL · 6–8 mL/kg PBW`)},
+  lamax:{lab:"LA maximum", ic:"spinal", cls:"t-regional", kind:"adult", keys:A, inp:aBoth, open:["1. LA dose calculator","regional","safety"],
+    ans:()=>{ const mg=laMaxMg("bupi","a"); return sm(sig(mg),`mg bupi = ${sig(mg/2.5)} mL 0.25%`); }},
+  spin:{lab:"Spinal (non-obs)", ic:"spinal", cls:"t-regional", kind:"adult", keys:["height"], inp:()=>`${Math.round(S.height)} cm`, goTab:"regional:neuraxial",
+    ans:()=>{ const o=OPS[S.spOp]||OPS.saddle, [lo,hi]=o.r, mid=Math.round((lo+hi)/2*10)/10, h=Math.round(S.height); return sm(fmt(h<=150?lo:h<=165?mid:hi),`mL heavy bupi · ${o.name.split(" / ")[0]}`); }},
+  pfl:{lab:"Paeds fluids", ic:"paeds", cls:"t-paeds", kind:"paeds", keys:["pw"], inp:()=>`${sig(S.pw)} kg`, open:["1. Fluids: maintenance & insensible loss","paeds","intra"],
+    ans:()=>{ const w=S.pw, m0=w<=10?4*w:w<=20?40+2*(w-10):60+(w-20); return sm(dz(Math.min(m0,100),"mL/h"),"mL/h maintenance"); }},
+  padr:{lab:"Paeds arrest adrenaline", ic:"emerg", cls:"t-emerg", kind:"paeds", keys:["pw"], inp:()=>`${sig(S.pw)} kg`, open:["Paeds cardiac arrest","emerg","paeds"],
+    ans:()=>{ const ml=dz(Math.min(0.1*S.pw,10),"mL",10); return sm(ml,`mL of 1:10 000 (10 mcg/kg)`); }},
+  dlt:{lab:"Double-lumen tube", ic:"airway", cls:"t-ga", kind:"adult", keys:["height"], inp:aHt, open:["2. One-lung ventilation","ga","maint"],
+    ans:()=>sm(dltSize(),`Fr left · ${sig(12+S.height/10)} cm`)},
+  prop:{lab:"Propofol induction", ic:"airway", cls:"t-ga", kind:"adult", keys:A, inp:aBoth, open:["1. Induction drugs","ga","ind"],
+    ans:()=>{ const w=wts().lbw, r=x=>dz(dz(x/10,"mL")*10,"mg"); return sm(`${r(1.5*w)}–${r(2.5*w)}`,`mg · 1.5–2.5 mg/kg LBW`); }},
+  sug:{lab:"Sugammadex", ic:"airway", cls:"t-ga", kind:"adult", keys:["aw"], inp:aWt, open:["1. Reversal","ga","post"],
+    ans:()=>{ const t=wts().tbw, m=k=>sig(dz(k*t/100,"mL")*100); return sm(m(2),`mg (2/kg) · 4: ${m(4)} · 16: ${m(16)}`); }},
+  neo:{lab:"Neostigmine + glyco", ic:"airway", cls:"t-ga", kind:"adult", keys:A, inp:aBoth, open:["1. Reversal","ga","post"],
+    ans:()=>{ const neo=Math.min(0.05*wts().ibw,5); return sm(sig(dz(neo/2.5,"mL")*2.5),`mg + glyco ${dz(neo*0.2,"mg")} mg`); }},
+  fent:{lab:"Fentanyl induction", ic:"airway", cls:"t-ga", kind:"adult", keys:A, inp:aBoth, open:["1. Induction drugs","ga","ind"],
+    ans:()=>{ const w=wts().lbw, r=x=>dz(dz(x/50,"mL")*50,"mcg"); return sm(`${r(w)}–${r(3*w)}`,`mcg · 1–3 mcg/kg LBW`); }},
+  bw:{lab:"Body weights", ic:"airway", cls:"t-ga", kind:"adult", keys:A, inp:aBoth, goTab:"ga:ind",
+    ans:()=>{ const x=wts(); return sm(sig(x.ibw),`kg IBW · LBW ${sig(x.lbw)} · Adj ${sig(x.adj)}`); }},
+  pwt:{lab:"Paeds weight estimate", ic:"paeds", cls:"t-paeds", kind:"paeds", keys:["pY"], inp:()=>`${S.pY} y${S.pM?` ${S.pM} m`:""}`, goTab:"paeds:pre",
+    ans:()=>{ const y=S.pY, mo=AGEM(), e = mo<1?null : y<1?0.5*mo+4 : y<=5?2*y+8 : y<=12?3*y+7 : null; return e==null ? sm("—","no formula for this age") : sm(sig(e),"kg (APLS)"); }},
+  pprop:{lab:"Paeds propofol", ic:"paeds", cls:"t-paeds", kind:"paeds", keys:Pk, inp:pAge, open:["5. Induction drugs","paeds","ind"],
+    ans:()=>{ const neo=AGEM()<1, w=S.pw; return neo ? sm(dz(2*w,"mg"),"mg · neonate 2 mg/kg") : sm(`${dz(4*w,"mg")}–${dz(5*w,"mg")}`,"mg · 4–5 mg/kg healthy"); }},
+  pcau:{lab:"Paeds caudal (T10)", ic:"spinal", cls:"t-regional", kind:"paeds", keys:["pw"], inp:()=>`${sig(S.pw)} kg`, open:["3. Caudal","paeds","blocks"],
+    ans:()=>{ const w=S.pw, a=Math.min(0.75*w,20), b=Math.min(w,20); return sm(a===b?sig(a):`${sig(a)}–${sig(b)}`,"mL bupi 0.25% (max 20)"); }},
+  pbp:{lab:"Paeds expected BP", ic:"paeds", cls:"t-paeds", kind:"paeds", keys:Pk, inp:pAge, open:["7. Expected BP for age / weight","paeds","pre"],
+    ans:()=>{ const w=S.pw, y=S.pY; if (AGEM()<1 && w<=3.5) return sm(w<1.5?40:w<2.5?50:60,"mmHg systolic (neonate)"); return sm(90+2*y,`mmHg · low &lt; ${70+2*y}`); }},
+  pebv:{lab:"Paeds blood volume", ic:"paeds", cls:"t-paeds", kind:"paeds", keys:Pk, inp:pAge, open:["3. Fluids: blood products","paeds","intra"],
+    ans:()=>{ const mo=AGEM(), k=mo<1?85:mo<12?80:S.pY<12?75:70; return sm(dz(k*S.pw,"mL"),`mL · ${k} mL/kg`); }},
+  mann:{lab:"Transplant mannitol", ic:"tx", cls:"t-tx", kind:"adult", keys:["aw"], inp:()=>`${sig(S.aw)} kg dry`, open:["5. Anastomosis & reperfusion","tx","intra"],
+    ans:()=>sm(dz(2.5*S.aw,"mL"),`mL of 20% = ${dz(0.5*S.aw,"g")} g`)}};
+})();
+function quickIds(){ const out = [...new Set(qSaved())]; for (const d of QDEF){ if (out.length>=3) break; if (!out.includes(d)) out.push(d); } for (const d of Object.keys(QT)){ if (out.length>=3) break; if (!out.includes(d)) out.push(d); } return out; }
+function quickTile(id){
+  const t = QT[id], ac = activeCase(), child = ac && ac.y < 16, male = ac && ac.sex === "M";
   const na = why => `—<small>${why}</small>`;
-  return [
-    ["obs","LSCS spinal",`${h} cm`,(child||male) ? na(child?"not for a child case":"male case") : `${row[1]===row[2]?fmt(row[1]):fmt(row[1])+"–"+fmt(row[2])}<small>mL heavy bupi</small>`,"A1. Spinal: dose by height","obs","lscs","t-obs"],
-    ["airway","Adult ETT",`${sxi(S.sex)} ${ah} cm`,child ? na("child case — see Paeds") : `${sz}<small>${f1(depth)} cm at mouth corner</small>`,"4. Tube & airway kit","ga","ind","t-ga"],
-    ["paeds","Paeds ETT",`${sig(S.pw)} kg · ${S.pY} y${S.pM?` ${S.pM} m`:""}`,(ac && !child) ? na("adult case") : `${main}<small>${e.useCuff?"cuffed · ":""}${fmt(e.depth)} cm</small>`,"1. Tube: size, depth, blade, suction","paeds","ind","t-paeds"]];
+  const blocked = t.kind==="obs" ? (child ? "not for a child case" : male ? "male case" : null) : t.kind==="adult" ? (child ? "child case — see Paeds" : null) : (ac && !child ? "adult case" : null);
+  const smp = t.keys.some(isSample);
+  const go = t.goTab ? `data-go-tab="${t.goTab}"` : `data-open="${esc(t.open[0])}" data-g="${t.open[1]}" data-tab="${t.open[2]}"`;
+  return `<button class="qbtn lcd ${t.cls}${smp?" smp":""}" ${go}><span class="qlab"><span class="qi qmini">${svg(t.ic)}</span>${t.lab}</span><span class="qans">${blocked?na(blocked):t.ans()}</span><span class="qin">${t.inp()}${smp?' <span class="stag">sample</span>':""}</span></button>`;
 }
+const qSaved = () => { const q = store.get("quick", null); return (Array.isArray(q) ? q : QDEF).filter(id => QT[id]).slice(0,3); };
+screens.quick = () => { const sel = qSaved();
+  return head("Quick tiles","home") + `<div class="card"><p>Choose the <b>3</b> tiles shown on the home screen. Tap to add or remove; they appear in the order you pick. Saved on this phone only.</p>
+    <p class="sub">Chosen: <b>${sel.map(id=>QT[id].lab).join(" · ") || "none"}</b>${sel.length<3?` — pick ${3-sel.length} more (empty slots show a default)`:""}</p>
+    <div class="txck">${Object.entries(QT).map(([id,t]) => { const n = sel.indexOf(id); return `<button class="txci ${n>=0?"on":""}" data-qpick="${id}" aria-pressed="${n>=0}"><span class="box">${n>=0?n+1:""}</span><span>${t.lab}</span></button>`; }).join("")}</div>
+    ${S.qmsg?`<div class="warn">${S.qmsg}</div>`:""}
+    <button class="linkbtn" data-qreset="1">Reset to default</button></div>` + disc; };
 screens.home = () => {
   const th = store.get("theme","auto"), thLabel = th==="auto" ? "◐" : th==="dark" ? "☾" : "☀";
   const pearl = PEARLS[Math.floor(Date.now()/86400000) % PEARLS.length];
@@ -566,8 +622,8 @@ screens.home = () => {
   </section>
   <div class="searchbox">${svg("search")}<input id="q" class="search" type="search" placeholder="Search caudal, remi, LSCS…" autocomplete="off" aria-label="Search cards"></div><div id="results"></div>
   <div class="toprow"><div class="tr-emerg"><div class="label">Emergency</div>${tile("t-emerg","emerg","Emergencies","Crisis steps with doses",'data-go="g-emerg"')}</div><div class="tr-quick">
-  <div class="label">Quick</div>
-  <div class="quick">${quickLive().map(([ic,lab,inp,ans,t,g,tb,cls],i)=>{ const smp = (i===0&&isSample("spHt"))||(i===1&&isSample("height"))||(i===2&&isSample("pw")); return `<button class="qbtn lcd ${cls}${smp?" smp":""}" data-open="${esc(t)}" data-g="${g}" data-tab="${tb}"><span class="qi qmini">${svg(ic)}</span><span class="qlab">${lab}</span><span class="qans">${ans}</span><span class="qin">${inp}${smp?' <span class="stag">sample</span>':""}</span></button>`; }).join("")}</div>
+  <div class="label qhead"><span>Quick</span><button class="aboutlink" data-go="quick">Edit</button></div>
+  <div class="quick">${quickIds().map(quickTile).join("")}</div>
   </div></div>
   ${caseStrip()}
   <button class="pearl" data-open="${esc(pearl[1])}" data-g="${pearl[2]}" data-tab="${pearl[3]}"><span class="plab">Pearl of the day</span><span class="ptxt">${pearl[0]}</span><span class="pgo">Open card ›</span></button>
@@ -2574,11 +2630,12 @@ function vTicks(){
 }
 /* ---------- ABOUT ---------- */
 const CHANGES = [
+  ["2.27","Quick tiles can be changed (Edit beside Quick)"],
+  ["2.26","About page added"],
   ["2.25","Values sheet grouped by section, with filter"],
   ["2.24","Quick tiles restyled as small monitor screens"],
   ["2.23","Seven-segment digits for big numbers"],
-  ["2.22","Doses rounded to amounts you can draw up"],
-  ["2.21","Dermatome card redesigned (block-up-to mode)"]];
+  ["2.22","Doses rounded to amounts you can draw up"]];
 const SRC_LINKS = [
   ["Emergencies", [["Resuscitation Council UK — ALS / PLS guidelines","https://www.resus.org.uk/library"],["Difficult Airway Society guidelines","https://das.uk.com/guidelines"],["Association of Anaesthetists — guidelines (anaphylaxis, LAST, safety)","https://anaesthetists.org/Home/Resources-publications/Guidelines"],["European Malignant Hyperthermia Group","https://www.emhg.org"],["UK Kidney Association — hyperkalaemia guideline","https://www.ukkidney.org/health-professionals/guidelines"]]],
   ["General", [["ASA standards & practice parameters (fasting, PACU)","https://www.asahq.org/standards-and-practice-parameters"],["Centre for Perioperative Care — diabetes guideline","https://cpoc.org.uk/guidelines-resources-guidelines"],["PROSPECT procedure-specific analgesia (ESRA)","https://esraeurope.org/prospect/"],["ASRA Pain Medicine — guidelines (ketamine, anticoagulation)","https://www.asra.com/guidelines-articles/guidelines"],["Brain Trauma Foundation guidelines","https://braintrauma.org/coma/guidelines"]]],
@@ -2973,6 +3030,8 @@ document.addEventListener("click", e => {
   if (d.apf!==undefined){ S.apfel = (S.apfel||0) ^ (1<<(+d.apf)); render(); return; }
   if (d.goTab){ const [gid,tid] = d.goTab.split(":"); const og = GROUPS.find(x=>x.id===gid); if (og) S[og.tabKey]=tid; S.open=null; const tg="#g-"+gid; if (location.hash===tg) render(); else location.hash=tg; window.scrollTo(0,0); return; }
   if (d.setw){ S.pw = parseFloat(d.setw); render(); return; }
+  if (d.qpick){ let c = qSaved(); S.qmsg = ""; if (c.includes(d.qpick)) c = c.filter(x=>x!==d.qpick); else if (c.length >= 3) S.qmsg = "Three are already chosen — remove one first."; else c = [...c, d.qpick]; store.set("quick", c); render(); return; }
+  if (d.qreset){ store.set("quick", null); S.qmsg = ""; render(); return; }
   if (d.ptedit){ S.ptEditing = true; render(); return; }
   if (d.ptdone){ S.ptEditing = false; render(); return; }
   if (d.seg && GROUPS.some(x=>x.tabKey===d.seg) && S[d.seg] !== d.val){ const og = GROUPS.find(x=>x.tabKey===d.seg), ids = og.tabs.map(t=>t.id), dir = ids.indexOf(d.val) > ids.indexOf(S[d.seg]) ? "tab-l" : "tab-r"; S.ptEditing = false; S.touched[d.seg]=true; S[d.seg] = d.val; transition(og.id==="emerg" ? "fast" : dir, () => render()); return; }
