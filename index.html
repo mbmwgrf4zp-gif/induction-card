@@ -300,6 +300,20 @@ tr.over td{background:var(--danger-bg)}
 .quick .qmini{position:absolute;top:8px;right:8px;width:24px;height:24px;border-radius:7px}.quick .qmini svg{width:16px;height:16px}
 .qlab{font-size:var(--fs-xs);font-weight:700;color:var(--t);letter-spacing:.02em;padding-right:26px;line-height:1.2;min-height:2.4em}
 .qin{font-size:var(--fs-xs);color:var(--muted)}
+/* quick tiles as mini monitors */
+.quick .qbtn.lcd{background:var(--mon-bg);border-color:#1f2c2e;color:var(--mon-ink);overflow:hidden;--lcd:var(--etco2)}
+.quick .qbtn.lcd::before{content:"";position:absolute;inset:0;background-image:linear-gradient(var(--mon-grid) 1px,transparent 1px),linear-gradient(90deg,var(--mon-grid) 1px,transparent 1px);background-size:12px 12px;pointer-events:none}
+.quick .qbtn.lcd.t-obs{--lcd:#f472b6}.quick .qbtn.lcd.t-ga{--lcd:#fbbf24}.quick .qbtn.lcd.t-paeds{--lcd:#4ade80}
+.quick .lcd .qlab{color:var(--lcd);text-transform:uppercase;font-size:11px;letter-spacing:.06em;min-height:2.3em}
+.quick .lcd .qmini{background:rgba(255,255,255,.07);color:var(--lcd)}
+.quick .lcd .qans{color:var(--lcd);font-size:clamp(18px,6.2vw,26px);white-space:nowrap;letter-spacing:-.01em;margin-top:4px;text-shadow:0 0 10px color-mix(in srgb,var(--lcd) 45%,transparent);transition:opacity .2s}
+.quick .lcd .qans small{color:var(--mon-muted);text-shadow:none;font-size:11px;margin-top:4px;white-space:normal;letter-spacing:0}
+.quick .lcd .qin{color:var(--mon-muted);font-size:11px;margin-top:auto;padding-top:6px;display:flex;align-items:center;flex-wrap:wrap;gap:4px}
+.quick .lcd.smp .qans{color:color-mix(in srgb,var(--lcd) 50%,transparent);text-shadow:none}
+.quick .lcd .stag{font-size:10px;padding:0 4px;margin:0;background:rgba(250,204,21,.14);border-color:rgba(250,204,21,.4);color:#facc15;line-height:1.5}
+@media (prefers-contrast: more),(prefers-reduced-motion: reduce){.quick .lcd .qans{text-shadow:none}}
+.stag{font-size:11px;padding:0 4px;border-radius:5px;line-height:1.45}
+
 .qans{font-family:'DSEG7',var(--font-mono);font-size:calc(var(--fs-lg)*.95);font-weight:400;letter-spacing:.02em;line-height:1.15;margin-top:2px}
 .qans small{display:block;font-family:var(--font-sans);font-size:var(--fs-xs);font-weight:500;color:var(--muted);margin-top:2px}
 /* pearl */
@@ -419,7 +433,7 @@ a{color:var(--accent)}
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.23.0";
+const APP_VERSION = "2.24.0";
 const APP_DATE = "15 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
@@ -544,7 +558,7 @@ screens.home = () => {
   <div class="searchbox">${svg("search")}<input id="q" class="search" type="search" placeholder="Search caudal, remi, LSCS…" autocomplete="off" aria-label="Search cards"></div><div id="results"></div>
   <div class="toprow"><div class="tr-emerg"><div class="label">Emergency</div>${tile("t-emerg","emerg","Emergencies","Crisis steps with doses",'data-go="g-emerg"')}</div><div class="tr-quick">
   <div class="label">Quick</div>
-  <div class="quick">${quickLive().map(([ic,lab,inp,ans,t,g,tb,cls],i)=>`<button class="qbtn ${cls}" data-open="${esc(t)}" data-g="${g}" data-tab="${tb}"><span class="qi qmini">${svg(ic)}</span><span class="qlab">${lab}</span><span class="qin">${inp}${(i===0&&isSample("spHt"))||(i===1&&isSample("height"))||(i===2&&isSample("pw"))?' <span class="stag">sample</span>':""}</span><span class="qans">${ans}</span></button>`).join("")}</div>
+  <div class="quick">${quickLive().map(([ic,lab,inp,ans,t,g,tb,cls],i)=>{ const smp = (i===0&&isSample("spHt"))||(i===1&&isSample("height"))||(i===2&&isSample("pw")); return `<button class="qbtn lcd ${cls}${smp?" smp":""}" data-open="${esc(t)}" data-g="${g}" data-tab="${tb}"><span class="qi qmini">${svg(ic)}</span><span class="qlab">${lab}</span><span class="qans">${ans}</span><span class="qin">${inp}${smp?' <span class="stag">sample</span>':""}</span></button>`; }).join("")}</div>
   </div></div>
   ${caseStrip()}
   <button class="pearl" data-open="${esc(pearl[1])}" data-g="${pearl[2]}" data-tab="${pearl[3]}"><span class="plab">Pearl of the day</span><span class="ptxt">${pearl[0]}</span><span class="pgo">Open card ›</span></button>
