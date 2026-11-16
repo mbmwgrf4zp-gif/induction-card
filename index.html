@@ -428,6 +428,7 @@ details.endo summary{cursor:pointer;font-weight:600;font-size:var(--fs-sm)}
 .vcount{font-size:var(--fs-sm);font-weight:700;color:var(--muted);background:var(--dim2);border-radius:999px;padding:2px 10px;font-variant-numeric:tabular-nums}.vcount.ok{color:var(--on);background:var(--accent)}
 .aboutlink{background:none;border:0;padding:0;font:inherit;color:var(--accent);font-weight:700;cursor:pointer;text-decoration:underline}
 .srcl a{color:var(--accent);text-decoration:none;font-weight:600}.srcl li{margin:6px 0}
+.csnote{width:calc(100% - 2*var(--s4));box-sizing:border-box;font:inherit;font-size:16px;padding:var(--s2) var(--s3);border:1px solid var(--line);border-radius:var(--r-sm);background:var(--field);color:var(--ink);resize:vertical}
 .cstext{background:var(--field);border:1px solid var(--line);border-radius:var(--r-sm);padding:var(--s3);font-size:var(--fs-body);line-height:1.55;margin:var(--s2) 0;-webkit-user-select:text;user-select:text}
 .presum{border-left:4px solid var(--gc)}.psline{font-weight:700;margin:4px 0 var(--s2);line-height:1.4}.psbtns{display:flex;gap:var(--s2)}.psbtns .iconbtn{height:36px}
 .wideonly{display:none}@media (min-width:1100px){.wideonly{display:block}}
@@ -449,7 +450,7 @@ a{color:var(--accent)}
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.29.1";
+const APP_VERSION = "2.29.2";
 const APP_DATE = "16 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
@@ -466,7 +467,7 @@ const store = {
 };
 // Inputs are not remembered between uses (per plan): state lives in memory only.
 const S = { ettMode:"adult", sex:"F", height:158, ageY:4, ageM:0, wt:3.0,
-            touched:{}, sc:{}, fastH:6, hbNow:12, hbLow:8, hbTarget:10, derm:"", abxSp:"general", spOp:"lscs", spHt:155, morWt:60, pw:10, pY:1, pM:0, pHt:75, pBE:-5, aw:70, emTab:"adult", obTab:"labour", pTab:"pre", gaTab:"pre", raTab:"safety", laA:[], laP:[], cSex:"F", cY:40, cM:0, cH:160, cW:60, cNick:"", laD:"bupi", laC:"0.5", laMl:15, laBi:"1", age:45, apfel:0, pump:"pcea_cse", topup:"lig", ventSc:"std", vfio:"", txTab:"pre", txck:{}, gaB:34, chW:6, dermMode:"block", asa:"", met:"", csWho:"patient", k:4.5, hb:100, todayWt:70, hdH:12 };
+            touched:{}, sc:{}, fastH:6, hbNow:12, hbLow:8, hbTarget:10, derm:"", abxSp:"general", spOp:"lscs", spHt:155, morWt:60, pw:10, pY:1, pM:0, pHt:75, pBE:-5, aw:70, emTab:"adult", obTab:"labour", pTab:"pre", gaTab:"pre", raTab:"safety", laA:[], laP:[], cSex:"F", cY:40, cM:0, cH:160, cW:60, cNick:"", laD:"bupi", laC:"0.5", laMl:15, laBi:"1", age:45, apfel:0, pump:"pcea_cse", topup:"lig", ventSc:"std", vfio:"", txTab:"pre", txck:{}, gaB:34, chW:6, dermMode:"block", asa:"", met:"", csWho:"patient", csLang:"English", csRec:"", csNote:"", k:4.5, hb:100, todayWt:70, hdH:12 };
 
 function src(text){ return `<div class="src">Source: ${text}</div>`; }
 function protoSrc(){
@@ -1844,28 +1845,46 @@ function csAuto(){ const a = {};
   if ((S.age >= 70 && S.touched.age) || scv("cfs","v") >= 5) a.old = "age / CFS";
   return a; }
 const csOn = (k, auto) => { const v = scv("cs", k); return v === 1 || (v == null && !!auto[k]); };
+const CS_BEN = {ga:"fully asleep throughout", sp:"awake, avoids GA, good early pain relief", epi:"continuing pain relief after surgery", pnb:"good pain relief with less opioid", sed:"comfortable, quicker recovery than GA"};
+const CS_LANG = [["English","English"],["Malay","Malay"],["Mandarin","Mandarin"],["Tamil","Tamil"],["other","Other"]];
+const csChosen = k => scv("csc", k) !== 0;   // explained techniques are "agreed" unless unticked
 function consentText(){
   const auto = csAuto(), tech = CS_TECH.filter(([k]) => csOn(k, {})), add = CS_ADD.filter(([k]) => csOn(k, auto));
   if (!tech.length) return "";
-  const who = S.csWho === "parent" ? "parent(s)" : "patient", Who = who[0].toUpperCase() + who.slice(1);
-  const names = tech.map(t => t[2]), plan = names.length > 1 ? names.slice(0,-1).join(", ") + " + " + names[names.length-1] : names[0];
-  return [`Explained to ${who} regarding the options of anaesthesia for this procedure. Risks and benefits of each technique were explained.`,
-    ...tech.map(t => `${t[2]}: common such as ${t[3]}; uncommon such as ${t[4]}; rare such as ${t[5]}.`),
+  const who = S.csWho === "parent" ? "parent / guardian" : "patient", Who = who[0].toUpperCase() + who.slice(1);
+  const join = a => a.length > 1 ? a.slice(0,-1).join(", ") + " + " + a[a.length-1] : (a[0] || "");
+  const chosen = tech.filter(([k]) => csChosen(k)), alt = tech.filter(([k]) => !csChosen(k));
+  const lang = S.csLang && S.csLang !== "other" ? ` in ${S.csLang}` : "", interp = scv("cs","interp") === 1 ? " with an interpreter" : "";
+  const rec = tech.find(([k]) => k === S.csRec);
+  const decide = [rec ? `Recommended: ${rec[2]}.` : "", chosen.length && (alt.length || rec) ? `${Who} chose: ${join(chosen.map(t=>t[2]))}.` : "", alt.length ? `Alternatives discussed: ${alt.map(t=>t[2]).join(", ")}.` : ""].filter(Boolean).join(" ");
+  const note = (S.csNote || "").trim();
+  return [`Explained to ${who}${lang}${interp} regarding the options of anaesthesia for this procedure: ${tech.map(t=>t[2]).join(", ")}. Risks and benefits of each were explained.`,
+    ...tech.map(t => `${t[2]} (${CS_BEN[t[0]]}): common such as ${t[3]}; uncommon such as ${t[4]}; rare such as ${t[5]}.`),
     ...add.map(t => t[2]),
-    `${Who} was given adequate information and time to ask questions. Consented for ${plan}.`].join("\n");
+    decide,
+    note ? `Specific concerns / questions: ${note}` : "",
+    `${Who} understood the explanation and had time to ask questions. ${chosen.length ? `Agrees to proceed with ${join(chosen.map(t=>t[2]))}.` : "Technique not yet agreed."}`].filter(Boolean).join("\n");
 }
-gaCards.consent = () => { const auto = csAuto(), txt = consentText();
+gaCards.consent = () => { const auto = csAuto(), txt = consentText(), tech = CS_TECH.filter(([k]) => csOn(k, {}));
+  if (S.csRec && !tech.some(([k]) => k === S.csRec)) S.csRec = "";
   const tg = (k, l, why) => { const on = csOn(k, auto); return `<button class="txci ${on?"on":""}" data-score="cs:${k}:${on?0:1}" aria-pressed="${on}"><span class="box">${on?"✓":""}</span><span>${l}${why && scv("cs",k)==null ? ` <span class="sub">(suggested: ${why})</span>` : ""}</span></button>`; };
+  const ch = ([k,l]) => { const on = csChosen(k); return `<button class="txci ${on?"on":""}" data-score="csc:${k}:${on?0:1}" aria-pressed="${on}"><span class="box">${on?"✓":""}</span><span>${l}</span></button>`; };
   return `<div class="card"><h2>Consent explanation</h2>${consDraft()}
-  <p class="sub">A short note to copy into your records after your own explanation — not a consent form. No patient details are stored.</p>
-  <h3>1. Technique(s) explained</h3><div class="txck">${CS_TECH.map(([k,l]) => tg(k,l)).join("")}</div>
-  <h3>2. Extra risks for this patient</h3><div class="txck">${CS_ADD.map(([k,l]) => tg(k,l,auto[k])).join("")}</div>
-  <h3>3. Explained to</h3>${seg("csWho",[["patient","Patient"],["parent","Parent(s)"]])}
+  <p class="sub">A short note to copy into your records after your own explanation — not a consent form. Nothing here is saved.</p>
+  <h3>1. Techniques explained</h3><div class="txck">${CS_TECH.map(([k,l]) => tg(k,l)).join("")}</div>
+  ${tech.length > 1 ? `<h3>2. Agreed technique</h3><p class="sub">Untick any that were only discussed as an alternative.</p><div class="txck">${tech.map(ch).join("")}</div>
+  <div class="sub" style="margin-top:var(--s2)">Your recommendation (optional)</div>${seg("csRec", [["","None"], ...tech.map(t => [t[0], t[2]])])}` : ""}
+  <h3>${tech.length > 1 ? 3 : 2}. Extra risks for this patient</h3><div class="txck">${CS_ADD.map(([k,l]) => tg(k,l,auto[k])).join("")}</div>
+  <h3>${tech.length > 1 ? 4 : 3}. Who and how</h3>${seg("csWho",[["patient","Patient"],["parent","Parent / guardian"]])}
+  ${seg("csLang", CS_LANG)}<div class="txck">${tog("cs","interp","Interpreter used")}</div>
+  <h3>${tech.length > 1 ? 5 : 4}. This patient's concerns or questions</h3>
+  <textarea id="csNote" class="csnote" rows="2" maxlength="300" placeholder="e.g. worried about awareness — reassured, depth monitoring planned. No names or IC.">${esc(S.csNote || "")}</textarea>
   ${txt ? `<div class="cstext">${esc(txt).replace(/\n/g,"<br>")}</div>
-  <div class="psbtns"><button class="iconbtn" data-copy="${esc(txt)}">${S.copied?"Copied ✓":"Copy text"}</button><button class="iconbtn" data-screset="cs">Clear</button></div>`
+  <div class="psbtns"><button class="iconbtn" data-copy="${esc(txt)}">${S.copied?"Copied ✓":"Copy text"}</button><button class="iconbtn" data-csclear="1">Clear</button></div>
+  <div class="warn"><b>Edit for this patient before filing.</b> Add anything that matters to them in particular (occupation, loose teeth, previous problems), then your name, date and time. An identical note for every patient is weak evidence of a real discussion.</div>`
   : `<div class="result">Tick at least one technique to build the note.</div>`}
-  <p class="sub">Common ≈ 1 in 10 to 1 in 100 · uncommon ≈ 1 in 1,000 · rare ≈ 1 in 10,000 or fewer.</p>
-  ${src("Royal College of Anaesthetists patient information (Risks associated with your anaesthetic); Association of Anaesthetists consent guidance 2017; NAP3, NAP5, NAP6.")}</div>`; };
+  <p class="sub">Common ≈ 1 in 10 to 1 in 100 · uncommon ≈ 1 in 1,000 · rare ≈ 1 in 10,000 or fewer. Consent for the operation itself is the surgeon's.</p>
+  ${src("Royal College of Anaesthetists patient information (Risks associated with your anaesthetic); Association of Anaesthetists consent guidance 2017; MMC consent guideline; NAP3, NAP5, NAP6.")}</div>`; };
 
 /* INDUCTION */
 gaCards.induction = () => `<div class="card"><h2>1. Induction drugs</h2>${gaDraft()}${GT([
@@ -2789,7 +2808,8 @@ VGROUPS.find(g => g[0]==="General")[1].push(["Pre-op risk scores & preparation",
   "Airway card: LEMON and MOANS added"]]);
 VGROUPS.find(g => g[0]==="General")[1].push(["Consent explanation (DRAFT — tick to sign off)", "", [
   "Short documentation note to copy after your own explanation; not a consent form; English; no patient details",
-  "Format: options explained → per technique 'common such as / uncommon such as / rare such as' → extra risks → information and time to ask → consented for [technique]",
+  "Format: options explained (language, interpreter) → per technique benefit + 'common / uncommon / rare such as' → extra risks → recommended / chosen / alternatives → specific concerns → understood, time to ask, agrees to proceed with [technique]",
+  "Reminder shown: edit for this patient, add name, date and time; consent for the operation is the surgeon's",
   "GA: common sore throat, PONV, shivering, drowsiness; uncommon dental damage, chest infection; rare awareness, anaphylaxis, aspiration, nerve injury, serious cardiac / neurological event, death",
   "Spinal: common hypotension, nausea, itching, shivering, urinary retention; uncommon PDPH, inadequate block; rare nerve injury, infection / haematoma, permanent damage",
   "Epidural: common hypotension, itching, leg weakness, catheter; uncommon PDPH, patchy block; rare nerve injury, abscess / haematoma, LA toxicity, permanent damage",
@@ -3230,7 +3250,8 @@ document.addEventListener("toggle", e => {
 document.addEventListener("click", e => { const t = e.target.closest && e.target.closest("[data-dl]"); if (!t) return; S.derm = t.getAttribute("data-dl"); render(); });
 let vtaps = 0, vtimer = null;
 document.addEventListener("click", e => { if (!e.target.closest || !e.target.closest(".vtap")) return; vtaps++; clearTimeout(vtimer); vtimer = setTimeout(()=>vtaps=0, 1500); if (vtaps >= 5){ vtaps = 0; location.hash = "#values"; window.scrollTo(0,0); } });
-document.addEventListener("input", e => { if (e.target.id==="q") runSearch(e.target.value); if (e.target.id==="vq"){ S.vq = e.target.value; const pos = e.target.selectionStart; render(); const el = document.getElementById("vq"); if (el){ el.focus(); try{ el.setSelectionRange(pos,pos); }catch(_){} } } if (e.target.id==="cNick") S.cNick = e.target.value.slice(0,12); if (e.target.id==="dname") S.dname = e.target.value.slice(0,24); });
+document.addEventListener("change", e => { if (e.target.id==="csNote"){ S.csNote = e.target.value.slice(0,300); render(); } });
+document.addEventListener("input", e => { if (e.target.id==="csNote") S.csNote = e.target.value.slice(0,300); if (e.target.id==="q") runSearch(e.target.value); if (e.target.id==="vq"){ S.vq = e.target.value; const pos = e.target.selectionStart; render(); const el = document.getElementById("vq"); if (el){ el.focus(); try{ el.setSelectionRange(pos,pos); }catch(_){} } } if (e.target.id==="cNick") S.cNick = e.target.value.slice(0,12); if (e.target.id==="dname") S.dname = e.target.value.slice(0,24); });
 function clamp(v,min,max){ return Math.min(max, Math.max(min, v)); }
 document.addEventListener("click", e => {
   const b = e.target.closest("button, input[type=checkbox]"); if (!b) return;
@@ -3240,6 +3261,7 @@ document.addEventListener("click", e => {
   if (d.copy!==undefined){ const t = d.copy; const done = () => { S.copied = true; render(); setTimeout(()=>{ S.copied = false; render(); }, 1500); };
     if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(t).then(done, done); else { const ta = document.createElement("textarea"); ta.value = t; document.body.appendChild(ta); ta.select(); try{ document.execCommand("copy"); }catch(_){} ta.remove(); done(); } return; }
   if (d.preclear){ ["pre","dasi","rcri","sb","ari","cfs"].forEach(k => delete S.sc[k]); S.asa = ""; S.met = ""; render(); return; }
+  if (d.csclear){ delete S.sc.cs; delete S.sc.csc; S.csNote = ""; S.csRec = ""; S.csWho = "patient"; S.csLang = "English"; render(); return; }
   if (d.screset){ S.sc[d.screset] = {}; render(); return; }
   if (d.derm){ S.derm = d.derm; if (!d.open){ render(); return; } }
   if (d.open){ const og = GROUPS.find(x=>x.id===d.g); if (og && og.tabs) S[og.tabKey] = d.tab || (og.tabs.find(t=>t.cards.some(c=>(Array.isArray(c)?c[1]:c)===d.open))||og.tabs[0]).id;
