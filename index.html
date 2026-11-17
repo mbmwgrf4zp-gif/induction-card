@@ -436,6 +436,14 @@ details.endo summary{cursor:pointer;font-weight:600;font-size:var(--fs-sm)}
 :root{--tile-grid:color-mix(in srgb,var(--ink) 5.5%,transparent)}
 .grid2 .sq,.pearl{background-image:linear-gradient(var(--tile-grid) 1px,transparent 1px),linear-gradient(90deg,var(--tile-grid) 1px,transparent 1px);background-size:12px 12px}
 .tile.t-emerg{background-image:linear-gradient(rgba(255,255,255,.09) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.09) 1px,transparent 1px);background-size:12px 12px}
+.quick .lcd.qtxt .qans{font-family:var(--font-sans);font-weight:700;font-size:clamp(15px,4.6vw,19px);letter-spacing:0;white-space:normal;line-height:1.15}
+:root[data-lcd="amber"]{--etco2:#fbbf24;--lcdx:#fbbf24}:root[data-lcd="green"]{--etco2:#4ade80;--lcdx:#4ade80}:root[data-lcd="cyan"]{--etco2:#22d3ee;--lcdx:#22d3ee}:root[data-lcd="white"]{--etco2:#f1f5f4;--lcdx:#f1f5f4}:root[data-lcd="red"]{--etco2:#ff7a59;--lcdx:#ff7a59}
+:root[data-lcd]:not([data-lcd="section"]) .quick .qbtn.lcd{--lcd:var(--lcdx)}
+.lcdpick{display:grid;grid-template-columns:1fr 1fr;gap:var(--s2);margin:var(--s2) 0}
+.lcdsw{display:flex;align-items:center;gap:10px;min-height:44px;padding:8px 12px;border:1px solid var(--line);border-radius:var(--r-sm);background:var(--card);color:var(--ink);font:inherit;font-size:var(--fs-sm);font-weight:600;cursor:pointer}
+.lcdsw.on{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}.lcdsw .sw{width:22px;height:22px;border-radius:50%;flex:none;border:1px solid rgba(0,0,0,.2)}
+.lcddemo{display:flex;align-items:center;justify-content:space-around;background:var(--mon-bg);border-radius:var(--r-sm);padding:var(--s3);margin-top:var(--s2)}
+.lcddemo .clock{font-size:var(--fs-lg)}.lcddemo .qans{color:var(--lcdx,var(--etco2));font-size:26px;margin:0}
 .vtap{cursor:default;-webkit-user-select:none;user-select:none}
 .disc{color:var(--muted);font-size:11px;text-align:center;margin-top:var(--s4);line-height:1.45;opacity:.9}.disc b{font-weight:600}
 a{color:var(--accent)}
@@ -450,8 +458,8 @@ a{color:var(--accent)}
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.29.3";
-const APP_DATE = "16 Nov 2026";
+const APP_VERSION = "2.30.0";
+const APP_DATE = "17 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
 /* ================= HELPERS ================= */
@@ -598,16 +606,25 @@ const QT = (() => {
   pebv:{lab:"Paeds blood volume", ic:"paeds", cls:"t-paeds", kind:"paeds", keys:Pk, inp:pAge, open:["3. Fluids: blood products","paeds","intra"],
     ans:()=>{ const mo=AGEM(), k=mo<1?85:mo<12?80:S.pY<12?75:70; return sm(dz(k*S.pw,"mL"),`mL · ${k} mL/kg`); }},
   mann:{lab:"Transplant mannitol", ic:"tx", cls:"t-tx", kind:"adult", keys:["aw"], inp:()=>`${sig(S.aw)} kg dry`, open:["5. Anastomosis & reperfusion","tx","intra"],
-    ans:()=>sm(dz(2.5*S.aw,"mL"),`mL of 20% = ${dz(0.5*S.aw,"g")} g`)}};
+    ans:()=>sm(dz(2.5*S.aw,"mL"),`mL of 20% = ${dz(0.5*S.aw,"g")} g`)},
+  cons:{lab:"Consent note", ic:"values", cls:"t-ga", kind:"any", txt:true, keys:[], inp:()=>"shortcut", open:["13. Consent explanation","ga","pre"],
+    ans:()=>{ const t = CS_TECH.filter(([k]) => csOn(k, {}) && csChosen(k)).map(x=>x[2]); return t.length ? sm(t.join(" + "),"note ready — tap to copy") : sm("Build","tap to write the note"); }},
+  psum:{lab:"Pre-op summary", ic:"values", cls:"t-ga", kind:"any", txt:true, keys:[], inp:()=>"shortcut", goTab:"ga:pre",
+    ans:()=>{ const p = []; if (S.asa) p.push(`ASA ${S.asa}${scv("pre","asaE")===1?"E":""}`); if (RCRI.some(([k]) => scv("rcri",k)!=null)) p.push(`RCRI ${cnt("rcri", RCRI.map(x=>x[0]))}`); if (sbTouched()) p.push(`STOP-BANG ${sbScore()}`); if (S.met) p.push(`METs ${({lt4:"&lt; 4",4:"4–10",gt10:"&gt; 10"})[S.met]}`); if (scv("cfs","v")) p.push(`CFS ${scv("cfs","v")}`);
+      return p.length ? sm(p[0], p.slice(1).join(" · ") || "tap for the scores") : sm("Score","tap to assess risk"); }},
+  derm:{lab:"Block height", ic:"spinal", cls:"t-regional", kind:"any", txt:true, keys:[], inp:()=>"shortcut", open:["6. Dermatomes & block height","regional","neuraxial"],
+    ans:()=>{ const top = dermExpand(S.derm)[0]; return top ? sm(top, DERM_INFO[top]) : sm("Map","tap to check block height"); }},
+  lac:{lab:"LA dose calc", ic:"spinal", cls:"t-regional", kind:"any", txt:true, keys:[], inp:()=>"shortcut", open:["1. LA dose calculator","regional","safety"],
+    ans:()=>{ const n = (S.laA||[]).length; return n ? sm(`${n} added`,"tap to see the total") : sm("Add","tap to total your blocks"); }}};
 })();
 function quickIds(){ const out = [...new Set(qSaved())]; for (const d of QDEF){ if (out.length>=3) break; if (!out.includes(d)) out.push(d); } for (const d of Object.keys(QT)){ if (out.length>=3) break; if (!out.includes(d)) out.push(d); } return out; }
 function quickTile(id){
   const t = QT[id], ac = activeCase(), child = ac && ac.y < 16, male = ac && ac.sex === "M";
   const na = why => `—<small>${why}</small>`;
-  const blocked = t.kind==="obs" ? (child ? "not for a child case" : male ? "male case" : null) : t.kind==="adult" ? (child ? "child case — see Paeds" : null) : (ac && !child ? "adult case" : null);
+  const blocked = t.kind==="any" ? null : t.kind==="obs" ? (child ? "not for a child case" : male ? "male case" : null) : t.kind==="adult" ? (child ? "child case — see Paeds" : null) : (ac && !child ? "adult case" : null);
   const smp = t.keys.some(isSample);
   const go = t.goTab ? `data-go-tab="${t.goTab}"` : `data-open="${esc(t.open[0])}" data-g="${t.open[1]}" data-tab="${t.open[2]}"`;
-  return `<button class="qbtn lcd ${t.cls}${smp?" smp":""}" ${go}><span class="qlab"><span class="qi qmini">${svg(t.ic)}</span>${t.lab}</span><span class="qans">${blocked?na(blocked):t.ans()}</span><span class="qin">${t.inp()}${smp?' <span class="stag">sample</span>':""}</span></button>`;
+  return `<button class="qbtn lcd ${t.cls}${smp?" smp":""}${t.txt?" qtxt":""}" ${go}><span class="qlab"><span class="qi qmini">${svg(t.ic)}</span>${t.lab}</span><span class="qans">${blocked?na(blocked):t.ans()}</span><span class="qin">${t.inp()}${smp?' <span class="stag">sample</span>':""}</span></button>`;
 }
 const qSaved = () => { const q = store.get("quick", null); return (Array.isArray(q) ? q : QDEF).filter(id => QT[id]).slice(0,3); };
 screens.quick = () => { const sel = qSaved();
@@ -2582,11 +2599,17 @@ pCards.abx = () => `<div class="card"><h2>Paeds antibiotic prophylaxis</h2>${abx
 /* ---------- DISPLAY NAME (phone only) ---------- */
 const cleanName = v => String(v||"").replace(/[<>&"'`]/g,"").trim().slice(0,24);
 const doctorName = () => cleanName(store.get("doctor", "Dr X")) || "Dr X";
-screens.settings = () => head("Display name","home") + `<div class="card">
+const LCDS = [["section","By section",""],["amber","Amber","#fbbf24"],["green","Green","#4ade80"],["cyan","Cyan","#22d3ee"],["white","White","#f1f5f4"],["red","Red-orange","#ff7a59"]];
+const lcdNow = () => { const v = store.get("lcd","section"); return LCDS.some(x=>x[0]===v) ? v : "section"; };
+function applyLcd(){ const v = lcdNow(); if (v==="section") document.documentElement.removeAttribute("data-lcd"); else document.documentElement.setAttribute("data-lcd", v); }
+screens.settings = () => head("Settings","home") + `<div class="card"><h2>Display name</h2>
   <label class="sub" for="dname">Name shown in the greeting (max 24 characters)</label>
   <input id="dname" class="search" style="padding-left:12px" maxlength="24" autocomplete="off" value="${esc(S.dname ?? doctorName())}">
   <p class="sub">Saved on this phone only.</p>
-  <button class="homebtn primary" data-savename="1">Save name</button></div>` + disc;
+  <button class="homebtn primary" data-savename="1">Save name</button></div>
+  <div class="card"><h2>Display colour</h2><p class="sub">Colour of the glowing numbers on the quick tiles, the header clock and the trace. Saved on this phone only.</p>
+  <div class="lcdpick">${LCDS.map(([k,l,c]) => `<button class="lcdsw ${lcdNow()===k?"on":""}" data-lcdpick="${k}" aria-pressed="${lcdNow()===k}"><span class="sw" style="${c?`background:${c}`:"background:conic-gradient(#f472b6,#fbbf24,#4ade80,#22d3ee,#f472b6)"}"></span>${l}</button>`).join("")}</div>
+  <div class="lcddemo"><span class="clock">12:34</span><span class="qans">6.5–7.0</span></div></div>` + disc;
 
 /* ---------- DERMATOMES (schematic) — DRAFT: ASIA/ISNCSCI 2019 key sensory points ---------- */
 const DERM_CHECKED = true;
@@ -2868,11 +2891,11 @@ function vTicks(){
 }
 /* ---------- ABOUT ---------- */
 const CHANGES = [
+  ["2.30","Shortcut quick tiles; display colour setting"],
   ["2.29","Consent explanation builder (General › Pre-op)"],
   ["2.28","General pre-op: risk scores, tests, common conditions"],
   ["2.27","Quick tiles can be changed (Edit beside Quick)"],
   ["2.26","About page added"],
-  ["2.25","Values sheet grouped by section, with filter"],
   ["2.22","Doses rounded to amounts you can draw up"]];
 const SRC_LINKS = [
   ["Emergencies", [["Resuscitation Council UK — ALS / PLS guidelines","https://www.resus.org.uk/library"],["Difficult Airway Society guidelines","https://das.uk.com/guidelines"],["Association of Anaesthetists — guidelines (anaphylaxis, LAST, safety)","https://anaesthetists.org/Home/Resources-publications/Guidelines"],["European Malignant Hyperthermia Group","https://www.emhg.org"],["UK Kidney Association — hyperkalaemia guideline","https://www.ukkidney.org/health-professionals/guidelines"]]],
@@ -3287,6 +3310,7 @@ document.addEventListener("click", e => {
   if (d.setw){ S.pw = parseFloat(d.setw); render(); return; }
   if (d.qpick){ let c = qSaved(); S.qmsg = ""; if (c.includes(d.qpick)) c = c.filter(x=>x!==d.qpick); else if (c.length >= 3) S.qmsg = "Three are already chosen — remove one first."; else c = [...c, d.qpick]; store.set("quick", c); render(); return; }
   if (d.qreset){ store.set("quick", null); S.qmsg = ""; render(); return; }
+  if (d.lcdpick){ store.set("lcd", d.lcdpick); applyLcd(); render(); return; }
   if (d.ptedit){ S.ptEditing = true; render(); return; }
   if (d.ptdone){ S.ptEditing = false; render(); return; }
   if (d.seg && GROUPS.some(x=>x.tabKey===d.seg) && S[d.seg] !== d.val){ const og = GROUPS.find(x=>x.tabKey===d.seg), ids = og.tabs.map(t=>t.id), dir = ids.indexOf(d.val) > ids.indexOf(S[d.seg]) ? "tab-l" : "tab-r"; S.ptEditing = false; S.touched[d.seg]=true; S[d.seg] = d.val; transition(og.id==="emerg" ? "fast" : dir, () => render()); return; }
@@ -3314,7 +3338,7 @@ document.addEventListener("keydown", e => {
     if ((location.hash||"#home") !== "#home") location.hash = "#home"; return; }
   if (!typing && /^[1-6]$/.test(e.key)){ const tabs = document.querySelectorAll(".emtabs button"); const b = tabs[+e.key-1]; if (b) b.click(); }
 });
-applyTheme(); { const c = activeCase(); if (c) applyCase(c); } render();
+applyTheme(); applyLcd(); { const c = activeCase(); if (c) applyCase(c); } render();
 if ("serviceWorker" in navigator && (location.protocol==="https:" || location.hostname==="localhost" || location.hostname==="127.0.0.1")) {
   const hadController = !!navigator.serviceWorker.controller;
   navigator.serviceWorker.register("sw.js").catch(()=>{});
