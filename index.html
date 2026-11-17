@@ -458,7 +458,7 @@ a{color:var(--accent)}
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.31.0";
+const APP_VERSION = "2.31.1";
 const APP_DATE = "17 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
@@ -1834,7 +1834,7 @@ function preSummary(){
 }
 
 /* ---------- CONSENT NOTE (documentation memory aid, English) — DRAFT ---------- */
-const CONS_CHECKED = false;
+const CONS_CHECKED = true;
 const consDraft = () => CONS_CHECKED ? "" : `<div class="warn" style="margin-top:0">DRAFT — short consent documentation note; frequency bands after the RCoA patient-information style. Not yet ticked by you.</div>`;
 // [key, label, name in note, common, uncommon, rare]
 const CS_TECH = [
@@ -2831,7 +2831,7 @@ VGROUPS.find(g => g[0]==="General")[1].push(["Pre-op risk scores & preparation",
   "MI ≥ 60 days; DES ≥ 6 months (12 if ACS; ≥ 3 months if time-sensitive), BMS ≥ 30 days, balloon ≥ 14 days; stroke / TIA ≥ 3 months",
   "Pacemaker check 12 months, ICD 6 months; anaemia Hb < 130 g/L before major surgery; URTI with fever / chest signs postpone 2–4 weeks; smoking stop ≥ 4 weeks",
   "Airway card: LEMON and MOANS added"]]);
-VGROUPS.find(g => g[0]==="General")[1].push(["Consent explanation (DRAFT — tick to sign off)", "", [
+VGROUPS.find(g => g[0]==="General")[1].push(["Consent explanation", "17 Nov 2026", [
   "Short note to copy after your own explanation; not a consent form; English; nothing saved",
   "Two outputs: full note for clinical notes; individual risks only, for the official form's 'risiko-risiko individu' box",
   "Risk lists and bands aligned with the Ministry of Health anaesthesia consent form (common / possible but uncommon / very rare)",
