@@ -282,7 +282,9 @@ details.acc[data-g="emerg"].anim>:not(summary){animation-duration:.1s;animation-
 .lamax{background:var(--gc-soft);border-radius:var(--r-sm);padding:var(--s2) var(--s3);font-size:var(--fs-sm);margin:var(--s2) 0;line-height:1.45}
 tr.over td{background:var(--danger-bg)}
 /* home hero (monitor) */
-.hero{position:relative;overflow:hidden;background:var(--mon-bg);color:var(--mon-ink);border-radius:var(--r);padding:var(--s3) var(--s4) var(--s4);margin:var(--s3) 0 var(--s3)}
+.hero{position:relative;overflow:hidden;background:var(--mon-bg);color:var(--mon-ink);border-radius:var(--r);padding:0;margin:var(--s3) 0 var(--s3)}
+.hero-in{position:relative;padding:var(--s3) var(--s4) var(--s4)}
+.hero .ticker{margin:0;border:0;border-top:1px solid rgba(255,255,255,.09);border-radius:0;background:transparent}.hero .ticker::before{display:none}
 .hero::before{content:"";position:absolute;inset:0;background-image:linear-gradient(var(--mon-grid) 1px,transparent 1px),linear-gradient(90deg,var(--mon-grid) 1px,transparent 1px);background-size:16px 16px;pointer-events:none}
 .capno{position:absolute;left:0;right:0;bottom:8px;width:100%;height:44px;opacity:.85}
 .capno .trace{animation:sweep 6s linear infinite}
@@ -507,7 +509,7 @@ a{color:var(--accent)}
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.35.1";
+const APP_VERSION = "2.35.2";
 const APP_DATE = "18 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
@@ -757,12 +759,13 @@ screens.home = () => {
   const th = store.get("theme","auto"), thLabel = th==="auto" ? "◐" : th==="dark" ? "☾" : "☀";
   const secs = ["ga","regional","paeds","obs","tx"].map(id=>GROUPS.find(g=>g.id===id));
   const short = {ga:"General", regional:"Regional", paeds:"Paediatric", obs:"Obstetric", tx:"Transplant"};
-  return `<section class="hero">
+  return `<section class="hero"><div class="hero-in">
     <svg class="capno" viewBox="0 0 400 48" preserveAspectRatio="none" aria-hidden="true"><g class="trace"><path d="${CAPNO}"/></g></svg>
     <div class="hero-top"><span class="brand">${svg("capno")} Induction Card</span>
       <span class="hero-r"><span id="clock" class="clock">${clockTxt()}</span><button class="iconbtn themebtn herobtn" data-theme-toggle aria-label="Theme: ${th}">${thLabel}</button></span></div>
     <h1 class="hello">${greet()},<br>${esc(doctorName())} <button class="namebtn" data-go="settings" aria-label="Change display name">✎</button></h1>
-    <div class="date">${dateTxt()}</div>
+    <div class="date">${dateTxt()}</div></div>
+    ${ticker()}
   </section>
   <div class="searchbox">${svg("search")}<input id="q" class="search" type="search" placeholder="Search caudal, remi, LSCS…" autocomplete="off" aria-label="Search cards"></div><div id="results"></div>
   <div class="toprow"><div class="tr-emerg"><div class="label wideonly" aria-hidden="true">&nbsp;</div>${tile("t-emerg","emerg","Emergencies","Crisis steps with doses",'data-go="g-emerg"')}</div><div class="tr-quick">
@@ -770,7 +773,6 @@ screens.home = () => {
   <div class="quick">${quickIds().map(quickTile).join("")}</div>
   </div></div>
   ${caseStrip()}
-  ${ticker()}
   <div class="nolabel"></div>
   <div class="grid2">${secs.map(g=>`<button class="sq t-${g.id}" data-go="g-${g.id}"><span class="qi">${svg(g.id)}</span><span class="sqt">${short[g.id]}</span><span class="sqs">${({paeds:"Pre-op · Induction · Blocks · Cases",tx:"Kidney recipient &amp; donor"})[g.id] || g.tabs.map(t=>t.label).join(" · ")}</span></button>`).join("")}</div>` + disc;
 };
@@ -3004,7 +3006,7 @@ VGROUPS.find(g => g[0]==="General")[1].push(["Print plan sheets", "18 Nov 2026",
   "Paeds emergency box: adrenaline 10 mcg/kg; 4 J/kg; amiodarone 5 mg/kg; atropine 0.02; laryngospasm propofol 0.5–1 + sux 0.1–0.5 mg/kg; anaphylaxis IV 1 / IM 10 mcg/kg; Intralipid 1.5 mL/kg + 15 mL/kg/h; CaCl 0.2 mL/kg (arrest still RCUK 2021)",
   "Transplant — all from existing kidney cards: discuss flags; pre-op ticks; induction (LBW / IBW / TBW), RSI by K⁺, ETT, CVC height/10; infusions; fluid by K⁺; before / after reperfusion ticks; reversal, analgesia, PACU"]]);
 VGROUPS.find(g => g[0]==="General")[1].push(["Tips & tricks ticker: quotes", "18 Nov 2026", [
-  "Home 'Pearl of the day' box replaced by a one-line ticker (label TIPS); today's pearl first, then the rest in a daily order; ~40 px/s; hold to pause; Reduce Motion: fades one item every 6 s",
+  "Home 'Pearl of the day' box replaced by a one-line ticker (label TIPS) along the bottom of the header; today's pearl first, then the rest in a daily order; ~40 px/s; hold to pause; Reduce Motion: fades one item every 6 s",
   "One quote after every 3 tips; switch in Settings (on by default); quotes do not open anything",
   "Added tip (no card): 'Rough list? Drink water, eat something, talk to a colleague.'",
   ...QUOTES.map(([q,a]) => `"${q}" — ${a}`)]]);
@@ -3058,7 +3060,7 @@ function vTicks(){
 }
 /* ---------- ABOUT ---------- */
 const CHANGES = [
-  ["2.35","Tips and tricks ticker (with optional quotes) replaces Pearl of the day"],
+  ["2.35","Tips and tricks ticker in the header (with optional quotes) replaces Pearl of the day"],
   ["2.34","Print plan sheets: Paeds and Kidney transplant"],
   ["2.33","Re-paralysis after sugammadex (Reversal card)"],
   ["2.32","Consent block reworded for notes (Assessment → Consent → Plan)"],
