@@ -488,7 +488,6 @@ a{color:var(--accent)}
 }
 .ticker{position:relative;display:flex;align-items:stretch;height:34px;margin-top:var(--s3);background:var(--mon-bg);border:1px solid #1f2c2e;border-radius:var(--r-sm);overflow:hidden;--tk:var(--lcdx,var(--etco2));touch-action:pan-y;user-select:none;-webkit-user-select:none}
 .ticker::before{content:"";position:absolute;inset:0;background-image:linear-gradient(var(--mon-grid) 1px,transparent 1px),linear-gradient(90deg,var(--mon-grid) 1px,transparent 1px);background-size:12px 12px;pointer-events:none}
-.tklab{position:relative;z-index:2;flex:0 0 auto;display:flex;align-items:center;padding:0 10px;font-family:var(--font-mono);font-size:11px;font-weight:600;letter-spacing:.1em;color:var(--mon-bg);background:var(--tk)}
 .tkwin{position:relative;flex:1;min-width:0;overflow:hidden;-webkit-mask-image:linear-gradient(90deg,transparent,#000 14px,#000 calc(100% - 14px),transparent);mask-image:linear-gradient(90deg,transparent,#000 14px,#000 calc(100% - 14px),transparent)}
 .tktrack{display:flex;width:max-content;height:100%;align-items:center;animation:tk var(--tkdur,240s) linear infinite;animation-delay:var(--tkdel,0s)}
 .tkdup{display:contents}
@@ -499,7 +498,7 @@ a{color:var(--accent)}
 .tkm{color:var(--tk);opacity:.8;font-style:normal}
 .ticker.still{height:auto;min-height:34px}.ticker.still .tkwin{-webkit-mask-image:none;mask-image:none}
 .ticker.still .tktrack{animation:none;width:100%;display:grid;align-items:center}.ticker.still .tkdup{display:none}
-.ticker.still .tki{grid-area:1/1;white-space:normal;text-align:left;line-height:1.35;padding:6px 10px;opacity:0;visibility:hidden;transition:opacity .6s,visibility .6s}.ticker.still .tki.on{opacity:1;visibility:visible}
+.ticker.still .tki{grid-area:1/1;white-space:normal;text-align:left;line-height:1.35;padding:6px var(--s4);opacity:0;visibility:hidden;transition:opacity .6s,visibility .6s}.ticker.still .tki.on{opacity:1;visibility:visible}
 </style>
 </head>
 <body>
@@ -509,7 +508,7 @@ a{color:var(--accent)}
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.35.2";
+const APP_VERSION = "2.35.3";
 const APP_DATE = "18 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
@@ -648,7 +647,7 @@ const tkItem = it => it.k==="tip"
 let tkT0 = 0, tkIdx = 0, tkTimer = null;
 function ticker(){
   const items = tickerItems(), row = items.map(tkItem).join("");
-  return `<section class="ticker" aria-label="Tips and tricks"><span class="tklab" aria-hidden="true">TIPS</span>
+  return `<section class="ticker" aria-label="Tips and tricks">
     <div class="tkwin"><div class="tktrack">${row}<span class="tkdup" aria-hidden="true">${row}</span></div></div></section>`;
 }
 const TK_SPEED = 40; // px per second
@@ -3006,7 +3005,7 @@ VGROUPS.find(g => g[0]==="General")[1].push(["Print plan sheets", "18 Nov 2026",
   "Paeds emergency box: adrenaline 10 mcg/kg; 4 J/kg; amiodarone 5 mg/kg; atropine 0.02; laryngospasm propofol 0.5–1 + sux 0.1–0.5 mg/kg; anaphylaxis IV 1 / IM 10 mcg/kg; Intralipid 1.5 mL/kg + 15 mL/kg/h; CaCl 0.2 mL/kg (arrest still RCUK 2021)",
   "Transplant — all from existing kidney cards: discuss flags; pre-op ticks; induction (LBW / IBW / TBW), RSI by K⁺, ETT, CVC height/10; infusions; fluid by K⁺; before / after reperfusion ticks; reversal, analgesia, PACU"]]);
 VGROUPS.find(g => g[0]==="General")[1].push(["Tips & tricks ticker: quotes", "18 Nov 2026", [
-  "Home 'Pearl of the day' box replaced by a one-line ticker (label TIPS) along the bottom of the header; today's pearl first, then the rest in a daily order; ~40 px/s; hold to pause; Reduce Motion: fades one item every 6 s",
+  "Home 'Pearl of the day' box replaced by a one-line ticker along the bottom of the header (no label); today's pearl first, then the rest in a daily order; ~40 px/s; hold to pause; Reduce Motion: fades one item every 6 s",
   "One quote after every 3 tips; switch in Settings (on by default); quotes do not open anything",
   "Added tip (no card): 'Rough list? Drink water, eat something, talk to a colleague.'",
   ...QUOTES.map(([q,a]) => `"${q}" — ${a}`)]]);
