@@ -507,7 +507,7 @@ a{color:var(--accent)}
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.35.0";
+const APP_VERSION = "2.35.1";
 const APP_DATE = "18 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
@@ -610,7 +610,7 @@ function dateTxt(){ return new Date().toLocaleDateString("en-GB", {weekday:"long
 /* ---------- QUICK TILES (user picks 3; numbers reuse the card formulas) ---------- */
 const QDEF = ["lscs","aett","pett"];
 /* ---------- TIPS & TRICKS TICKER ---------- */
-const QUOTES_CHECKED = false;
+const QUOTES_CHECKED = true;
 // Public-domain translations only, each checked word-for-word against the published text
 const QUOTES = [
   ["Life is short, and Art long; the crisis fleeting; experience perilous, and decision difficult.","Hippocrates, Aphorisms (tr. Adams)"],
@@ -3003,7 +3003,7 @@ VGROUPS.find(g => g[0]==="General")[1].push(["Print plan sheets", "18 Nov 2026",
   "Paeds — from existing cards: ETT / depth / suction / blade; propofol 4–5 (neonate 2); fentanyl 1–2 (neonate 0.5–3); glyco 4 mcg/kg; paracetamol IV; morphine titration; ondansetron / dex 0.15 mg/kg; cefazolin 30 mg/kg; LA max; fluids 4/2/1 + deficit; EBV, ABL; D10 2 mL/kg",
   "Paeds emergency box: adrenaline 10 mcg/kg; 4 J/kg; amiodarone 5 mg/kg; atropine 0.02; laryngospasm propofol 0.5–1 + sux 0.1–0.5 mg/kg; anaphylaxis IV 1 / IM 10 mcg/kg; Intralipid 1.5 mL/kg + 15 mL/kg/h; CaCl 0.2 mL/kg (arrest still RCUK 2021)",
   "Transplant — all from existing kidney cards: discuss flags; pre-op ticks; induction (LBW / IBW / TBW), RSI by K⁺, ETT, CVC height/10; infusions; fluid by K⁺; before / after reperfusion ticks; reversal, analgesia, PACU"]]);
-VGROUPS.find(g => g[0]==="General")[1].push(["Tips & tricks ticker: quotes (DRAFT — tick to sign off)", "", [
+VGROUPS.find(g => g[0]==="General")[1].push(["Tips & tricks ticker: quotes", "18 Nov 2026", [
   "Home 'Pearl of the day' box replaced by a one-line ticker (label TIPS); today's pearl first, then the rest in a daily order; ~40 px/s; hold to pause; Reduce Motion: fades one item every 6 s",
   "One quote after every 3 tips; switch in Settings (on by default); quotes do not open anything",
   "Added tip (no card): 'Rough list? Drink water, eat something, talk to a colleague.'",
