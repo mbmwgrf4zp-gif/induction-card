@@ -501,6 +501,16 @@ a{color:var(--accent)}
 .ticker.still .tki{grid-area:1/1;white-space:normal;text-align:left;line-height:1.35;padding:6px var(--s4);opacity:0;visibility:hidden;transition:opacity .6s,visibility .6s}.ticker.still .tki.on{opacity:1;visibility:visible}
 .echo td{vertical-align:top}.echo td:first-child{width:36%}
 .egoal{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:4px}.egoal span{font-size:var(--fs-xs);padding:1px 6px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--muted)}.egoal b{color:var(--ink);font-weight:600}
+.casestrip{position:relative;display:flex;align-items:center;gap:var(--s2);min-height:46px;margin-top:var(--s3);padding:6px 6px 6px var(--s3);background:var(--mon-bg);border:1px solid #1f2c2e;border-radius:var(--r-sm);color:var(--mon-ink);overflow:hidden;--cs:var(--lcdx,var(--etco2))}
+.casestrip::before{content:"";position:absolute;inset:0;background-image:linear-gradient(var(--mon-grid) 1px,transparent 1px),linear-gradient(90deg,var(--mon-grid) 1px,transparent 1px);background-size:12px 12px;pointer-events:none}
+.cslab{position:relative;display:flex;align-items:center;gap:6px;flex:0 0 auto;font-size:var(--fs-sm);white-space:nowrap}.cslab b{font-weight:600}
+.csico svg{width:18px;height:18px;color:var(--cs);display:block}.csnone{color:var(--mon-muted)}
+.cschips{position:relative;display:flex;gap:6px;flex:1;min-width:0;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}.cschips::-webkit-scrollbar{display:none}.cschips>:first-child{margin-left:auto}
+.cschip{flex:0 0 auto;display:inline-flex;align-items:center;gap:4px;min-height:34px;padding:0 12px;border-radius:999px;border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.06);color:var(--mon-ink);font:inherit;font-size:var(--fs-sm);font-weight:600;white-space:nowrap;cursor:pointer}
+.cschip .sx{width:14px;height:14px}
+.cschip.on{background:var(--cs);border-color:var(--cs);color:var(--mon-bg)}
+.cschip.add{color:var(--cs);border-color:color-mix(in srgb,var(--cs) 55%,transparent);background:none}
+.cschip.ghost{background:none;border-color:transparent;color:var(--mon-muted)}
 </style>
 </head>
 <body>
@@ -510,7 +520,7 @@ a{color:var(--accent)}
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.36.1";
+const APP_VERSION = "2.36.2";
 const APP_DATE = "18 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
@@ -769,11 +779,11 @@ screens.home = () => {
     ${ticker()}
   </section>
   <div class="searchbox">${svg("search")}<input id="q" class="search" type="search" placeholder="Search caudal, remi, LSCS…" autocomplete="off" aria-label="Search cards"></div><div id="results"></div>
+  ${caseStrip()}
   <div class="toprow"><div class="tr-emerg"><div class="label wideonly" aria-hidden="true">&nbsp;</div>${tile("t-emerg","emerg","Emergencies","Crisis steps with doses",'data-go="g-emerg"')}</div><div class="tr-quick">
   <div class="label qhead"><span>Quick</span><button class="aboutlink" data-go="quick">Edit</button></div>
   <div class="quick">${quickIds().map(quickTile).join("")}</div>
   </div></div>
-  ${caseStrip()}
   <div class="nolabel"></div>
   <div class="grid2">${secs.map(g=>`<button class="sq t-${g.id}" data-go="g-${g.id}"><span class="qi">${svg(g.id)}</span><span class="sqt">${short[g.id]}</span><span class="sqs">${({paeds:"Pre-op · Induction · Blocks · Cases",tx:"Kidney recipient &amp; donor"})[g.id] || g.tabs.map(t=>t.label).join(" · ")}</span></button>`).join("")}</div>` + disc;
 };
@@ -3085,10 +3095,12 @@ function sampleWarn(keys){ const k = keys.filter(isSample); if (!k.length) retur
   const names = {k:"K⁺", hb:"Hb", height:"height", aw:"weight", pw:"weight", pY:"age", spHt:"height", morWt:"weight"};
   return `<div class="samplewarn"><b>Sample values</b> — ${[...new Set(k.map(x=>names[x]))].join(" and ")} not entered. Enter the patient or tap a case.</div>`; }
 function activeBar(){ const c = activeCase(); return c ? `<button class="activebar" data-go="cases"><span>Active: <b>${caseName(c)}</b> · ${caseLine(c)}</span><span class="sub">change ›</span></button>` : ""; }
+ICONS.list = '<path d="M9 6h11M9 12h11M9 18h11"/><circle cx="4.5" cy="6" r="1" fill="currentColor"/><circle cx="4.5" cy="12" r="1" fill="currentColor"/><circle cx="4.5" cy="18" r="1" fill="currentColor"/>';
 function caseStrip(){
   const cs = getCases(), act = store.get("active", null);
-  return `<div class="label">Today's list</div><div class="chips">${cs.map(c => `<button class="chip ${c.id===act?"on":""}" data-case="${c.id}">${caseName(c)} · ${sxi(c.sex)} ${sig(c.w)} kg</button>`).join("")}
-    ${cs.length < CASE_MAX ? `<button class="chip add" data-go="cases">+ Add case</button>` : ""}${cs.length ? `<button class="chip ghost" data-go="cases">Edit</button>` : ""}</div>`;
+  return `<section class="casestrip" aria-label="Today's list"><span class="cslab"><span class="csico">${svg("list")}</span>${cs.length ? "" : `<b>Today's list</b><span class="csnone"> · no cases</span>`}</span>
+    <div class="cschips">${cs.map(c => `<button class="cschip ${c.id===act?"on":""}" data-case="${c.id}" aria-pressed="${c.id===act}">${caseName(c)} · ${sxi(c.sex)} ${sig(c.w)} kg</button>`).join("")}
+    ${cs.length < CASE_MAX ? `<button class="cschip add" data-go="cases">+ Add</button>` : ""}${cs.length ? `<button class="cschip ghost" data-go="cases">Edit</button>` : ""}</div></section>`;
 }
 screens.cases = () => {
   const cs = getCases(), act = store.get("active", null), now = Date.now();
@@ -3113,7 +3125,7 @@ function vTicks(){
 /* ---------- ABOUT ---------- */
 const CHANGES = [
   ["2.35","Tips and tricks ticker in the header (with optional quotes) replaces Pearl of the day"],
-  ["2.36","Echo report: what matters (General › Pre-op)"],
+  ["2.36","Echo report card; Today's list as a slim strip under search"],
   ["2.34","Print plan sheets: Paeds and Kidney transplant"],
   ["2.33","Re-paralysis after sugammadex (Reversal card)"],
   ["2.32","Consent block reworded for notes (Assessment → Consent → Plan)"],
