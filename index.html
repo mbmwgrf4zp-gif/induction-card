@@ -510,7 +510,7 @@ a{color:var(--accent)}
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.36.0";
+const APP_VERSION = "2.36.1";
 const APP_DATE = "18 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
@@ -1904,7 +1904,7 @@ gaCards.cfs = () => { const v = scv("cfs","v");
   ${v>=5?`<div class="warn"><b>CFS ${v}: living with frailty.</b> Senior review and shared decision-making; delirium precautions (avoid benzodiazepines, keep glasses / hearing aids, depth-of-anaesthesia monitoring); lower doses; plan post-op destination.</div>`:v?`<div class="result ok">CFS ${v}: not frail.</div>`:""}${reset("cfs")}
   ${src("Rockwood Clinical Frailty Scale v2.0 (2020); CPOC / BGS perioperative frailty guideline 2021.")}</div>`; };
 /* ECHO REPORT — what matters intra-op. DRAFT: ASE/EACVI chamber, diastolic and valve guidance; ACC/AHA 2020 VHD; ESC/ERS 2022 PH; ESC 2022 / ACC-AHA 2024 peri-op */
-const ECHO_CHECKED = false;
+const ECHO_CHECKED = true;
 const echoDraft = () => ECHO_CHECKED ? "" : `<div class="warn" style="margin-top:0">DRAFT — echo cut-offs (ASE/EACVI, ACC/AHA 2020 valve, ESC/ERS 2022 PH) and intra-op goals (BJA Education, Miller). Not yet ticked by you.</div>`;
 const EG = (hr, pre, aft, con) => `<div class="egoal"><span>HR <b>${hr}</b></span><span>Preload <b>${pre}</b></span><span>Afterload <b>${aft}</b></span><span>Contractility <b>${con}</b></span></div>`;
 const ER = (name, sev, goals, body) => `<tr><td><b>${name}</b><div class="sub">${sev}</div></td><td>${goals||""}${body}</td></tr>`;
@@ -3052,7 +3052,7 @@ VGROUPS.find(g => g[0]==="General")[1].push(["Tips & tricks ticker: quotes", "18
   "One quote after every 3 tips; switch in Settings (on by default); quotes do not open anything",
   "Added tip (no card): 'Rough list? Drink water, eat something, talk to a colleague.'",
   ...QUOTES.map(([q,a]) => `"${q}" — ${a}`)]]);
-VGROUPS.find(g => g[0]==="General")[1].push(["Echo report: what matters (DRAFT — tick to sign off)", "", [
+VGROUPS.find(g => g[0]==="General")[1].push(["Echo report: what matters", "18 Nov 2026", [
   "General › Pre-op › Assess card 8 (later Pre-op cards renumbered 9–14); linked from Intra-op › Vasopressors and Transplant › Cardiac risk",
   "Discuss before elective: new / unexplained severe AS; EF < 30% or decompensated HF without review; severe PH with RV dysfunction; LV thrombus; tamponade",
   "EF ≥ 50 normal, 41–49 mildly reduced, ≤ 40 reduced, < 30 severe (ESC HF 2021 bands)",
