@@ -493,7 +493,7 @@ a{color:var(--accent)}
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.34.0";
+const APP_VERSION = "2.34.1";
 const APP_DATE = "18 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
@@ -2912,7 +2912,7 @@ VGROUPS.find(g => g[0]==="General")[1].push(["Re-paralysis after sugammadex", "1
   "Mild–moderate kidney impairment: 24 h → rocuronium 0.6 or vecuronium 0.1 mg/kg; sooner → rocuronium 1.2 mg/kg",
   "After immediate reversal (16 mg/kg): 24 h suggested",
   "Rocuronium 1.2 mg/kg within 30 min: onset up to ~4 min slower, duration up to ~15 min shorter; before wait is over use a non-steroidal NMBA; sux onset may be slower"]]);
-VGROUPS.find(g => g[0]==="General")[1].push(["Print plan sheets (DRAFT — tick to sign off)", "", [
+VGROUPS.find(g => g[0]==="General")[1].push(["Print plan sheets", "18 Nov 2026", [
   "Print plan button on Paediatric (all tabs) and Transplant (recipient tabs); quick tiles 'Print paeds plan' / 'Print transplant plan'",
   "Blocked while weight / age (paeds) or weight, height, K⁺, Hb (transplant) are sample values",
   "One A4, black on white; sticker box, procedure / date / allergies lines, notes lines; footer: printed date-time, weight, version, recheck warning",
@@ -3028,7 +3028,7 @@ screens.values = () => {
 const EMERG_ADULT = ["§Airway & breathing","Failed intubation / CICO","Bronchospasm","Anaphylaxis","Latex allergy","§Circulation & drugs","Bradycardia & cardiac arrest","High / total spinal","Hypotension after spinal","LA toxicity (LAST)","Malignant hyperthermia","Hyperkalaemia","§Obstetric","Massive obstetric haemorrhage","Eclampsia"];
 const EMERG_PAEDS = ["§Airway","Laryngospasm","Paeds bronchospasm","§Circulation","Paeds cardiac arrest","Paeds anaphylaxis","Cyanotic heart disease / Fallot spell","Paeds massive transfusion","§Drugs","Paeds LA toxicity (LAST)","Paeds malignant hyperthermia","Latex allergy","§Recovery","Paeds PACU crises"];
 /* ---------- PRINT PLAN SHEETS (paper copy for theatre) ---------- */
-const PRINT_CHECKED = false;
+const PRINT_CHECKED = true;
 const PR_KEYS = {paeds:["pw","pY"], tx:["aw","height","k","hb"]};
 const PR_NAME = {paeds:"Paediatric anaesthetic plan", tx:"Kidney transplant (recipient) anaesthetic plan"};
 const PR_BACK = {paeds:"g-paeds", tx:"g-tx"};
