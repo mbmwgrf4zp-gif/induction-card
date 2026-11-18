@@ -449,6 +449,41 @@ details.endo summary{cursor:pointer;font-weight:600;font-size:var(--fs-sm)}
 a{color:var(--accent)}
 .vs label{display:flex;gap:var(--s3);align-items:flex-start;padding:var(--s2) 0;border-bottom:1px solid var(--line);font-size:var(--fs-sm)}
 .vs input{width:22px;height:22px;flex:none;margin-top:1px}
+.printbtn{display:flex;align-items:center;justify-content:center;gap:var(--s2);width:100%;margin-top:var(--s2);min-height:44px;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:var(--r-sm);font:inherit;font-size:var(--fs-sm);font-weight:600;cursor:pointer}
+.psheet{background:#fff;color:#000;border:1px solid var(--line);border-radius:6px;padding:14px;margin-top:var(--s3);font-size:12px;line-height:1.35;overflow-x:auto}
+.psheet table{width:100%;border-collapse:collapse;margin:0;font-size:inherit;background:none}
+.psheet td{border:0;border-bottom:1px solid #bbb;padding:3px 4px;vertical-align:top;color:#000;background:none}
+.psheet b{font-weight:700}
+.psheet h3{font-size:12.5px;margin:0 0 3px;padding:2px 4px;background:#e8e8e8;color:#000;text-transform:none;letter-spacing:0}
+.pr-head{display:flex;gap:10px;justify-content:space-between;border-bottom:2px solid #000;padding-bottom:6px;margin-bottom:6px}
+.pr-head>div:first-child{flex:1;min-width:0}
+.pr-title{font-size:16px;font-weight:700}
+.pr-pt{margin:3px 0 4px}
+.pr-sticker{flex:0 0 38%;max-width:200px;min-height:88px;border:1.5px dashed #666;border-radius:4px;display:flex;align-items:flex-start;justify-content:center;padding-top:4px;color:#777;font-size:10px}
+.pr-line{display:flex;gap:6px;align-items:flex-end;margin:3px 0}.pr-line span{white-space:nowrap}.pr-line i{flex:1;border-bottom:1px solid #777;min-height:14px}
+.pr-cols{columns:2 300px;column-gap:14px}
+.pr-sec{break-inside:avoid;margin-bottom:8px}
+.pr-rule{color:#444;font-size:10.5px}
+.pr-emerg{border:2px solid #000;padding:4px}
+.pr-flag{border:2px solid #000;padding:4px 6px;margin:4px 0 6px;font-weight:600}
+.pr-small{font-size:10px;color:#444;margin-top:2px}
+.pr-ck{list-style:none;margin:0;padding:0}.pr-ck li{display:flex;gap:6px;padding:2px 4px;border-bottom:1px solid #bbb}
+.pr-box{flex:0 0 11px;height:11px;border:1.5px solid #000;margin-top:2px}
+.pr-notes{margin-top:6px}.pr-notes i{display:block;border-bottom:1px solid #777;height:20px}
+.pr-foot{margin-top:8px;padding-top:4px;border-top:1px solid #000;font-size:10px}
+@media print{
+  @page{size:A4;margin:10mm}
+  html,body{background:#fff!important}
+  body>*:not(#app),#app>*:not(.shell),.shell>*:not(.content),.content>*:not(.psheet){display:none!important}
+  #app,.shell,.content{display:block!important;padding:0!important;margin:0!important;max-width:none!important;width:auto!important;background:#fff!important;min-height:0!important}
+  .psheet{border:0;padding:0;margin:0;font-size:9.5pt;line-height:1.25;overflow:visible}
+  .psheet td{padding:1.5px 3px}
+  .psheet h3{font-size:10pt}
+  .pr-title{font-size:13pt}
+  .pr-sec{margin-bottom:5px}
+  .pr-notes i{height:16px}
+  .psheet h3{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+}
 </style>
 </head>
 <body>
@@ -458,8 +493,8 @@ a{color:var(--accent)}
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.33.0";
-const APP_DATE = "17 Nov 2026";
+const APP_VERSION = "2.34.0";
+const APP_DATE = "18 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
 /* ================= HELPERS ================= */
@@ -614,6 +649,10 @@ const QT = (() => {
       return p.length ? sm(p[0], p.slice(1).join(" · ") || "tap for the scores") : sm("Score","tap to assess risk"); }},
   derm:{lab:"Block height", ic:"spinal", cls:"t-regional", kind:"any", txt:true, keys:[], inp:()=>"shortcut", open:["6. Dermatomes & block height","regional","neuraxial"],
     ans:()=>{ const top = dermExpand(S.derm)[0]; return top ? sm(top, DERM_INFO[top]) : sm("Map","tap to check block height"); }},
+  prp:{lab:"Print paeds plan", ic:"paeds", cls:"t-paeds", kind:"paeds", txt:true, keys:["pw","pY"], inp:()=>`${sig(S.pw)} kg · ${S.pY} y`, go:"print-paeds",
+    ans:()=>sm("Print","one A4 sheet for this child")},
+  prt:{lab:"Print transplant plan", ic:"tx", cls:"t-tx", kind:"adult", txt:true, keys:["aw","height","k","hb"], inp:()=>`${sig(S.aw)} kg dry`, go:"print-tx",
+    ans:()=>sm("Print","kidney recipient, one A4 sheet")},
   lac:{lab:"LA dose calc", ic:"spinal", cls:"t-regional", kind:"any", txt:true, keys:[], inp:()=>"shortcut", open:["1. LA dose calculator","regional","safety"],
     ans:()=>{ const n = (S.laA||[]).length; return n ? sm(`${n} added`,"tap to see the total") : sm("Add","tap to total your blocks"); }}};
 })();
@@ -623,7 +662,7 @@ function quickTile(id){
   const na = why => `—<small>${why}</small>`;
   const blocked = t.kind==="any" ? null : t.kind==="obs" ? (child ? "not for a child case" : male ? "male case" : null) : t.kind==="adult" ? (child ? "child case — see Paeds" : null) : (ac && !child ? "adult case" : null);
   const smp = t.keys.some(isSample);
-  const go = t.goTab ? `data-go-tab="${t.goTab}"` : `data-open="${esc(t.open[0])}" data-g="${t.open[1]}" data-tab="${t.open[2]}"`;
+  const go = t.go ? `data-go="${t.go}"` : t.goTab ? `data-go-tab="${t.goTab}"` : `data-open="${esc(t.open[0])}" data-g="${t.open[1]}" data-tab="${t.open[2]}"`;
   return `<button class="qbtn lcd ${t.cls}${smp?" smp":""}${t.txt?" qtxt":""}" ${go}><span class="qlab"><span class="qi qmini">${svg(t.ic)}</span>${t.lab}</span><span class="qans">${blocked?na(blocked):t.ans()}</span><span class="qin">${t.inp()}${smp?' <span class="stag">sample</span>':""}</span></button>`;
 }
 const qSaved = () => { const q = store.get("quick", null); return (Array.isArray(q) ? q : QDEF).filter(id => QT[id]).slice(0,3); };
@@ -2873,6 +2912,15 @@ VGROUPS.find(g => g[0]==="General")[1].push(["Re-paralysis after sugammadex", "1
   "Mild–moderate kidney impairment: 24 h → rocuronium 0.6 or vecuronium 0.1 mg/kg; sooner → rocuronium 1.2 mg/kg",
   "After immediate reversal (16 mg/kg): 24 h suggested",
   "Rocuronium 1.2 mg/kg within 30 min: onset up to ~4 min slower, duration up to ~15 min shorter; before wait is over use a non-steroidal NMBA; sux onset may be slower"]]);
+VGROUPS.find(g => g[0]==="General")[1].push(["Print plan sheets (DRAFT — tick to sign off)", "", [
+  "Print plan button on Paediatric (all tabs) and Transplant (recipient tabs); quick tiles 'Print paeds plan' / 'Print transplant plan'",
+  "Blocked while weight / age (paeds) or weight, height, K⁺, Hb (transplant) are sample values",
+  "One A4, black on white; sticker box, procedure / date / allergies lines, notes lines; footer: printed date-time, weight, version, recheck warning",
+  "Paeds — NEW on paper (not on screen before): LMA size by weight < 5 kg 1, 5–10 1.5, 10–20 2, 20–30 2.5, 30–50 3, 50–70 4, > 70 5",
+  "Paeds — NEW: rocuronium 0.6 mg/kg (RSI 1.2); atracurium 0.5 mg/kg; neostigmine 50 mcg/kg max 2.5 mg + glycopyrrolate 10 mcg/kg max 500 mcg; sugammadex 2 mg/kg (4 if deep)",
+  "Paeds — from existing cards: ETT / depth / suction / blade; propofol 4–5 (neonate 2); fentanyl 1–2 (neonate 0.5–3); glyco 4 mcg/kg; paracetamol IV; morphine titration; ondansetron / dex 0.15 mg/kg; cefazolin 30 mg/kg; LA max; fluids 4/2/1 + deficit; EBV, ABL; D10 2 mL/kg",
+  "Paeds emergency box: adrenaline 10 mcg/kg; 4 J/kg; amiodarone 5 mg/kg; atropine 0.02; laryngospasm propofol 0.5–1 + sux 0.1–0.5 mg/kg; anaphylaxis IV 1 / IM 10 mcg/kg; Intralipid 1.5 mL/kg + 15 mL/kg/h; CaCl 0.2 mL/kg (arrest still RCUK 2021)",
+  "Transplant — all from existing kidney cards: discuss flags; pre-op ticks; induction (LBW / IBW / TBW), RSI by K⁺, ETT, CVC height/10; infusions; fluid by K⁺; before / after reperfusion ticks; reversal, analgesia, PACU"]]);
 const VLEGACY = ["Depth (oral, at mouth corner ≈ upper canine) = 4 + height(cm)/10, rounded to 0.5 cm — Chula formula","Female size 6.5–7.0 mm (shown with 6.0 / 7.5)","Male size 7.0–7.5 mm (shown with 6.5 / 8.0)","21/23 cm shown for comparison only","<1 kg 2.5; 1–2 kg 2.5–3.0 (gap in notes); >2 kg 3.0; >3.5 kg 3.5 (neonate 3–3.5) — all plain","4 months 4.0; 8 months 4.0–4.5; 1 y 4.5 plain",">1 y: plain age/4 + 4, cuffed age/4 + 3.5 (rounded down to 0.5); cuffed if > 5 kg","Infant > 5 kg cuffed size = plain − 0.5 (convention, NOT in your notes)","Depth: premature ~1 kg 7 cm, ~2 kg 8 cm; term 9 cm; 1–11 months 3 × ETT; 1 y 12 cm; then age/2 + 12","Nasal = oral + 2–3 cm; suction catheter 2 × ETT (Fr)","Laryngoscope: <5 kg Miller 0 / MAC 1; >5 kg curved; Glidescope 2/2.5 (8–9 y)","Estimated weight (age + 4) × 2 for 1–10 y; estimated SBP 1/2/3 kg = 40/50/60, else 90 + 2 × age","TV 4–7 mL/kg, PIP <20, PEEP 4–6, RR 30–35, I:E as notes","TCI propofol (Paedfusor): GA induction ≥5 mcg/mL, maintenance >3.5 mcg/mL; spontaneous 2.5–4 mcg/mL","Remi 10 mcg/mL: mL/h = rate × weight × 60 / 10","All mg/kg drug doses, infusions and inotrope dilutions transcribed as in your notes","Fluids 4/2/1; insensible 2/4/>10 mL/kg/h; D10 2 mL/kg; blood products as notes; max rate 0.5–1 mL/kg/min (= 30–60 mL/kg/h)","Blocks: caudal 0.5/1/1.2 mL/kg; hypospadias max 20 mL; epidural bolus 0.5 mL/kg; intrapleural lignocaine 2 / ropi 3 mg/kg","Caudal needle colour: 10–15 kg not stated in your notes (shown as gap)","Parecoxib mg/kg chosen by age: <5 y 0.9, 5–9 y 0.75, ≥10 y 0.65 (my banding of your 2/7/12 y values)","≤150 cm: 1.8 mL (9 mg); total 2.1 mL","151–155 cm: 1.9–2.0 mL (9.5–10 mg); total 2.2–2.3 mL","156–160 cm: 2.1–2.2 mL (10.5–11 mg); total 2.4–2.5 mL",">160 cm: 2.3 mL (11.5 mg); total 2.6 mL","Height rounded to nearest cm; exactly 150 → 1.8 mL row","Morphine 0.1 mg (0.1 mL of 1 mg/mL diluted); fentanyl 10 mcg (0.2 mL of 50 mcg/mL)","Perineal/saddle S1–S5: 1.0–1.5 mL","TURP/urology T10: 2.0–2.5 mL","Inguinal hernia/lower abdo T10: 2.5–3.0 mL","Lower limb/hip/knee T10–T12: 2.5–3.0 mL","Height ≤150 → lower end; 151–165 → middle; >165 → upper end","Optional: fentanyl 10–25 mcg; morphine 0.1 mg (1 mg/mL) for hip/knee","Bolus 0.25% 3 mL (1 mL 0.75% → 3 mL)","Loading 40 mL/hr: 0.15% + fentanyl 100 mcg (2 mL 0.75% + 2 mL fentanyl → 10 mL)","Infusion 8–15 mL/hr: 50 mL syringe 7 mL (0.1%) or 10 mL (0.15%) 0.75% + fentanyl 2 mL","60 mL syringe: 8 mL (0.1%) or 12 mL (0.15%) 0.75% + fentanyl 2.4 mL (120 mcg)","0.15% from 0.2% stock: 38 mL → 50 mL; 45 mL → 60 mL","Top-up 1.5 mL 0.75% → 5 mL (≈0.23%) ± fentanyl 50–100 mcg","IT fentanyl 10–25 mcg + NS to 1 mL","Cocktail 3 mL every 1–2 h, assess first","LSCS: intended spinal dose by height, small increments","Do not flush catheter before removal","Emergency top-up A: 0.1 mL adrenaline 1:1000 + 20 mL lignocaine 2%; test 3 mL; top-up 17 mL + fentanyl 100 mcg; +3 mL every 2–3 min","Emergency top-up B: 20 mL ropi 0.75%; test 3 mL; top-up 10 mL + fentanyl 100 mcg (12 mL); +3 mL every 3–5 min","Cocktail A: 3.4 mL ropi 0.75% + fentanyl 100 mcg → 50 mL; B: 5 mL levobupi 0.5% + fentanyl 100 mcg → 50 mL","Pump settings 1–4 and labour spinal single shot as transcribed","PCA morphine 1 mg/mL; fentanyl 10 mcg/mL (25 mcg bolus IV, basal 10 mcg/h, PCA 10 mcg, LO 12 min)","PCA remi 20 mcg/mL; bolus 20 mcg over ≥30 s; LO 2 min; background 4 mL/h (80 mcg/h), max 120 mcg/h","Complications, post-op flowchart; IV morphine 0.05–0.1 mg/kg","Paeds a: caudal morphine 30–50 mcg/kg (corrected)","Paeds c: esmolol 500 mcg/kg then 50–300 mcg/kg/min; phenylephrine 1–5 mcg/kg (corrected)","Paeds d: blood max 0.5–1 mL/kg/min (corrected)","Paeds e: frusemide 0.5–1 mg/kg (corrected)","Paeds f: epidural bands <5 kg 0.1% 0.1–0.2 mL/kg/h (max 0.2 mg/kg/h); 5–10 / >10 kg 0.2–0.3 / 0.2–0.4 (max 0.4) (corrected)","Paeds g: ilioinguinal 0.3 mL/kg per side (corrected)","Paeds h: bicarbonate 2 mL/kg of 4.2% (corrected)","Paeds i: RESOLVED — anaphylaxis doses now on Emergencies › Paeds card","Paeds j: atropine 1 mg in 10 mL, 0.2 mL/kg (corrected)","Paeds k: ketofol 3:1, 1–1.5 mL/kg/h (corrected)","Paeds l: SD5 = 5 mL D50 + 45 mL (corrected)","Paeds m: albumin 25 mL 20% + 75 mL NS (corrected)","Paeds n: exposed bowel 10–20 (up to 30) mL/kg/h (corrected)","Paeds o: propofol by age 1–2 / 3–5 / 2.5–3.5 mg/kg (corrected)","IT morphine: 10 mg/mL, 0.1 mL to 1 mL NS, give 0.1 mL (corrected)","Phenylephrine: 0.1 mL of 10 mg/mL to 20 mL = 50 mcg/mL (corrected)","Cocktail A 0.2% alternative removed","Diclofenac 50 mg TDS × 3 days, max 150 mg/day (corrected)","High spinal: phenylephrine 50–100 mcg, ephedrine 6–9 mg, adrenaline 10–100 mcg, atropine 0.5 mg (max 3), glyco 200–400 mcg; RSI if failing","LAST (adult + paeds): intralipid 20% 1.5 mL/kg bolus, 15 mL/kg/h, repeat ×2 + 30 mL/kg/h, max 12 mL/kg; midazolam 1–2 mg adult / 0.05–0.1 mg/kg paeds","Anaphylaxis adult: IV adrenaline 50 mcg, IM 0.5 mg; fluid 20 mL/kg; infusion 0.05–0.1 mcg/kg/min; chlorphenamine 10 mg, hydrocortisone 200 mg","Anaphylaxis paeds: IV adrenaline 1 mcg/kg (0.01 mL/kg 1:10 000); IM 10 mcg/kg (0.01 mL/kg 1:1000, max 0.5 mL); fluid 10 mL/kg; hydrocortisone 4 mg/kg","Spinal hypotension: phenylephrine 50–100 mcg bolus or 25–50 mcg/min (30–60 mL/h of 50 mcg/mL); ephedrine 6–9 mg / glyco 200 mcg if HR <60","Adult ALS: atropine 500 mcg to 3 mg; adrenaline 1 mg q3–5 min; amiodarone 300 then 150 mg; 150–200 J","Bronchospasm adult: salbutamol 6–10 puffs / neb 5 mg / IV 250 mcg; Mg 2 g; ketamine 0.5–1 mg/kg; hydrocortisone 200 mg","Bronchospasm paeds: IV salbutamol 15 mcg/kg (max 250); Mg 40 mg/kg (max 2 g); ketamine 1–2 mg/kg; adrenaline 1 mcg/kg","MH (adult + paeds): dantrolene 2.5 mg/kg, repeat 1 mg/kg to max 10 mg/kg; 20 mg vials in 60 mL; stop cooling 38.5 °C; paeds CaCl 0.2 mL/kg, insulin 0.1 U/kg + D10 5 mL/kg","CICO: DAS plans A–D; sugammadex 16 mg/kg; scalpel–bougie–6.0 tube","PPH: oxytocin 5 IU then 40 IU/500 mL at 125 mL/h; ergometrine 500 mcg IM; carboprost 250 mcg IM q15 min max 8; misoprostol 800 mcg; TXA 1 g, repeat once","Eclampsia: MgSO4 4 g over 10–15 min then 1 g/h × 24 h; recurrent 2 g; toxicity Ca gluconate 10% 10 mL; labetalol 20/40/80 mg, hydralazine 5 mg","Paeds arrest: adrenaline 0.1 mL/kg 1:10 000; 4 J/kg; amiodarone 5 mg/kg (max 300); fluid 10 mL/kg; D10 2 mL/kg; CaCl 0.2 mL/kg","Weights: IBW Devine; LBW Janmahasatian; AdjBW = IBW + 0.4 × (TBW − IBW); actual used if below ideal","Fasting 2 h clear / 6 h light / 8 h fatty; GLP-1 weekly hold 1 week, daily hold on day","Drugs: continue β-blocker/statin etc; omit ACEi/ARB, diuretics, SU on morning; SGLT2i stop 3 days (ertugliflozin 4); basal insulin 80%","Steroid cover: hydrocortisone 100 mg at induction then 200 mg/24 h (major)","Induction (LBW): propofol 1.5–2.5, thiopentone 3–5, ketamine 1–2, etomidate 0.2–0.3 mg/kg; fentanyl 1–3 mcg/kg","Relaxants: sux 1–1.5 mg/kg TBW (RSI 1.5); roc 0.6 / RSI 1.2 mg/kg IBW; atracurium 0.5, cis 0.15, vec 0.1 mg/kg IBW","Sugammadex TBW 2 / 4 / 16 mg/kg; neostigmine 0.05 mg/kg IBW max 5 mg + glyco 0.2 mg per mg","SAD: LMA 3 = 30–50, 4 = 50–70, 5 = 70–100 kg; i-gel 3 = 30–60, 4 = 50–90, 5 = >90 kg","TIVA: Marsh Cp 4–6 / 3–6 (AdjBW if obese); Schnider Ce 3–5 / 2.5–5; Minto 4–6 / 2–8 ng/mL; remi 0.05–0.25 mcg/kg/min LBW at 50 mcg/mL","MAC 40 y: sevo 2.1, iso 1.17, des 6.6% with Mapleson age correction","Pressors: ephedrine 6 mg/mL; phenylephrine 100 mcg/mL; NA/adrenaline 4 mg/50 mL; dobutamine 250 mg/50 mL","Antibiotics: cefazolin 2 g (3 g ≥120 kg), redose 4 h; vancomycin 15 mg/kg (max 2 g); TXA 1 g","PONV: Apfel 10/21/39/61/79%; dex 4–8 mg, ondansetron 4 mg, granisetron 1 mg, droperidol 0.625–1.25 mg","Analgesia: paracetamol 1 g (15 mg/kg <50 kg); parecoxib 40 mg; tramadol 50–100 mg; PCA morphine 1 mg/5 min; fentanyl 10–20 mcg/5 min","Anticoagulant timing (ASRA 2018) table as shown in Regional › Anticoagulants; platelets ≥80 (obstetric ≥70)","LA max adult: lignocaine 3 mg/kg (200 mg), + adrenaline 7 mg/kg (500 mg), bupi/levobupi 2 mg/kg (150 mg), ropi 3 mg/kg (225 mg); LBW if BMI ≥ 30; paeds bupi 2.5 mg/kg","Calculator combines drugs as % of each maximum; amber > 80%, red > 100%","Block solution: bupi/levobupi 0.5% surgical, 0.25% analgesia","Volumes: ISB 10–15, SCB 20–25, axillary 20–25, femoral 15–20, fascia iliaca 30–40, PENG 20, adductor 10–20, popliteal 20–30, ESP 20–30/side, rectus sheath 10–15/side, TAP 15–20/side, serratus 20–30 mL","Epidural: test 3 mL lignocaine 2% + adrenaline; 0.1% + fentanyl 2 mcg/mL thoracic 4–10, lumbar 6–14 mL/h; bolus 3–5 mL","PDPH: caffeine ≤300 mg/day; blood patch 15–20 mL","Adjuncts: dexamethasone IV 0.1–0.15 mg/kg (4 mg perineural); dexmedetomidine / clonidine 0.5–1 mcg/kg; IT fentanyl 10–25 mcg; IT morphine 100–150 mcg","Adult: cefazolin 2 g (3 g ≥120 kg) redose 4 h; cefuroxime 1.5 g 4 h; Unasyn 3 g 2 h; Augmentin 1.2 g 2 h; metronidazole 500 mg; gentamicin 5 mg/kg (AdjBW if >120% IBW); clindamycin 900 mg 6 h; vancomycin 15 mg/kg max 2 g; azithromycin 500 mg","Paeds: cefazolin 30 mg/kg (max 2 g); cefuroxime 50 (1.5 g); Unasyn 75 mg/kg combined (3 g); Augmentin 30 (1.2 g); metronidazole 15 (500 mg); gentamicin 2.5; clindamycin 10 (900 mg); vancomycin 15 (2 g); azithromycin 10 (500 mg)","General/upper GI: cefazolin; allergy clinda + gent","HPB: cefazolin or Unasyn; allergy clinda + gent; low-risk lap chole none","Colorectal/appendix: cefazolin + metronidazole or Unasyn; allergy clinda + gent or metronidazole + gent","Urology: cefazolin or gentamicin; bowel opened add metronidazole","Gynae: cefazolin; LSCS cefazolin before incision + azithromycin if labour/ROM","Ortho: cefazolin; allergy/MRSA vancomycin or clinda; open fracture ± gentamicin","Dental/maxfax/H&N clean-contaminated: cefazolin + metronidazole, Unasyn or Augmentin; allergy clinda","Clean with implant/mesh: cefazolin; neuro/vascular/cardiac: cefazolin or cefuroxime","Timing ≤60 min before incision; redose also after 1.5 L (paeds 25 mL/kg) blood loss; stop ≤24 h","Endocarditis (AHA 2021): amoxicillin/ampicillin 2 g (50 mg/kg), cefazolin 1 g (50 mg/kg), azithromycin 500 mg (15 mg/kg)","Key points: C6 thumb, C7 middle finger, C8 little finger, T4 nipple, T6 xiphisternum, T10 umbilicus, T12 inguinal ligament, L3 medial knee, L4 medial malleolus, L5 dorsum foot, S1 lateral heel, S4-5 perianal","Block height: LSCS T4; upper abdo T4–T6; lower abdo/hernia T8–T10; TURP/vaginal T10; testes T10; hip/knee T10–L1; foot/ankle L2; perineal S1–S5","Cold lost 1–2 segments above pinprick, above light touch; LSCS aim T4 (touch T5–T4)","Bromage 0–3 (0 full movement → 3 complete motor block)","Caudal (Armitage): 0.5 mL/kg ≈ L1, 1 mL/kg ≈ T10, 1.2 mL/kg ≈ T6","Recovery: modified Aldrete (activity, breathing, circulation, consciousness, SpO₂) ≥ 9 with no zero; ≥ 30 min after last IV opioid; temp > 36 °C","Home: PADSS (vital signs, walking, PONV, pain, bleeding) ≥ 9 with no zero; escort + adult at home 24 h; no driving 24 h","Spinal: voiding required only if high risk (hernia, anorectal, urology, pelvic, retention history)","Nerve block: home with protected numb limb; oral analgesia before block wears off","Paeds: drinking not required; ex-prem < 60 weeks PCA overnight; tonsillectomy < 3 y / OSA overnight; paracetamol 15 mg/kg 6-hourly, ibuprofen 10 mg/kg 8-hourly","PBW (ARDSNet/Devine) from sex + height: male 50, female 45.5 + 0.91 × (height − 152.4); TV never from actual weight","Start: TV 6–8 mL/kg PBW, PEEP 5 then individualise, RR 12–14 to EtCO₂ 35–45 mmHg, lowest FiO₂ for SpO₂ ≥ 94%","Limits: plateau < 30, driving pressure < 15 cmH₂O; mode default PCV-VG / PRVC","Laparoscopy: PEEP 8–10, RR 14–18, re-check after insufflation / position; Obese: PEEP 8–10, recruit, ramped","Asthma/COPD: RR 8–10, I:E 1:3–1:4, auto-PEEP → disconnect 10–30 s; ARDS: TV 4–6, ARDSNet lower-PEEP table (0.3→5 … 1.0→18–24), pH ≥ 7.25","Neuro: PaCO₂ 35–40 mmHg, no prophylactic hyperventilation (≤ 25 mmHg); Pregnancy GA: EtCO₂ 30–32 mmHg","Recruitment: 30–40 cmH₂O × 30 s or stepwise PEEP 5→10→15(→20); caution hypotension, pneumothorax, ICP","OLV: left DLT female <160 cm 35 / ≥160 37 Fr; male <170 cm 37 / ≥170 39 Fr; depth 12 + height/10 cm; confirm with fibreoptic","Blocker 9 Fr: ETT ≥ 7.5 (8.0 easier); 7 Fr: ETT ≥ 6.0","OLV settings: TV 4–6 mL/kg PBW, PEEP 5, FiO₂ 0.8–1.0 then lower, peak < 30, driving < 15; hypoxia: FiO₂ 1.0 → scope → suction → recruit/PEEP → CPAP 5–10 to non-ventilated lung → intermittent 2-lung → PA clamp","Recipient: RSI preferable; propofol 1–2 mg/kg; triple-lumen CVC R-IJV (scan first); no double-lumen unless nephrologist agrees; art line not on fistula arm; cefuroxime 1.5 g","Bilateral IJV thrombosis / femoral line: MUST discuss with nephrologist / urologist","BP: patient's baseline (often 140–150/80–90); noradrenaline first choice; fluids up to 30 mL/kg/h (donor 20 mL/kg/h); balanced crystalloid, saline if K⁺ high; albumin 5%","Blood: discuss with nephrology, leucocyte filter, rarely unless Hb < 70 g/L","Methylprednisolone 500 mg slow, complete before reperfusion; mannitol 20% 0.5 g/kg (2.5 mL/kg) complete before reperfusion (donor: before arterial clamping); furosemide 0.5–1 mg/kg after; UO > 1 mL/kg/h","Thymoglobulin / basiliximab: drug and dose by nephrologist (protocol example thymoglobulin 75 mg in NS 500 mL over 4–6 h, light-protected)","Syringes: fentanyl 10 mcg/mL; atracurium 10 mg/mL (0.3–0.6 mg/kg/h); noradrenaline 4 mg/50 mL","Renal drugs: atracurium/cisatracurium preferred; sux single dose only if K⁺ normal; sugammadex not recommended CrCl < 30; fentanyl over morphine; no NSAIDs","PACU: diuresis 500–1000 mL/h replace; CXR; graft ultrasound; paracetamol + tramadol ± PCA; antibiotic 5–7 days","Hyperkalaemia (UKKA): ≥ 6.5 or ECG → CaCl 10% 10 mL / Ca gluconate 10% 30 mL; insulin 10 u + glucose 25 g (10% glucose 50 mL/h × 5 h if glucose < 7); salbutamol 10–20 mg neb; bicarbonate only if acidotic; dialysis","Phase tabs: Pre-op · Induction · Intra-op · Post-op · Donor; patient box adds K⁺, Hb, today's weight, hours since HD","Discuss before proceeding: K⁺ ≥ 5.5 (5.0–5.4 dialyse if time / graft risk), pulmonary oedema, infection ≤ 2 weeks, cardiac event, Hb < 70 / platelets / clotting, both IJVs thrombosed; > 2 kg above dry weight; last HD > 24 h","HD heparin within ~4 h: APTT before CVC; residual native urine noted","Cardiac: ≥ 4 METs; EF < 40% or pulmonary hypertension → cardiac-output monitoring; continue beta-blocker, statin","Drugs: stop OHA, SGLT2i 3 days; ACEi/ARB omit morning; basal insulin 80%; omit EPO / binders / calcium morning; omeprazole 20 mg or ranitidine 150 mg once","Induction (LBW): propofol 1–2 mg/kg, fentanyl 1–3 mcg/kg, ketamine 1–2 mg/kg, midazolam 0.02 mg/kg max 2 mg","RSI: K⁺ ≥ 5.5 or unknown → rocuronium 1.2 mg/kg IBW, sugammadex 16 mg/kg CICO rescue only; else sux 1.5 mg/kg TBW single dose; atracurium 0.5 mg/kg IBW, top-up 0.1–0.15; avoid vecuronium / pancuronium","CVC R-IJV depth ≈ height/10 cm (Peres; confirm CXR); NG 14–16 Fr","Fentanyl infusion 0.5–2 mcg/kg/h LBW; atracurium 0.3–0.6 mg/kg/h; noradrenaline 0.05–0.3 mcg/kg/min","Fluid: saline if K⁺ ≥ 5.5 / unknown, else balanced; albumin 5% 250 mL; PACU replace previous hour's urine mL for mL","Reversal: neostigmine 0.05 mg/kg IBW (max 5 mg) + glycopyrrolate 0.2 mg per mg","Analgesia: paracetamol 1 g; tramadol 50 mg 12-hourly max 200 mg/day; fentanyl PCA preferred; no NSAIDs; ondansetron 4 mg, no extra dexamethasone","Fasting: solids, formula, milky drinks 6 h; breast milk 4 h; clear 1 h","Premed: oral / buccal midazolam 0.3–0.5 mg/kg (max 15); IN midazolam 0.2–0.3 (max 10); IN dexmedetomidine 2–2.5 mcg/kg","PAAS 0–4 low, 5–7 moderate, 8–10 high (≥ 6 predicts difficult intubation); STBUR ≥ 3 high, 5 very high","URTI mild proceed; moderate–severe delay ≥ 2 weeks; asthma attack < 4 weeks postpone","Ex-prem PMA < 44 NICU ≥ 24 h; 44–55 monitored 12–24 h; 55–60 admit 24 h; > 60 daycare","Propofol induction healthy 4–5 mg/kg, ill / neonate 2 mg/kg; laryngospasm sux 0.1–0.5 mg/kg (or roc 1.2)","LA max < 4 months: bupi / levobupi 2.0, ropi 2.5, lignocaine 3.5; ≥ 4 months 2.5 / 3 / 4 mg/kg","Caudal: T6 1–1.2, T10 0.75–1, groin / perineal 0.5 mL/kg, max 20 mL","Epidural infusion: neonate 0.1–0.2 plain; 1–3 months 0.2–0.3 + fentanyl 1; 3–12 months 0.2–0.4 + fentanyl 1; > 1 y 0.2–0.4 + fentanyl 2 mcg/mL; max 0.4 mL/kg/h; rescue 0.25 mL/kg","Neonatal spinal 0.5% bupi: < 5 kg 0.1–0.2 mL/kg; 5–15 kg 0.08; > 15 kg 0.06 mL/kg + 0.1 mL dead space","PONV: < 3 y none; ≥ 3 + 1 factor one agent; ≥ 3 + 2 two agents; ondansetron 0.15 (max 4), dex 0.15 (max 5), droperidol 0.025 (max 1.25); metoclopramide max 10 mg (local 20)","Pain infusions: morphine 0.5 mg/kg/50 mL; fentanyl 20 mcg/kg/50 mL; ketamine 5 mg/kg/50 mL; PCA 4-h max morphine 0.4 mg/kg (40 mg), fentanyl 20 mcg/kg (400 mcg)","Endocarditis (local): amoxicillin / ampicillin 50 mg/kg; allergy clindamycin 20 mg/kg (max 600), cephalexin 50 mg/kg, azithromycin 15 mg/kg","MTP: TXA 15 mg/kg then 2 mg/kg/h; PC:FFP 1:1 in 10 mL/kg; CaCl 0.2 mL/kg; fibrinogen 40 mg/kg; rFVIIa 90 mcg/kg","TIVA: Paedfusor 1–16 y > 5 kg; Kataria 3–16 y 15–61 kg; Eleveld < 1 y / < 5 kg; McFarlan 2.5 mg/kg then 15/13/11/10/9 mg/kg/h","CVC jugular 0.13 × kg + 4.9 cm; lung isolation sizes by age (Coté)","Base: paracetamol 1 g (15 mg/kg < 50 kg, AdjBW if obese); parecoxib 40 mg (20 mg elderly / < 50 kg) or diclofenac PR 1 mg/kg max 100 mg; dexamethasone 0.1 mg/kg IBW max 8 mg","Opioids: fentanyl 1–2 mcg/kg LBW then 0.5–1; morphine 0.1–0.15 mg/kg IBW; tramadol 1–2 mg/kg max 100 mg; halve if ≥ 65; remi → morphine 0.1 mg/kg or fentanyl 1–2 mcg/kg 30 min before stopping","Ketamine 0.15–0.35 mg/kg then 0.1–0.5 mg/kg/h (max 1); 2 mg/mL","Lignocaine 1.5 mg/kg IBW over 10 min then ≤ 1.5 mg/kg/h ≤ 24 h; not within 4 h of a nerve block","Magnesium 30–50 mg/kg then 10–15 mg/kg/h; dexmedetomidine 0.5–1 mcg/kg then 0.2–0.7 mcg/kg/h; clonidine 1–2 mcg/kg max 150 mcg","Modifiers: kidney → no NSAID, fentanyl not morphine; liver → paracetamol ≤ 2–3 g/day, reduce lignocaine; OSA → opioid-sparing; tolerant → continue baseline + ketamine","PROSPECT table: lap chole port-site; laparotomy epidural / rectus sheath / TAP; hernia II-IH block; TKA adductor canal + LIA; THA LIA or fascia iliaca / PENG; spine infiltration / ESP; breast PECS II / paravertebral","Strength known: volume rounded first (0.01 mL under 1 mL · 0.1 mL under 10 mL · 0.5 mL to 100 mL), mg shown = that volume × strength (e.g. sux 73.5 → 1.5 mL = 75 mg; roc 58.8 → 5.9 mL = 59 mg)","No strength: mg steps 5 (≥ 50) · 1 (≥ 10) · 0.5 (≥ 1) · 0.05 (≥ 0.1) · 0.01; mcg steps 5 (≥ 20) · 1 (≥ 2) · 0.1","Pump rates 0.1 mL/h (whole ≥ 100); fluids 5 mL steps ≥ 100 mL; g 0.1/0.5; mmol 0.5/1","Never rounded above a stated maximum (rounds down instead); a real dose never rounds to zero","UPDATED: RCUK Adult ALS 2025 (shock ≥ 150 J, lignocaine 100 mg alternative, isoprenaline 5 mcg/min) — read from the primary text","UPDATED (verified): DAS 2025 intubation — CICO card: VL first-line, routine NMB, no blind SGA intubation, prepare FONA early","UPDATED (verified): ASRA 5th ed. 2025 — low/high-dose wording; intervals confirmed unchanged","UPDATED (verified): Multisociety GLP-1 guidance 2024 — most continue; 24 h liquid diet if high risk","UPDATED (verified): 5th consensus PONV 2025 — 1–2 factors: 2 agents; ≥3: 3–4 agents","UPDATED (verified): Multisociety PDPH 2024 — caffeine first 24 h only; EBP 15–20 mL, never > 30 mL","UPDATED (verified): EMHG MH 2024 — dantrolene 2–2.5 mg/kg (max 300 mg/dose) every 10 min; charcoal filters","NOT YET VERIFIED: RCUK paediatric life support 2025 — doses could not be confirmed; paeds arrest still RCUK 2021 (flagged)","LATEST AVAILABLE: RCOG PPH 2016; ASA PACU 2013; ASHP/IDSA 2013; Malaysian NAG 2019 (ask pharmacy re newer MOH policy); CPOC diabetes 2021; Association day-case 2019 (update pending); steroid 2020; LAST v3 (reviewed 2025); ESAIC 2022; AHA 2021; ASIA/ISNCSCI 2019; DAS ATI 2020","CLASSIC VALIDATED TOOLS (still current): Aldrete 1995, PADSS 1995, Apfel 1999, Mapleson 1996, Bromage 1965, Chula formula 2005","GLP-1: most continue; high risk → 24 h clear-liquid diet, adjust plan, consider holding; symptomatic → full stomach","PONV: 0 factors risk reduction ± 1 agent; 1–2 factors 2 agents; ≥ 3 factors 3–4 agents + TIVA; PDNV long-acting antiemetic","PDPH: suspect ≤ 5 days; paracetamol + NSAID; caffeine first 24 h only; EBP 15–20 mL, never > 30 mL; no prophylactic EBP","Anticoagulants: low/high-dose wording; DOAC intervals individualised (72 h standard)","CICO: VL first-line; routine NMB; peroxygenation; 3 + 1 attempts; 2nd-gen SGA max 3, no blind intubation; prepare FONA if SGA difficult","MH: dantrolene 2–2.5 mg/kg actual weight, max 300 mg per dose, repeat every 10 min; max 10 mg/kg may be exceeded; charcoal filters; chilled crystalloid 2–3 L; stop cooling < 38.5 °C","Adult ALS (RCUK 2025): first shock ≥ 150 J; lignocaine 100 mg alternative; isoprenaline 5 mcg/min for bradycardia","Labour epidural contraindications (absolute / relative) and bloods (FBC/PT/APTT for severe PE)","Dural puncture: inform specialist; re-site one space above or intrathecal catheter; keep catheter ≥ 24 h; LSCS top-ups 0.2 mL 0.5% heavy bupivacaine","Catheter troubleshooting table (withdraw 0.5–1 cm for patchy block; 3 cm in space; severed / knotted catheter steps)","Aspiration prophylaxis: elective ranitidine 150 mg PO 10 pm + morning, sodium citrate 30 mL; emergency ranitidine 50 mg IV, sodium citrate 30 mL ± metoclopramide 10 mg","Post-natal: PCA morphine 1 mg/mL 100–200 mL; SC morphine 7.5–10 mg 4-hourly regular","IT morphine ward obs hourly × 4 h then 4-hourly; call if RR < 8, sedation > 2, VAS > 50%, SBP < 90; pruritus naloxone 0.1–0.4 mg or nalbuphine 2.5–5 mg","PDPH practical steps: blood patch prerequisites and aftercare; SPG block with lignocaine 2%; local caffeine 300–500 mg/day × 3 days noted","Estimated weight (APLS): < 1 y 0.5 × months + 4; 1–5 y 2 × age + 8; 6–12 y 3 × age + 7; banner > 40 kg","Cuffed ETT (Microcuff): term–8 months 3.0; 8 months–2 y 3.5; then age/4 + 3.5","NPA ≈ plain ETT size; length nose tip → tragus","Auto-highlight: HMEF by TV 7 mL/kg; bag nearest 3 × VC; Storz scope by ETT; I:E by age; glucose target by age; caudal needle 5–15 kg black","BP: median 90 + 2 × age; hypotension below 70 + 2 × age","Fluids: maintenance capped 100 mL/h; deficit = maintenance × fasting h; ½ hour 1, ¼ hours 2–3","Blood: EBV 85 / 80 / 75 / 70 mL/kg (term / infant / child / > 12 y; prem 95); ABL = EBV × (Hb − Hb min) / Hb; PRBC = 4 mL/kg × rise","Inotrope rate table (1 mL/h = 0.1 mcg/kg/min or 1 mcg/kg/min)","Bicarbonate: 0.3 × weight × BE, give half; mL of 4.2% / 8.4%","Caps: ondansetron 4 mg, dex PONV 4 mg, granisetron 1 mg, glyco 200 mcg, TXA 1 g, hydrocortisone 100 mg, ranitidine 50 mg, Ca gluconate 20 mL, CaCl 10 mL, adrenaline 1 mg (10 mL), atropine 0.6 mg, bolus 500 mL, IV/syrup morphine 10 mg"];
 
 /* ---------- ANONYMOUS CASES (phone only, 36 h) ---------- */
@@ -2923,11 +2971,11 @@ function vTicks(){
 }
 /* ---------- ABOUT ---------- */
 const CHANGES = [
+  ["2.34","Print plan sheets: Paeds and Kidney transplant"],
   ["2.33","Re-paralysis after sugammadex (Reversal card)"],
   ["2.32","Consent block reworded for notes (Assessment → Consent → Plan)"],
   ["2.30","Shortcut quick tiles; display colour setting"],
   ["2.29","Consent explanation builder (General › Pre-op)"],
-  ["2.28","General pre-op: risk scores, tests, common conditions"],
   ["2.22","Doses rounded to amounts you can draw up"]];
 const SRC_LINKS = [
   ["Emergencies", [["Resuscitation Council UK — ALS / PLS guidelines","https://www.resus.org.uk/library"],["Difficult Airway Society guidelines","https://das.uk.com/guidelines"],["Association of Anaesthetists — guidelines (anaphylaxis, LAST, safety)","https://anaesthetists.org/Home/Resources-publications/Guidelines"],["European Malignant Hyperthermia Group","https://www.emhg.org"],["UK Kidney Association — hyperkalaemia guideline","https://www.ukkidney.org/health-professionals/guidelines"]]],
@@ -2979,6 +3027,150 @@ screens.values = () => {
 /* ================= GROUPS (by situation) ================= */
 const EMERG_ADULT = ["§Airway & breathing","Failed intubation / CICO","Bronchospasm","Anaphylaxis","Latex allergy","§Circulation & drugs","Bradycardia & cardiac arrest","High / total spinal","Hypotension after spinal","LA toxicity (LAST)","Malignant hyperthermia","Hyperkalaemia","§Obstetric","Massive obstetric haemorrhage","Eclampsia"];
 const EMERG_PAEDS = ["§Airway","Laryngospasm","Paeds bronchospasm","§Circulation","Paeds cardiac arrest","Paeds anaphylaxis","Cyanotic heart disease / Fallot spell","Paeds massive transfusion","§Drugs","Paeds LA toxicity (LAST)","Paeds malignant hyperthermia","Latex allergy","§Recovery","Paeds PACU crises"];
+/* ---------- PRINT PLAN SHEETS (paper copy for theatre) ---------- */
+const PRINT_CHECKED = false;
+const PR_KEYS = {paeds:["pw","pY"], tx:["aw","height","k","hb"]};
+const PR_NAME = {paeds:"Paediatric anaesthetic plan", tx:"Kidney transplant (recipient) anaesthetic plan"};
+const PR_BACK = {paeds:"g-paeds", tx:"g-tx"};
+const PR_FIELD = {aw:"weight", height:"height", k:"K⁺", hb:"Hb", pw:"weight", pY:"age"};
+// paper dose: per-kg x weight, capped, drawable; optional conc (unit per mL) adds mL
+function pq(w, per, unit, max, conc){
+  const one = p => { let v = p*w, c = false; if (max!=null && v > max){ v = max; c = true; }
+    v = conc ? dz(dz(v/conc,"mL", max!=null?max/conc:null)*conc, unit, max) : dz(v, unit, max); return [v, c]; };
+  const [a, ca] = one(Array.isArray(per)?per[0]:per), [b, cb] = one(Array.isArray(per)?per[1]:per);
+  const t = a===b ? `${a} ${unit}` : `${a}–${b} ${unit}`;
+  const ml = conc ? (a===b ? ` = ${dz(a/conc,"mL")} mL` : ` = ${dz(a/conc,"mL")}–${dz(b/conc,"mL")} mL`) : "";
+  return `<b>${t}</b>${ml}${ca||cb?" (max)":""}`;
+}
+const prRow = (name, rule, dose) => `<tr><td>${name}</td><td class="pr-rule">${rule}</td><td>${dose}</td></tr>`;
+const prTab = (title, rows) => `<div class="pr-sec"><h3>${title}</h3><table>${rows.join("")}</table></div>`;
+const prBox = t => `<span class="pr-box"></span><span>${t}</span>`;
+const prChk = (title, items) => `<div class="pr-sec"><h3>${title}</h3><ul class="pr-ck">${items.map(t=>`<li>${prBox(t)}</li>`).join("")}</ul></div>`;
+const prLine = (lab, n=1) => `<div class="pr-line"><span>${lab}</span>${"<i></i>".repeat(n)}</div>`;
+const lmaSize = w => w < 5 ? "1" : w < 10 ? "1.5" : w < 20 ? "2" : w < 30 ? "2.5" : w < 50 ? "3" : w < 70 ? "4" : "5";
+
+function prPaeds(){
+  const w = W(), mo = AGEM(), y = S.pY, neo = mo < 1, lt2 = w < 2, e = paedEtt(), ett = e.useCuff ? e.cuffed : e.plain;
+  const m0 = w<=10 ? 4*w : w<=20 ? 40 + 2*(w-10) : 60 + (w-20), maint = Math.min(m0, 100), def = maint*S.fastH;
+  const ebvk = neo?85:mo<12?80:y<12?75:70, ebv = ebvk*w, abl = S.hbNow>S.hbLow ? ebv*(S.hbNow-S.hbLow)/S.hbNow : 0;
+  const prop = neo ? [2,"2 mg/kg (neonate, titrate)"] : [[4,5],"4–5 mg/kg (healthy)"];
+  const paraIV = neo ? [lt2?7.5:10, `${lt2?7.5:10} mg/kg 8-hourly`] : w < 50 ? [15, "15 mg/kg 6-hourly"] : null;
+  const morph = neo ? ["0.05–0.1 mg/kg, ≥ 4 h apart", pq(w,[0.05,0.1],"mg")] : mo < 6 ? ["0.02 mg/kg, max 0.1 mg/kg", pq(w,0.02,"mg")] : w < 50 ? ["0.05 mg/kg each, max 0.2 mg/kg", pq(w,0.05,"mg")] : ["1–2 mg each, max 5–10 mg", "<b>1–2 mg</b>"];
+  const bmax = pMaxFor("bupi");
+  return `<div class="pr-cols">
+  <div class="pr-sec"><h3>Airway</h3><table>
+    <tr><td>ETT</td><td colspan="2"><b>${e.useCuff?`Cuffed ${f1(e.cuffed)}`:`Plain ${e.plainTxt}`}</b>${e.useCuff?` · plain ${e.plainTxt}`:""} · have ${f1(ett-0.5)} and ${f1(ett+0.5)}</td></tr>
+    <tr><td>Depth</td><td colspan="2">Oral <b>${fmt(e.depth)} cm</b> · nasal ${fmt(e.depth+2)}–${fmt(e.depth+3)} cm</td></tr>
+    <tr><td>Suction</td><td colspan="2"><b>${fmt(2*ett)} Fr</b> · NPA ≈ size ${e.plainTxt}</td></tr>
+    <tr><td>Blade</td><td colspan="2">${w < 5 ? "Straight Miller 0 or MAC 1" : "Curved blade"}</td></tr>
+    <tr><td>LMA</td><td colspan="2">Size <b>${lmaSize(w)}</b> (by weight)</td></tr></table></div>
+  ${prTab("Induction & relaxant", [
+    prRow("Propofol 1%", prop[1], pq(w,prop[0],"mg",null,10)),
+    prRow("Fentanyl", neo?"0.5–3 mcg/kg":"1–2 mcg/kg", pq(w,neo?[0.5,3]:[1,2],"mcg")),
+    prRow("Rocuronium", "0.6 mg/kg (RSI 1.2)", `${pq(w,0.6,"mg",null,10)} · RSI ${pq(w,1.2,"mg",null,10)}`),
+    prRow("Atracurium", "0.5 mg/kg", pq(w,0.5,"mg",null,10)),
+    prRow("Glycopyrrolate", "4 mcg/kg, max 200", pq(w,4,"mcg",200))])}
+  ${prTab("Reversal", [
+    prRow("Neostigmine", "50 mcg/kg, max 2.5 mg", pq(w,0.05,"mg",2.5)),
+    prRow("+ glycopyrrolate", "10 mcg/kg, max 500", pq(w,10,"mcg",500)),
+    prRow("or sugammadex", "2 mg/kg (4 if deep)", `${pq(w,2,"mg",null,100)} · 4: ${pq(w,4,"mg",null,100)}`)])}
+  ${prTab("Analgesia, PONV, antibiotic", [
+    prRow("Paracetamol IV", paraIV ? paraIV[1] : "1 g 6-hourly", paraIV ? pq(w,paraIV[0],"mg",1000) : "<b>1 g</b>"),
+    prRow("Morphine IV", morph[0], morph[1]),
+    prRow("Ondansetron", "0.15 mg/kg, max 4", pq(w,0.15,"mg",4)),
+    prRow("Dexamethasone", "0.15 mg/kg, max 5", pq(w,0.15,"mg",5)),
+    prRow("Cefazolin", "30 mg/kg, max 2 g", pq(w,30,"mg",2000)),
+    prRow("LA maximum", `bupi ${bmax} mg/kg${mo<4?" (&lt; 4 m)":""}`, `<b>${sig(dz(bmax*w/2.5,"mL")*2.5)} mg</b> = ${dz(bmax*w/2.5,"mL")} mL 0.25%`)])}
+  <div class="pr-sec"><h3>Fluids &amp; blood</h3><table>
+    <tr><td>Maintenance</td><td class="pr-rule">4/2/1, max 100</td><td><b>${dz(maint,"mL/h")} mL/h</b></td></tr>
+    <tr><td>Deficit (${S.fastH} h fast)</td><td class="pr-rule">½ hour 1, ¼ hours 2–3</td><td><b>${dz(def,"mL")} mL</b> · h1 ${dz(maint+def/2,"mL/h")} · h2–3 ${dz(maint+def/4,"mL/h")} mL/h</td></tr>
+    <tr><td>Bolus</td><td class="pr-rule">10 mL/kg, max 500</td><td>${pq(w,10,"mL",500)}</td></tr>
+    <tr><td>Blood volume</td><td class="pr-rule">${ebvk} mL/kg</td><td><b>${dz(ebv,"mL")} mL</b></td></tr>
+    <tr><td>Allowable loss</td><td class="pr-rule">Hb ${S.hbNow} → ${S.hbLow} g/dL</td><td><b>${dz(abl,"mL")} mL</b></td></tr>
+    <tr><td>Packed cells</td><td class="pr-rule">10–20 mL/kg</td><td>${pq(w,[10,20],"mL")}</td></tr>
+    <tr><td>Glucose low</td><td class="pr-rule">D10 2 mL/kg</td><td>${pq(w,2,"mL")}</td></tr></table></div>
+  <div class="pr-sec pr-emerg"><h3>Emergency</h3><table>
+    <tr><td>Arrest adrenaline</td><td class="pr-rule">10 mcg/kg, 1:10 000</td><td>${pq(w,0.1,"mL",10)} = ${dz(Math.min(10*w,1000),"mcg")} mcg</td></tr>
+    <tr><td>Shock · amiodarone</td><td class="pr-rule">4 J/kg · 5 mg/kg</td><td><b>${dz(4*w,"J")} J</b> · ${pq(w,5,"mg",300)}</td></tr>
+    <tr><td>Atropine</td><td class="pr-rule">0.02 mg/kg, max 0.6</td><td>${pq(w,0.02,"mg",0.6,0.1)}</td></tr>
+    <tr><td>Laryngospasm</td><td class="pr-rule">propofol 0.5–1 · sux 0.1–0.5 mg/kg</td><td>${pq(w,[0.5,1],"mg")} · ${pq(w,[0.1,0.5],"mg")} + atropine</td></tr>
+    <tr><td>Anaphylaxis</td><td class="pr-rule">IV 1 mcg/kg · IM 10 mcg/kg</td><td>IV ${pq(w,1,"mcg")} · IM ${pq(w,0.01,"mL",0.5)} 1:1000</td></tr>
+    <tr><td>Intralipid 20%</td><td class="pr-rule">1.5 mL/kg, then 15 mL/kg/h</td><td>${pq(w,1.5,"mL")} · ${dz(15*w,"mL")} mL/h</td></tr>
+    <tr><td>Calcium chloride 10%</td><td class="pr-rule">0.2 mL/kg, max 10</td><td>${pq(w,0.2,"mL",10)}</td></tr></table>
+    <div class="pr-small">Arrest doses: RCUK 2021 (2025 update pending).</div></div>
+  </div>`;
+}
+
+function prTx(){
+  const W2 = wts(), w = S.aw, hi = kHigh(), neo = Math.min(0.05*W2.ibw, 5), nor = (lo,h) => `${dz(lo*w*60/80,"mL/h")}–${dz(h*w*60/80,"mL/h")} mL/h`;
+  const r = (x, conc, unit) => `<b>${sig(dz(x/conc,"mL")*conc)} ${unit}</b> = ${dz(x/conc,"mL")} mL`;
+  const sz = S.sex==="F" ? "6.5–7.0" : "7.0–7.5", depth = f1(r05(4 + S.height/10));
+  const flags = [], gain = S.todayWt - S.aw;
+  if (S.k >= 5.5) flags.push(`K⁺ ${S.k} ≥ 5.5: dialyse / discuss before induction`); else if (S.k >= 5) flags.push(`K⁺ ${S.k}: dialyse if time or graft risk`);
+  if (S.hb < 70) flags.push(`Hb ${S.hb} &lt; 70: discuss transfusion with nephrology`);
+  if (S.touched.todayWt && gain > 2) flags.push(`${sig(gain)} kg above dry weight`);
+  if (S.touched.hdH && S.hdH > 24) flags.push(`Last HD ${S.hdH} h ago: repeat K⁺`);
+  return `${flags.length ? `<div class="pr-flag"><b>Discuss before proceeding:</b> ${flags.join(" · ")}</div>` : ""}
+  ${prLine("Baseline BP (target)")}
+  <div class="pr-cols">
+  ${prChk("1 · Pre-op", ["K⁺, Hb, last HD, UF volume, residual urine checked", "Fistula arm marked and protected", "Omeprazole 20 mg (or ranitidine 150 mg once)", "Cefuroxime 1.5 g sent with patient", "Immunosuppressants handed doctor-to-doctor", "Group &amp; crossmatch sent"])}
+  ${prTab("2 · Induction", [
+    prRow("Propofol 1%", `1–2 mg/kg LBW ${sig(W2.lbw)}`, pq(W2.lbw,[1,2],"mg",null,10)),
+    prRow("Fentanyl", "1–3 mcg/kg LBW", pq(W2.lbw,[1,3],"mcg",null,50)),
+    hi ? prRow("Rocuronium RSI", `1.2 mg/kg IBW ${sig(W2.ibw)} (K⁺ ${S.k})`, r(1.2*W2.ibw,10,"mg")) : prRow("Suxamethonium RSI", `1.5 mg/kg TBW (K⁺ ${S.k})`, r(1.5*W2.tbw,50,"mg")+" · single dose"),
+    hi ? prRow("Sugammadex", "16 mg/kg TBW — CICO only", r(16*W2.tbw,100,"mg")) : prRow("or rocuronium", "1.2 mg/kg IBW", r(1.2*W2.ibw,10,"mg")),
+    prRow("Atracurium", "0.5 mg/kg IBW · top-up 0.1–0.15", pq(W2.ibw,0.5,"mg",null,10)),
+    prRow("ETT", "", `<b>${sz}</b> · ${depth} cm at mouth corner · NG 14–16 Fr`),
+    prRow("CVC R-IJV", "scan first · height/10", `<b>≈ ${sig(S.height/10)} cm</b> · confirm on CXR`),
+    prRow("Art line", "", "<b>Not</b> on the fistula arm")])}
+  ${prTab("3 · Intra-op", [
+    prRow("Fentanyl 10 mcg/mL", "0.5–2 mcg/kg/h LBW", `<b>${dz(0.05*W2.lbw,"mL/h")}–${dz(0.2*W2.lbw,"mL/h")} mL/h</b>`),
+    prRow("Atracurium 10 mg/mL", "0.3–0.6 mg/kg/h", `<b>${dz(0.03*w,"mL/h")}–${dz(0.06*w,"mL/h")} mL/h</b>`),
+    prRow("Noradrenaline 4 mg/50 mL", "0.05–0.3 mcg/kg/min", `<b>${nor(0.05,0.3)}</b>`),
+    prRow("Fluid", hi ? "K⁺ ≥ 5.5: saline" : "balanced", `<b>${hi?"0.9% saline":"Sterofundin / balanced"}</b> · up to ${dz(30*w,"mL/h")} mL/h`),
+    prRow("Urine aim", "&gt; 1 mL/kg/h", `<b>&gt; ${dz(w,"mL/h")} mL/h</b>`)])}
+  ${prChk("4 · Before reperfusion", [`Mannitol 20% ${dz(2.5*w,"mL")} mL (${dz(0.5*w,"g")} g) — started after induction, <b>complete</b>`, "Methylprednisolone 500 mg slow — <b>complete</b>", "Thymoglobulin / basiliximab as nephrologist prescribed (light-protected)", "BP at or above baseline before clamps off", "Fully relaxed"])}
+  ${prChk("5 · After reperfusion", [`Furosemide ${dz(0.5*w,"mg")}–${dz(w,"mg")} mg (0.5–1 mg/kg)`, "ABG: K⁺, acid–base", "Keep relaxed until retractors out"])}
+  ${prTab("6 · End & PACU", [
+    prRow("Neostigmine", "0.05 mg/kg IBW, max 5", `<b>${sig(dz(neo/2.5,"mL")*2.5)} mg</b> + glyco <b>${dz(neo*0.2,"mg")} mg</b>`),
+    prRow("Paracetamol", "", w<50 ? `<b>${dz(15*w,"mg")} mg</b> 6-hourly` : "<b>1 g</b> 6-hourly"),
+    prRow("Tramadol", "renal", "<b>50 mg</b> 12-hourly, max 200 mg/day"),
+    prRow("PCA", "", "Fentanyl 10 mcg/mL preferred · <b>no NSAIDs</b>"),
+    prRow("PONV", "", "Ondansetron 4 mg · no extra dexamethasone"),
+    prRow("PACU", "", "Replace last hour's urine mL for mL · CXR · graft ultrasound")])}
+  </div>`;
+}
+
+screens.print = (which) => {
+  const keys = PR_KEYS[which], miss = keys.filter(isSample);
+  const back = PR_BACK[which];
+  if (miss.length) return head("Print plan", back) + `<div class="card"><h2>Enter this patient first</h2>
+    <p>The sheet still shows sample values for: <b>${[...new Set(miss.map(k=>PR_FIELD[k]))].join(", ")}</b>. A printed sheet with sample doses is not safe.</p>
+    <button class="homebtn" data-go="${back}">‹ Back to enter the patient</button></div>` + disc;
+  const now = new Date(), dt = now.toLocaleDateString("en-GB",{day:"numeric",month:"short",year:"numeric"}) + " " + now.toLocaleTimeString("en-GB",{hour:"2-digit",minute:"2-digit"});
+  const W2 = wts();
+  const pt = which==="paeds"
+    ? `Age <b>${S.pY} y${S.pM?` ${S.pM} m`:""}</b> · Weight <b>${sig(S.pw)} kg</b> ${S.pwEst?"(<b>estimated</b> from age)":"(actual)"}`
+    : `${S.sex==="F"?"Female":"Male"} · <b>${S.height} cm</b> · dry weight <b>${sig(S.aw)} kg</b>${S.touched.todayWt?` · today ${sig(S.todayWt)} kg`:""}${S.touched.age?` · ${S.age} y`:""} · BMI ${sig(W2.bmi)} · IBW ${sig(W2.ibw)} · LBW ${sig(W2.lbw)} · <b>K⁺ ${S.k}</b> · <b>Hb ${S.hb}</b>${S.touched.hdH?` · last HD ${S.hdH} h ago`:""}`;
+  const wtxt = which==="paeds" ? `${sig(S.pw)} kg` : `${sig(S.aw)} kg dry weight`;
+  return head("Print plan", back) + `<div class="card prtools"><p>Check the sheet, then print. On iPhone: <b>Print</b> → choose a printer, or pinch out on the preview → Share → <b>Save to Files</b> for a PDF.</p>
+    <button class="homebtn" data-print="1">⎙ Print / Save as PDF</button>
+    <p class="sub">Nothing happens from the home-screen app? Open the same page in Safari and print from there. Name and IC go on paper only (sticker box).</p></div>
+  <div class="psheet">
+    <div class="pr-head"><div><div class="pr-title">${PR_NAME[which]}</div>
+      <div class="pr-pt">${pt}</div>
+      ${prLine("Procedure")}${prLine("Date")}${prLine("Allergies")}${which==="paeds"?prLine("Fasted since"):prLine("Donor (living / deceased)")}</div>
+      <div class="pr-sticker">Patient sticker</div></div>
+    ${PRINT_CHECKED ? "" : `<div class="pr-flag">DRAFT sheet — not yet checked by the author.</div>`}
+    ${which==="paeds" ? prPaeds() : prTx()}
+    <div class="pr-notes"><b>Notes</b>${"<i></i>".repeat(which==="paeds"?3:2)}</div>
+    <div class="pr-foot">Printed ${dt} for <b>${wtxt}</b> — recheck all doses if the weight or values change. Induction Card v${APP_VERSION} · values reviewed Nov 2026. Memory aid only — clinical judgement decides.</div>
+  </div>` + disc;
+};
+screens["print-paeds"] = () => screens.print("paeds");
+screens["print-tx"] = () => screens.print("tx");
+const printBtn = (gid, tab) => (gid==="paeds" || (gid==="tx" && tab!=="don")) ? `<button class="printbtn" data-go="print-${gid}">⎙ Print plan</button>` : "";
+
 const GROUPS = [
  {id:"emerg", name:"Emergencies", sub:"Adult & obstetric · Paeds — crisis steps with doses", tabKey:"emTab", tabs:[
    {id:"adult", label:"Adult / Obstetric", input:()=>step("aw","Weight","kg",30,200,1), cards:EMERG_ADULT},
@@ -3188,7 +3380,7 @@ function groupScreen(g){
     const links = (tab.links||[]).map(([t,tb,label])=>`<button class="emlink" data-open="${esc(t)}" data-g="emerg" data-tab="${tb}">⚠ ${esc(label)} ›</button>`).join("");
     const keys = SAMPLE_BY[g.id] ? (SAMPLE_BY[g.id][tab.id] || SAMPLE_BY[g.id]["*"] || []) : [];
     const filled = !!tab.input && keys.length > 0 && !keys.some(isSample), slim = filled && !S.ptEditing;
-    const side = ab + (tab.input ? (slim ? ptBar(g.id, tab.id) : `<div class="card">${tab.input()}${filled?`<button class="linkbtn" data-ptdone="1">Done ✓</button>`:""}</div>`) : "");
+    const side = ab + (tab.input ? (slim ? ptBar(g.id, tab.id) : `<div class="card">${tab.input()}${filled?`<button class="linkbtn" data-ptdone="1">Done ✓</button>`:""}</div>`) : "") + printBtn(g.id, tab.id);
     return head(g.name,"home",g.id) + (g.tabs.length>1 ? `<div class="seg emtabs${g.tabs.length>=6?" five six":g.tabs.length>=5?" five":""}">${g.tabs.map(t=>`<button aria-pressed="${t===tab}" data-seg="${g.tabKey}" data-val="${t.id}">${t.label}</button>`).join("")}</div>` : `<div class="label" style="margin-top:0">${tab.label}</div>`) +
       `<div class="gwrap${side.trim()?"":" noside"}"><aside class="gside${slim?" slim":""}">${side}</aside><div class="gmain">` + (tab.top ? tab.top() : "") +
       (tab.cards.length ? `<div class="hint">${tab.hint || "Tap a heading to open it."}${isWide()?" Several can be open at once.":""}</div>` + acc(tab.cards) : "") +
@@ -3340,7 +3532,8 @@ document.addEventListener("click", e => {
   if (d.clrla){ S[laKey(d.clrla)] = []; render(); return; }
   if (d.apf!==undefined){ S.apfel = (S.apfel||0) ^ (1<<(+d.apf)); render(); return; }
   if (d.goTab){ const [gid,tid] = d.goTab.split(":"); const og = GROUPS.find(x=>x.id===gid); if (og) S[og.tabKey]=tid; S.open=null; const tg="#g-"+gid; if (location.hash===tg) render(); else location.hash=tg; window.scrollTo(0,0); return; }
-  if (d.setw){ S.pw = parseFloat(d.setw); render(); return; }
+  if (d.setw){ S.pw = parseFloat(d.setw); S.touched.pw = true; S.pwEst = true; render(); return; }
+  if (d.print){ try { window.print(); } catch (err) {} return; }
   if (d.qpick){ let c = qSaved(); S.qmsg = ""; if (c.includes(d.qpick)) c = c.filter(x=>x!==d.qpick); else if (c.length >= 3) S.qmsg = "Three are already chosen — remove one first."; else c = [...c, d.qpick]; store.set("quick", c); render(); return; }
   if (d.qreset){ store.set("quick", null); S.qmsg = ""; render(); return; }
   if (d.lcdpick){ store.set("lcd", d.lcdpick); applyLcd(); render(); return; }
@@ -3348,7 +3541,7 @@ document.addEventListener("click", e => {
   if (d.ptdone){ S.ptEditing = false; render(); return; }
   if (d.seg && GROUPS.some(x=>x.tabKey===d.seg) && S[d.seg] !== d.val){ const og = GROUPS.find(x=>x.tabKey===d.seg), ids = og.tabs.map(t=>t.id), dir = ids.indexOf(d.val) > ids.indexOf(S[d.seg]) ? "tab-l" : "tab-r"; S.ptEditing = false; S.touched[d.seg]=true; S[d.seg] = d.val; transition(og.id==="emerg" ? "fast" : dir, () => render()); return; }
   if (d.seg){ if (GROUPS.some(x=>x.tabKey===d.seg)) S.ptEditing = false; else if (d.seg==='sex') S.ptEditing = true; S.touched[d.seg]=true; S[d.seg] = d.val; render(); return; }
-  if (d.step){ S.ptEditing = true; S.touched[d.step]=true; const k=d.step, st=parseFloat(d.d); let v=parseFloat(S[k])||0; v=clamp(Math.round((v+st)*10)/10, +d.min, +d.max); S[k]=v; render(); return; }
+  if (d.step){ S.ptEditing = true; S.touched[d.step]=true; if (d.step==="pw") S.pwEst = false; const k=d.step, st=parseFloat(d.d); let v=parseFloat(S[k])||0; v=clamp(Math.round((v+st)*10)/10, +d.min, +d.max); S[k]=v; render(); return; }
   if (d.tick!==undefined){ const t=vTicks(); t[d.tick]=b.checked; store.set("ticks",t); render(); return; }
   if (b.hasAttribute("data-theme-toggle")){ const cur=store.get("theme","auto"); const nxt = cur==="auto"?"dark":cur==="dark"?"light":"auto"; store.set("theme",nxt); applyTheme(); render(); }
 });
@@ -3356,7 +3549,7 @@ document.addEventListener("change", e => {
   const el = e.target; if (!el.dataset || !el.dataset.in) return;
   const k = el.dataset.in; S.ptEditing = true; let v = parseFloat(el.value.replace(",", "."));
   if (!isNaN(v) && +S[k] === v && S.touched[k]) return;
-  S.touched[k]=true;
+  S.touched[k]=true; if (k==="pw") S.pwEst = false;
   if (isNaN(v)) v = S[k];
   S[k] = clamp(v, +el.dataset.min, +el.dataset.max); render();
 });
