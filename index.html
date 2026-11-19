@@ -315,7 +315,7 @@ tr.over td{background:var(--danger-bg)}
 .quick .lcd .qans{color:var(--lcd);font-size:clamp(18px,6.2vw,26px);white-space:nowrap;letter-spacing:-.01em;margin-top:4px;text-shadow:0 0 10px color-mix(in srgb,var(--lcd) 45%,transparent);transition:opacity .2s}
 .quick .lcd .qans small{color:var(--mon-muted);text-shadow:none;font-size:11px;margin-top:4px;white-space:normal;letter-spacing:0}
 .quick .lcd .qin{color:var(--mon-muted);font-size:11px;margin-top:auto;padding-top:6px;display:flex;align-items:center;flex-wrap:wrap;gap:4px}
-.quick .lcd.smp .qans{color:color-mix(in srgb,var(--lcd) 50%,transparent);text-shadow:none}
+.quick .lcd.smp .qans{opacity:.5;text-shadow:none}
 .quick .lcd .stag{font-size:10px;padding:0 4px;margin:0;background:rgba(250,204,21,.14);border-color:rgba(250,204,21,.4);color:#facc15;line-height:1.5}
 @media (prefers-contrast: more),(prefers-reduced-motion: reduce){.quick .lcd .qans{text-shadow:none}}
 .stag{font-size:11px;padding:0 4px;border-radius:5px;line-height:1.45}
@@ -435,7 +435,10 @@ details.endo summary{cursor:pointer;font-weight:600;font-size:var(--fs-sm)}
 .presum{border-left:4px solid var(--gc)}.psline{font-weight:700;margin:4px 0 var(--s2);line-height:1.4}.psbtns{display:flex;gap:var(--s2)}.psbtns .iconbtn{height:36px}
 .wideonly{display:none}@media (min-width:1100px){.wideonly{display:block}}
 .nolabel{height:var(--s4)}.tr-emerg .t-emerg{margin-top:var(--s2)}@media (min-width:1100px){.tr-emerg .t-emerg{margin-top:0}}
-:root{--tile-grid:color-mix(in srgb,var(--ink) 5.5%,transparent)}
+:root{--tile-grid:rgba(20,32,31,.055)}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--tile-grid:rgba(228,238,236,.055)}}
+:root[data-theme="dark"]{--tile-grid:rgba(228,238,236,.055)}
+@supports (color:color-mix(in srgb,red 50%,transparent)){:root{--tile-grid:color-mix(in srgb,var(--ink) 5.5%,transparent)}}
 .grid2 .sq,.pearl{background-image:linear-gradient(var(--tile-grid) 1px,transparent 1px),linear-gradient(90deg,var(--tile-grid) 1px,transparent 1px);background-size:12px 12px}
 .tile.t-emerg{background-image:linear-gradient(rgba(255,255,255,.09) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.09) 1px,transparent 1px);background-size:12px 12px}
 .quick .lcd.qtxt .qans{font-family:var(--font-sans);font-weight:700;font-size:clamp(15px,4.6vw,19px);letter-spacing:0;white-space:normal;line-height:1.15}
@@ -513,7 +516,7 @@ a{color:var(--accent)}
 .cschip{flex:0 0 auto;display:inline-flex;align-items:center;gap:4px;min-height:34px;padding:0 12px;border-radius:999px;border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.06);color:var(--mon-ink);font:inherit;font-size:var(--fs-sm);font-weight:600;white-space:nowrap;cursor:pointer}
 .cschip .sx{width:14px;height:14px}
 .cschip.on{background:var(--cs);border-color:var(--cs);color:var(--mon-bg)}
-.cschip.add{color:var(--cs);border-color:color-mix(in srgb,var(--cs) 55%,transparent);background:none}
+.cschip.add{color:var(--cs);border-color:var(--cs);background:none}
 .cschip.ghost{background:none;border-color:transparent;color:var(--mon-muted)}
 .sharebox{display:flex;gap:var(--s4);align-items:center;flex-wrap:wrap}.sharebox>div{flex:1;min-width:160px}.sharebox p{margin-top:0}
 .qr{width:150px;height:150px;flex:0 0 150px;border-radius:10px;border:1px solid var(--line);background:#fff}
@@ -527,7 +530,7 @@ a{color:var(--accent)}
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.37.1";
+const APP_VERSION = "2.37.2";
 const APP_DATE = "19 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
