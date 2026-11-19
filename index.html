@@ -527,10 +527,15 @@ a{color:var(--accent)}
 <main id="app"></main>
 <script>
 "use strict";
+// Anti-clickjacking: the published app must not run inside another site's frame.
+if (window.top !== window.self && /\.github\.io$/.test(location.hostname)) {
+  document.documentElement.innerHTML = '<body style="font-family:sans-serif;padding:24px">This app cannot be shown inside another website. <a href="' + location.href.replace(/"/g, "") + '" target="_top" rel="noopener">Open Induction Card</a></body>';
+  throw new Error("framed");
+}
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.40.1";
+const APP_VERSION = "2.40.2";
 const APP_DATE = "19 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
