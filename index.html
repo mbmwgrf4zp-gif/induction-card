@@ -530,7 +530,7 @@ a{color:var(--accent)}
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.39.2";
+const APP_VERSION = "2.39.3";
 const APP_DATE = "19 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
@@ -2127,6 +2127,7 @@ gaCards.consent = () => { const auto = csAuto(), txt = consentText(), tech = CS_
   const ind = S.csOut === "ind"; let n = 0; const h = t => `<h3>${++n}. ${t}</h3>`;
   return `<div class="card"><h2>Consent explanation</h2>${consDraft()}
   <p class="sub">A block to paste between <b>Assessment</b> and <b>Plan</b> in your notes, after your own explanation — not a consent form. Nothing here is saved.</p>
+  <button class="homebtn" data-open="0. Consent note: labour epidural" data-g="obs" data-tab="labour">Labour epidural? Use the labour consent note → Obstetric › Labour ›</button>
   ${seg("csOut",[["full","Notes block"],["ind","Individual risks only (form box)"]])}
   ${ind ? "" : h("Techniques explained") + `<div class="txck">${CS_TECH.map(([k,l]) => tg(k,l)).join("")}</div>`}
   ${!ind && tech.length > 1 ? h("Planned technique") + `<p class="sub">Untick any that were only discussed as an alternative.</p><div class="txck">${tech.map(ch).join("")}</div>` : ""}
@@ -3622,6 +3623,7 @@ function cardMap(){
 }
 /* "Same topic elsewhere" links */
 const REL_PAIRS = [
+  [["ga","pre","14. Consent explanation"],["obs","labour","0. Consent note: labour epidural"]],
   [["ga","pre","11. Fasting"],["paeds","pre","1. Fasting (child)"]],
   [["ga","maint","1. Ventilation strategies"],["paeds","ind","9. Ventilation settings"]],
   [["ga","maint","2. One-lung ventilation"],["paeds","ind","10. One-lung ventilation (Storz)"]],
@@ -3632,7 +3634,7 @@ const REL_PAIRS = [
   [["ga","post","5. Discharge from recovery"],["paeds","post","8. Discharge (recovery & home)"]],
   [["regional","safety","1. LA dose calculator"],["paeds","blocks","1. LA dose calculator (child)"]],
   [["regional","neuraxial","1. Epidural"],["paeds","blocks","4. Lumbar / thoracic epidural"]]];
-const GNAME = {ga:"General", regional:"Regional", paeds:"Paediatric"};
+const GNAME = {ga:"General", regional:"Regional", paeds:"Paediatric", obs:"Obstetric", tx:"Transplant"};
 function relLinks(gid, t){
   const out = [];
   REL_PAIRS.forEach(([a,b]) => { if (a[0]===gid && a[2]===t) out.push(b); else if (b[0]===gid && b[2]===t) out.push(a); });
