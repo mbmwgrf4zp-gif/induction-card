@@ -530,7 +530,7 @@ a{color:var(--accent)}
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.39.1";
+const APP_VERSION = "2.39.2";
 const APP_DATE = "19 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
@@ -2153,7 +2153,7 @@ function lepText(){
   const L = [];
   L.push(`Labour epidural: discussed with ${andJoin(who)}${leOn("interp") ? " with an interpreter" : ""}.`);
   L.push("Purpose: effective pain relief in labour while staying awake; can be topped up for caesarean section if needed.");
-  if (det) L.push("Procedure: fine plastic catheter in the lower back, sitting or lying on the side, under sterile conditions; local anaesthetic ± opioid through the catheter by infusion or pump; test dose and regular blood pressure and fetal heart monitoring.");
+  if (det) L.push("Procedure: sitting or lying on the side, with sterile technique and local anaesthetic to the skin. A needle is used to place a fine plastic catheter in the epidural space in the lower back; the needle is removed and the catheter taped in place. After a test dose, local anaesthetic with a small dose of opioid is given through the catheter by infusion or a patient-controlled pump. Blood pressure and the baby's heart rate are monitored throughout.");
   L.push(det
     ? "Common: drop in blood pressure needing treatment (about 1 in 50); itching; shivering; heavy or weak legs; difficulty passing urine; not working well enough and needing extra pain relief (about 1 in 8); catheter may need re-siting."
     : "Common: drop in blood pressure (about 1 in 50), itching, heavy legs; may not work fully and need extra pain relief or re-siting (about 1 in 8).");
