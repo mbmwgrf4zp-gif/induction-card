@@ -530,7 +530,7 @@ a{color:var(--accent)}
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.39.0";
+const APP_VERSION = "2.39.1";
 const APP_DATE = "19 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
@@ -1492,7 +1492,7 @@ pCards.nspin = () => { const w = W(), band = w<5?0:w<=15?1:2;
   <li><b>Monitor for apnoea 12–24 h</b>, especially ex-prems; watch for high block (apnoea, bradycardia)</li></ul>
   ${src(PLOC+"; Koszela & Sethna, WFSA Update in Anaesthesia.")}</div>`; };
 /* PAEDS TRANSFUSION PROTOCOL — DRAFT: BSH 2016 (+ 2020 addendum), SHOT bookmarks, TAXI 2018 */
-const PTX_CHECKED = false;
+const PTX_CHECKED = true;
 const ptxDraft = () => PTX_CHECKED ? "" : `<div class="warn" style="margin-top:0">DRAFT — BSH 2016 neonatal / paediatric transfusion guideline + 2020 addendum, SHOT transfusion bookmarks, TAXI 2018. Not yet ticked by you.</div>`;
 pCards.ptx = () => { const w = W(), mo = AGEM(), neo = mo < 1, rise = Math.max(0, S.hbTarget - S.hbNow), vol = 0.4*w*rise;
   const h = c => c ? ' class="hl"' : "";
@@ -2142,7 +2142,7 @@ gaCards.consent = () => { const auto = csAuto(), txt = consentText(), tech = CS_
   ${src("Ministry of Health Malaysia anaesthesia information and consent form; Royal College of Anaesthetists patient information; Association of Anaesthetists consent guidance 2017; MMC consent guideline.")}</div>`; };
 
 /* LABOUR EPIDURAL CONSENT NOTE — DRAFT: OAA labour epidural information card; NAP3 (Cook 2009); Moen 2004; MOH consent form */
-const LEP_CHECKED = false;
+const LEP_CHECKED = true;
 const lepDraft = () => LEP_CHECKED ? "" : `<div class="warn" style="margin-top:0">DRAFT — labour epidural consent note; frequencies from the OAA labour epidural information card (NAP3, Moen 2004). Not yet ticked by you.</div>`;
 const LE_WHO = [["husband","Husband"],["family","Other family member"],["interp","Interpreter used"]];
 const LE_CHK = [["plt","Platelet count acceptable"],["ac","No anticoagulant within the safe interval"],["site","No infection at the site"],["iv","IV access in place"],["ctg","CTG reviewed"]];
@@ -3170,7 +3170,7 @@ VGROUPS.find(g => g[0]==="General")[1].push(["Echo report: what matters", "18 No
   "PH: TRV > 3.4 m/s high probability (≈ PASP > 50); RV strain TAPSE < 17 mm or TAPSE/sPAP < 0.55 (ESC/ERS 2022, ASE 2015)",
   "HOCM: LVOT gradient ≥ 30 (≥ 50 significant), SAM; tamponade signs; IVC > 2.1 cm < 50% collapse → RAP 15 (3 / 8)",
   "Goals: AS HR 50–70 sinus, preload ↑, SVR ↑, art line pre-induction, no single-shot spinal; MS HR ↓, avoid PVR rise; AR / MR HR normal–high, afterload ↓; PH SVR > PVR; HOCM HR ↓ preload ↑ afterload ↑ contractility ↓, no inotropes; tamponade fast full tight, drain under LA"]]);
-VGROUPS.find(g => g[0]==="Paediatric")[1].push(["Transfusion protocol (DRAFT — tick to sign off)", "", [
+VGROUPS.find(g => g[0]==="Paediatric")[1].push(["Transfusion protocol", "19 Nov 2026", [
   "Paeds › Intra-op card 3 (later intra-op cards renumbered 4–9); paeds Hb calculator now in g/L (4 mL/kg ≈ 10 g/L)",
   "Preterm < 32 wk Hb (g/L) vent / O₂ / no O₂: first 24 h 120/120/100; days 1–7 120/100/100; days 8–14 100/95/75; day 15+ 100/85/75 (BSH 2016)",
   "Infants / children stable: Hb < 70 g/L (restrictive; TAXI 2018)",
@@ -3179,7 +3179,7 @@ VGROUPS.find(g => g[0]==="Paediatric")[1].push(["Transfusion protocol (DRAFT —
   "FFP 15–20 mL/kg only if bleeding or procedure with coagulopathy (local 10–15 noted); cryo 5–10 mL/kg if fibrinogen < 1.0 (< 1.5 bleeding)",
   "CMV-neg to 28 d post-EDD; irradiated after IUT (6 months), exchange, T-cell immunodeficiency, relatives; fresh ≤ 5 d for exchange / ≥ 25 mL/kg / bypass",
   "Filter 170–200 µm; complete within 4 h; hyperkalaemia Ca gluconate 0.5 mL/kg max 20; TACO furosemide 0.5–1 mg/kg; refusal → local policy / legal pathway"]]);
-VGROUPS.find(g => g[0]==="Obstetric")[1].push(["Labour epidural consent note (DRAFT — tick to sign off)", "", [
+VGROUPS.find(g => g[0]==="Obstetric")[1].push(["Labour epidural consent note", "19 Nov 2026", [
   "Obstetric › Labour card 0; Copy; Brief / Detailed; ticks for husband, family member, interpreter and optional checks; nothing saved",
   "Purpose: pain relief while awake; can be topped up for caesarean section",
   "Common: BP drop ~1 in 50; itching; heavy legs; not working well enough ~1 in 8; re-siting",
