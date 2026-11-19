@@ -530,7 +530,7 @@ a{color:var(--accent)}
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.39.3";
+const APP_VERSION = "2.40.0";
 const APP_DATE = "19 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
@@ -750,7 +750,7 @@ const QT = (() => {
     ans:()=>{ const mo=AGEM(), k=mo<1?85:mo<12?80:S.pY<12?75:70; return sm(dz(k*S.pw,"mL"),`mL · ${k} mL/kg`); }},
   mann:{lab:"Transplant mannitol", ic:"tx", cls:"t-tx", kind:"adult", keys:["aw"], inp:()=>`${sig(S.aw)} kg dry`, open:["5. Anastomosis & reperfusion","tx","intra"],
     ans:()=>sm(dz(2.5*S.aw,"mL"),`mL of 20% = ${dz(0.5*S.aw,"g")} g`)},
-  cons:{lab:"Consent note", ic:"values", cls:"t-ga", kind:"any", txt:true, keys:[], inp:()=>store.get("consLast","cs")==="le" ? "labour epidural" : "shortcut", get open(){ return store.get("consLast","cs")==="le" ? ["0. Consent note: labour epidural","obs","labour"] : ["14. Consent explanation","ga","pre"]; },
+  cons:{lab:"Consent note", ic:"values", cls:"t-ga", kind:"any", txt:true, keys:[], inp:()=>store.get("consLast","cs")==="le" ? "labour epidural" : "shortcut", open:["14. Consent note","ga","pre"],
     ans:()=>{ if (store.get("consLast","cs")==="le") return sm("Epidural","labour note — tap to copy"); const t = CS_TECH.filter(([k]) => csOn(k, {}) && csChosen(k)).map(x=>x[2]); return t.length ? sm(t.join(" + "),"note ready — tap to copy") : sm("Build","tap to write the note"); }},
   psum:{lab:"Pre-op summary", ic:"values", cls:"t-ga", kind:"any", txt:true, keys:[], inp:()=>"shortcut", goTab:"ga:pre",
     ans:()=>{ const p = []; if (S.asa) p.push(`ASA ${S.asa}${scv("pre","asaE")===1?"E":""}`); if (RCRI.some(([k]) => scv("rcri",k)!=null)) p.push(`RCRI ${cnt("rcri", RCRI.map(x=>x[0]))}`); if (sbTouched()) p.push(`STOP-BANG ${sbScore()}`); if (S.met) p.push(`METs ${({lt4:"&lt; 4",4:"4–10",gt10:"&gt; 10"})[S.met]}`); if (scv("cfs","v")) p.push(`CFS ${scv("cfs","v")}`);
@@ -2125,9 +2125,13 @@ gaCards.consent = () => { const auto = csAuto(), txt = consentText(), tech = CS_
   const tg = (k, l, why) => { const on = csOn(k, auto); return `<button class="txci ${on?"on":""}" data-score="cs:${k}:${on?0:1}" aria-pressed="${on}"><span class="box">${on?"✓":""}</span><span>${l}${why && scv("cs",k)==null ? ` <span class="sub">(suggested: ${why})</span>` : ""}</span></button>`; };
   const ch = ([k]) => { const on = csChosen(k); return `<button class="txci ${on?"on":""}" data-score="csc:${k}:${on?0:1}" aria-pressed="${on}"><span class="box">${on?"✓":""}</span><span>${CS_META[k][1]}</span></button>`; };
   const ind = S.csOut === "ind"; let n = 0; const h = t => `<h3>${++n}. ${t}</h3>`;
-  return `<div class="card"><h2>Consent explanation</h2>${consDraft()}
+  S.csMode = csMode();
+  if (S.csMode === "le") return `<div class="card"><h2>Consent note</h2>
+  <p class="sub">A block to paste in your notes after your own explanation — not a consent form. Nothing here is saved.</p>
+  ${seg("csMode",[["ga","Anaesthetic"],["le","Labour epidural"]])}${lepBody()}</div>`;
+  return `<div class="card"><h2>Consent note</h2>${consDraft()}
   <p class="sub">A block to paste between <b>Assessment</b> and <b>Plan</b> in your notes, after your own explanation — not a consent form. Nothing here is saved.</p>
-  <button class="homebtn" data-open="0. Consent note: labour epidural" data-g="obs" data-tab="labour">Labour epidural? Use the labour consent note → Obstetric › Labour ›</button>
+  ${seg("csMode",[["ga","Anaesthetic"],["le","Labour epidural"]])}
   ${seg("csOut",[["full","Notes block"],["ind","Individual risks only (form box)"]])}
   ${ind ? "" : h("Techniques explained") + `<div class="txck">${CS_TECH.map(([k,l]) => tg(k,l)).join("")}</div>`}
   ${!ind && tech.length > 1 ? h("Planned technique") + `<p class="sub">Untick any that were only discussed as an alternative.</p><div class="txck">${tech.map(ch).join("")}</div>` : ""}
@@ -2171,9 +2175,9 @@ function lepText(){
   L.push("Patient verbalised understanding; questions answered. Patient consented for labour epidural.");
   return L.join("\n");
 }
-obsCards.lConsent = () => { const txt = lepText();
-  return `<div class="card"><h2>Consent note: labour epidural</h2>${lepDraft()}
-  <p class="sub">A block to paste in the notes after your own explanation — not a consent form. Nothing here is saved. No names or IC.</p>
+const csMode = () => S.csMode || (store.get("consLast","cs")==="le" ? "le" : "ga");
+function lepBody(){ const txt = lepText();
+  return `${lepDraft()}
   <h3>1. Who was there</h3><div class="txck">${LE_WHO.map(([k,l]) => tog("le",k,l)).join("")}</div>
   <h3>2. Checks done (optional)</h3><div class="txck">${LE_CHK.map(([k,l]) => tog("le",k,l)).join("")}</div>
   <h3>3. Length</h3>${seg("leLen",[["brief","Brief"],["detailed","Detailed"]])}
@@ -2183,7 +2187,10 @@ obsCards.lConsent = () => { const txt = lepText();
   <div class="psbtns"><button class="iconbtn" data-copy="${esc(txt)}">${S.copied?"Copied ✓":"Copy text"}</button><button class="iconbtn" data-leclear="1">Clear</button></div>
   <div class="warn"><b>Edit for this patient before filing.</b> Add anything specific to her (previous back surgery, tattoo, low platelets, needle phobia).</div>
   <p class="sub">Frequencies are estimates from published data and may differ between units.</p>
-  ${src("OAA labour epidural information card; NAP3 (Cook et al., BJA 2009); Moen et al., Anesthesiology 2004; Ministry of Health Malaysia anaesthesia consent form.")}</div>`; };
+  ${src("OAA labour epidural information card; NAP3 (Cook et al., BJA 2009); Moen et al., Anesthesiology 2004; Ministry of Health Malaysia anaesthesia consent form.")}`; }
+obsCards.lConsent = () => `<div class="card"><h2>Consent note: labour epidural</h2>
+  <p class="sub">The labour epidural note lives in the consent card, so all consent notes are in one place.</p>
+  <button class="homebtn primary" data-open="14. Consent note" data-g="ga" data-tab="pre" data-csmode="le">Open consent note — Labour epidural ›</button></div>`;
 
 /* INDUCTION */
 gaCards.induction = () => `<div class="card"><h2>1. Induction drugs</h2>${gaDraft()}${GT([
@@ -3181,7 +3188,7 @@ VGROUPS.find(g => g[0]==="Paediatric")[1].push(["Transfusion protocol", "19 Nov 
   "CMV-neg to 28 d post-EDD; irradiated after IUT (6 months), exchange, T-cell immunodeficiency, relatives; fresh ≤ 5 d for exchange / ≥ 25 mL/kg / bypass",
   "Filter 170–200 µm; complete within 4 h; hyperkalaemia Ca gluconate 0.5 mL/kg max 20; TACO furosemide 0.5–1 mg/kg; refusal → local policy / legal pathway"]]);
 VGROUPS.find(g => g[0]==="Obstetric")[1].push(["Labour epidural consent note", "19 Nov 2026", [
-  "Obstetric › Labour card 0; Copy; Brief / Detailed; ticks for husband, family member, interpreter and optional checks; nothing saved",
+  "General › Pre-op › 14 Consent note, Labour epidural switch (Obstetric › Labour card 0 opens it); Copy; Brief / Detailed; ticks for husband, family member, interpreter and optional checks; nothing saved",
   "Purpose: pain relief while awake; can be topped up for caesarean section",
   "Common: BP drop ~1 in 50; itching; heavy legs; not working well enough ~1 in 8; re-siting",
   "Uncommon: severe headache after dural puncture ~1 in 100; temporary nerve damage ~1 in 1,000",
@@ -3241,7 +3248,7 @@ function vTicks(){
 /* ---------- ABOUT ---------- */
 const CHANGES = [
   ["2.35","Tips and tricks ticker in the header (with optional quotes) replaces Pearl of the day"],
-  ["2.39","Labour epidural consent note (Obstetric › Labour)"],
+  ["2.39","Labour epidural consent note, in the Consent note card (switch)"],
   ["2.38","Paeds transfusion protocol; paeds Hb in g/L"],
   ["2.37","Share this app; quieter footer; PBW shown with the other weights"],
   ["2.36","Echo report card; Today's list as a slim strip under search"],
@@ -3459,7 +3466,7 @@ const GROUPS = [
    {id:"pre", label:"Pre-op", input:()=>gaInputs(), top:()=>preSummary(), hint:"Assess the risk, then prepare the patient.",
     cards:["§Assess",["ASA physical status","1. ASA physical status"],"2. Airway assessment & plan",["Functional capacity (METs / DASI)","3. Functional capacity (METs / DASI)"],["Cardiac risk (RCRI)","4. Cardiac risk (RCRI)"],["OSA screen (STOP-BANG)","5. OSA screen (STOP-BANG)"],["Lung risk (ARISCAT)","6. Lung risk (ARISCAT)"],["Frailty (Clinical Frailty Scale)","7. Frailty (CFS)"],["Echo report: what matters","8. Echo report: what matters"],
       "§Prepare",["Which tests to order","9. Which tests to order"],["Common conditions: optimise or postpone","10. Common conditions: optimise or postpone"],"11. Fasting","12. Regular drugs: stop or continue","13. Steroid cover",
-      "§Explain",["Consent explanation","14. Consent explanation"]],
+      "§Explain",["Consent note","14. Consent note"]],
     links:[["Failed intubation / CICO","adult","Failed intubation / CICO"]]},
    {id:"ind", label:"Induction", input:()=>gaInputs(), hint:"Drugs → RSI → relaxant → tube & airway kit.",
     cards:["1. Induction drugs","2. RSI","3. Muscle relaxants","4. Tube & airway kit"],
@@ -3540,11 +3547,10 @@ const GROUPS = [
    {id:"don", label:"Donor", input:()=>donInputs(), hint:"Living donor nephrectomy.",
     cards:["1. Donor pre-op","2. Donor intra-op","3. Donor post-op"], links:[]}], cards:[]}];
 const SEARCH_EXTRA = {
-  "0. Consent note: labour epidural":"consent labour epidural risks explained documentation note husband headache dural puncture nerve damage haematoma abscess paralysis",
   "3. Fluids: transfusion protocol":"paeds paediatric neonate transfusion blood red cells prbc packed cells platelets ffp cryo cryoprecipitate trigger threshold hb irradiated cmv negative paedipack taco trali hyperkalaemia jehovah",
   "8. Echo report: what matters":"echo echocardiogram tte report ejection fraction ef lvef diastolic e/e aortic stenosis mitral stenosis regurgitation ava mva pulmonary hypertension pasp trv tapse hocm lvot sam rwma pericardial effusion tamponade pfo asd thrombus prosthetic valve ivc valve",
   "1. Reversal":"reversal sugammadex neostigmine glycopyrrolate re-paralysis reparalysis re-administration redose rocuronium vecuronium waiting time after sugammadex",
-  "14. Consent explanation":"consent explanation note documentation risks explained anaesthesia general spinal epidural nerve block sedation high risk cardiac parents",
+  "14. Consent note":"consent explanation note labour epidural husband dural puncture headache haematoma abscess paralysis documentation risks explained anaesthesia general spinal epidural nerve block sedation high risk cardiac parents",
   "1. ASA physical status":"pre-op preop assessment risk asa grade physical status classification",
   "3. Functional capacity (METs / DASI)":"pre-op preop assessment risk mets met functional capacity dasi duke activity stairs exercise tolerance",
   "4. Cardiac risk (RCRI)":"pre-op preop assessment risk rcri revised cardiac risk index lee cardiac mace",
@@ -3623,7 +3629,6 @@ function cardMap(){
 }
 /* "Same topic elsewhere" links */
 const REL_PAIRS = [
-  [["ga","pre","14. Consent explanation"],["obs","labour","0. Consent note: labour epidural"]],
   [["ga","pre","11. Fasting"],["paeds","pre","1. Fasting (child)"]],
   [["ga","maint","1. Ventilation strategies"],["paeds","ind","9. Ventilation settings"]],
   [["ga","maint","2. One-lung ventilation"],["paeds","ind","10. One-lung ventilation (Storz)"]],
@@ -3790,7 +3795,9 @@ document.addEventListener("click", e => {
   const b = e.target.closest("button, input[type=checkbox]"); if (!b) return;
   const d = b.dataset;
   if (d.seg==="leLen") store.set("consLast","le");
-  if (d.score && /^(le|cs|csc):/.test(d.score)) store.set("consLast", d.score.startsWith("le") ? "le" : "cs");
+  if (d.seg==="csMode"){ store.set("consLast", d.val==="le" ? "le" : "cs"); }
+  if (d.csmode){ S.csMode = d.csmode; store.set("consLast", d.csmode==="le" ? "le" : "cs"); }
+  if (d.score && /^(le|cs|csc):/.test(d.score)){ store.set("consLast", d.score.startsWith("le") ? "le" : "cs"); }
   if (d.score){ const [id,k,v] = d.score.split(":"); (S.sc[id] = S.sc[id] || {})[k] = +v; render(); return; }
   if (d.txck!==undefined){ S.txck[d.txck] = !S.txck[d.txck]; render(); return; }
   if (d.shareapp){ const done = () => { S.copied = true; render(); setTimeout(()=>{ S.copied = false; render(); }, 1500); };
