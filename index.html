@@ -447,7 +447,11 @@ details.endo summary{cursor:pointer;font-weight:600;font-size:var(--fs-sm)}
 .lcddemo{display:flex;align-items:center;justify-content:space-around;background:var(--mon-bg);border-radius:var(--r-sm);padding:var(--s3);margin-top:var(--s2)}
 .lcddemo .clock{font-size:var(--fs-lg)}.lcddemo .qans{color:var(--lcdx,var(--etco2));font-size:26px;margin:0}
 .vtap{cursor:default;-webkit-user-select:none;user-select:none}
-.disc{color:var(--muted);font-size:11px;text-align:center;margin-top:var(--s4);line-height:1.45;opacity:.9}.disc b{font-weight:600}
+.disc{color:var(--muted);font-size:12px;text-align:center;margin-top:var(--s4);line-height:1.5}.disc p{margin:0}.disc b{font-weight:600}
+.disc.full{margin-top:var(--s5);padding-top:var(--s4);border-top:1px solid var(--line);position:relative}
+.dsig{position:absolute;top:-9px;left:50%;transform:translateX(-50%);background:var(--bg);padding:0 8px;color:var(--muted);opacity:.7}.dsig svg{width:22px;height:16px;display:block}
+.d2{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;column-gap:2px;margin-top:2px!important}.dsep{opacity:.6;padding:0 4px}
+.flink{display:inline-flex;align-items:center;gap:4px;min-height:44px;padding:0 6px;background:none;border:0;font:inherit;font-size:12px;font-weight:600;color:var(--accent);cursor:pointer}.flink svg{width:13px;height:13px}
 a{color:var(--accent)}
 .vs label{display:flex;gap:var(--s3);align-items:flex-start;padding:var(--s2) 0;border-bottom:1px solid var(--line);font-size:var(--fs-sm)}
 .vs input{width:22px;height:22px;flex:none;margin-top:1px}
@@ -523,8 +527,8 @@ a{color:var(--accent)}
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.37.0";
-const APP_DATE = "18 Nov 2026";
+const APP_VERSION = "2.37.1";
+const APP_DATE = "19 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
 /* ================= HELPERS ================= */
@@ -563,7 +567,11 @@ function step(key, label, unit, min, max, stp){
     <span class="unit">${unit}</span></div>`;
 }
 function trio(a,b,c){ return `<div class="trio"><span>${a}</span><span class="main">${b}</span><span>${c}</span></div>`; }
-const disc = `<div class="disc">Memory aid only — clinical judgement decides. Cases stay on this phone, deleted after 36 h.<br><b class="vtap">Version ${APP_VERSION} · ${APP_DATE}</b> · <button class="aboutlink" data-go="about">About</button> · <button class="aboutlink" data-go="about">Share</button><br>${VALUES_CHECKED ? "Values &amp; sources reviewed Nov 2026" : "<b>DRAFT – values not checked</b>"} · next review Nov 2027</div>`;
+const disc = `<div class="disc"><p class="d1">Memory aid only — clinical judgement decides.</p></div>`;
+const discFull = () => `<footer class="disc full"><div class="dsig" aria-hidden="true">${svg("capno")}</div>
+  <p class="d1">Memory aid only — clinical judgement decides.</p>
+  <p class="d2"><span class="vtap mono">v${APP_VERSION}</span><span class="dsep">·</span>${VALUES_CHECKED ? "reviewed Nov 2026" : "<b>DRAFT – values not checked</b>"}<span class="dsep">·</span><button class="flink" data-go="about">${svg("about")}About</button><span class="dsep">·</span><button class="flink" data-shareapp="1">${svg("share")}Share</button></p>
+  ${S.copied && (location.hash||"#home")==="#home" ? `<p class="d2">Link copied ✓</p>` : ""}</footer>`;
 
 /* ================= SCREENS ================= */
 function banner(){
@@ -788,7 +796,7 @@ screens.home = () => {
   <div class="quick">${quickIds().map(quickTile).join("")}</div>
   </div></div>
   <div class="nolabel"></div>
-  <div class="grid2">${secs.map(g=>`<button class="sq t-${g.id}" data-go="g-${g.id}"><span class="qi">${svg(g.id)}</span><span class="sqt">${short[g.id]}</span><span class="sqs">${({paeds:"Pre-op · Induction · Blocks · Cases",tx:"Kidney recipient &amp; donor"})[g.id] || g.tabs.map(t=>t.label).join(" · ")}</span></button>`).join("")}</div>` + disc;
+  <div class="grid2">${secs.map(g=>`<button class="sq t-${g.id}" data-go="g-${g.id}"><span class="qi">${svg(g.id)}</span><span class="sqt">${short[g.id]}</span><span class="sqs">${({paeds:"Pre-op · Induction · Blocks · Cases",tx:"Kidney recipient &amp; donor"})[g.id] || g.tabs.map(t=>t.label).join(" · ")}</span></button>`).join("")}</div>` + discFull();
 };
 setInterval(() => { const c = document.getElementById("clock"); if (c){ c.textContent = clockTxt(); seg1(c.parentElement); } }, 30000);
 
@@ -3128,7 +3136,7 @@ function vTicks(){
 /* ---------- ABOUT ---------- */
 const CHANGES = [
   ["2.35","Tips and tricks ticker in the header (with optional quotes) replaces Pearl of the day"],
-  ["2.37","Share this app: QR code and share button (About)"],
+  ["2.37","Share this app (QR code, share button); quieter footer"],
   ["2.36","Echo report card; Today's list as a slim strip under search"],
   ["2.34","Print plan sheets: Paeds and Kidney transplant"],
   ["2.33","Re-paralysis after sugammadex (Reversal card)"],
@@ -3162,6 +3170,7 @@ screens.about = () => head("About","home") + shareCard() + `
   ${SRC_LINKS.map(([g,ls])=>`<h3>${g}</h3><ul class="srcl">${ls.map(([t,u])=>`<li><a href="${u}" target="_blank" rel="noopener noreferrer">${t} ↗</a></li>`).join("")}</ul>`).join("")}
   <h3>Local and personal sources</h3><ul>${LOCAL_SRC.map(t=>`<li>${t}</li>`).join("")}</ul>
   <p class="sub">Local documents are summarised, not reproduced, and are not linked. Sources reviewed Nov 2026; next review Nov 2027.</p></div>
+  <div class="card"><h2>Version</h2><p><span class="mono">v${APP_VERSION}</span> · built ${APP_DATE} · values and sources reviewed Nov 2026, next review Nov 2027.</p></div>
   <div class="card"><h2>Privacy</h2><ul><li>Nothing you enter leaves this phone. No accounts, no tracking, no analytics.</li><li>Anonymous cases (sex, age, height, weight) are kept on this phone only and deleted after 36 hours.</li><li>Works offline once opened.</li></ul></div>
   <div class="card"><h2>What changed recently</h2><table>${CHANGES.map(([v,t])=>`<tr><td class="mono">${v}</td><td>${t}</td></tr>`).join("")}</table></div>
   <div class="card"><h2>Licences</h2><p class="sub">IBM Plex Sans / Mono and DSEG7 (keshikan) fonts — SIL Open Font License 1.1.</p></div>` + disc;
