@@ -535,7 +535,7 @@ if (window.top !== window.self && /\.github\.io$/.test(location.hostname)) {
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.41.0";
+const APP_VERSION = "2.41.1";
 const APP_DATE = "21 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
@@ -2093,7 +2093,7 @@ function csAuto(){ const a = {};
   if ((S.age >= 70 && S.touched.age) || scv("cfs","v") >= 5) a.old = "age / CFS";
   return a; }
 const csOn = (k, auto) => { const v = scv("cs", k); return v === 1 || (v == null && !!auto[k]); };
-const CS2_CHECKED = false;
+const CS2_CHECKED = true;
 const cs2Draft = () => CS2_CHECKED ? "" : `<div class="warn" style="margin-top:0">DRAFT — detailed note now explains purpose and procedure before side effects and complications; new brief examples. Not yet ticked by you.</div>`;
 // full heading, purpose, procedure (Detailed note)
 const CS_PP = {
@@ -3218,7 +3218,7 @@ VGROUPS.find(g => g[0]==="Obstetric")[1].push(["Labour epidural consent note", "
   "Rare: permanent nerve damage ~1 in 13,000; abscess ~1 in 50,000; meningitis ~1 in 100,000; haematoma ~1 in 170,000; paralysis ~1 in 250,000",
   "Does not increase caesarean rate or long-term backache; may prolong second stage / increase instrumental delivery",
   "Ending: 'Patient verbalised understanding; questions answered. Patient consented for labour epidural.'; Consent quick tile opens the consent card used last"]]);
-VGROUPS.find(g => g[0]==="General")[1].push(["Consent note: purpose, procedure, then side effects and complications (DRAFT — tick to sign off)", "", [
+VGROUPS.find(g => g[0]==="General")[1].push(["Consent note: purpose, procedure, then side effects and complications", "21 Nov 2026", [
   "Detailed: per technique — heading, Purpose, Procedure, 'Possible side effects and complications:' then Common / Uncommon / Rare lines (signed-off lists unchanged)",
   "Purpose / procedure wording for GA, spinal, epidural / CSE, nerve block, monitored anaesthesia care (sedation) — drafted with ChatGPT, reviewed",
   "Sedation shown as 'Sedation / MAC' (tick box) and 'monitored anaesthesia care (sedation)' in the note",
