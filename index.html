@@ -634,7 +634,7 @@ if (window.top !== window.self && /\.github\.io$/.test(location.hostname)) {
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.51.1";
+const APP_VERSION = "2.52.0";
 const APP_DATE = "21 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
@@ -2491,13 +2491,15 @@ function decisionLine(Who, thing){
   if (S.csDec === "agree") return `${Who} was given the opportunity to ask questions, which were answered. Understanding was confirmed. ${Who} agreed to ${thing}.`;
   if (S.csDec === "decline") return `${Who} declined the proposed ${thing.replace(/^the proposed /,"")} after discussion of its benefits, risks and alternatives.`;
   if (S.csDec === "defer") return `${Who} requested further time or discussion before deciding.`;
-  return "Decision: —"; }
+  return "Decision: not yet recorded."; }
 const langLine = (lang, interp) => lang && lang !== "English" && lang !== "other" ? `The discussion was conducted in ${lang}${interp ? " through an interpreter" : ""}.` : interp ? "The discussion was conducted through an interpreter." : "";
 const dxUI = () => `<div class="txck">${DX.map(([k,l]) => tog("dx",k,l)).join("")}</div><p class="sub" style="margin:8px 0 4px">Decision — the closing sentence prints only after you choose:</p>${seg("csDec",[["agree","Agreed"],["decline","Declined"],["defer","Wants more time"]])}`;
+const plainTxt = t => t.replace(/[\u2013\u2014\u2212]/g, "-").replace(/[\u2018\u2019]/g, "'").replace(/[\u201C\u201D]/g, '"').replace(/\u00A0/g, " ").replace(/[ \t]+\n/g, "\n").replace(/\n{3,}/g, "\n\n").trim();
+const bands = (c, u, r) => `- Common: ${c}\n- Uncommon: ${u}\n- Rare: ${r}`;
 function consentText(){
   const auto = csAuto(), tech = CS_TECH.filter(([k]) => csOn(k, {})), add = CS_ADD.filter(([k]) => csOn(k, auto));
   const note = (S.csNote || "").trim();
-  if (S.csOut === "ind"){ return [...add.map(t => t[2]), note ? `Specific concerns: ${note}` : ""].filter(Boolean).join("\n"); }
+  if (S.csOut === "ind"){ return plainTxt([...add.map(t => `- ${t[2]}`), note ? `\nSpecific concerns: ${note}` : ""].filter(Boolean).join("\n")); }
   if (!tech.length) return "";
   const par = S.csWho === "parent", who = par ? "parent or legally authorised guardian" : "patient", Who = par ? "The parent or legally authorised guardian" : "The patient";
   const brief = S.csLen !== "detailed";
@@ -2505,28 +2507,26 @@ function consentText(){
   const NM = {ga:"general anaesthesia (GA)", sp:"spinal anaesthesia", epi:"epidural / CSE", pnb:"a peripheral nerve block", sed:"monitored anaesthesia care (MAC)"};
   const cap = t => t.replace(/^./, c => c.toUpperCase());
   const extra = t => t[0] === "sed" ? "\nMAC may be insufficient for the procedure; airway support, deeper anaesthesia or conversion to GA may be needed." : t[0] === "pnb" && scv("cs","pnbchest") === 1 ? "\nBlock near the chest or neck: possible breathing difficulty or collapsed lung (pneumothorax)." : "";
-  const one = t => { const m = CS_META[t[0]], r = m[2]; return `${m[1]} — possible side effects and complications: common — ${r[0]}; uncommon — ${r[1]}; rare — ${r[2]}.` + extra(t); };
+  const one = t => { const m = CS_META[t[0]], r = m[2]; return `${m[1]}\nPossible side effects and complications:\n${bands(r[0], r[1], r[2])}` + extra(t); };
   const obs = add.some(([k]) => k === "lscs");
   const nap = t => t[0] === "sp" || t[0] === "epi" ? "\n" + (obs
     ? "NAP3 (UK national audit, 2009): permanent harm after obstetric spinal or epidural about 1 in 80,000 or fewer, with no cases of paralysis or death."
     : t[0] === "sp" ? "NAP3 (UK national audit, 2009): permanent harm after spinal anaesthesia for surgery about 1 in 38,000 to 1 in 62,000."
     : "NAP3 (UK national audit, 2009): permanent harm after epidural for surgery about 1 in 5,700 to 1 in 12,000; after CSE about 1 in 5,500 to 1 in 8,300.") : "";
-  const full = t => { const pp = CS_PP[t[0]]; return [pp[0], `Purpose: ${pp[1]}`, `Procedure: ${pp[2]}`, "Possible side effects and complications:", ` – Common: ${t[3]}`, ` – Uncommon: ${t[4]}`, ` – Rare: ${t[5]}`].join("\n") + extra(t) + nap(t); };
+  const full = t => { const pp = CS_PP[t[0]]; return [pp[0], `Purpose: ${pp[1]}`, `Procedure: ${pp[2]}`, "Possible side effects and complications:", bands(t[3], t[4], t[5])].join("\n") + extra(t) + nap(t); };
   const isAlt = t => alt.includes(t) && chosen.length;
-  const line = t => brief ? one(t) : isAlt(t) ? `${CS_PP[t[0]][0]} (alternative) — purpose: ${CS_PP[t[0]][1].replace(/^To /,"to ")}\n${one(t)}` : full(t);
+  const line = t => { if (brief) return one(t); if (!isAlt(t)) return full(t); const m = CS_META[t[0]], r = m[2]; return `${CS_PP[t[0]][0]} (alternative)\nPurpose: ${CS_PP[t[0]][1]}\nPossible side effects and complications:\n${bands(r[0], r[1], r[2])}` + extra(t); };
   const open = chosen.length && alt.length
     ? `Anaesthetic discussion: ${cap(andJoin(chosen.map(t => NM[t[0]])))} ${chosen.length > 1 ? "were" : "was"} discussed with the ${who} as the proposed technique, including ${chosen.length > 1 ? "their" : "its"} purpose, benefits and risks; ${andJoin(alt.map(t => NM[t[0]]))} ${alt.length > 1 ? "were" : "was"} discussed as ${alt.length > 1 ? "alternatives" : "an alternative"}. Risks are grouped as on the MOH anaesthesia consent form:`
     : `Anaesthetic discussion: ${cap(andJoin(tech.map(t => NM[t[0]])))} ${tech.length > 1 ? "were" : "was"} discussed with the ${who}, including purpose, benefits and risks. Risks are grouped as on the MOH anaesthesia consent form:`;
   const altLine = alt.length && chosen.length ? `${Who} chose ${andJoin(chosen.map(t => NM[t[0]]))} after discussing the alternatives.` : "";
-  const indiv = add.map(t => { const x = t[2].replace(/\.$/,""), i = x.indexOf(": "); return i > 0 ? x.slice(0,i).replace(/^./, c => c.toLowerCase()) + " — " + x.slice(i+2) : x.replace(/^./, c => c.toLowerCase()); });
-  return [open,
-    ...(brief ? tech.map(line) : [[...chosen, ...alt].map(line).join("\n\n") + "\n"]),
-    indiv.length ? `Individual risks: ${indiv.join("; ")}.` : "",
+  const disc = [langLine(S.csLang, scv("cs","interp") === 1), ...dxLines(Who), note ? `Specific concerns: ${note}` : ""].filter(Boolean);
+  return plainTxt([open,
+    ...[...chosen, ...alt, ...tech.filter(t => !chosen.includes(t) && !alt.includes(t))].map(line),
+    add.length ? "Individual risks:\n" + add.map(t => `- ${t[2]}`).join("\n") : "",
     altLine,
-    langLine(S.csLang, scv("cs","interp") === 1),
-    ...dxLines(Who),
-    note ? `Specific concerns: ${note}` : "",
-    decisionLine(Who, "the proposed anaesthetic plan")].filter(Boolean).join("\n");
+    disc.join("\n"),
+    decisionLine(Who, "the proposed anaesthetic plan")].filter(Boolean).join("\n\n"));
 }
 gaCards.consent = () => { const auto = csAuto(), txt = consentText(), tech = CS_TECH.filter(([k]) => csOn(k, {}));
   const tg = (k, l, why) => { const on = csOn(k, auto); return `<button class="txci ${on?"on":""}" data-score="cs:${k}:${on?0:1}" aria-pressed="${on}"><span class="box">${on?"✓":""}</span><span>${l}${why && scv("cs",k)==null ? ` <span class="sub">(suggested: ${why})</span>` : ""}</span></button>`; };
@@ -2579,17 +2579,16 @@ function lepText(){
     L.push(["Labour epidural analgesia",
       "Purpose: To provide effective pain relief during labour while the mother remains awake and able to push. The epidural can also be topped up to provide anaesthesia for a caesarean section if one is needed.",
       "Procedure: The patient sits or lies on her side, and the lower back is cleaned before an injection is given to numb the skin. A needle is used to place a fine plastic tube (catheter) into the epidural space in the lower back; the needle is then removed and the catheter is taped in place. After a test dose, pain-relieving medicine (local anaesthetic with a small dose of opioid) is given through the catheter by infusion or a patient-controlled pump. Blood pressure and the baby's heart rate are monitored throughout.",
-      "Possible side effects and complications:", ` – Common: ${C}`, ` – Uncommon: ${U}`, ` – Rare: ${R}`].join("\n") + "\n");
-  } else L.push(`Labour epidural analgesia — possible side effects and complications: common — ${C}; uncommon — ${U}; rare — ${R}.`);
+      "Possible side effects and complications:", bands(C, U, R)].join("\n"));
+  } else L.push(`Labour epidural analgesia\nPossible side effects and complications:\n${bands(C, U, R)}`);
   if (det) L.push("In a UK national audit of about 320,000 obstetric spinal and epidural procedures (NAP3, 2009), permanent harm occurred in about 1 in 80,000 or fewer, with no cases of paralysis or death.");
   L.push("Also explained: a low-dose epidural does not increase the chance of caesarean section or cause long-term backache. Any effect on instrumental (forceps or vacuum) delivery is small and uncertain, and labour, especially the second stage, may be longer.");
-  const lg = langLine("", leOn("interp")); if (lg) L.push(lg);
   const chk = LE_CHK.filter(([k]) => leOn(k)).map(x => /^[A-Z]{2}/.test(x[1]) ? x[1] : x[1][0].toLowerCase() + x[1].slice(1));
   if (chk.length) L.push(`Checked: ${chk.join("; ")}.`);
-  const note = (S.leNote || "").trim(); if (note) L.push(`Specific concerns: ${note}`);
-  dxLines("The patient").forEach(x => L.push(x));
+  const note = (S.leNote || "").trim();
+  L.push([langLine("", leOn("interp")), ...dxLines("The patient"), note ? `Specific concerns: ${note}` : ""].filter(Boolean).join("\n"));
   L.push(decisionLine("The patient", "the proposed labour epidural"));
-  return L.join("\n");
+  return plainTxt(L.filter(Boolean).join("\n\n"));
 }
 const csMode = () => S.csMode || (store.get("consLast","cs")==="le" ? "le" : "ga");
 function lepBody(){ const txt = lepText();
@@ -3720,12 +3719,12 @@ function vTicks(){
 }
 /* ---------- ABOUT ---------- */
 const CHANGES = [
+  ["2.52","Consent notes copy as plain text: paragraphs, blank lines and hyphen bullets"],
   ["2.51","NAP3 permanent-harm figures in the detailed spinal / epidural and labour notes (checked)"],
   ["2.50","Labour epidural note laid out like the GA and spinal notes (checked)"],
   ["2.49","Consent wording revised: decision switch, discussion ticks, clearer language / interpreter, revised risk lists (checked)"],
   ["2.48","Premed reorganised: Assess (examine → score → decide), Prepare (medications, before theatre), Plan & note (plan inside consent, then the note)"],
-  ["2.47","Safety release: cases keep separate entries; LAST updated to QRH 2023; no sample totals in emergencies; incomplete scores flagged; offline status"],
-  ["2.46","Premed: proceed-or-postpone, anticoagulants, diabetes plan, pacemaker / ICD, premedication drugs, premed note (your template or MOH form); Hb in g/dL throughout"]];
+  ["2.47","Safety release: cases keep separate entries; LAST updated to QRH 2023; no sample totals in emergencies; incomplete scores flagged; offline status"]];
 const SRC_LINKS = [
   ["Emergencies", [["Resuscitation Council UK — ALS / PLS guidelines","https://www.resus.org.uk/library"],["Difficult Airway Society guidelines","https://das.uk.com/guidelines"],["Association of Anaesthetists — guidelines (anaphylaxis, LAST, safety)","https://anaesthetists.org/Home/Resources-publications/Guidelines"],["European Malignant Hyperthermia Group","https://www.emhg.org"],["UK Kidney Association — hyperkalaemia guideline","https://www.ukkidney.org/health-professionals/guidelines"]]],
   ["General", [["ASA standards & practice parameters (fasting, PACU)","https://www.asahq.org/standards-and-practice-parameters"],["Centre for Perioperative Care — diabetes guideline","https://cpoc.org.uk/guidelines-resources-guidelines"],["PROSPECT procedure-specific analgesia (ESRA)","https://esraeurope.org/prospect/"],["ASRA Pain Medicine — guidelines (ketamine, anticoagulation)","https://www.asra.com/guidelines-articles/guidelines"],["Brain Trauma Foundation guidelines","https://braintrauma.org/coma/guidelines"]]],
