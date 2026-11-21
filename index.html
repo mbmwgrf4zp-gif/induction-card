@@ -557,7 +557,61 @@ a{color:var(--accent)}
 .tpv .sq.mon{background:var(--mon-bg);color:var(--mon-ink);border-color:#1f2c2e;--lcd:#fbbf24}.tpv .sq.chart{background:var(--pp-bg);border-color:var(--pp-line)}
 .tpv .sq.mon::before{content:"";position:absolute;inset:0;background-image:linear-gradient(var(--mon-grid) 1px,transparent 1px),linear-gradient(90deg,var(--mon-grid) 1px,transparent 1px);background-size:8px 8px}
 .tpv .sq.chart .sqt{color:var(--t);position:relative}.tpv .sq.mon .sqt{color:var(--mon-ink);position:relative}
-.tpv .sq:not(.mon):not(.chart){display:flex;flex-direction:column;gap:4px;align-items:flex-start;background:var(--card);border:1px solid var(--line);border-radius:8px}
+.tpv .sq:not(.mon):not(.chart):not(.sty){display:flex;flex-direction:column;gap:4px;align-items:flex-start;background:var(--card);border:1px solid var(--line);border-radius:8px}
+
+/* shared layout for the newer tile styles */
+.grid2 .sq.sty{position:relative;overflow:hidden;display:flex;flex-direction:column;align-items:stretch;justify-content:flex-start;gap:2px;text-align:left;background-image:none}
+.grid2 .sq.sty .sqt,.grid2 .sq.sty .sqs{position:relative;margin:0;align-self:stretch}
+.grid2 .sq.sty:last-child:nth-child(odd){display:flex;align-items:stretch;padding:8px 12px 12px}
+.grid2 .sq.sty:last-child:nth-child(odd) .sqt,.grid2 .sq.sty:last-child:nth-child(odd) .sqs{align-self:stretch;margin:0}
+.cm-w{display:none}@media (max-width:1099px){.grid2 .sq.sty:last-child:nth-child(odd) .cm-n{display:none}.grid2 .sq.sty:last-child:nth-child(odd) .cm-w{display:block}}
+/* ECG paper */
+:root{--eg-bg:#fff5f6;--eg-line:#f1c7cf;--eg-mj:rgba(225,70,95,.35);--eg-mn:rgba(225,70,95,.14);--eg-tr:#1b1b1b;--eg-sub:#5d4a4e}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--eg-bg:#211517;--eg-line:#47282d;--eg-mj:rgba(255,120,140,.24);--eg-mn:rgba(255,120,140,.09);--eg-tr:#f2e8e9;--eg-sub:#c9aeb3}}
+:root[data-theme="dark"]{--eg-bg:#211517;--eg-line:#47282d;--eg-mj:rgba(255,120,140,.24);--eg-mn:rgba(255,120,140,.09);--eg-tr:#f2e8e9;--eg-sub:#c9aeb3}
+.grid2 .sq.ecgp{padding:8px 12px 12px;border-radius:4px;background:var(--eg-bg);border-color:var(--eg-line)}
+.sq.ecgp::before{content:"";position:absolute;inset:0;background-image:linear-gradient(var(--eg-mj) 1px,transparent 1px),linear-gradient(90deg,var(--eg-mj) 1px,transparent 1px),linear-gradient(var(--eg-mn) 1px,transparent 1px),linear-gradient(90deg,var(--eg-mn) 1px,transparent 1px);background-size:20px 20px,20px 20px,4px 4px,4px 4px;pointer-events:none}
+.sq.ecgp .chd{color:var(--eg-sub)}.es{position:relative;width:100%;height:34px;margin:4px 0 6px}.es:not(.cm-w){display:block}
+.es path{fill:none;stroke:var(--eg-tr);stroke-width:1.5;vector-effect:non-scaling-stroke;stroke-linejoin:round}.es .ectg{opacity:.35;stroke-width:1}
+.grid2 .sq.ecgp .sqt{color:var(--t);font-size:var(--fs-md)}.grid2 .sq.ecgp .sqs{color:var(--eg-sub)}
+/* Infusion pump */
+:root{--pu-body:linear-gradient(#f4f6f6,#dfe4e4);--pu-edge:#c3cbcb;--pu-scr:#cfe8c3;--pu-txt:#173016;--pu-btn:rgba(0,0,0,.12)}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--pu-body:linear-gradient(#2b3134,#1d2224);--pu-edge:#3a4245;--pu-scr:#0c1f14;--pu-txt:#7dffa5;--pu-btn:rgba(255,255,255,.1)}}
+:root[data-theme="dark"]{--pu-body:linear-gradient(#2b3134,#1d2224);--pu-edge:#3a4245;--pu-scr:#0c1f14;--pu-txt:#7dffa5;--pu-btn:rgba(255,255,255,.1)}
+.grid2 .sq.pump{padding:8px 8px 10px;gap:7px;border-radius:14px;background:var(--pu-body);border-color:var(--pu-edge);color:var(--ink)}
+.pscr{display:block;border-radius:6px;padding:6px 8px;font-family:var(--font-mono);background:var(--pu-scr);color:var(--pu-txt);box-shadow:inset 0 0 0 1px rgba(0,0,0,.18),inset 0 2px 6px rgba(0,0,0,.18)}
+.ptop{display:flex;justify-content:space-between;font-size:9px;opacity:.8}.pnm{display:block;font-weight:700;font-size:14px;letter-spacing:.03em;margin:3px 0 2px;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.prt{display:block;font-size:10px}.pbar{display:block;height:5px;border:1px solid currentColor;border-radius:2px;margin-top:4px;position:relative}.pbar i{position:absolute;left:0;top:0;bottom:0;background:currentColor}
+.pbt{display:flex;gap:6px;align-items:center}.pbt b{flex:1;height:8px;border-radius:4px;background:var(--pu-btn)}.pbt em{width:8px;height:8px;border-radius:50%;background:#22c55e;box-shadow:0 0 6px #22c55e;animation:pled 2s ease-in-out infinite}
+@keyframes pled{50%{opacity:.25;box-shadow:none}}
+.grid2 .sq.pump .sqs{font-size:10.5px;padding:0 2px}
+/* Flowmeter */
+:root{--fl-body:linear-gradient(135deg,#fafbfb,#e3e8e8);--fl-edge:#c9d0d0;--fl-tube:linear-gradient(90deg,rgba(255,255,255,.95),rgba(205,216,216,.7) 40%,rgba(255,255,255,.98) 60%,rgba(196,207,207,.7));--fl-tedge:#b7c0c0}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--fl-body:linear-gradient(135deg,#232a2c,#171d1e);--fl-edge:#364042;--fl-tube:linear-gradient(90deg,rgba(255,255,255,.12),rgba(255,255,255,.03) 40%,rgba(255,255,255,.16) 60%,rgba(255,255,255,.04));--fl-tedge:#4a5557}}
+:root[data-theme="dark"]{--fl-body:linear-gradient(135deg,#232a2c,#171d1e);--fl-edge:#364042;--fl-tube:linear-gradient(90deg,rgba(255,255,255,.12),rgba(255,255,255,.03) 40%,rgba(255,255,255,.16) 60%,rgba(255,255,255,.04));--fl-tedge:#4a5557}
+.grid2 .sq.sty.flow,.grid2 .sq.sty.flow:last-child:nth-child(odd){flex-direction:row;gap:10px;padding:10px;border-radius:14px;background:var(--fl-body);border-color:var(--fl-edge);color:var(--ink)}
+.ftube{flex:0 0 22px;position:relative;border-radius:11px;overflow:hidden;background:var(--fl-tube);border:1px solid var(--fl-tedge);min-height:96px}
+.ftube b{position:absolute;left:0;width:6px;border-top:1px solid rgba(127,140,140,.8)}
+.fbob{position:absolute;left:3px;right:3px;height:12px;border-radius:6px 6px 3px 3px;background-color:var(--t);box-shadow:0 1px 2px rgba(0,0,0,.35);background-image:repeating-linear-gradient(115deg,rgba(255,255,255,.45) 0 2px,transparent 2px 5px);background-size:10px 12px;animation:fbob var(--fd,3s) ease-in-out infinite,fspin .9s linear infinite}
+@keyframes fbob{0%,100%{transform:translateY(-3px)}50%{transform:translateY(3px)}}@keyframes fspin{to{background-position:10px 0}}
+.finfo{display:flex;flex-direction:column;min-width:0;flex:1}.fic svg{display:block;width:26px;height:26px;color:var(--t);margin-bottom:6px}
+.grid2 .sq.flow .sqt{font-size:var(--fs-md)}.flab{display:block;font:600 10px var(--font-mono);letter-spacing:.1em;color:var(--t);margin-top:auto;padding-top:6px}
+/* Editorial */
+.grid2.ts-editorial{gap:0;border-top:2px solid var(--ink)}
+.grid2 .sq.ed{padding:12px 10px 14px;border:0;border-bottom:1px solid var(--line);border-radius:0;background:none;box-shadow:none;color:var(--ink);min-height:122px}
+.grid2.ts-editorial .sq.ed:nth-child(odd):not(:last-child){border-right:1px solid var(--line)}
+.enum{display:block;font-weight:300;font-size:44px;letter-spacing:-.03em;line-height:.9}.ebar{display:block;height:5px;width:28px;margin:8px 0;background:var(--t)}
+.grid2 .sq.ed .sqt{text-transform:uppercase;letter-spacing:.04em;font-size:15px}
+@media (min-width:1100px){.grid2.ts-editorial .sq.ed:not(:last-child){border-right:1px solid var(--line)}}
+@media (prefers-reduced-motion: reduce){.fbob,.pbt em{animation:none}}
+/* Settings previews for the newer styles */
+.tpick7{grid-template-columns:repeat(3,1fr)}
+.tpv .sq.sty{display:flex;flex-direction:column;position:relative;overflow:hidden;border:1px solid;border-radius:8px;padding:6px 8px 8px}
+.tpv .sq.ecgp{background:var(--eg-bg);border-color:var(--eg-line)}.tpv .sq.ecgp .sqt{color:var(--t);position:relative}.tpv .es{height:20px;margin:2px 0 3px}.tpv .es.cm-w{display:none}.tpv .es.cm-n{display:block}
+.tpv .sq.ecgp::before{content:"";position:absolute;inset:0;background-image:linear-gradient(var(--eg-mj) 1px,transparent 1px),linear-gradient(90deg,var(--eg-mj) 1px,transparent 1px);background-size:10px 10px}
+.tpv .sq.pump{background:var(--pu-body);border-color:var(--pu-edge);gap:4px}.tpv .pscr{padding:4px 5px}.tpv .ptop,.tpv .prt,.tpv .pbt{display:none}.tpv .pnm{font-size:10px;margin:0}
+.tpv .sq.flow{flex-direction:row;gap:6px;background:var(--fl-body);border-color:var(--fl-edge)}.tpv .ftube{flex-basis:12px;min-height:44px}.tpv .fbob{height:7px;left:2px;right:2px;animation:none}.tpv .fic svg{width:14px;height:14px;margin-bottom:2px}.tpv .flab{display:none}
+.tpv .sq.ed{border:0;border-top:2px solid var(--ink);border-radius:0;background:none}.tpv .enum{font-size:26px}.tpv .ebar{height:3px;width:18px;margin:4px 0}.tpv .sq.ed .sqt{font-size:11px!important}
 </style>
 </head>
 <body>
@@ -572,7 +626,7 @@ if (window.top !== window.self && /\.github\.io$/.test(location.hostname)) {
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.43.0";
+const APP_VERSION = "2.44.0";
 const APP_DATE = "21 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
@@ -828,7 +882,7 @@ const MON_SEG = {ga:[26,"h6l2-18c5 0 9-1 13-2l3 20h16"], regional:[15,"q5-12 10 
 const monWave = id => { const m = MON_SEG[id];
   const d = m ? `M0 ${m[0]}${m[1].repeat(5)}` : "M0 26h15v-3h15v-2h15v-3h15v-2h15v-3h15v-2h15v-3h15";   // transplant: hourly urine output, still
   return `<svg class="mw" viewBox="0 0 120 30" preserveAspectRatio="none" aria-hidden="true"><g class="${m ? "mwv" : ""}"><path d="${d}"/></g></svg>`; };
-const TILE_STYLES = [["chart","Chart paper"],["monitor","Monitor"],["classic","Classic"]];
+const TILE_STYLES = [["chart","Chart paper"],["monitor","Monitor"],["ecg","ECG paper"],["pump","Infusion pump"],["flow","Flowmeter"],["editorial","Editorial"],["classic","Classic"]];
 const tileStyle = () => { const v = store.get("tiles","chart"); return TILE_STYLES.some(x=>x[0]===v) ? v : "chart"; };
 const SEC_SHORT = {ga:"General", regional:"Regional", paeds:"Paediatric", obs:"Obstetric", tx:"Transplant"};
 const secSub = g => ({paeds:"Pre-op · Induction · Blocks · Cases", tx:"Kidney recipient &amp; donor"})[g.id] || g.tabs.map(t=>t.label).join(" · ");
@@ -841,9 +895,25 @@ function chartMarks(id){ const k = CHART_SEED[id] || 0;
       hr += `M${x} ${h.toFixed(1)}h.01`; }
     return `<svg class="cm ${cls}" viewBox="0 0 ${w} 36" preserveAspectRatio="none" aria-hidden="true"><path class="cbp" d="${bp}"/><path class="chr" d="${hr}"/></svg>`; };
   return one(12, 120, "cm-n") + one(24, 240, "cm-w"); }
+const SEC_ORDER = ["ga","regional","paeds","obs","tx"];
+const ECG_BEAT = {sinus:[40,"h8q2-3 4 0h3l1 2 2-16 2 18 1-4h4q4-6 8 0h5"], slow:[60,"h18q2-3 4 0h3l1 2 2-16 2 18 1-4h4q4-6 8 0h15"],
+  fast:[26,"h3q2-3 4 0h2l1 2 2-14 2 16 1-4h3q3-5 6 0h1"], peaked:[40,"h8q2-2 4 0h3l1 2 2-16 2 18 1-4h3l3-14 3 14h6"]};
+const ECG_OF = {ga:"sinus", regional:"slow", paeds:"fast", obs:"sinus", tx:"peaked"};
+function ecgStrip(id){ const one = (w, cls) => { const [bw, seg] = ECG_BEAT[ECG_OF[id]];
+    const ctg = id === "obs" ? `<path class="ectg" d="M0 31q${w/24} -3 ${w/12} 0${` t${w/12} 0`.repeat(11)}"/>` : "";
+    return `<svg class="es ${cls}" viewBox="0 0 ${w} 34" preserveAspectRatio="none" aria-hidden="true"><path d="M0 22${seg.repeat(Math.ceil(w/bw)+1)}"/>${ctg}</svg>`; };
+  return one(120, "cm-n") + one(240, "cm-w"); }
+const secCounts = g => [g.tabs.length, g.tabs.reduce((a,t) => a + t.cards.filter(c => !(typeof c === "string" && c[0] === "§")).length, 0)];
+const FLOW_LEV = {ga:22, regional:42, paeds:30, obs:52, tx:64};
 function secTile(g, style, tag){ style = style || tileStyle(); tag = tag || "button";
   const act = tag === "button" ? ` data-go="g-${g.id}"` : "", t = `<span class="sqt">${SEC_SHORT[g.id]}</span><span class="sqs">${secSub(g)}</span>`;
   if (style === "monitor") return `<${tag} class="sq mon t-${g.id}"${act}><span class="mhd"><span class="mch">${MON_CH[g.id]}</span><span class="mic">${svg(g.id)}</span></span>${monWave(g.id)}${t}</${tag}>`;
+  const i = SEC_ORDER.indexOf(g.id);
+  if (style === "ecg") return `<${tag} class="sq sty ecgp t-${g.id}"${act}><span class="chd"><span>II</span><span>25 mm/s · 10 mm/mV</span></span>${ecgStrip(g.id)}${t}</${tag}>`;
+  if (style === "pump"){ const [tb, cd] = secCounts(g), mx = Math.max(...SEC_ORDER.map(id => secCounts(GROUPS.find(x => x.id === id))[1]));
+    return `<${tag} class="sq sty pump t-${g.id}"${act}><span class="pscr"><span class="ptop"><span>CH ${i+1}</span><span>▮▮▮▯ 100%</span></span><span class="pnm">▶ ${SEC_SHORT[g.id]}</span><span class="prt">${tb} tabs · ${cd} cards</span><span class="pbar"><i style="width:${Math.round(cd/mx*100)}%"></i></span></span><span class="pbt"><em></em><b></b><b></b><b></b></span><span class="sqs">${secSub(g)}</span></${tag}>`; }
+  if (style === "flow") return `<${tag} class="sq sty flow t-${g.id}"${act}><span class="ftube" aria-hidden="true">${[10,23,36,49,62,75,88].map(y => `<b style="top:${y}%"></b>`).join("")}<i class="fbob" style="top:${FLOW_LEV[g.id]}%;--fd:${(2.6 + i*0.45).toFixed(2)}s"></i></span><span class="finfo"><span class="fic">${svg(g.id)}</span>${t}<span class="flab">${MON_CH[g.id]}</span></span></${tag}>`;
+  if (style === "editorial") return `<${tag} class="sq sty ed t-${g.id}"${act}><span class="enum">0${i+1}</span><span class="ebar"></span>${t}</${tag}>`;
   if (style === "chart") return `<${tag} class="sq chart t-${g.id}"${act}><span class="chd"><span>08:00</span><span>08:15</span><span>08:30</span></span>${chartMarks(g.id)}${t}</${tag}>`;
   return `<${tag} class="sq t-${g.id}"${act}><span class="qi">${svg(g.id)}</span>${t}</${tag}>`; }
 screens.home = () => {
@@ -865,7 +935,7 @@ screens.home = () => {
   <div class="quick">${quickIds().map(quickTile).join("")}</div>
   </div></div>
   <div class="nolabel"></div>
-  <div class="grid2">${secs.map(g=>secTile(g)).join("")}</div>` + discFull();
+  <div class="grid2 ts-${tileStyle()}">${secs.map(g=>secTile(g)).join("")}</div>` + discFull();
 };
 setInterval(() => { const c = document.getElementById("clock"); if (c){ c.textContent = clockTxt(); seg1(c.parentElement); } }, 30000);
 
@@ -3340,12 +3410,12 @@ function vTicks(){
 }
 /* ---------- ABOUT ---------- */
 const CHANGES = [
+  ["2.44","Four more home tile styles: ECG paper, Infusion pump, Flowmeter (moving), Editorial"],
   ["2.43","Home tiles style setting: Chart paper (default), Monitor or Classic"],
   ["2.42","Home section tiles redesigned as monitor channels"],
   ["2.41","Consent note: purpose and procedure first, then side effects and complications"],
   ["2.40","One Consent note card (Anaesthetic / Labour epidural switch); tiles aligned; security hardening and dose-cap lock"],
-  ["2.39","Labour epidural consent note"],
-  ["2.38","Paeds transfusion protocol; paeds Hb in g/L"]];
+  ["2.39","Labour epidural consent note"]];
 const SRC_LINKS = [
   ["Emergencies", [["Resuscitation Council UK — ALS / PLS guidelines","https://www.resus.org.uk/library"],["Difficult Airway Society guidelines","https://das.uk.com/guidelines"],["Association of Anaesthetists — guidelines (anaphylaxis, LAST, safety)","https://anaesthetists.org/Home/Resources-publications/Guidelines"],["European Malignant Hyperthermia Group","https://www.emhg.org"],["UK Kidney Association — hyperkalaemia guideline","https://www.ukkidney.org/health-professionals/guidelines"]]],
   ["General", [["ASA standards & practice parameters (fasting, PACU)","https://www.asahq.org/standards-and-practice-parameters"],["Centre for Perioperative Care — diabetes guideline","https://cpoc.org.uk/guidelines-resources-guidelines"],["PROSPECT procedure-specific analgesia (ESRA)","https://esraeurope.org/prospect/"],["ASRA Pain Medicine — guidelines (ketamine, anticoagulation)","https://www.asra.com/guidelines-articles/guidelines"],["Brain Trauma Foundation guidelines","https://braintrauma.org/coma/guidelines"]]],
