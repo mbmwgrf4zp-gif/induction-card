@@ -634,7 +634,7 @@ if (window.top !== window.self && /\.github\.io$/.test(location.hostname)) {
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.51.0";
+const APP_VERSION = "2.51.1";
 const APP_DATE = "21 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
@@ -2557,7 +2557,7 @@ gaCards.consent = () => { const auto = csAuto(), txt = consentText(), tech = CS_
   ${src("Ministry of Health Malaysia anaesthesia information and consent form; Royal College of Anaesthetists patient information; Association of Anaesthetists consent guidance 2017; MMC consent guideline; NAP3 (RCoA 2009; Cook et al., BJA 2009) for the detailed spinal / epidural figures.")}</div>`; };
 
 /* LABOUR EPIDURAL CONSENT NOTE — DRAFT: OAA labour epidural information card; NAP3 (Cook 2009); Moen 2004; MOH consent form */
-const LEP_CHECKED = true, LEP2_CHECKED = true, NAP_CHECKED = false;
+const LEP_CHECKED = true, LEP2_CHECKED = true, NAP_CHECKED = true;
 const napDraft = () => NAP_CHECKED ? "" : `<div class="warn" style="margin-top:0">DRAFT — NAP3 permanent-harm figures added to the detailed spinal / epidural and labour notes. Not yet ticked by you.</div>`;
 const lep2Draft = () => LEP2_CHECKED ? "" : `<div class="warn" style="margin-top:0">DRAFT — labour epidural note rewritten in the same style as the GA / spinal notes (same figures). Not yet ticked by you.</div>`;
 const lepDraft = () => LEP_CHECKED ? "" : `<div class="warn" style="margin-top:0">DRAFT — labour epidural consent note; frequencies from the OAA labour epidural information card (NAP3, Moen 2004). Not yet ticked by you.</div>`;
@@ -3648,7 +3648,7 @@ VGROUPS.find(g => g[0]==="General")[1].push(["Consent wording revision", "21 Nov
 VGROUPS.find(g => g[0]==="General")[1].push(["Labour epidural note layout", "21 Nov 2026", [
   "Same layout as the GA / spinal notes: 'Anaesthetic discussion' opening, heading, Purpose and Procedure as full sentences, then Common / Uncommon / Rare",
   "Brief = one line per band, like the GA brief; figures unchanged (1 in 50, 1 in 10, 1 in 100, 8 in 20,000, 1 in 13,000, 1 in 50,000, 1 in 100,000, 1 in 170,000, 1 in 250,000)"]]);
-VGROUPS.find(g => g[0]==="General")[1].push(["NAP3 neuraxial figures (DRAFT — tick to sign off)", "", [
+VGROUPS.find(g => g[0]==="General")[1].push(["NAP3 neuraxial figures", "21 Nov 2026 (from the RCoA NAP3 report)", [
   "Source: RCoA NAP3 report 2009, Tables 1 and 5–8 and Chapter 16; denominator 707,425 blocks a year, 320,425 obstetric",
   "Surgical spinal permanent harm 2.6 / 1.6 per 100,000 (pessimistic / optimistic) = about 1 in 38,000 to 1 in 62,000",
   "Surgical epidural 17.4 / 8.2 per 100,000 = about 1 in 5,700 to 1 in 12,000; surgical CSE 18.2 / 12.1 = about 1 in 5,500 to 1 in 8,300",
@@ -3720,7 +3720,7 @@ function vTicks(){
 }
 /* ---------- ABOUT ---------- */
 const CHANGES = [
-  ["2.51","NAP3 permanent-harm figures in the detailed spinal / epidural and labour notes (draft)"],
+  ["2.51","NAP3 permanent-harm figures in the detailed spinal / epidural and labour notes (checked)"],
   ["2.50","Labour epidural note laid out like the GA and spinal notes (checked)"],
   ["2.49","Consent wording revised: decision switch, discussion ticks, clearer language / interpreter, revised risk lists (checked)"],
   ["2.48","Premed reorganised: Assess (examine → score → decide), Prepare (medications, before theatre), Plan & note (plan inside consent, then the note)"],
