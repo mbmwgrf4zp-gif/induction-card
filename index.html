@@ -634,7 +634,7 @@ if (window.top !== window.self && /\.github\.io$/.test(location.hostname)) {
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.49.0";
+const APP_VERSION = "2.49.1";
 const APP_DATE = "21 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
@@ -2481,7 +2481,7 @@ const CS_META = {
   pnb: ["RA", "Peripheral nerve block", ["temporary limb numbness and weakness, bruising", "incomplete block, bleeding or infection at the injection site, injury to nearby structures", "lasting nerve damage, local anaesthetic toxicity"]],
   sed: ["MAC", "Monitored anaesthesia care (MAC)", ["drowsiness, amnesia, nausea", "slow breathing or low oxygen needing airway support", "aspiration, severe allergic reaction"]]};
 const andJoin = a => a.length > 1 ? a.slice(0,-1).join(", ") + " and " + a[a.length-1] : (a[0] || "");
-const CS3_CHECKED = false;
+const CS3_CHECKED = true;
 const cs3Draft = () => CS3_CHECKED ? "" : `<div class="warn" style="margin-top:0">DRAFT — consent wording revised after review (decision switch, discussion ticks, language / interpreter, technique wording, risk lists, individual risks, labour figures). Not yet ticked by you.</div>`;
 const DX = [["cap","Capacity confirmed","demonstrated capacity to make this decision"],["alt","Alternatives, incl. declining, discussed","Reasonable alternatives, including declining the proposed anaesthetic and its consequences, were discussed."],
   ["time","Time to consider","Time was given to consider the information."],["leaflet","Information leaflet given","Written information was provided."],["und","Understanding checked","Understanding was checked during the discussion."]];
@@ -3628,7 +3628,7 @@ VGROUPS.find(g => g[0]==="Emergencies")[1].push(["LA toxicity (adult and paeds) 
   "Airway: avoid hypercarbia (mild hyperventilation); seizures: small incremental benzodiazepine; after: exclude pancreatitis, report",
   "Source: Association of Anaesthetists QRH 3-10 v.2 (2023), downloaded and quoted; ticker tip updated to match",
   "Emergency cards show no totals until a real weight is entered (per-kg rule + 'enter weight'); totals show the weight used"]]);
-VGROUPS.find(g => g[0]==="General")[1].push(["Consent wording revision (DRAFT — tick to sign off)", "", [
+VGROUPS.find(g => g[0]==="General")[1].push(["Consent wording revision", "21 Nov 2026", [
   "Decision switch Agreed / Declined / Wants more time — closing sentence only after a choice; discussion ticks: capacity, alternatives incl. declining, time to consider, leaflet, understanding",
   "Language line only when not English; interpreter only when ticked; parent mode = parent or legally authorised guardian; labour: 'discussed with the patient', husband / family present as separate ticks",
   "Opening: 'Anaesthetic discussion: … proposed technique … alternative'; 'Risks are grouped as on the MOH anaesthesia consent form'; 'chose … after discussing the alternatives'",
@@ -3702,7 +3702,7 @@ function vTicks(){
 }
 /* ---------- ABOUT ---------- */
 const CHANGES = [
-  ["2.49","Consent wording revised: decision switch, discussion ticks, clearer language / interpreter, revised risk lists (draft)"],
+  ["2.49","Consent wording revised: decision switch, discussion ticks, clearer language / interpreter, revised risk lists (checked)"],
   ["2.48","Premed reorganised: Assess (examine → score → decide), Prepare (medications, before theatre), Plan & note (plan inside consent, then the note)"],
   ["2.47","Safety release: cases keep separate entries; LAST updated to QRH 2023; no sample totals in emergencies; incomplete scores flagged; offline status"],
   ["2.46","Premed: proceed-or-postpone, anticoagulants, diabetes plan, pacemaker / ICD, premedication drugs, premed note (your template or MOH form); Hb in g/dL throughout"],
