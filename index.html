@@ -44,6 +44,7 @@
   --g-emerg:#b42318; --g-emerg-soft:#fde9e9;
   --g-obs:#be185d;   --g-obs-soft:#fce7f3;
   --g-tx:#6d28d9;    --g-tx-soft:#ede9fe;
+  --g-premed:#1d4ed8; --g-premed-soft:#dbeafe;
   --g-paeds:#15803d; --g-paeds-soft:#dcfce7;
   --g-spinal:#0e7490; --g-spinal-soft:#cffafe;
   --g-airway:#b45309; --g-airway-soft:#fef3c7;
@@ -61,6 +62,7 @@
     --g-emerg:#ff9b93; --g-emerg-soft:#3a1414;
     --g-obs:#f472b6;   --g-obs-soft:#3a1028;
   --g-tx:#a78bfa;    --g-tx-soft:#251a40;
+  --g-premed:#60a5fa; --g-premed-soft:#14233f;
     --g-paeds:#4ade80; --g-paeds-soft:#0c2e1a;
     --g-spinal:#22d3ee; --g-spinal-soft:#08303a;
     --g-airway:#fbbf24; --g-airway-soft:#3a2a06;
@@ -78,6 +80,7 @@
   --g-emerg:#ff9b93; --g-emerg-soft:#3a1414;
   --g-obs:#f472b6;   --g-obs-soft:#3a1028;
   --g-tx:#a78bfa;    --g-tx-soft:#251a40;
+  --g-premed:#60a5fa; --g-premed-soft:#14233f;
   --g-paeds:#4ade80; --g-paeds-soft:#0c2e1a;
   --g-spinal:#22d3ee; --g-spinal-soft:#08303a;
   --g-airway:#fbbf24; --g-airway-soft:#3a2a06;
@@ -128,7 +131,7 @@ header h1{font-size:var(--fs-lg);font-weight:700;margin:0;flex:1;display:flex;al
 .tile .chev{color:var(--muted);font-size:var(--fs-xl);line-height:1}
 .t-obs{--t:var(--g-obs);--t-soft:var(--g-obs-soft)} .t-paeds{--t:var(--g-paeds);--t-soft:var(--g-paeds-soft)}
 .t-spinal,.t-regional{--t:var(--g-spinal);--t-soft:var(--g-spinal-soft)} .t-airway,.t-ga{--t:var(--g-airway);--t-soft:var(--g-airway-soft)}
-.t-values{--t:var(--g-values);--t-soft:var(--g-values-soft)} .t-tx,.qbtn.t-tx,.sq.t-tx{--t:var(--g-tx);--t-soft:var(--g-tx-soft)}
+.t-values{--t:var(--g-values);--t-soft:var(--g-values-soft)} .t-tx,.qbtn.t-tx,.sq.t-tx{--t:var(--g-tx);--t-soft:var(--g-tx-soft)} .t-premed,.sq.t-premed{--t:var(--g-premed);--t-soft:var(--g-premed-soft)}
 .txck{display:flex;flex-direction:column;gap:6px}.txci{display:flex;gap:10px;align-items:center;text-align:left;min-height:44px;padding:8px 12px;border:1px solid var(--line);border-radius:var(--r-sm);background:var(--card);color:var(--ink);font:inherit;font-size:var(--fs-sm);cursor:pointer}
 .txci .box{flex:0 0 22px;height:22px;border-radius:6px;border:2px solid var(--line);display:grid;place-items:center;font-weight:700;color:var(--on)}.txci.on .box{background:var(--gc);border-color:var(--gc)}.txci.on{color:var(--muted)}
 .grid2 .sq:last-child:nth-child(odd){grid-column:1/-1}
@@ -416,13 +419,13 @@ details.endo summary{cursor:pointer;font-weight:600;font-size:var(--fs-sm)}
   .snitem:hover{background:var(--card)} .snitem.on{background:var(--card);box-shadow:inset 0 0 0 1px var(--line)}
   .snico{width:28px;height:28px;border-radius:8px;display:grid;place-items:center;background:var(--t-soft,var(--accent-soft));color:var(--t,var(--accent))}.snico svg{width:18px;height:18px}
   .sn-emerg{--t:var(--g-emerg);--t-soft:var(--g-emerg-soft)} .sn-ga{--t:var(--g-airway);--t-soft:var(--g-airway-soft)} .sn-regional{--t:var(--g-spinal);--t-soft:var(--g-spinal-soft)}
-  .sn-paeds{--t:var(--g-paeds);--t-soft:var(--g-paeds-soft)} .sn-obs{--t:var(--g-obs);--t-soft:var(--g-obs-soft)} .sn-tx{--t:var(--g-tx);--t-soft:var(--g-tx-soft)} .sn-values,.sn-home{--t:var(--g-values);--t-soft:var(--g-values-soft)}
+  .sn-paeds{--t:var(--g-paeds);--t-soft:var(--g-paeds-soft)} .sn-obs{--t:var(--g-obs);--t-soft:var(--g-obs-soft)} .sn-premed{--t:var(--g-premed);--t-soft:var(--g-premed-soft)} .sn-tx{--t:var(--g-tx);--t-soft:var(--g-tx-soft)} .sn-values,.sn-home{--t:var(--g-values);--t-soft:var(--g-values-soft)}
   .snkeys{margin-top:auto;padding:var(--s3);font-size:var(--fs-xs);color:var(--muted)}
   .content{min-width:0}
   .gwrap{grid-template-columns:minmax(0,820px) 340px}
   .toprow{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,2fr);gap:var(--s4);align-items:stretch}
   .tr-emerg,.tr-quick{display:flex;flex-direction:column}.tr-emerg .t-emerg{flex:1}.tr-quick .quick{flex:1}
-  .grid2{grid-template-columns:repeat(5,1fr)} .grid2 .sq:last-child:nth-child(odd){grid-column:auto}
+  .grid2{grid-template-columns:repeat(6,1fr)} .grid2 .sq:last-child:nth-child(odd){grid-column:auto}
   .hero .capno{height:56px}
   .date{margin-bottom:56px}
 }
@@ -523,7 +526,7 @@ a{color:var(--accent)}
 .sharebox .homebtn svg{width:18px;height:18px;vertical-align:-3px;margin-right:4px}.shareurl{word-break:break-all;margin:6px 0 0}
 .grid2 .sq.mon{position:relative;overflow:hidden;display:flex;flex-direction:column;align-items:stretch;justify-content:flex-start;gap:2px;padding:10px 12px 12px;text-align:left;background:var(--mon-bg);background-image:none;border-color:#1f2c2e;color:var(--mon-ink);--lcd:var(--etco2)}
 .grid2 .sq.mon::before{content:"";position:absolute;inset:0;background-image:linear-gradient(var(--mon-grid) 1px,transparent 1px),linear-gradient(90deg,var(--mon-grid) 1px,transparent 1px);background-size:12px 12px;pointer-events:none}
-.sq.mon.t-ga{--lcd:#fbbf24}.sq.mon.t-regional{--lcd:#22d3ee}.sq.mon.t-paeds{--lcd:#4ade80}.sq.mon.t-obs{--lcd:#f472b6}.sq.mon.t-tx{--lcd:#a78bfa}
+.sq.mon.t-premed{--lcd:#60a5fa}.sq.mon.t-ga{--lcd:#fbbf24}.sq.mon.t-regional{--lcd:#22d3ee}.sq.mon.t-paeds{--lcd:#4ade80}.sq.mon.t-obs{--lcd:#f472b6}.sq.mon.t-tx{--lcd:#a78bfa}
 :root[data-lcd]:not([data-lcd="section"]) .sq.mon{--lcd:var(--lcdx)}
 .mhd{position:relative;display:flex;justify-content:space-between;align-items:center;font:700 11px var(--font-mono);letter-spacing:.08em;color:var(--lcd)}
 .mic svg{display:block;width:22px;height:22px;color:var(--lcd)}
@@ -626,7 +629,7 @@ if (window.top !== window.self && /\.github\.io$/.test(location.hostname)) {
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.44.1";
+const APP_VERSION = "2.45.0";
 const APP_DATE = "21 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
@@ -643,7 +646,7 @@ const store = {
 };
 // Inputs are not remembered between uses (per plan): state lives in memory only.
 const S = { ettMode:"adult", sex:"F", height:158, ageY:4, ageM:0, wt:3.0,
-            touched:{}, sc:{}, fastH:6, leLen:"brief", leNote:"", hbNow:120, hbLow:80, hbTarget:100, derm:"", abxSp:"general", spOp:"lscs", spHt:155, morWt:60, pw:10, pY:1, pM:0, pHt:75, pBE:-5, aw:70, emTab:"adult", obTab:"labour", pTab:"pre", gaTab:"pre", raTab:"safety", laA:[], laP:[], cSex:"F", cY:40, cM:0, cH:160, cW:60, cNick:"", laD:"bupi", laC:"0.5", laMl:15, laBi:"1", age:45, apfel:0, pump:"pcea_cse", topup:"lig", ventSc:"std", vfio:"", txTab:"pre", txck:{}, gaB:34, chW:6, dermMode:"block", asa:"", met:"", csWho:"patient", csOut:"full", csLen:"brief", csLang:"English", csNote:"", k:4.5, hb:100, todayWt:70, hdH:12 };
+            touched:{}, sc:{}, fastH:6, leLen:"brief", leNote:"", hbNow:120, hbLow:80, hbTarget:100, derm:"", abxSp:"general", spOp:"lscs", spHt:155, morWt:60, pw:10, pY:1, pM:0, pHt:75, pBE:-5, aw:70, emTab:"adult", obTab:"labour", pTab:"pre", gaTab:"ind", pmTab:"assess", raTab:"safety", laA:[], laP:[], cSex:"F", cY:40, cM:0, cH:160, cW:60, cNick:"", laD:"bupi", laC:"0.5", laMl:15, laBi:"1", age:45, apfel:0, pump:"pcea_cse", topup:"lig", ventSc:"std", vfio:"", txTab:"pre", txck:{}, gaB:34, chW:6, dermMode:"block", asa:"", met:"", csWho:"patient", csOut:"full", csLen:"brief", csLang:"English", csNote:"", k:4.5, hb:100, todayWt:70, hdH:12 };
 
 function src(text){ return `<div class="src">Source: ${text}</div>`; }
 function protoSrc(){
@@ -689,7 +692,7 @@ const ICONS = {
   capno:'<path d="M2 16h4l1.5-9c3 0 6-.6 8.5-1.2L17.5 16H22"/>',
   search:'<circle cx="11" cy="11" r="6.5"/><path d="m16 16 4.5 4.5"/>'};
 ICONS.tx = '<path d="M14.5 3.5c-3.4 0-6 3.7-6 8.5s2.6 8.5 6 8.5c2.6 0 4.5-2 4.5-4.5 0-1.7-1-2.8-2.3-3.6.1-.3.1-.6 0-.8C18 10.8 19 9.7 19 8c0-2.5-1.9-4.5-4.5-4.5z"/><path d="M8.7 12H6c-1.1 0-2 .9-2 2v7"/>';
-ICONS.ga = ICONS.airway; ICONS.regional = ICONS.spinal;
+ICONS.ga = ICONS.airway; ICONS.premed = ICONS.values; ICONS.regional = ICONS.spinal;
 const SXI = {F:'<svg class="sx" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="9" r="5.5"/><path d="M12 14.5V22M8.5 18.5h7"/></svg>', M:'<svg class="sx" viewBox="0 0 24 24" aria-hidden="true"><circle cx="10" cy="14" r="5.5"/><path d="M14 10l6-6M14.5 4H20v5.5"/></svg>'};
 const sxi = f => SXI[f==="F"?"F":"M"];
 const svg = k => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS[k]}</svg>`;
@@ -719,7 +722,7 @@ const PEARLS = [
   ["Remi PCA not working? Adjust the background rate, not the bolus.","7. No epidural: IV PCA","obs","labour"],
   ["4/2/1: a 10 kg child needs 40 mL/h maintenance.","1. Fluids: maintenance & insensible loss","paeds","intra"],
   ["Apfel 2 risk factors = 39% PONV risk → give 2 agents.","3. PONV: Apfel score","ga","post"],
-  ["SGLT2 inhibitors: stop 3 days before surgery (ertugliflozin 4).","12. Regular drugs: stop or continue","ga","pre"],
+  ["SGLT2 inhibitors: stop 3 days before surgery (ertugliflozin 4).","4. Regular drugs: stop or continue","premed","prepare"],
   ["Laryngospasm: suxamethonium 0.1–0.5 mg/kg IV with atropine 0.02 mg/kg.","Laryngospasm","emerg","paeds"]];
 const CAPNO = (() => { let d = "M0 40"; for (let i=0;i<6;i++){ const x=i*100; d += ` L${x+18} 40 L${x+23} 13 Q${x+40} 10 ${x+58} 8 L${x+63} 40 L${x+100} 40`; } return d; })();
 function greet(){ const h = new Date().getHours(); return h<5 ? "Night shift" : h<12 ? "Good morning" : h<17 ? "Good afternoon" : "Good evening"; }
@@ -846,9 +849,9 @@ const QT = (() => {
     ans:()=>{ const mo=AGEM(), k=mo<1?85:mo<12?80:S.pY<12?75:70; return sm(dz(k*S.pw,"mL"),`mL · ${k} mL/kg`); }},
   mann:{lab:"Transplant mannitol", ic:"tx", cls:"t-tx", kind:"adult", keys:["aw"], inp:()=>`${sig(S.aw)} kg dry`, open:["5. Anastomosis & reperfusion","tx","intra"],
     ans:()=>sm(dz(2.5*S.aw,"mL"),`mL of 20% = ${dz(0.5*S.aw,"g")} g`)},
-  cons:{lab:"Consent note", ic:"values", cls:"t-ga", kind:"any", txt:true, keys:[], inp:()=>store.get("consLast","cs")==="le" ? "labour epidural" : "shortcut", open:["14. Consent note","ga","pre"],
+  cons:{lab:"Consent note", ic:"values", cls:"t-ga", kind:"any", txt:true, keys:[], inp:()=>store.get("consLast","cs")==="le" ? "labour epidural" : "shortcut", open:["1. Consent note","premed","consent"],
     ans:()=>{ if (store.get("consLast","cs")==="le") return sm("Epidural","labour note — tap to copy"); const t = CS_TECH.filter(([k]) => csOn(k, {}) && csChosen(k)).map(x=>x[2]); return t.length ? sm(t.join(" + "),"note ready — tap to copy") : sm("Build","tap to write the note"); }},
-  psum:{lab:"Pre-op summary", ic:"values", cls:"t-ga", kind:"any", txt:true, keys:[], inp:()=>"shortcut", goTab:"ga:pre",
+  psum:{lab:"Pre-op summary", ic:"values", cls:"t-ga", kind:"any", txt:true, keys:[], inp:()=>"shortcut", goTab:"premed:assess",
     ans:()=>{ const p = []; if (S.asa) p.push(`ASA ${S.asa}${scv("pre","asaE")===1?"E":""}`); if (RCRI.some(([k]) => scv("rcri",k)!=null)) p.push(`RCRI ${cnt("rcri", RCRI.map(x=>x[0]))}`); if (sbTouched()) p.push(`STOP-BANG ${sbScore()}`); if (S.met) p.push(`METs ${({lt4:"&lt; 4",4:"4–10",gt10:"&gt; 10"})[S.met]}`); if (scv("cfs","v")) p.push(`CFS ${scv("cfs","v")}`);
       return p.length ? sm(p[0], p.slice(1).join(" · ") || "tap for the scores") : sm("Score","tap to assess risk"); }},
   derm:{lab:"Block height", ic:"spinal", cls:"t-regional", kind:"any", txt:true, keys:[], inp:()=>"shortcut", open:["6. Dermatomes & block height","regional","neuraxial"],
@@ -877,17 +880,17 @@ screens.quick = () => { const sel = qSaved();
     ${S.qmsg?`<div class="warn">${S.qmsg}</div>`:""}
     <button class="linkbtn" data-qreset="1">Reset to default</button></div>` + disc; };
 /* Home section tiles: monitor channels. Each wave segment is exactly 40 units wide so the sweep loops seamlessly. */
-const MON_CH = {ga:"GA", regional:"RA", paeds:"PAED", obs:"OBS", tx:"TX"};
-const MON_SEG = {ga:[26,"h6l2-18c5 0 9-1 13-2l3 20h16"], regional:[15,"q5-12 10 0t10 0t10 0t10 0"], paeds:[20,"h8l2-3 2 3h5l2-14 2 22 2-8h6l2-2 2 2h7"], obs:[15,"q3-4 6-1t6 1t6-1t6 2t6-2t6 1t4 0"]};
+const MON_CH = {premed:"PRE", ga:"GA", regional:"RA", paeds:"PAED", obs:"OBS", tx:"TX"};
+const MON_SEG = {premed:[24,"q4-16 9-14q3 1 4 4q2-3 5-2q5 6 9 12h13"], ga:[26,"h6l2-18c5 0 9-1 13-2l3 20h16"], regional:[15,"q5-12 10 0t10 0t10 0t10 0"], paeds:[20,"h8l2-3 2 3h5l2-14 2 22 2-8h6l2-2 2 2h7"], obs:[15,"q3-4 6-1t6 1t6-1t6 2t6-2t6 1t4 0"]};
 const monWave = id => { const m = MON_SEG[id];
   const d = m ? `M0 ${m[0]}${m[1].repeat(5)}` : "M0 26h15v-3h15v-2h15v-3h15v-2h15v-3h15v-2h15v-3h15";   // transplant: hourly urine output, still
   return `<svg class="mw" viewBox="0 0 120 30" preserveAspectRatio="none" aria-hidden="true"><g class="${m ? "mwv" : ""}"><path d="${d}"/></g></svg>`; };
 const TILE_STYLES = [["chart","Chart paper"],["monitor","Monitor"],["ecg","ECG paper"],["pump","Infusion pump"],["flow","Flowmeter"],["editorial","Editorial"],["classic","Classic"]];
 const tileStyle = () => { const v = store.get("tiles","chart"); return TILE_STYLES.some(x=>x[0]===v) ? v : "chart"; };
-const SEC_SHORT = {ga:"General", regional:"Regional", paeds:"Paediatric", obs:"Obstetric", tx:"Transplant"};
+const SEC_SHORT = {premed:"Premed", ga:"General", regional:"Regional", paeds:"Paediatric", obs:"Obstetric", tx:"Transplant"};
 const secSub = g => ({paeds:"Pre-op · Induction · Blocks · Cases", tx:"Kidney recipient &amp; donor"})[g.id] || g.tabs.map(t=>t.label).join(" · ");
 // anaesthetic-record marks: systolic ∨ and diastolic ∧ (red), heart rate dots (section ink). Decoration only.
-const CHART_SEED = {ga:0, regional:1.3, paeds:2.1, obs:3.4, tx:4.6};
+const CHART_SEED = {premed:5.6, ga:0, regional:1.3, paeds:2.1, obs:3.4, tx:4.6};
 function chartMarks(id){ const k = CHART_SEED[id] || 0;
   const one = (n, w, cls) => { let bp = "", hr = "";
     for (let i = 0; i < n; i++){ const x = 5 + i*10, t = i*12/n, sys = 8 + 3*Math.sin(t*.7 + k), dia = 17 + 2*Math.sin(t*.6 + k + .5), h = 29 + 3*Math.cos(t*.8 + k);
@@ -895,16 +898,16 @@ function chartMarks(id){ const k = CHART_SEED[id] || 0;
       hr += `M${x} ${h.toFixed(1)}h.01`; }
     return `<svg class="cm ${cls}" viewBox="0 0 ${w} 36" preserveAspectRatio="none" aria-hidden="true"><path class="cbp" d="${bp}"/><path class="chr" d="${hr}"/></svg>`; };
   return one(12, 120, "cm-n") + one(24, 240, "cm-w"); }
-const SEC_ORDER = ["ga","regional","paeds","obs","tx"];
+const SEC_ORDER = ["premed","ga","regional","paeds","obs","tx"];
 const ECG_BEAT = {sinus:[40,"h8q2-3 4 0h3l1 2 2-16 2 18 1-4h4q4-6 8 0h5"], slow:[60,"h18q2-3 4 0h3l1 2 2-16 2 18 1-4h4q4-6 8 0h15"],
   fast:[26,"h3q2-3 4 0h2l1 2 2-14 2 16 1-4h3q3-5 6 0h1"], peaked:[40,"h8q2-2 4 0h3l1 2 2-16 2 18 1-4h3l3-14 3 14h6"]};
-const ECG_OF = {ga:"sinus", regional:"slow", paeds:"fast", obs:"sinus", tx:"peaked"};
+const ECG_OF = {premed:"sinus", ga:"sinus", regional:"slow", paeds:"fast", obs:"sinus", tx:"peaked"};
 function ecgStrip(id){ const one = (w, cls) => { const [bw, seg] = ECG_BEAT[ECG_OF[id]];
     const ctg = id === "obs" ? `<path class="ectg" d="M0 31q${w/24} -3 ${w/12} 0${` t${w/12} 0`.repeat(11)}"/>` : "";
     return `<svg class="es ${cls}" viewBox="0 0 ${w} 34" preserveAspectRatio="none" aria-hidden="true"><path d="M0 22${seg.repeat(Math.ceil(w/bw)+1)}"/>${ctg}</svg>`; };
   return one(120, "cm-n") + one(240, "cm-w"); }
 const secCounts = g => [g.tabs.length, g.tabs.reduce((a,t) => a + t.cards.filter(c => !(typeof c === "string" && c[0] === "§")).length, 0)];
-const FLOW_LEV = {ga:22, regional:42, paeds:30, obs:52, tx:64};
+const FLOW_LEV = {premed:14, ga:22, regional:42, paeds:30, obs:52, tx:64};
 function secTile(g, style, tag){ style = style || tileStyle(); tag = tag || "button";
   const act = tag === "button" ? ` data-go="g-${g.id}"` : "", t = `<span class="sqt">${SEC_SHORT[g.id]}</span><span class="sqs">${secSub(g)}</span>`;
   if (style === "monitor") return `<${tag} class="sq mon t-${g.id}"${act}><span class="mhd"><span class="mch">${MON_CH[g.id]}</span><span class="mic">${svg(g.id)}</span></span>${monWave(g.id)}${t}</${tag}>`;
@@ -918,8 +921,8 @@ function secTile(g, style, tag){ style = style || tileStyle(); tag = tag || "but
   return `<${tag} class="sq t-${g.id}"${act}><span class="qi">${svg(g.id)}</span>${t}</${tag}>`; }
 screens.home = () => {
   const th = store.get("theme","auto"), thLabel = th==="auto" ? "◐" : th==="dark" ? "☾" : "☀";
-  const secs = ["ga","regional","paeds","obs","tx"].map(id=>GROUPS.find(g=>g.id===id));
-  const short = {ga:"General", regional:"Regional", paeds:"Paediatric", obs:"Obstetric", tx:"Transplant"};
+  const secs = ["premed","ga","regional","paeds","obs","tx"].map(id=>GROUPS.find(g=>g.id===id));
+  const short = {premed:"Premed", ga:"General", regional:"Regional", paeds:"Paediatric", obs:"Obstetric", tx:"Transplant"};
   return `<section class="hero"><div class="hero-in">
     <svg class="capno" viewBox="0 0 400 48" preserveAspectRatio="none" aria-hidden="true"><g class="trace"><path d="${CAPNO}"/></g></svg>
     <div class="hero-top"><span class="brand">${svg("capno")} Induction Card</span>
@@ -1993,14 +1996,14 @@ function gaInputs(){
 
 const gaCards = {};
 /* PRE-OP */
-gaCards.fasting = () => `<div class="card"><h2>11. Fasting</h2>${gaDraft()}
+gaCards.fasting = () => `<div class="card"><h2>3. Fasting</h2>${gaDraft()}
   <table><tr><td>Clear fluids</td><td class="hl">2 h</td></tr><tr><td>Light meal, milk</td><td class="hl">6 h</td></tr><tr><td>Fatty / heavy meal</td><td class="hl">8 h</td></tr></table>
   <h3>GLP-1 agonists (semaglutide, liraglutide…)</h3>${updNote("2024 multisociety GLP-1 guidance","AGA (gastro.org) + EMJ / News-Medical coverage of the guidance")}
   <ul><li><b>Most patients continue</b> the drug as prescribed; assess individual risk</li>
   <li><b>Higher risk</b> (dose-escalation phase, higher doses, GI symptoms, other causes of slow gastric emptying): <b>clear-liquid diet for 24 h</b> before; adjust the anaesthetic plan (e.g. RSI, gastric ultrasound); holding the drug may be considered, weighed against glycaemic risk; rarely, delay</li>
   <li>Nausea, vomiting or bloating on the day: treat as <b>full stomach</b></li></ul>
   ${src("ASA / ESAIC fasting guidance; Multisociety GLP-1 guidance (ASA, AGA, ASMBS, ISPCOP, SAGES) 2024.")}</div>`;
-gaCards.meds = () => `<div class="card"><h2>12. Regular drugs: stop or continue</h2>${gaDraft()}
+gaCards.meds = () => `<div class="card"><h2>4. Regular drugs: stop or continue</h2>${gaDraft()}
   <table>
   <tr><th>Continue</th><td>Beta-blockers, statins, antiepileptics, inhalers, thyroxine, antiparkinson, steroids</td></tr>
   <tr><th>Omit morning</th><td>ACEi / ARB, diuretics, sulfonylureas</td></tr>
@@ -2010,7 +2013,7 @@ gaCards.meds = () => `<div class="card"><h2>12. Regular drugs: stop or continue<
   <tr><th>Anticoagulants / antiplatelets</th><td>See Regional › Anticoagulants</td></tr></table>
   <button class="homebtn" data-open="3. Anticoagulant timing" data-g="regional" data-tab="safety">Open anticoagulant timing table ›</button>
   ${src("CPOC 2021 perioperative diabetes; FDA SGLT2i advice · latest available, checked Nov 2026")}</div>`;
-gaCards.steroid = () => `<div class="card"><h2>13. Steroid cover</h2>${gaDraft()}
+gaCards.steroid = () => `<div class="card"><h2>5. Steroid cover</h2>${gaDraft()}
   <p>On ≥ 5 mg prednisolone (or equivalent) for &gt; 4 weeks:</p>
   <ul><li>Give usual morning dose</li><li>Major / moderate surgery: <b>hydrocortisone 100 mg IV</b> at induction, then 200 mg / 24 h infusion (or 50 mg 6-hourly)</li><li>Minor surgery: usual dose ± 100 mg at induction</li></ul>
   ${src("Association of Anaesthetists 2020 steroid guideline · latest available, checked Nov 2026")}</div>`;
@@ -2344,7 +2347,7 @@ function lepBody(){ const txt = lepText();
   ${src("OAA labour epidural information card; NAP3 (Cook et al., BJA 2009); Moen et al., Anesthesiology 2004; Ministry of Health Malaysia anaesthesia consent form.")}`; }
 obsCards.lConsent = () => `<div class="card"><h2>Consent note: labour epidural</h2>
   <p class="sub">The labour epidural note lives in the consent card, so all consent notes are in one place.</p>
-  <button class="homebtn primary" data-open="14. Consent note" data-g="ga" data-tab="pre" data-csmode="le">Open consent note — Labour epidural ›</button></div>`;
+  <button class="homebtn primary" data-open="1. Consent note" data-g="premed" data-tab="consent" data-csmode="le">Open consent note — Labour epidural ›</button></div>`;
 
 /* INDUCTION */
 gaCards.induction = () => `<div class="card"><h2>1. Induction drugs</h2>${gaDraft()}${GT([
@@ -2556,15 +2559,15 @@ txCards.cardiac = () => `<div class="card"><h2>Kidney: cardiac risk</h2>${tx2Dra
   <tr><th>Ischaemia</th><td>Exercise test / CTCA / coronary angiogram result; cardiologist input (protocol)</td></tr>
   <tr><th>Continue</th><td>Beta-blocker, statin</td></tr></table>
   <p class="sub">ECG: LVH, ischaemia, hyperkalaemia changes (peaked T, wide QRS).</p>
-  <button class="homebtn" data-open="8. Echo report: what matters" data-g="ga" data-tab="pre">Reading the echo report → General › Pre-op ›</button>
+  <button class="homebtn" data-open="8. Echo report: what matters" data-g="premed" data-tab="assess">Reading the echo report → General › Pre-op ›</button>
   ${src(TXP+"; Mayhew BJA Education 2016.")}</div>`;
 txCards.asp = () => `<div class="card"><h2>Kidney: airway &amp; aspiration</h2>${tx2Draft()}
   <ul><li>Diabetic / uraemic gastric delay → <b>RSI</b></li>
   <li>Fasting per GA rules (deceased-donor recipients often arrive non-fasted: RSI)</li>
   <li>Antacid: <b>omeprazole 20 mg PO</b> morning, or ranitidine <b>150 mg once</b> (renal dose — not twice daily)</li>
   <li>Fistula arm marked and protected; IV access difficulty noted (scan, interventional radiology)</li></ul>
-  <button class="homebtn" data-open="11. Fasting" data-g="ga" data-tab="pre">Fasting → General › Pre-op ›</button>
-  <button class="homebtn" data-open="2. Airway assessment & plan" data-g="ga" data-tab="pre">Airway assessment → General › Pre-op ›</button>
+  <button class="homebtn" data-open="3. Fasting" data-g="premed" data-tab="prepare">Fasting → General › Pre-op ›</button>
+  <button class="homebtn" data-open="2. Airway assessment & plan" data-g="premed" data-tab="assess">Airway assessment → General › Pre-op ›</button>
   ${src(TXP+"; BNF ranitidine renal dosing; standard references.")}</div>`;
 txCards.meds = () => `<div class="card"><h2>Kidney: drugs stop or continue</h2>${tx2Draft()}
   <table><tr><th>Stop</th><td><b>Oral hypoglycaemics</b> (protocol); SGLT2 inhibitors 3 days before (ertugliflozin 4)</td></tr>
@@ -2574,7 +2577,7 @@ txCards.meds = () => `<div class="card"><h2>Kidney: drugs stop or continue</h2>$
   <tr><th>Antiplatelets / anticoagulants</th><td>Discuss with transplant team</td></tr>
   <tr><th>Omit morning</th><td>EPO, phosphate binders, calcium tablets</td></tr>
   <tr><th>Immunosuppression</th><td>Started by the transplant team — not by us</td></tr></table>
-  <button class="homebtn" data-open="12. Regular drugs: stop or continue" data-g="ga" data-tab="pre">Full drug list → General › Pre-op ›</button>
+  <button class="homebtn" data-open="4. Regular drugs: stop or continue" data-g="premed" data-tab="prepare">Full drug list → General › Pre-op ›</button>
   ${src(TXP+"; CPOC 2021; FDA SGLT2i advice.")}</div>`;
 txCards.dd = () => `<div class="card"><h2>Kidney: deceased-donor / emergency recipient</h2>${tx2Draft()}
   <ul><li>Same plan as living-donor recipient</li><li>On-call MO reviews <b>all listed recipients</b>; discuss with the OT specialist on call</li>
@@ -2796,7 +2799,7 @@ gaCards.pressors = () => { const w = S.aw, rate = (lo,hi,conc) => `${dz(lo*w*60/
   <tr><td>Adrenaline<div class="sub">4 mg in 50 mL = 80 mcg/mL</div></td><td>0.05–0.5 mcg/kg/min</td><td class="hl">${rate(0.05,0.5,80)}</td></tr>
   <tr><td>Dobutamine<div class="sub">250 mg in 50 mL = 5 mg/mL</div></td><td>2–20 mcg/kg/min</td><td class="hl">${rate(2,20,5000)}</td></tr></table></div>
   <p class="sub">Infusion rates use actual weight. Check your unit's standard concentrations.</p>
-  <button class="homebtn" data-open="8. Echo report: what matters" data-g="ga" data-tab="pre">Valve lesion or poor EF: goals → General › Pre-op › Echo ›</button>${src("Common UK/Malaysian ICU concentrations.")}</div>`; };
+  <button class="homebtn" data-open="8. Echo report: what matters" data-g="premed" data-tab="assess">Valve lesion or poor EF: goals → General › Pre-op › Echo ›</button>${src("Common UK/Malaysian ICU concentrations.")}</div>`; };
 gaCards.abx = () => { const w = S.aw;
   return `<div class="card"><h2>7. Antibiotic prophylaxis</h2>${gaDraft()}
   <table><tr><th>Cefazolin</th><td><b>${w>=120?"3 g":"2 g"} IV</b> (${w>=120?"≥ 120 kg":"&lt; 120 kg"}) within 60 min before incision; redose every 4 h or blood loss &gt; 1.5 L</td></tr>
@@ -3376,7 +3379,7 @@ function applyCase(c){
   if (c.y < 16){ S.pw = c.w; S.pY = c.y; S.pM = c.m; S.pHt = c.h; }
   if (c.sex === "F") S.spHt = Math.min(200, Math.max(140, c.h));
 }
-const SAMPLE_BY = {emerg:{adult:["aw"], paeds:["pw","pY"]}, ga:{"*":["height","aw"]}, regional:{"*":["height","aw"]}, paeds:{"*":["pw","pY"]}, obs:{lscs:["spHt"], post:["morWt"]}, tx:{pre:["aw","height","k","hb"], ind:["aw","height","k"], intra:["aw","k","hb"], post:["aw","height"], don:["aw"]}};
+const SAMPLE_BY = {emerg:{adult:["aw"], paeds:["pw","pY"]}, premed:{"*":["height","aw"]}, ga:{"*":["height","aw"]}, regional:{"*":["height","aw"]}, paeds:{"*":["pw","pY"]}, obs:{lscs:["spHt"], post:["morWt"]}, tx:{pre:["aw","height","k","hb"], ind:["aw","height","k"], intra:["aw","k","hb"], post:["aw","height"], don:["aw"]}};
 function sampleWarn(keys){ const k = keys.filter(isSample); if (!k.length) return "";
   const names = {k:"K⁺", hb:"Hb", height:"height", aw:"weight", pw:"weight", pY:"age", spHt:"height", morWt:"weight"};
   return `<div class="samplewarn"><b>Sample values</b> — ${[...new Set(k.map(x=>names[x]))].join(" and ")} not entered. Enter the patient or tap a case.</div>`; }
@@ -3410,12 +3413,12 @@ function vTicks(){
 }
 /* ---------- ABOUT ---------- */
 const CHANGES = [
+  ["2.45","Premed is its own section (Assess · Prepare · Consent), moved out of General"],
   ["2.44","Four more home tile styles: ECG paper, Infusion pump, Flowmeter (moving), Editorial"],
   ["2.43","Home tiles style setting: Chart paper (default), Monitor or Classic"],
   ["2.42","Home section tiles redesigned as monitor channels"],
   ["2.41","Consent note: purpose and procedure first, then side effects and complications"],
-  ["2.40","One Consent note card (Anaesthetic / Labour epidural switch); tiles aligned; security hardening and dose-cap lock"],
-  ["2.39","Labour epidural consent note"]];
+  ["2.40","One Consent note card (Anaesthetic / Labour epidural switch); tiles aligned; security hardening and dose-cap lock"]];
 const SRC_LINKS = [
   ["Emergencies", [["Resuscitation Council UK — ALS / PLS guidelines","https://www.resus.org.uk/library"],["Difficult Airway Society guidelines","https://das.uk.com/guidelines"],["Association of Anaesthetists — guidelines (anaphylaxis, LAST, safety)","https://anaesthetists.org/Home/Resources-publications/Guidelines"],["European Malignant Hyperthermia Group","https://www.emhg.org"],["UK Kidney Association — hyperkalaemia guideline","https://www.ukkidney.org/health-professionals/guidelines"]]],
   ["General", [["ASA standards & practice parameters (fasting, PACU)","https://www.asahq.org/standards-and-practice-parameters"],["Centre for Perioperative Care — diabetes guideline","https://cpoc.org.uk/guidelines-resources-guidelines"],["PROSPECT procedure-specific analgesia (ESRA)","https://esraeurope.org/prospect/"],["ASRA Pain Medicine — guidelines (ketamine, anticoagulation)","https://www.asra.com/guidelines-articles/guidelines"],["Brain Trauma Foundation guidelines","https://braintrauma.org/coma/guidelines"]]],
@@ -3625,12 +3628,15 @@ const GROUPS = [
  {id:"emerg", name:"Emergencies", sub:"Adult & obstetric · Paeds — crisis steps with doses", tabKey:"emTab", tabs:[
    {id:"adult", label:"Adult / Obstetric", input:()=>step("aw","Weight","kg",30,200,1), cards:EMERG_ADULT},
    {id:"paeds", label:"Paeds", input:()=>pInputs(), cards:EMERG_PAEDS}], cards:[]},
- {id:"ga", name:"General", sub:"Pre-op · Induction · Intra-op · Post-op", tabKey:"gaTab", tabs:[
-   {id:"pre", label:"Pre-op", input:()=>gaInputs(), top:()=>preSummary(), hint:"Assess the risk, then prepare the patient.",
-    cards:["§Assess",["ASA physical status","1. ASA physical status"],"2. Airway assessment & plan",["Functional capacity (METs / DASI)","3. Functional capacity (METs / DASI)"],["Cardiac risk (RCRI)","4. Cardiac risk (RCRI)"],["OSA screen (STOP-BANG)","5. OSA screen (STOP-BANG)"],["Lung risk (ARISCAT)","6. Lung risk (ARISCAT)"],["Frailty (Clinical Frailty Scale)","7. Frailty (CFS)"],["Echo report: what matters","8. Echo report: what matters"],
-      "§Prepare",["Which tests to order","9. Which tests to order"],["Common conditions: optimise or postpone","10. Common conditions: optimise or postpone"],"11. Fasting","12. Regular drugs: stop or continue","13. Steroid cover",
-      "§Explain",["Consent note","14. Consent note"]],
+ {id:"premed", name:"Premed", sub:"Assess · Prepare · Consent", tabKey:"pmTab", tabs:[
+   {id:"assess", label:"Assess", input:()=>gaInputs(), top:()=>preSummary(), hint:"Score the risk; the summary bar collects the scores to copy.",
+    cards:[["ASA physical status","1. ASA physical status"],"2. Airway assessment & plan",["Functional capacity (METs / DASI)","3. Functional capacity (METs / DASI)"],["Cardiac risk (RCRI)","4. Cardiac risk (RCRI)"],["OSA screen (STOP-BANG)","5. OSA screen (STOP-BANG)"],["Lung risk (ARISCAT)","6. Lung risk (ARISCAT)"],["Frailty (Clinical Frailty Scale)","7. Frailty (CFS)"],["Echo report: what matters","8. Echo report: what matters"]],
     links:[["Failed intubation / CICO","adult","Failed intubation / CICO"]]},
+   {id:"prepare", label:"Prepare", input:()=>gaInputs(), hint:"Tests, conditions, fasting and regular drugs before the day.",
+    cards:[["Which tests to order","1. Which tests to order"],["Common conditions: optimise or postpone","2. Common conditions: optimise or postpone"],"3. Fasting","4. Regular drugs: stop or continue","5. Steroid cover"], links:[]},
+   {id:"consent", label:"Consent", input:()=>gaInputs(), hint:"Anaesthetic or labour epidural consent note to paste into your notes.",
+    cards:[["Consent note","1. Consent note"]], links:[]}], cards:[]},
+ {id:"ga", name:"General", sub:"Induction · Intra-op · Post-op", tabKey:"gaTab", tabs:[
    {id:"ind", label:"Induction", input:()=>gaInputs(), hint:"Drugs → RSI → relaxant → tube & airway kit.",
     cards:["1. Induction drugs","2. RSI","3. Muscle relaxants","4. Tube & airway kit"],
     links:[["Failed intubation / CICO","adult","Failed intubation / CICO"],["Anaphylaxis","adult","Anaphylaxis"],["Bronchospasm","adult","Bronchospasm"]]},
@@ -3713,15 +3719,15 @@ const SEARCH_EXTRA = {
   "3. Fluids: transfusion protocol":"paeds paediatric neonate transfusion blood red cells prbc packed cells platelets ffp cryo cryoprecipitate trigger threshold hb irradiated cmv negative paedipack taco trali hyperkalaemia jehovah",
   "8. Echo report: what matters":"echo echocardiogram tte report ejection fraction ef lvef diastolic e/e aortic stenosis mitral stenosis regurgitation ava mva pulmonary hypertension pasp trv tapse hocm lvot sam rwma pericardial effusion tamponade pfo asd thrombus prosthetic valve ivc valve",
   "1. Reversal":"reversal sugammadex neostigmine glycopyrrolate re-paralysis reparalysis re-administration redose rocuronium vecuronium waiting time after sugammadex",
-  "14. Consent note":"consent explanation note labour epidural husband dural puncture headache haematoma abscess paralysis documentation risks explained anaesthesia general spinal epidural nerve block sedation high risk cardiac parents",
+  "1. Consent note":"consent explanation note labour epidural husband dural puncture headache haematoma abscess paralysis documentation risks explained anaesthesia general spinal epidural nerve block sedation high risk cardiac parents",
   "1. ASA physical status":"pre-op preop assessment risk asa grade physical status classification",
   "3. Functional capacity (METs / DASI)":"pre-op preop assessment risk mets met functional capacity dasi duke activity stairs exercise tolerance",
   "4. Cardiac risk (RCRI)":"pre-op preop assessment risk rcri revised cardiac risk index lee cardiac mace",
   "5. OSA screen (STOP-BANG)":"pre-op preop assessment risk stop-bang stopbang stop bang osa sleep apnoea snoring",
   "6. Lung risk (ARISCAT)":"pre-op preop assessment risk ariscat pulmonary complications lung risk ppc",
   "7. Frailty (CFS)":"pre-op preop assessment risk frailty clinical frailty scale cfs rockwood elderly",
-  "9. Which tests to order":"pre-op preop assessment risk investigations tests bloods ecg echo fbc renal profile coagulation hba1c nice ng45",
-  "10. Common conditions: optimise or postpone":"pre-op preop assessment risk hypertension diabetes hba1c mi stent stroke heart failure aortic stenosis pacemaker icd asthma copd urti anaemia thyroid postpone cancel optimise",
+  "1. Which tests to order":"pre-op preop assessment risk investigations tests bloods ecg echo fbc renal profile coagulation hba1c nice ng45",
+  "2. Common conditions: optimise or postpone":"pre-op preop assessment risk hypertension diabetes hba1c mi stent stroke heart failure aortic stenosis pacemaker icd asthma copd urti anaemia thyroid postpone cancel optimise",
   "2. Airway assessment & plan":"pre-op preop assessment risk airway lemon moans mallampati difficult intubation mask ventilation",
   "5. Intra-op analgesia":"analgesia intraop intra-op multimodal opioid fentanyl morphine tramadol remifentanil ketamine lignocaine lidocaine infusion magnesium dexmedetomidine clonidine paracetamol parecoxib diclofenac dexamethasone opioid-free opioid-sparing prospect infiltration",
   "1. Fasting (child)":"paeds child fasting clear fluid breast milk formula",
@@ -3792,7 +3798,8 @@ function cardMap(){
 }
 /* "Same topic elsewhere" links */
 const REL_PAIRS = [
-  [["ga","pre","11. Fasting"],["paeds","pre","1. Fasting (child)"]],
+  [["premed","prepare","3. Fasting"],["paeds","pre","1. Fasting (child)"]],
+  [["premed","assess","1. ASA physical status"],["tx","pre","1. Workup checklist"]],
   [["ga","maint","1. Ventilation strategies"],["paeds","ind","9. Ventilation settings"]],
   [["ga","maint","2. One-lung ventilation"],["paeds","ind","10. One-lung ventilation (Storz)"]],
   [["ga","maint","3. TIVA"],["paeds","ind","7. TIVA: model check & propofol targets"]],
@@ -3802,7 +3809,7 @@ const REL_PAIRS = [
   [["ga","post","5. Discharge from recovery"],["paeds","post","8. Discharge (recovery & home)"]],
   [["regional","safety","1. LA dose calculator"],["paeds","blocks","1. LA dose calculator (child)"]],
   [["regional","neuraxial","1. Epidural"],["paeds","blocks","4. Lumbar / thoracic epidural"]]];
-const GNAME = {ga:"General", regional:"Regional", paeds:"Paediatric", obs:"Obstetric", tx:"Transplant"};
+const GNAME = {premed:"Premed", ga:"General", regional:"Regional", paeds:"Paediatric", obs:"Obstetric", tx:"Transplant"};
 function relLinks(gid, t){
   const out = [];
   REL_PAIRS.forEach(([a,b]) => { if (a[0]===gid && a[2]===t) out.push(b); else if (b[0]===gid && b[2]===t) out.push(a); });
@@ -3841,7 +3848,7 @@ function groupScreen(g){
   return head(g.name,"home",g.id) + (g.calc ? g.calc() : "") + (g.weight ? `<div class="card">${pInputs()}</div>` : "") +
     (g.cards.length?`<div class="hint">Tap a heading to open it.</div>`:"") + acc(g.cards) + disc;
 }
-const GKW = {ga:" ga general anaesthesia anesthesia", regional:" ra regional anaesthesia anesthesia block"};
+const GKW = {premed:" premed pre-op preop pre-operative assessment clinic", ga:" ga general anaesthesia anesthesia", regional:" ra regional anaesthesia anesthesia block"};
 function searchIndex(){
   if (searchIndex.cache) return searchIndex.cache;
   const m = cardMap(), idx = [], seen = {};
@@ -3880,7 +3887,7 @@ function renderNow(){
   const app = $("#app"), active = document.activeElement && document.activeElement.dataset ? document.activeElement.dataset.in : null;
   const y = window.scrollY;
   app.dataset.group = h.startsWith("g-") ? h.slice(2) : "";
-  const navItems = [["home","Home","search","home"],["g-emerg","Emergencies","emerg","emerg"],["g-ga","General","ga","ga"],["g-regional","Regional","regional","regional"],["g-paeds","Paediatric","paeds","paeds"],["g-obs","Obstetric","obs","obs"],["g-tx","Transplant","tx","tx"],["about","About","about","values"]];
+  const navItems = [["home","Home","search","home"],["g-emerg","Emergencies","emerg","emerg"],["g-premed","Premed","premed","premed"],["g-ga","General","ga","ga"],["g-regional","Regional","regional","regional"],["g-paeds","Paediatric","paeds","paeds"],["g-obs","Obstetric","obs","obs"],["g-tx","Transplant","tx","tx"],["about","About","about","values"]];
   const nav = `<nav class="sidenav" aria-label="Sections"><div class="snbrand">${svg("capno")} Induction Card</div>${navItems.map(([hh,l,ic,cls])=>`<button class="snitem sn-${cls} ${h===hh||(hh==="home"&&!h.startsWith("g-")&&h!=="values"&&h!=="about")?"on":""}" data-go="${hh}"><span class="snico">${svg(ic)}</span>${l}</button>`).join("")}
     <div class="snkeys">Keys: <b>/</b> search · <b>Esc</b> back · <b>1–6</b> tabs</div></nav>`;
   app.innerHTML = `<div class="shell">${nav}<div class="content">${html}</div></div>`;
