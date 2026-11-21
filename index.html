@@ -630,7 +630,7 @@ if (window.top !== window.self && /\.github\.io$/.test(location.hostname)) {
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.46.3";
+const APP_VERSION = "2.46.4";
 const APP_DATE = "21 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
@@ -2015,7 +2015,7 @@ gaCards.meds = () => `<div class="card"><h2>4. Regular drugs: stop or continue</
   <button class="homebtn" data-open="3. Anticoagulant timing" data-g="regional" data-tab="safety">Open anticoagulant timing table ›</button>
   ${src("CPOC 2021 perioperative diabetes; FDA SGLT2i advice · latest available, checked Nov 2026")}</div>`;
 /* ---------- PREMED EXPANSION (Nov 2026) — DRAFT ---------- */
-const PM2_CHECKED = false;
+const PM2_CHECKED = true;
 const pm2Draft = () => PM2_CHECKED ? "" : `<div class="warn" style="margin-top:0">DRAFT — premed expansion (Nov 2026), checked against two sources where available. Not yet ticked by you.</div>`;
 function preScoreTxt(){
   const p = [];
@@ -3574,11 +3574,11 @@ VGROUPS.find(g => g[0]==="General")[1].push(["Consent note: purpose, procedure, 
   "Alternative only discussed: purpose + brief line; planned technique gets the full block; one ending at the end",
   "Brief: one line per technique, 'possible side effects and complications: common — …; uncommon — …; rare — …' with new examples (nerve block keeps vessel / lung injury)",
   "No numeric frequency key in the anaesthetic note (bands follow the MOH form); labour note keeps OAA numbers under the same heading"]]);
-VGROUPS.find(g => g[0]==="General")[1].push(["Premed expansion: 6 cards (DRAFT — tick to sign off)", "", [
+VGROUPS.find(g => g[0]==="General")[1].push(["Premed expansion: 6 cards, premed note, Hb in g/dL", "21 Nov 2026", [
   "Assess 9 Proceed or postpone: BP ≥ 180/120 clinic (≥ 175/115 home) [2026 update; was 180/110]; HbA1c ≥ 69 mmol/mol; ketones ≥ 3; K < 3.0 / > 5.5 and Na < 130 / > 150 (common practice); WHO anaemia Hb < 13 / < 12 g/dL; plt < 50 / INR > 1.5; all Hb in the app now g/dL (Malaysian lab convention)",
-  "Cardiac intervals: MI ≥ 60 days and stroke/TIA ≥ 3 months — NOT confirmed from a second source, please check; stent 6 months (elective PCI) / 12 months (ACS), time-sensitive ≥ 1 month DAPT (3 after ACS) [ESC 2022]",
+  "Cardiac intervals: MI ≥ 60 days and stroke/TIA ≥ 3 months (single source; accepted by author); stent 6 months (elective PCI) / 12 months (ACS), time-sensitive ≥ 1 month DAPT (3 after ACS) [ESC 2022]",
   "Prepare 6 Anticoagulants: Cockcroft–Gault CrCl (actual weight) from creatinine; DOAC days off: Xa 1 / 2; dabigatran CrCl ≥ 50 1 / 2, 30–49 2 / 4 [PAUSE]; restart 24 h / 48–72 h; warfarin 5 days, INR > 1.5 vit K 1–2 mg, bridge only high thrombotic risk; aspirin continue; clopidogrel 5, ticagrelor 3–5, prasugrel 7 days",
-  "Prepare 7 Diabetes: long-acting −20%; premixed halve morning dose; basal-bolus basal −20%, omit short-acting; SGLT2 3 days (as Regular drugs); sulfonylurea omit; target 6–12 mmol/L [CPOC]; VRIII triggers — insulin table partly from a local CPOC adaptation, please check",
+  "Prepare 7 Diabetes: long-acting −20%; premixed halve morning dose; basal-bolus basal −20%, omit short-acting; SGLT2 3 days (as Regular drugs); sulfonylurea omit; target 6–12 mmol/L [CPOC]; VRIII triggers — insulin table partly from a local CPOC adaptation (accepted by author)",
   "Prepare 8 Pacemaker / ICD: suspend ICD shocks above umbilicus (programming or magnet); dependent → asynchronous by programming; pads on; bipolar / short bursts; restore and re-enable after",
   "Prepare 9 Premedication (adult): midazolam PO 7.5 mg (3.75 elderly), IV 0.02–0.03 mg/kg LBW max 2 mg; temazepam 10–20 mg; omeprazole 20–40 mg; famotidine 20 mg; sodium citrate 30 mL; metoclopramide 10 mg; paracetamol 15 mg/kg max 1 g; glycopyrrolate 4 mcg/kg max 200 mcg — new caps added to the dose lock",
   "Notes 1 Premed note: switch My template (Pre-Anaesthetic Evaluation headings, ASA in Roman numerals, STOP-BANG with Low / Intermediate / High band; optional extras print only when filled) / MOH form order (PRP-BOR-38/A); Name / IC / R/N as blank labels (never typed); filled in: age, sex, weight, height (cm, or m in MOH order), BMI, physical status (ASA · CFS · METs · STOP-BANG /8 · RCRI · ARISCAT), airway (MP 1–4, TMD, Neck ROM, STOP-BANG), proposed mode and consent explanation from the Consent note; boxes for pain score, PONV Y/N, emergency / elective, medications, essential data (T, BP, HR, SpO₂, Hb, WBC, Plt, RBS, Urea, Na, K, Creatinine — creatinine also feeds CrCl); empty headings kept; nothing saved"]]);
