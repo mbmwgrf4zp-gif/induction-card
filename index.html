@@ -633,7 +633,7 @@ if (window.top !== window.self && /\.github\.io$/.test(location.hostname)) {
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.47.0";
+const APP_VERSION = "2.47.1";
 const APP_DATE = "21 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
@@ -1806,7 +1806,7 @@ const CRISIS_CHECKED = true;
 const UPD_CHECKED = true;
 const updNote = (g, srcs) => UPD_CHECKED ? "" : `<div class="warn"><b>DRAFT — updated to ${g}</b>, verified from ${srcs}. Tick on the Values sheet.</div>`;
 const newerFlag = (name, yr, cur) => `<div class="newer"><b>⟳ Newer guideline published:</b> ${name} (${yr}). This card still follows ${cur} until it is updated from the full text.</div>`;
-const LAST_CHECKED = false;
+const LAST_CHECKED = true;
 const lastDraft = () => LAST_CHECKED ? "" : `<div class="warn">DRAFT — updated to Association of Anaesthetists QRH 3-10 v.2 (2023): slower bolus, arrest changes. Not yet ticked by you.</div>`;
 let WKS = false, CRISIS_W = null;   // emergency cards: sample weight → no totals
 const crisisDraft = () => CRISIS_CHECKED ? "" : `<div class="warn" style="margin-top:0">DRAFT — from published guidelines, not yet ticked by you.</div>`;
@@ -3595,7 +3595,7 @@ VGROUPS.find(g => g[0]==="General")[1].push(["Premed expansion: 6 cards, premed 
   "Prepare 8 Pacemaker / ICD: suspend ICD shocks above umbilicus (programming or magnet); dependent → asynchronous by programming; pads on; bipolar / short bursts; restore and re-enable after",
   "Prepare 9 Premedication (adult): midazolam PO 7.5 mg (3.75 elderly), IV 0.02–0.03 mg/kg LBW max 2 mg; temazepam 10–20 mg; omeprazole 20–40 mg; famotidine 20 mg; sodium citrate 30 mL; metoclopramide 10 mg; paracetamol 15 mg/kg max 1 g; glycopyrrolate 4 mcg/kg max 200 mcg — new caps added to the dose lock",
   "Notes 1 Premed note: switch My template (Pre-Anaesthetic Evaluation headings, ASA in Roman numerals, STOP-BANG with Low / Intermediate / High band; optional extras print only when filled) / MOH form order (PRP-BOR-38/A); Name / IC / R/N as blank labels (never typed); filled in: age, sex, weight, height (cm, or m in MOH order), BMI, physical status (ASA · CFS · METs · STOP-BANG /8 · RCRI · ARISCAT), airway (MP 1–4, TMD, Neck ROM, STOP-BANG), proposed mode and consent explanation from the Consent note; boxes for pain score, PONV Y/N, emergency / elective, medications, essential data (T, BP, HR, SpO₂, Hb, WBC, Plt, RBS, Urea, Na, K, Creatinine — creatinine also feeds CrCl); empty headings kept; nothing saved"]]);
-VGROUPS.find(g => g[0]==="Emergencies")[1].push(["LA toxicity (adult and paeds) — QRH 3-10 v.2 (DRAFT — tick to sign off)", "", [
+VGROUPS.find(g => g[0]==="Emergencies")[1].push(["LA toxicity (adult and paeds) — QRH 3-10 v.2", "21 Nov 2026", [
   "Lipid 20% bolus 1.5 mL/kg over 2–3 min (was 1 min); infusion 15 mL/kg/h; repeat bolus at 5 and 10 min if unstable; double to 30 mL/kg/h any time after 5 min; max 12 mL/kg",
   "Cardiac arrest: adrenaline ≤ 1 mcg/kg (not 1 mg); avoid vasopressin; no lignocaine; recovery may take > 1 h — consider bypass; pregnant: perimortem caesarean",
   "Airway: avoid hypercarbia (mild hyperventilation); seizures: small incremental benzodiazepine; after: exclude pancreatitis, report",
