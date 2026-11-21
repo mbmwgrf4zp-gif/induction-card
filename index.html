@@ -635,7 +635,7 @@ if (window.top !== window.self && /\.github\.io$/.test(location.hostname)) {
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.53.0";
+const APP_VERSION = "2.53.1";
 const APP_DATE = "21 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
@@ -2258,7 +2258,7 @@ gaCards.steroid = () => `<div class="card"><h2>4. Steroid cover</h2>${gaDraft()}
   <p>On ≥ 5 mg prednisolone (or equivalent) for &gt; 4 weeks:</p>
   <ul><li>Give usual morning dose</li><li>Major / moderate surgery: <b>hydrocortisone 100 mg IV</b> at induction, then 200 mg / 24 h infusion (or 50 mg 6-hourly)</li><li>Minor surgery: usual dose ± 100 mg at induction</li></ul>
   ${src("Association of Anaesthetists 2020 steroid guideline · latest available, checked Nov 2026")}</div>`;
-const AWOP_CHECKED = false;
+const AWOP_CHECKED = true;
 const awopDraft = () => AWOP_CHECKED ? "" : `<div class="warn" style="margin-top:0">DRAFT — airway checklist rebuilt (history, examination, rescue, aspiration risk, plan tier) and Proceed / Common conditions merged into one card with conflicts resolved. Not yet ticked by you.</div>`;
 // [key, label, predicts: M mask ventilation · L laryngoscopy · F front-of-neck]
 const AW_HX = [["prev","Previous difficult airway, or alert in the notes","ML"],["osa","Snoring / OSA","M"],["strid","Stridor, voice change or difficulty swallowing","MLP"],
@@ -3703,7 +3703,7 @@ VGROUPS.find(g => g[0]==="General")[1].push(["NAP3 neuraxial figures", "21 Nov 2
   "Obstetric (all blocks) 1.2 / 0.3 per 100,000 = about 1 in 80,000 to 1 in 320,000; no paraplegia or death. Used when the Caesarean section risk is ticked, and in the detailed labour note",
   "Labour figures kept from the OAA card; all consistent with NAP3 Chapter 16 and Ruppen 2006 (haematoma 1 in 168,000, deep infection 1 in 145,000). Permanent nerve damage kept at the more cautious 1 in 13,000",
   "Detailed notes only; brief notes keep the MOH form bands without numbers"]]);
-VGROUPS.find(g => g[0]==="General")[1].push(["Airway checklist & Optimise or postpone (DRAFT — tick to sign off)", "", [
+VGROUPS.find(g => g[0]==="General")[1].push(["Airway checklist & Optimise or postpone", "21 Nov 2026", [
   "Airway checklist: history (previous difficulty, OSA, stridor / voice / swallowing, head and neck radiotherapy or surgery, cervical spine), examination (Mallampati, neck extension, mouth opening < 3 cm, TMD < 6 cm, jaw protrusion, beard, no teeth, prominent teeth, neck > 40 cm; BMI ≥ 35 and age > 55 from Patient), rescue (cricothyroid membrane)",
   "Tiers (advice only): consider awake intubation if stridor / airway pathology or ≥ 2 mask and ≥ 2 laryngoscopy flags; anticipated difficult if previous difficulty or ≥ 2 flags of either kind; single predictor = routine with kit ready",
   "Aspiration risk (full stomach, reflux, gastroparesis, GLP-1 agonist, pregnancy > 18 weeks) suggests RSI in the plan; anticipated difficult suggests the consent Difficult airway risk",
@@ -3773,7 +3773,7 @@ function vTicks(){
 }
 /* ---------- ABOUT ---------- */
 const CHANGES = [
-  ["2.53","Airway assessment rebuilt as a checklist with plan tier and aspiration risk; Optimise or postpone merged into one card (draft)"],
+  ["2.53","Airway assessment rebuilt as a checklist with plan tier and aspiration risk; Optimise or postpone merged into one card (checked)"],
   ["2.52","Consent notes copy as plain text: paragraphs, blank lines and hyphen bullets"],
   ["2.51","NAP3 permanent-harm figures in the detailed spinal / epidural and labour notes (checked)"],
   ["2.50","Labour epidural note laid out like the GA and spinal notes (checked)"],
