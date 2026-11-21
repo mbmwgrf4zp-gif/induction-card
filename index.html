@@ -619,6 +619,7 @@ a{color:var(--accent)}
 .cwt{margin:0 0 6px;font-size:var(--fs-sm);color:var(--muted)}.cwt b{color:var(--ink)}
 .scdone{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-top:6px}.scdone .linkbtn{width:auto;margin:0;min-height:36px}
 .offl{font-size:11px;opacity:.85}
+.planout{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:8px 0;padding:8px 10px;border:1px solid var(--line);border-radius:var(--r-sm);background:var(--bg)}.planout b{flex:1;min-width:140px}
 </style>
 </head>
 <body>
@@ -633,7 +634,7 @@ if (window.top !== window.self && /\.github\.io$/.test(location.hostname)) {
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.47.1";
+const APP_VERSION = "2.48.0";
 const APP_DATE = "21 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
@@ -726,7 +727,7 @@ const PEARLS = [
   ["It is easier to manage hypotension than an inadequate block.","A1. Spinal: dose by height","obs","lscs"],
   ["4/2/1: a 10 kg child needs 40 mL/h maintenance.","1. Fluids: maintenance & insensible loss","paeds","intra"],
   ["Apfel 2 risk factors = 39% PONV risk → give 2 agents.","3. PONV: Apfel score","ga","post"],
-  ["SGLT2 inhibitors: stop 3 days before surgery (ertugliflozin 4).","4. Regular drugs: stop or continue","premed","prepare"],
+  ["SGLT2 inhibitors: stop 3 days before surgery (ertugliflozin 4).","1. Regular drugs: stop or continue","premed","prepare"],
   ["Laryngospasm: suxamethonium 0.1–0.5 mg/kg IV with atropine 0.02 mg/kg.","Laryngospasm","emerg","paeds"]];
 const CAPNO = (() => { let d = "M0 40"; for (let i=0;i<6;i++){ const x=i*100; d += ` L${x+18} 40 L${x+23} 13 Q${x+40} 10 ${x+58} 8 L${x+63} 40 L${x+100} 40`; } return d; })();
 function greet(){ const h = new Date().getHours(); return h<5 ? "Night shift" : h<12 ? "Good morning" : h<17 ? "Good afternoon" : "Good evening"; }
@@ -853,7 +854,7 @@ const QT = (() => {
     ans:()=>{ const mo=AGEM(), k=mo<1?85:mo<12?80:S.pY<12?75:70; return sm(dz(k*S.pw,"mL"),`mL · ${k} mL/kg`); }},
   mann:{lab:"Transplant mannitol", ic:"tx", cls:"t-tx", kind:"adult", keys:["aw"], inp:()=>`${sig(S.aw)} kg dry`, open:["5. Anastomosis & reperfusion","tx","intra"],
     ans:()=>sm(dz(2.5*S.aw,"mL"),`mL of 20% = ${dz(0.5*S.aw,"g")} g`)},
-  cons:{lab:"Consent note", ic:"values", cls:"t-ga", kind:"any", txt:true, keys:[], inp:()=>store.get("consLast","cs")==="le" ? "labour epidural" : "shortcut", open:["2. Consent note","premed","consent"],
+  cons:{lab:"Plan & consent", ic:"values", cls:"t-ga", kind:"any", txt:true, keys:[], inp:()=>store.get("consLast","cs")==="le" ? "labour epidural" : "shortcut", open:["1. Anaesthetic plan & consent","premed","consent"],
     ans:()=>{ if (store.get("consLast","cs")==="le") return sm("Epidural","labour note — tap to copy"); const t = CS_TECH.filter(([k]) => csOn(k, {}) && csChosen(k)).map(x=>x[2]); return t.length ? sm(t.join(" + "),"note ready — tap to copy") : sm("Build","tap to write the note"); }},
   psum:{lab:"Pre-op summary", ic:"values", cls:"t-ga", kind:"any", txt:true, keys:[], inp:()=>"shortcut", goTab:"premed:assess",
     ans:()=>{ const p = []; if (S.asa) p.push(`ASA ${S.asa}${scv("pre","asaE")===1?"E":""}`); if (RCRI.some(([k]) => scv("rcri",k)!=null)) p.push(rcriDone() ? `RCRI ${cnt("rcri", RCRI.map(x=>x[0]))}` : "RCRI incomplete"); if (sbTouched()) p.push(`STOP-BANG ${sbScore()}`); if (S.met) p.push(`METs ${({lt4:"&lt; 4",4:"4–10",gt10:"&gt; 10"})[S.met]}`); if (scv("cfs","v")) p.push(`CFS ${scv("cfs","v")}`);
@@ -2007,14 +2008,14 @@ function gaInputs(){
 
 const gaCards = {};
 /* PRE-OP */
-gaCards.fasting = () => `<div class="card"><h2>3. Fasting</h2>${gaDraft()}
+gaCards.fasting = () => `<div class="card"><h2>5. Fasting</h2>${gaDraft()}
   <table><tr><td>Clear fluids</td><td class="hl">2 h</td></tr><tr><td>Light meal, milk</td><td class="hl">6 h</td></tr><tr><td>Fatty / heavy meal</td><td class="hl">8 h</td></tr></table>
   <h3>GLP-1 agonists (semaglutide, liraglutide…)</h3>${updNote("2024 multisociety GLP-1 guidance","AGA (gastro.org) + EMJ / News-Medical coverage of the guidance")}
   <ul><li><b>Most patients continue</b> the drug as prescribed; assess individual risk</li>
   <li><b>Higher risk</b> (dose-escalation phase, higher doses, GI symptoms, other causes of slow gastric emptying): <b>clear-liquid diet for 24 h</b> before; adjust the anaesthetic plan (e.g. RSI, gastric ultrasound); holding the drug may be considered, weighed against glycaemic risk; rarely, delay</li>
   <li>Nausea, vomiting or bloating on the day: treat as <b>full stomach</b></li></ul>
   ${src("ASA / ESAIC fasting guidance; Multisociety GLP-1 guidance (ASA, AGA, ASMBS, ISPCOP, SAGES) 2024.")}</div>`;
-gaCards.meds = () => `<div class="card"><h2>4. Regular drugs: stop or continue</h2>${gaDraft()}
+gaCards.meds = () => `<div class="card"><h2>1. Regular drugs: stop or continue</h2>${gaDraft()}
   <table>
   <tr><th>Continue</th><td>Beta-blockers, statins, antiepileptics, inhalers, thyroxine, antiparkinson, steroids</td></tr>
   <tr><th>Omit morning</th><td>ACEi / ARB, diuretics, sulfonylureas</td></tr>
@@ -2040,7 +2041,7 @@ function preScoreTxt(){
 }
 
 /* Assess 9 — proceed or postpone */
-gaCards.postpone = () => `<div class="card"><h2>9. Proceed or postpone: cut-offs</h2>${pm2Draft()}
+gaCards.postpone = () => `<div class="card"><h2>11. Proceed or postpone: cut-offs</h2>${pm2Draft()}
   <p class="sub">Elective surgery. Urgent / emergency: weigh the delay against the risk; senior decision.</p>
   <table><tr><th>Blood pressure</th><td>Postpone if clinic <b>≥ 180/120</b> (home / ambulatory ≥ 175/115) without documented normal readings in primary care <span class="sub">(2026 update; was 180/110)</span></td></tr>
   <tr><th>HbA1c</th><td><b>≥ 69 mmol/mol (8.5%)</b>: refer to optimise before elective surgery</td></tr>
@@ -2054,15 +2055,15 @@ gaCards.postpone = () => `<div class="card"><h2>9. Proceed or postpone: cut-offs
   <tr><th>Stroke / TIA</th><td>Defer elective surgery <b>≥ 3 months</b></td></tr>
   <tr><th>Active cardiac condition</th><td>Unstable angina, decompensated heart failure, significant arrhythmia, symptomatic severe valve disease: postpone, cardiology</td></tr>
   <tr><th>Chest infection / URTI</th><td>Fever, productive cough or chest signs: postpone about 2–4 weeks</td></tr></table>
-  <button class="homebtn" data-open="8. Echo report: what matters" data-g="premed" data-tab="assess">Valve lesions and EF → Echo report ›</button>
-  <button class="homebtn" data-open="2. Common conditions: optimise or postpone" data-g="premed" data-tab="prepare">Condition by condition → Common conditions ›</button>
+  <button class="homebtn" data-open="2. Echo report: what matters" data-g="premed" data-tab="assess">Valve lesions and EF → Echo report ›</button>
+  <button class="homebtn" data-open="10. Common conditions: optimise or postpone" data-g="premed" data-tab="assess">Condition by condition → Common conditions ›</button>
   ${src("Association of Anaesthetists / BHS peri-operative BP guideline (2016, updated 2026); Association of Anaesthetists diabetes guideline; ESC 2022 / ACC-AHA 2024 non-cardiac surgery; WHO anaemia thresholds.")}</div>`;
 
 /* Prepare 6 — anticoagulants & antiplatelets */
 const crcl = () => { if (isSample("crea") || !S.crea) return null; const f = S.sex === "M" ? 1.23 : 1.04; return (140 - S.age) * S.aw * f / S.crea; };
 gaCards.pmAnticoag = () => { const c = crcl(), cr = c == null ? "" : ` · CrCl ≈ <b>${Math.round(c)} mL/min</b> (Cockcroft–Gault, actual weight)`;
   const dab = c == null ? "" : c >= 50 ? " — <b>CrCl ≥ 50: use the first row</b>" : c >= 30 ? " — <b>CrCl 30–49: use the second row</b>" : " — <b>CrCl &lt; 30: discuss with haematology</b>";
-  return `<div class="card"><h2>6. Anticoagulants &amp; antiplatelets</h2>${pm2Draft()}
+  return `<div class="card"><h2>2. Anticoagulants &amp; antiplatelets</h2>${pm2Draft()}
   <p class="sub">For the surgery itself. Neuraxial and deep blocks have their own timings (link below).</p>
   ${step("crea","Creatinine","µmol/L",30,1200,5)}<p class="sub" style="margin-top:4px">${c == null ? "Enter creatinine for CrCl." : `Age ${S.age}, ${sig(S.aw)} kg${cr}`}</p>
   <h3>DOACs — days with no dose before surgery</h3>
@@ -2084,7 +2085,7 @@ gaCards.pmAnticoag = () => { const c = crcl(), cr = c == null ? "" : ` · CrCl �
   ${src("PAUSE trial (Douketis, JAMA Intern Med 2019); ACCP perioperative antithrombotic guideline 2022; ESC 2022 non-cardiac surgery; BSH warfarin reversal guidance.")}</div>`; };
 
 /* Prepare 7 — diabetes day-of-surgery plan */
-gaCards.dmplan = () => `<div class="card"><h2>7. Diabetes: day-of-surgery plan</h2>${pm2Draft()}
+gaCards.dmplan = () => `<div class="card"><h2>3. Diabetes: day-of-surgery plan</h2>${pm2Draft()}
   <p class="sub">Aim for a short fast: first on the list. Glucose target in theatre <b>6–12 mmol/L</b>; treat &lt; 4.</p>
   <h3>Insulin</h3><table><tr><th>Type</th><th>Day before</th><th>Day of surgery</th></tr>
   <tr><td>Once-daily long-acting (glargine, detemir, degludec)</td><td>Reduce by 20% if taken in the evening</td><td>Reduce by 20% if taken in the morning; check glucose on admission</td></tr>
@@ -2099,11 +2100,11 @@ gaCards.dmplan = () => `<div class="card"><h2>7. Diabetes: day-of-surgery plan</
   <tr><th>GLP-1 agonists</th><td>Usually continue; check the fasting card for GI symptoms</td></tr></table>
   <h3>Variable-rate insulin infusion when</h3><ul><li>More than one missed meal expected</li><li>Poorly controlled (glucose &gt; 12 mmol/L on two readings)</li><li>Type 1 diabetes without basal insulin, or emergency surgery with high glucose</li></ul>
   <p class="sub">Check capillary glucose at least hourly in theatre and recovery. Ketones ≥ 3 mmol/L: treat as DKA.</p>
-  <button class="homebtn" data-open="4. Regular drugs: stop or continue" data-g="premed" data-tab="prepare">Other regular drugs → Regular drugs ›</button>
+  <button class="homebtn" data-open="1. Regular drugs: stop or continue" data-g="premed" data-tab="prepare">Other regular drugs → Regular drugs ›</button>
   ${src("CPOC perioperative diabetes guideline (2021, updated 2023); Association of Anaesthetists diabetes guideline; local adaptations.")}</div>`;
 
 /* Prepare 8 — pacemaker / ICD */
-gaCards.cied = () => `<div class="card"><h2>8. Pacemaker / ICD</h2>${pm2Draft()}
+gaCards.cied = () => `<div class="card"><h2>7. Pacemaker / ICD</h2>${pm2Draft()}
   <h3>Find out</h3><ul><li>Device type (pacemaker, ICD, CRT), maker, reason fitted, last check and battery</li>
   <li><b>Pacing-dependent?</b> (underlying rhythm on ECG, device card or clinic letter)</li>
   <li>Where the surgery and diathermy will be relative to the device</li></ul>
@@ -2119,7 +2120,7 @@ gaCards.cied = () => `<div class="card"><h2>8. Pacemaker / ICD</h2>${pm2Draft()}
 
 /* Prepare 9 — premedication drugs (adult) */
 gaCards.premeds = () => { const W2 = wts(), old = (S.touched.age && S.age >= 70) || scv("cfs","v") >= 5;
-  return `<div class="card"><h2>9. Premedication drugs</h2>${pm2Draft()}
+  return `<div class="card"><h2>6. Premedication drugs</h2>${pm2Draft()}
   <p class="sub">Adults. Children: Paediatric › Pre-op › Premedication.</p>
   <h3>Anxiolysis</h3>${GT([
     R("Midazolam oral", old ? "elderly / frail: 3.75 mg" : "7.5 mg (elderly / frail 3.75 mg)", old ? "<b>3.75 mg</b>" : "<b>7.5 mg</b>", "30–60 min before"),
@@ -2137,7 +2138,10 @@ gaCards.premeds = () => { const W2 = wts(), old = (S.touched.age && S.age >= 70)
   ${src("BNF; PROSPECT; Association of Anaesthetists aspiration and premedication guidance.")}</div>`; };
 
 /* Notes 1 — premed note: author's template or MOH Anaesthesia Record (PRP-BOR-38/A) order */
-const PN_PLAN = [["ga","GA"],["ra","Regional"],["mac","Monitored anaesthesia care"],["rsi","RSI"],["art","Arterial line"],["hdu","Post-op HDU / ICU"],["pca","PCA"]];
+const PL_X = [["rsi","RSI"],["art","Arterial line"],["cvc","Central line"],["hdu","Post-op HDU / ICU"],["pca","PCA"]];
+const PL_TECH = {ga:"GA", sp:"Spinal", epi:"Epidural / CSE", pnb:"Nerve block", sed:"Monitored anaesthesia care"};
+const planTech = () => csMode() === "le" ? "Labour epidural" : CS_TECH.filter(([k]) => csOn(k, {}) && csChosen(k)).map(([k]) => PL_TECH[k]).join(" + ");
+const planLine = () => [planTech(), ...PL_X.filter(([k]) => scv("pl", k) === 1).map(x => x[1].replace(/^(Arterial|Central|Post-op)/, c => c.toLowerCase()))].filter(Boolean).join("; ");
 // free-text fields: [heading, quick ticks, multi-line]
 const PN_F = {allergy:["Allergy",[["nkda","NKDA"]]], dent:["Dentition",[["dint","Intact"],["dloose","Loose teeth"],["dden","Dentures"]]],
   dx:["Diagnosis",[]], op:["Op/procedure",[]], under:["Underlying problem",[],true], curr:["Current assessment",[],true], meds:["Medications",[],true],
@@ -2181,7 +2185,7 @@ function premedText(){
   const ac = activeCase(), age = ac ? caseAgeTxt(ac) : has("age") ? `${S.age} years` : "", sex = has("sex") ? (S.sex === "M" ? "M" : "F") : "";
   const wt = has("aw") ? `${sig(S.aw)} kg` : "", bmi = has("aw") && has("height") ? `${sig(W2.bmi)}` : "";
   const pain = pnRaw("pain"), ponv = S.pnPonv ? (S.pnPonv === "Y" ? "Y" : "N") : "", urg = S.pnUrg ? (S.pnUrg === "em" ? "Emergency" : "Elective") : "";
-  const cs = pnConsent(), plan = PN_PLAN.filter(([k]) => pnOn(k)).map(x => x[1]).join(", ");
+  const cs = pnConsent(), plan = planLine();
   const assess = [pnVal("under"), pnVal("curr"), pnVal("pe")].filter(Boolean).join("; ");
   if (moh){
     L.push("Anaesthesia record — pre-operative (MOH PRP-BOR-38/A)");
@@ -2193,11 +2197,11 @@ function premedText(){
     line("Assessment", assess); line("Medications", pnVal("meds")); gap();
     line("Essential data", [pnEd(PN_VITALS), pnEd(PN_LABS)].filter(Boolean).join(" · "));
     line("Miscellaneous investigations", [pnVal("blood"), pnVal("other")].filter(Boolean).join("; ")); gap();
-    line("Proposed mode of anaesthesia", pnMode());
+    line("Proposed mode of anaesthesia", planTech());
     L.push(cs ? `Consent explanation:\n${cs}` : "Consent explanation:"); gap(); line("Plan", plan);
   } else {
     const opt = (h, v) => { if (v) line(h, v); };
-    const mode = pnMode(), dup = mode && plan.toLowerCase().split(/,\s*/).some(x => x && mode.toLowerCase() === x.toLowerCase()), aplan = [plan, mode && !dup ? `proposed: ${mode}` : ""].filter(Boolean).join("; ");
+    const aplan = plan;
     L.push("Pre-Anaesthetic Evaluation"); gap();
     line("Name"); line("NRIC / Passport"); line("Age", age); opt("Sex", sex === "M" ? "Male" : sex === "F" ? "Female" : ""); gap();
     line("Allergies", pnVal("allergy")); line("Dentition", pnVal("dent")); opt("Pain score", pain); opt("PONV history", ponv === "Y" ? "Yes" : ponv === "N" ? "No" : ""); gap();
@@ -2214,7 +2218,7 @@ const pnField = f => { const [h, ticks, multi] = PN_F[f], v = esc((S.pnF || {})[
     ${multi ? `<textarea id="pnf-${f}" class="csnote" rows="2" maxlength="300" data-pnf="${f}">${v}</textarea>` : `<input id="pnf-${f}" class="search pnin" maxlength="160" autocomplete="off" data-pnf="${f}" value="${v}">`}</div>`; };
 const pnSmall = (k, l, ph) => `<label class="pned"><span>${l}</span><input class="search pnin" maxlength="24" autocomplete="off" inputmode="text" data-pnf="${k}" value="${esc((S.pnF||{})[k] || (k === "cr" && S.touched.crea ? String(S.crea) : ""))}" placeholder="${ph||""}"></label>`;
 gaCards.pnote = () => { const txt = premedText();
-  return `<div class="card"><h2>1. Premed note</h2>${pm2Draft()}
+  return `<div class="card"><h2>2. Premed note</h2>${pm2Draft()}
   <p class="sub">Name, IC and R/N copy out as blank labels — <b>never type them here</b>. Age, sex, weight, height, BMI, physical status, STOP-BANG, mode of anaesthesia and the consent explanation fill in from the rest of the app. Nothing is saved.</p>
   ${seg("pnLay",[["mine","My template"],["moh","MOH form order"]])}
   ${pnField("allergy")}${pnField("dent")}
@@ -2229,18 +2233,17 @@ gaCards.pnote = () => { const txt = premedText();
   <div class="pnf"><span class="sub">Essential data</span><div class="pngrid">${PN_ED.map(([k,l,u]) => pnSmall(k, l + (u ? ` (${u})` : ""), k === "hb" ? "e.g. 12.8" : k === "bp" ? "120/80" : "")).join("")}</div>
     <p class="sub">Creatinine here also feeds the CrCl on the Anticoagulants card.</p></div>
   ${pnField("blood")}${pnField("other")}
-  <div class="pnf"><span class="sub">Plan</span><div class="txck">${PN_PLAN.map(([k,l]) => tog("pn",k,l)).join("")}</div></div>
   <div class="warn">No names, IC or MRN in any box.</div>
   <div class="cstext">${esc(txt).replace(/\n/g,"<br>")}</div>
-  <div class="psbtns"><button class="iconbtn" data-copy="${esc(txt)}">${S.copied?"Copied ✓":"Copy text"}</button><button class="iconbtn" data-pnclear="1">Clear</button></div>
-  <p class="sub">Proposed mode and consent explanation come from card 2 (Consent note). Empty headings stay in so you can finish on the hospital system.</p>
+  <div class="psbtns"><button class="iconbtn" data-copy="${esc(txt)}">${S.copied?"Copied ✓":"Copy full note"}</button><button class="iconbtn" data-pnclear="1">Clear</button></div>
+  <p class="sub">Anaesthetic plan and consent come from card 1 (Anaesthetic plan &amp; consent). Empty headings stay in so you can finish on the hospital system.</p>
   ${src("Author's preoperative assessment template; Ministry of Health Malaysia Anaesthesia Record PRP-BOR-38/A (2024).")}</div>`; };
 
-gaCards.steroid = () => `<div class="card"><h2>5. Steroid cover</h2>${gaDraft()}
+gaCards.steroid = () => `<div class="card"><h2>4. Steroid cover</h2>${gaDraft()}
   <p>On ≥ 5 mg prednisolone (or equivalent) for &gt; 4 weeks:</p>
   <ul><li>Give usual morning dose</li><li>Major / moderate surgery: <b>hydrocortisone 100 mg IV</b> at induction, then 200 mg / 24 h infusion (or 50 mg 6-hourly)</li><li>Minor surgery: usual dose ± 100 mg at induction</li></ul>
   ${src("Association of Anaesthetists 2020 steroid guideline · latest available, checked Nov 2026")}</div>`;
-gaCards.airway = () => `<div class="card"><h2>2. Airway assessment &amp; plan</h2>${gaDraft()}
+gaCards.airway = () => `<div class="card"><h2>1. Airway assessment &amp; plan</h2>${gaDraft()}
   <h3>Predictors of difficulty</h3>
   <ul><li>Previous difficulty (ask, check notes)</li><li>Mallampati III–IV, mouth opening &lt; 3 cm, thyromental &lt; 6 cm</li><li>Poor jaw protrusion, limited neck movement</li><li>BMI &gt; 35, neck circumference &gt; 40 cm, OSA (STOP-BANG ≥ 3)</li><li>Beard, no teeth, airway pathology, radiotherapy</li></ul>
   <h3>Plan before induction</h3>
@@ -2406,6 +2409,7 @@ gaCards.cond = () => `<div class="card"><h2>Common conditions: optimise or postp
   <tr><td><b>Smoking / alcohol</b></td><td>Stop smoking ≥ 4 weeks before if possible (any time helps); screen for alcohol dependence</td></tr></table>
   <p class="sub">Urgent or cancer surgery: balance delay against these — discuss with senior and the surgeon.</p>
   <button class="homebtn" data-open="3. PONV: Apfel score" data-g="ga" data-tab="post">PONV risk (Apfel) → General › Post-op ›</button>
+  <button class="homebtn" data-open="11. Proceed or postpone: cut-offs" data-g="premed" data-tab="assess">Thresholds on one page → Proceed or postpone ›</button>
   ${src("Association of Anaesthetists / BHS hypertension 2016; CPOC diabetes 2021; ACC/AHA perioperative guideline 2024; ESC 2022; International consensus on peri-operative anaemia 2017; BHRS / Association CIED guidance.")}</div>`;
 /* summary at top of the Pre-op tab */
 function preSummary(){
@@ -2507,21 +2511,23 @@ gaCards.consent = () => { const auto = csAuto(), txt = consentText(), tech = CS_
   const ch = ([k]) => { const on = csChosen(k); return `<button class="txci ${on?"on":""}" data-score="csc:${k}:${on?0:1}" aria-pressed="${on}"><span class="box">${on?"✓":""}</span><span>${CS_META[k][1]}</span></button>`; };
   const ind = S.csOut === "ind"; let n = 0; const h = t => `<h3>${++n}. ${t}</h3>`;
   S.csMode = csMode();
-  if (S.csMode === "le") return `<div class="card"><h2>Consent note</h2>
-  <p class="sub">A block to paste in your notes after your own explanation — not a consent form. Nothing here is saved.</p>
-  ${seg("csMode",[["ga","Anaesthetic"],["le","Labour epidural"]])}${lepBody()}</div>`;
-  return `<div class="card"><h2>Consent note</h2>${consDraft()}${cs2Draft()}
-  <p class="sub">A block to paste between <b>Assessment</b> and <b>Plan</b> in your notes, after your own explanation — not a consent form. Nothing here is saved.</p>
+  if (S.csMode === "le") return `<div class="card"><h2>Anaesthetic plan &amp; consent</h2>
+  <p class="sub">Decide the plan, explain it, then copy. Nothing here is saved. The Premed note (card 2) picks this up.</p>
+  ${seg("csMode",[["ga","Anaesthetic"],["le","Labour epidural"]])}<h3>Plan extras</h3><div class="txck">${PL_X.map(([k,l]) => tog("pl",k,l)).join("")}</div>
+  <div class="planout"><span class="sub">Anaesthetic plan</span><b>${esc(planLine()) || "— tick a technique"}</b>${planLine() ? `<button class="iconbtn" data-copy="${esc(planLine())}">Copy plan</button>` : ""}</div>${lepBody()}</div>`;
+  return `<div class="card"><h2>Anaesthetic plan &amp; consent</h2>${consDraft()}${cs2Draft()}
+  <p class="sub">Decide the plan, explain it, then copy. Not a consent form. Nothing here is saved. The Premed note (card 2) picks this up.</p>
   ${seg("csMode",[["ga","Anaesthetic"],["le","Labour epidural"]])}
   ${seg("csOut",[["full","Notes block"],["ind","Individual risks only (form box)"]])}
   ${ind ? "" : h("Techniques explained") + `<div class="txck">${CS_TECH.map(([k,l]) => tg(k,l)).join("")}</div>`}
   ${!ind && tech.length > 1 ? h("Planned technique") + `<p class="sub">Untick any that were only discussed as an alternative.</p><div class="txck">${tech.map(ch).join("")}</div>` : ""}
+  ${ind ? "" : h("Plan extras") + `<div class="txck">${PL_X.map(([k,l]) => tog("pl",k,l)).join("")}</div><div class="planout"><span class="sub">Anaesthetic plan</span><b>${esc(planLine()) || "— tick a technique"}</b>${planLine() ? `<button class="iconbtn" data-copy="${esc(planLine())}">Copy plan</button>` : ""}</div>`}
   ${h("Individual risks for this patient")}<div class="txck">${CS_ADD.map(([k,l]) => tg(k,l,auto[k])).join("")}</div>
   ${ind ? "" : h("Who, how and length") + seg("csWho",[["patient","Patient"],["parent","Parent / guardian"]]) + seg("csLang", CS_LANG) + `<div class="txck">${tog("cs","interp","Interpreter used")}</div>` + seg("csLen",[["brief","Brief (2–3 examples)"],["detailed","Detailed (full lists)"]])}
   ${h("This patient's concerns or questions")}
   <textarea id="csNote" class="csnote" rows="2" maxlength="300" placeholder="e.g. worried about awareness — reassured, depth monitoring planned. No names or IC.">${esc(S.csNote || "")}</textarea>
   ${txt ? `<div class="cstext">${esc(txt).replace(/\n/g,"<br>")}</div>
-  <div class="psbtns"><button class="iconbtn" data-copy="${esc(txt)}">${S.copied?"Copied ✓":"Copy text"}</button><button class="iconbtn" data-csclear="1">Clear</button></div>
+  <div class="psbtns"><button class="iconbtn" data-copy="${esc(txt)}">${S.copied?"Copied ✓":"Copy consent"}</button><button class="iconbtn" data-csclear="1">Clear</button></div>
   <div class="warn"><b>Edit for this patient before filing.</b> Add anything that matters to them in particular (occupation, loose teeth, previous problems). An identical note for every patient is weak evidence of a real discussion.</div>`
   : `<div class="result">${ind ? "Tick the individual risks, or type the patient's concerns, to fill the form's individual-risks box." : "Tick at least one technique to build the block."}</div>`}
   <p class="sub">Bands match the official form: common · possible but uncommon · very rare. Consent for the operation itself is the surgeon's.</p>
@@ -2571,8 +2577,8 @@ function lepBody(){ const txt = lepText();
   <p class="sub">Frequencies are estimates from published data and may differ between units.</p>
   ${src("OAA labour epidural information card; NAP3 (Cook et al., BJA 2009); Moen et al., Anesthesiology 2004; Ministry of Health Malaysia anaesthesia consent form.")}`; }
 obsCards.lConsent = () => `<div class="card"><h2>Consent note: labour epidural</h2>
-  <p class="sub">The labour epidural note lives in the consent card, so all consent notes are in one place.</p>
-  <button class="homebtn primary" data-open="2. Consent note" data-g="premed" data-tab="consent" data-csmode="le">Open consent note — Labour epidural ›</button></div>`;
+  <p class="sub">The labour epidural consent lives in Premed › Plan &amp; note, so the plan and all consent notes are in one place.</p>
+  <button class="homebtn primary" data-open="1. Anaesthetic plan & consent" data-g="premed" data-tab="consent" data-csmode="le">Open plan &amp; consent — Labour epidural ›</button></div>`;
 
 /* INDUCTION */
 gaCards.induction = () => `<div class="card"><h2>1. Induction drugs</h2>${gaDraft()}${GT([
@@ -2784,15 +2790,15 @@ txCards.cardiac = () => `<div class="card"><h2>Kidney: cardiac risk</h2>${tx2Dra
   <tr><th>Ischaemia</th><td>Exercise test / CTCA / coronary angiogram result; cardiologist input (protocol)</td></tr>
   <tr><th>Continue</th><td>Beta-blocker, statin</td></tr></table>
   <p class="sub">ECG: LVH, ischaemia, hyperkalaemia changes (peaked T, wide QRS).</p>
-  <button class="homebtn" data-open="8. Echo report: what matters" data-g="premed" data-tab="assess">Reading the echo report → General › Pre-op ›</button>
+  <button class="homebtn" data-open="2. Echo report: what matters" data-g="premed" data-tab="assess">Reading the echo report → General › Pre-op ›</button>
   ${src(TXP+"; Mayhew BJA Education 2016.")}</div>`;
 txCards.asp = () => `<div class="card"><h2>Kidney: airway &amp; aspiration</h2>${tx2Draft()}
   <ul><li>Diabetic / uraemic gastric delay → <b>RSI</b></li>
   <li>Fasting per GA rules (deceased-donor recipients often arrive non-fasted: RSI)</li>
   <li>Antacid: <b>omeprazole 20 mg PO</b> morning, or ranitidine <b>150 mg once</b> (renal dose — not twice daily)</li>
   <li>Fistula arm marked and protected; IV access difficulty noted (scan, interventional radiology)</li></ul>
-  <button class="homebtn" data-open="3. Fasting" data-g="premed" data-tab="prepare">Fasting → General › Pre-op ›</button>
-  <button class="homebtn" data-open="2. Airway assessment & plan" data-g="premed" data-tab="assess">Airway assessment → General › Pre-op ›</button>
+  <button class="homebtn" data-open="5. Fasting" data-g="premed" data-tab="prepare">Fasting → General › Pre-op ›</button>
+  <button class="homebtn" data-open="1. Airway assessment & plan" data-g="premed" data-tab="assess">Airway assessment → General › Pre-op ›</button>
   ${src(TXP+"; BNF ranitidine renal dosing; standard references.")}</div>`;
 txCards.meds = () => `<div class="card"><h2>Kidney: drugs stop or continue</h2>${tx2Draft()}
   <table><tr><th>Stop</th><td><b>Oral hypoglycaemics</b> (protocol); SGLT2 inhibitors 3 days before (ertugliflozin 4)</td></tr>
@@ -2802,7 +2808,7 @@ txCards.meds = () => `<div class="card"><h2>Kidney: drugs stop or continue</h2>$
   <tr><th>Antiplatelets / anticoagulants</th><td>Discuss with transplant team</td></tr>
   <tr><th>Omit morning</th><td>EPO, phosphate binders, calcium tablets</td></tr>
   <tr><th>Immunosuppression</th><td>Started by the transplant team — not by us</td></tr></table>
-  <button class="homebtn" data-open="4. Regular drugs: stop or continue" data-g="premed" data-tab="prepare">Full drug list → General › Pre-op ›</button>
+  <button class="homebtn" data-open="1. Regular drugs: stop or continue" data-g="premed" data-tab="prepare">Full drug list → General › Pre-op ›</button>
   ${src(TXP+"; CPOC 2021; FDA SGLT2i advice.")}</div>`;
 txCards.dd = () => `<div class="card"><h2>Kidney: deceased-donor / emergency recipient</h2>${tx2Draft()}
   <ul><li>Same plan as living-donor recipient</li><li>On-call MO reviews <b>all listed recipients</b>; discuss with the OT specialist on call</li>
@@ -3024,7 +3030,7 @@ gaCards.pressors = () => { const w = S.aw, rate = (lo,hi,conc) => `${dz(lo*w*60/
   <tr><td>Adrenaline<div class="sub">4 mg in 50 mL = 80 mcg/mL</div></td><td>0.05–0.5 mcg/kg/min</td><td class="hl">${rate(0.05,0.5,80)}</td></tr>
   <tr><td>Dobutamine<div class="sub">250 mg in 50 mL = 5 mg/mL</div></td><td>2–20 mcg/kg/min</td><td class="hl">${rate(2,20,5000)}</td></tr></table></div>
   <p class="sub">Infusion rates use actual weight. Check your unit's standard concentrations.</p>
-  <button class="homebtn" data-open="8. Echo report: what matters" data-g="premed" data-tab="assess">Valve lesion or poor EF: goals → General › Pre-op › Echo ›</button>${src("Common UK/Malaysian ICU concentrations.")}</div>`; };
+  <button class="homebtn" data-open="2. Echo report: what matters" data-g="premed" data-tab="assess">Valve lesion or poor EF: goals → General › Pre-op › Echo ›</button>${src("Common UK/Malaysian ICU concentrations.")}</div>`; };
 gaCards.abx = () => { const w = S.aw;
   return `<div class="card"><h2>7. Antibiotic prophylaxis</h2>${gaDraft()}
   <table><tr><th>Cefazolin</th><td><b>${w>=120?"3 g":"2 g"} IV</b> (${w>=120?"≥ 120 kg":"&lt; 120 kg"}) within 60 min before incision; redose every 4 h or blood loss &gt; 1.5 L</td></tr>
@@ -3666,12 +3672,12 @@ function vTicks(){
 }
 /* ---------- ABOUT ---------- */
 const CHANGES = [
+  ["2.48","Premed reorganised: Assess (examine → score → decide), Prepare (medications, before theatre), Plan & note (plan inside consent, then the note)"],
   ["2.47","Safety release: cases keep separate entries; LAST updated to QRH 2023; no sample totals in emergencies; incomplete scores flagged; offline status"],
   ["2.46","Premed: proceed-or-postpone, anticoagulants, diabetes plan, pacemaker / ICD, premedication drugs, premed note (your template or MOH form); Hb in g/dL throughout"],
   ["2.45","Premed is its own section (Assess · Prepare · Consent), moved out of General"],
   ["2.44","Four more home tile styles: ECG paper, Infusion pump, Flowmeter (moving), Editorial"],
-  ["2.43","Home tiles style setting: Chart paper (default), Monitor or Classic"],
-  ["2.42","Home section tiles redesigned as monitor channels"]];
+  ["2.43","Home tiles style setting: Chart paper (default), Monitor or Classic"]];
 const SRC_LINKS = [
   ["Emergencies", [["Resuscitation Council UK — ALS / PLS guidelines","https://www.resus.org.uk/library"],["Difficult Airway Society guidelines","https://das.uk.com/guidelines"],["Association of Anaesthetists — guidelines (anaphylaxis, LAST, safety)","https://anaesthetists.org/Home/Resources-publications/Guidelines"],["European Malignant Hyperthermia Group","https://www.emhg.org"],["UK Kidney Association — hyperkalaemia guideline","https://www.ukkidney.org/health-professionals/guidelines"]]],
   ["General", [["ASA standards & practice parameters (fasting, PACU)","https://www.asahq.org/standards-and-practice-parameters"],["Centre for Perioperative Care — diabetes guideline","https://cpoc.org.uk/guidelines-resources-guidelines"],["PROSPECT procedure-specific analgesia (ESRA)","https://esraeurope.org/prospect/"],["ASRA Pain Medicine — guidelines (ketamine, anticoagulation)","https://www.asra.com/guidelines-articles/guidelines"],["Brain Trauma Foundation guidelines","https://braintrauma.org/coma/guidelines"]]],
@@ -3881,14 +3887,17 @@ const GROUPS = [
  {id:"emerg", name:"Emergencies", sub:"Adult & obstetric · Paeds — crisis steps with doses", tabKey:"emTab", tabs:[
    {id:"adult", label:"Adult / Obstetric", input:()=>step("aw","Weight","kg",30,200,1), cards:EMERG_ADULT},
    {id:"paeds", label:"Paeds", input:()=>pInputs(), cards:EMERG_PAEDS}], cards:[]},
- {id:"premed", name:"Premed", sub:"Assess · Prepare · Notes", tabKey:"pmTab", tabs:[
-   {id:"assess", label:"Assess", input:()=>gaInputs(), top:()=>preSummary(), hint:"Score the risk; the summary bar collects the scores to copy.",
-    cards:[["ASA physical status","1. ASA physical status"],"2. Airway assessment & plan",["Functional capacity (METs / DASI)","3. Functional capacity (METs / DASI)"],["Cardiac risk (RCRI)","4. Cardiac risk (RCRI)"],["OSA screen (STOP-BANG)","5. OSA screen (STOP-BANG)"],["Lung risk (ARISCAT)","6. Lung risk (ARISCAT)"],["Frailty (Clinical Frailty Scale)","7. Frailty (CFS)"],["Echo report: what matters","8. Echo report: what matters"],"9. Proceed or postpone: cut-offs"],
+ {id:"premed", name:"Premed", sub:"Assess · Prepare · Plan & note", tabKey:"pmTab", tabs:[
+   {id:"assess", label:"Assess", input:()=>gaInputs(), top:()=>preSummary(), hint:"Examine → score → decide. The summary bar collects the scores to copy.",
+    cards:["§Examine","1. Airway assessment & plan",["Echo report: what matters","2. Echo report: what matters"],
+      "§Score",["Functional capacity (METs / DASI)","3. Functional capacity (METs / DASI)"],["Cardiac risk (RCRI)","4. Cardiac risk (RCRI)"],["Lung risk (ARISCAT)","5. Lung risk (ARISCAT)"],["OSA screen (STOP-BANG)","6. OSA screen (STOP-BANG)"],["Frailty (Clinical Frailty Scale)","7. Frailty (CFS)"],["ASA physical status","8. ASA physical status"],
+      "§Decide",["Which tests to order","9. Which tests to order"],["Common conditions: optimise or postpone","10. Common conditions: optimise or postpone"],"11. Proceed or postpone: cut-offs"],
     links:[["Failed intubation / CICO","adult","Failed intubation / CICO"]]},
-   {id:"prepare", label:"Prepare", input:()=>gaInputs(), hint:"Tests, conditions, fasting and regular drugs before the day.",
-    cards:[["Which tests to order","1. Which tests to order"],["Common conditions: optimise or postpone","2. Common conditions: optimise or postpone"],"3. Fasting","4. Regular drugs: stop or continue","5. Steroid cover","6. Anticoagulants & antiplatelets","7. Diabetes: day-of-surgery plan","8. Pacemaker / ICD","9. Premedication drugs"], links:[]},
-   {id:"consent", label:"Notes", input:()=>gaInputs(), hint:"Premed assessment note, then the consent note — paste in that order.",
-    cards:["1. Premed note",["Consent note","2. Consent note"]], links:[]}], cards:[]},
+   {id:"prepare", label:"Prepare", input:()=>gaInputs(), hint:"Instructions for the patient and the ward.",
+    cards:["§Medications","1. Regular drugs: stop or continue","2. Anticoagulants & antiplatelets","3. Diabetes: day-of-surgery plan","4. Steroid cover",
+      "§Before theatre","5. Fasting","6. Premedication drugs","7. Pacemaker / ICD"], links:[]},
+   {id:"consent", label:"Plan & note", input:()=>gaInputs(), hint:"Decide the plan and explain it, then copy the full premed note.",
+    cards:[["Anaesthetic plan & consent","1. Anaesthetic plan & consent"],"2. Premed note"], links:[]}], cards:[]},
  {id:"ga", name:"General", sub:"Induction · Intra-op · Post-op", tabKey:"gaTab", tabs:[
    {id:"ind", label:"Induction", input:()=>gaInputs(), hint:"Drugs → RSI → relaxant → tube & airway kit.",
     cards:["1. Induction drugs","2. RSI","3. Muscle relaxants","4. Tube & airway kit"],
@@ -3969,25 +3978,25 @@ const GROUPS = [
    {id:"don", label:"Donor", input:()=>donInputs(), hint:"Living donor nephrectomy.",
     cards:["1. Donor pre-op","2. Donor intra-op","3. Donor post-op"], links:[]}], cards:[]}];
 const SEARCH_EXTRA = {
-  "9. Proceed or postpone: cut-offs":"postpone cancel proceed elective blood pressure hypertension hba1c ketones potassium sodium anaemia platelets inr myocardial infarction stent stroke tia urti",
-  "6. Anticoagulants & antiplatelets":"anticoagulant antiplatelet doac apixaban rivaroxaban edoxaban dabigatran warfarin bridging lmwh aspirin clopidogrel ticagrelor prasugrel crcl creatinine",
-  "7. Diabetes: day-of-surgery plan":"diabetes insulin glargine detemir degludec premixed basal bolus pump vrii vriii sliding scale sulfonylurea gliclazide sglt2 metformin glucose ketones",
-  "8. Pacemaker / ICD":"pacemaker icd cied crt defibrillator magnet diathermy asynchronous voo doo pacing dependent",
-  "9. Premedication drugs":"premedication premed anxiolysis midazolam temazepam omeprazole famotidine sodium citrate metoclopramide paracetamol glycopyrrolate",
-  "1. Premed note":"premed note preoperative assessment template documentation copy allergy dentition diagnosis underlying physical status airway back examination investigations consent plan",
+  "11. Proceed or postpone: cut-offs":"postpone cancel proceed elective blood pressure hypertension hba1c ketones potassium sodium anaemia platelets inr myocardial infarction stent stroke tia urti",
+  "2. Anticoagulants & antiplatelets":"anticoagulant antiplatelet doac apixaban rivaroxaban edoxaban dabigatran warfarin bridging lmwh aspirin clopidogrel ticagrelor prasugrel crcl creatinine",
+  "3. Diabetes: day-of-surgery plan":"diabetes insulin glargine detemir degludec premixed basal bolus pump vrii vriii sliding scale sulfonylurea gliclazide sglt2 metformin glucose ketones",
+  "7. Pacemaker / ICD":"pacemaker icd cied crt defibrillator magnet diathermy asynchronous voo doo pacing dependent",
+  "6. Premedication drugs":"premedication premed anxiolysis midazolam temazepam omeprazole famotidine sodium citrate metoclopramide paracetamol glycopyrrolate",
+  "2. Premed note":"premed note preoperative assessment template documentation copy allergy dentition diagnosis underlying physical status airway back examination investigations consent plan",
   "3. Fluids: transfusion protocol":"paeds paediatric neonate transfusion blood red cells prbc packed cells platelets ffp cryo cryoprecipitate trigger threshold hb irradiated cmv negative paedipack taco trali hyperkalaemia jehovah",
-  "8. Echo report: what matters":"echo echocardiogram tte report ejection fraction ef lvef diastolic e/e aortic stenosis mitral stenosis regurgitation ava mva pulmonary hypertension pasp trv tapse hocm lvot sam rwma pericardial effusion tamponade pfo asd thrombus prosthetic valve ivc valve",
+  "2. Echo report: what matters":"echo echocardiogram tte report ejection fraction ef lvef diastolic e/e aortic stenosis mitral stenosis regurgitation ava mva pulmonary hypertension pasp trv tapse hocm lvot sam rwma pericardial effusion tamponade pfo asd thrombus prosthetic valve ivc valve",
   "1. Reversal":"reversal sugammadex neostigmine glycopyrrolate re-paralysis reparalysis re-administration redose rocuronium vecuronium waiting time after sugammadex",
-  "2. Consent note":"consent explanation note labour epidural husband dural puncture headache haematoma abscess paralysis documentation risks explained anaesthesia general spinal epidural nerve block sedation high risk cardiac parents",
-  "1. ASA physical status":"pre-op preop assessment risk asa grade physical status classification",
+  "1. Anaesthetic plan & consent":"consent explanation note labour epidural husband dural puncture headache haematoma abscess paralysis documentation risks explained anaesthesia general spinal epidural nerve block sedation high risk cardiac parents",
+  "8. ASA physical status":"pre-op preop assessment risk asa grade physical status classification",
   "3. Functional capacity (METs / DASI)":"pre-op preop assessment risk mets met functional capacity dasi duke activity stairs exercise tolerance",
   "4. Cardiac risk (RCRI)":"pre-op preop assessment risk rcri revised cardiac risk index lee cardiac mace",
-  "5. OSA screen (STOP-BANG)":"pre-op preop assessment risk stop-bang stopbang stop bang osa sleep apnoea snoring",
-  "6. Lung risk (ARISCAT)":"pre-op preop assessment risk ariscat pulmonary complications lung risk ppc",
+  "6. OSA screen (STOP-BANG)":"pre-op preop assessment risk stop-bang stopbang stop bang osa sleep apnoea snoring",
+  "5. Lung risk (ARISCAT)":"pre-op preop assessment risk ariscat pulmonary complications lung risk ppc",
   "7. Frailty (CFS)":"pre-op preop assessment risk frailty clinical frailty scale cfs rockwood elderly",
-  "1. Which tests to order":"pre-op preop assessment risk investigations tests bloods ecg echo fbc renal profile coagulation hba1c nice ng45",
-  "2. Common conditions: optimise or postpone":"pre-op preop assessment risk hypertension diabetes hba1c mi stent stroke heart failure aortic stenosis pacemaker icd asthma copd urti anaemia thyroid postpone cancel optimise",
-  "2. Airway assessment & plan":"pre-op preop assessment risk airway lemon moans mallampati difficult intubation mask ventilation",
+  "9. Which tests to order":"pre-op preop assessment risk investigations tests bloods ecg echo fbc renal profile coagulation hba1c nice ng45",
+  "10. Common conditions: optimise or postpone":"pre-op preop assessment risk hypertension diabetes hba1c mi stent stroke heart failure aortic stenosis pacemaker icd asthma copd urti anaemia thyroid postpone cancel optimise",
+  "1. Airway assessment & plan":"pre-op preop assessment risk airway lemon moans mallampati difficult intubation mask ventilation",
   "5. Intra-op analgesia":"analgesia intraop intra-op multimodal opioid fentanyl morphine tramadol remifentanil ketamine lignocaine lidocaine infusion magnesium dexmedetomidine clonidine paracetamol parecoxib diclofenac dexamethasone opioid-free opioid-sparing prospect infiltration",
   "1. Fasting (child)":"paeds child fasting clear fluid breast milk formula",
   "2. Premedication":"premed premedication midazolam oral buccal intranasal dexmedetomidine anxiety",
@@ -4057,8 +4066,8 @@ function cardMap(){
 }
 /* "Same topic elsewhere" links */
 const REL_PAIRS = [
-  [["premed","prepare","3. Fasting"],["paeds","pre","1. Fasting (child)"]],
-  [["premed","assess","1. ASA physical status"],["tx","pre","1. Workup checklist"]],
+  [["premed","prepare","5. Fasting"],["paeds","pre","1. Fasting (child)"]],
+  [["premed","assess","8. ASA physical status"],["tx","pre","1. Workup checklist"]],
   [["ga","maint","1. Ventilation strategies"],["paeds","ind","9. Ventilation settings"]],
   [["ga","maint","2. One-lung ventilation"],["paeds","ind","10. One-lung ventilation (Storz)"]],
   [["ga","maint","3. TIVA"],["paeds","ind","7. TIVA: model check & propofol targets"]],
@@ -4239,8 +4248,8 @@ document.addEventListener("click", e => {
     if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(t).then(done, done); else { const ta = document.createElement("textarea"); ta.value = t; document.body.appendChild(ta); ta.select(); try{ document.execCommand("copy"); }catch(_){} ta.remove(); done(); } return; }
   if (d.preclear){ ["pre","dasi","rcri","sb","ari","cfs"].forEach(k => delete S.sc[k]); S.asa = ""; S.met = ""; render(); return; }
   if (d.pnclear){ delete S.sc.pn; S.pnNote = ""; S.pnF = {}; S.pnMP = S.pnNeck = S.pnPonv = S.pnUrg = ""; render(); return; }
-  if (d.leclear){ delete S.sc.le; S.leNote = ""; S.leLen = "brief"; render(); return; }
-  if (d.csclear){ delete S.sc.cs; delete S.sc.csc; S.csNote = ""; S.csWho = "patient"; S.csLang = "English"; S.csOut = "full"; S.csLen = "brief"; render(); return; }
+  if (d.leclear){ delete S.sc.le; delete S.sc.pl; S.leNote = ""; S.leLen = "brief"; render(); return; }
+  if (d.csclear){ delete S.sc.cs; delete S.sc.csc; delete S.sc.pl; S.csNote = ""; S.csWho = "patient"; S.csLang = "English"; S.csOut = "full"; S.csLen = "brief"; render(); return; }
   if (d.screset){ S.sc[d.screset] = {}; render(); return; }
   if (d.derm){ S.derm = d.derm; if (!d.open){ render(); return; } }
   if (d.open){ const og = GROUPS.find(x=>x.id===d.g); if (og && og.tabs) S[og.tabKey] = d.tab || (og.tabs.find(t=>t.cards.some(c=>(Array.isArray(c)?c[1]:c)===d.open))||og.tabs[0]).id;
