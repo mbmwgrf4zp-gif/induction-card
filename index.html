@@ -521,6 +521,20 @@ a{color:var(--accent)}
 .sharebox{display:flex;gap:var(--s4);align-items:center;flex-wrap:wrap}.sharebox>div{flex:1;min-width:160px}.sharebox p{margin-top:0}
 .qr{width:150px;height:150px;flex:0 0 150px;border-radius:10px;border:1px solid var(--line);background:#fff}
 .sharebox .homebtn svg{width:18px;height:18px;vertical-align:-3px;margin-right:4px}.shareurl{word-break:break-all;margin:6px 0 0}
+.grid2 .sq.mon{position:relative;overflow:hidden;display:flex;flex-direction:column;align-items:stretch;justify-content:flex-start;gap:2px;padding:10px 12px 12px;text-align:left;background:var(--mon-bg);background-image:none;border-color:#1f2c2e;color:var(--mon-ink);--lcd:var(--etco2)}
+.grid2 .sq.mon::before{content:"";position:absolute;inset:0;background-image:linear-gradient(var(--mon-grid) 1px,transparent 1px),linear-gradient(90deg,var(--mon-grid) 1px,transparent 1px);background-size:12px 12px;pointer-events:none}
+.sq.mon.t-ga{--lcd:#fbbf24}.sq.mon.t-regional{--lcd:#22d3ee}.sq.mon.t-paeds{--lcd:#4ade80}.sq.mon.t-obs{--lcd:#f472b6}.sq.mon.t-tx{--lcd:#a78bfa}
+:root[data-lcd]:not([data-lcd="section"]) .sq.mon{--lcd:var(--lcdx)}
+.mhd{position:relative;display:flex;justify-content:space-between;align-items:center;font:700 11px var(--font-mono);letter-spacing:.08em;color:var(--lcd)}
+.mic svg{display:block;width:22px;height:22px;color:var(--lcd)}
+.mw{position:relative;display:block;width:100%;height:30px;margin:6px 0 4px;overflow:hidden}
+.mw path{fill:none;stroke:var(--lcd);stroke-width:1.8;vector-effect:non-scaling-stroke;stroke-linejoin:round;stroke-linecap:round}
+.mwv{animation:mwave 4s linear infinite}@keyframes mwave{to{transform:translateX(-40px)}}
+.grid2 .sq.mon .sqt{position:relative;color:var(--mon-ink);margin:0;align-self:stretch}
+.grid2 .sq.mon .sqs{position:relative;color:var(--mon-muted);font-family:var(--font-mono);font-size:11px;line-height:1.4;align-self:stretch}
+.grid2 .sq.mon:last-child:nth-child(odd){display:flex;align-items:stretch;padding:10px 12px 12px}.grid2 .sq.mon:last-child:nth-child(odd) .sqt,.grid2 .sq.mon:last-child:nth-child(odd) .sqs{align-self:stretch;margin:0}
+@media (max-width:1099px){.grid2 .sq.mon:last-child:nth-child(odd) .mw{height:24px}}
+@media (prefers-reduced-motion: reduce){.mwv{animation:none}}
 </style>
 </head>
 <body>
@@ -535,7 +549,7 @@ if (window.top !== window.self && /\.github\.io$/.test(location.hostname)) {
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.41.1";
+const APP_VERSION = "2.42.0";
 const APP_DATE = "21 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
@@ -785,6 +799,12 @@ screens.quick = () => { const sel = qSaved();
     <div class="txck">${Object.entries(QT).map(([id,t]) => { const n = sel.indexOf(id); return `<button class="txci ${n>=0?"on":""}" data-qpick="${id}" aria-pressed="${n>=0}"><span class="box">${n>=0?n+1:""}</span><span>${t.lab}</span></button>`; }).join("")}</div>
     ${S.qmsg?`<div class="warn">${S.qmsg}</div>`:""}
     <button class="linkbtn" data-qreset="1">Reset to default</button></div>` + disc; };
+/* Home section tiles: monitor channels. Each wave segment is exactly 40 units wide so the sweep loops seamlessly. */
+const MON_CH = {ga:"GA", regional:"RA", paeds:"PAED", obs:"OBS", tx:"TX"};
+const MON_SEG = {ga:[26,"h6l2-18c5 0 9-1 13-2l3 20h16"], regional:[15,"q5-12 10 0t10 0t10 0t10 0"], paeds:[20,"h8l2-3 2 3h5l2-14 2 22 2-8h6l2-2 2 2h7"], obs:[15,"q3-4 6-1t6 1t6-1t6 2t6-2t6 1t4 0"]};
+const monWave = id => { const m = MON_SEG[id];
+  const d = m ? `M0 ${m[0]}${m[1].repeat(5)}` : "M0 26h15v-3h15v-2h15v-3h15v-2h15v-3h15v-2h15v-3h15";   // transplant: hourly urine output, still
+  return `<svg class="mw" viewBox="0 0 120 30" preserveAspectRatio="none" aria-hidden="true"><g class="${m ? "mwv" : ""}"><path d="${d}"/></g></svg>`; };
 screens.home = () => {
   const th = store.get("theme","auto"), thLabel = th==="auto" ? "◐" : th==="dark" ? "☾" : "☀";
   const secs = ["ga","regional","paeds","obs","tx"].map(id=>GROUPS.find(g=>g.id===id));
@@ -804,7 +824,7 @@ screens.home = () => {
   <div class="quick">${quickIds().map(quickTile).join("")}</div>
   </div></div>
   <div class="nolabel"></div>
-  <div class="grid2">${secs.map(g=>`<button class="sq t-${g.id}" data-go="g-${g.id}"><span class="qi">${svg(g.id)}</span><span class="sqt">${short[g.id]}</span><span class="sqs">${({paeds:"Pre-op · Induction · Blocks · Cases",tx:"Kidney recipient &amp; donor"})[g.id] || g.tabs.map(t=>t.label).join(" · ")}</span></button>`).join("")}</div>` + discFull();
+  <div class="grid2">${secs.map(g=>`<button class="sq mon t-${g.id}" data-go="g-${g.id}"><span class="mhd"><span class="mch">${MON_CH[g.id]}</span><span class="mic">${svg(g.id)}</span></span>${monWave(g.id)}<span class="sqt">${short[g.id]}</span><span class="sqs">${({paeds:"Pre-op · Induction · Blocks · Cases",tx:"Kidney recipient &amp; donor"})[g.id] || g.tabs.map(t=>t.label).join(" · ")}</span></button>`).join("")}</div>` + discFull();
 };
 setInterval(() => { const c = document.getElementById("clock"); if (c){ c.textContent = clockTxt(); seg1(c.parentElement); } }, 30000);
 
@@ -3277,12 +3297,12 @@ function vTicks(){
 }
 /* ---------- ABOUT ---------- */
 const CHANGES = [
+  ["2.42","Home section tiles redesigned as monitor channels"],
   ["2.41","Consent note: purpose and procedure first, then side effects and complications"],
   ["2.40","One Consent note card (Anaesthetic / Labour epidural switch); tiles aligned; security hardening and dose-cap lock"],
   ["2.39","Labour epidural consent note"],
   ["2.38","Paeds transfusion protocol; paeds Hb in g/L"],
-  ["2.37","Share this app; quieter footer; PBW shown with the other weights"],
-  ["2.36","Echo report card; Today's list as a slim strip under search"]];
+  ["2.37","Share this app; quieter footer; PBW shown with the other weights"]];
 const SRC_LINKS = [
   ["Emergencies", [["Resuscitation Council UK — ALS / PLS guidelines","https://www.resus.org.uk/library"],["Difficult Airway Society guidelines","https://das.uk.com/guidelines"],["Association of Anaesthetists — guidelines (anaphylaxis, LAST, safety)","https://anaesthetists.org/Home/Resources-publications/Guidelines"],["European Malignant Hyperthermia Group","https://www.emhg.org"],["UK Kidney Association — hyperkalaemia guideline","https://www.ukkidney.org/health-professionals/guidelines"]]],
   ["General", [["ASA standards & practice parameters (fasting, PACU)","https://www.asahq.org/standards-and-practice-parameters"],["Centre for Perioperative Care — diabetes guideline","https://cpoc.org.uk/guidelines-resources-guidelines"],["PROSPECT procedure-specific analgesia (ESRA)","https://esraeurope.org/prospect/"],["ASRA Pain Medicine — guidelines (ketamine, anticoagulation)","https://www.asra.com/guidelines-articles/guidelines"],["Brain Trauma Foundation guidelines","https://braintrauma.org/coma/guidelines"]]],
