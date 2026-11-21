@@ -535,6 +535,29 @@ a{color:var(--accent)}
 .grid2 .sq.mon:last-child:nth-child(odd){display:flex;align-items:stretch;padding:10px 12px 12px}.grid2 .sq.mon:last-child:nth-child(odd) .sqt,.grid2 .sq.mon:last-child:nth-child(odd) .sqs{align-self:stretch;margin:0}
 @media (max-width:1099px){.grid2 .sq.mon:last-child:nth-child(odd) .mw{height:24px}}
 @media (prefers-reduced-motion: reduce){.mwv{animation:none}}
+
+:root{--pp-bg:#fffdf5;--pp-line:#d9d2b8;--pp-grid:rgba(34,120,80,.13);--pp-time:#6b6450;--pp-ink:#14201f;--pp-sub:#5d5845;--pp-bp:#c0392b}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--pp-bg:#142321;--pp-line:#2a3b38;--pp-grid:rgba(120,200,160,.09);--pp-time:#8fa7a3;--pp-ink:#e6f1ef;--pp-sub:#9db0ad;--pp-bp:#f08a7e}}
+:root[data-theme="dark"]{--pp-bg:#142321;--pp-line:#2a3b38;--pp-grid:rgba(120,200,160,.09);--pp-time:#8fa7a3;--pp-ink:#e6f1ef;--pp-sub:#9db0ad;--pp-bp:#f08a7e}
+.grid2 .sq.chart{position:relative;overflow:hidden;display:flex;flex-direction:column;align-items:stretch;justify-content:flex-start;gap:2px;padding:8px 12px 12px;text-align:left;background:var(--pp-bg);background-image:none;border-color:var(--pp-line);border-radius:6px;color:var(--pp-ink)}
+.sq.chart::before{content:"";position:absolute;inset:0;background-image:linear-gradient(var(--pp-grid) 1px,transparent 1px),linear-gradient(90deg,var(--pp-grid) 1px,transparent 1px);background-size:10px 10px;pointer-events:none}
+.chd{position:relative;display:flex;justify-content:space-between;font:10px var(--font-mono);color:var(--pp-time)}
+.cm{position:relative;display:block;width:100%;height:36px;margin:4px 0 6px}
+.cbp{fill:none;stroke:var(--pp-bp);stroke-width:1.4;vector-effect:non-scaling-stroke;stroke-linecap:round;stroke-linejoin:round}.chr{fill:none;stroke:var(--t);stroke-width:3.4;stroke-linecap:round;vector-effect:non-scaling-stroke}
+.cm-w{display:none}@media (max-width:1099px){.grid2 .sq.chart:last-child:nth-child(odd) .cm-n{display:none}.grid2 .sq.chart:last-child:nth-child(odd) .cm-w{display:block}}
+.grid2 .sq.chart .sqt{position:relative;color:var(--t);font-size:var(--fs-md);margin:0;align-self:stretch}
+.grid2 .sq.chart .sqs{position:relative;color:var(--pp-sub);align-self:stretch}
+.grid2 .sq.chart:last-child:nth-child(odd){display:flex;align-items:stretch;padding:8px 12px 12px}.grid2 .sq.chart:last-child:nth-child(odd) .sqt,.grid2 .sq.chart:last-child:nth-child(odd) .sqs{align-self:stretch;margin:0}
+.tilepick{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--s2)}
+.tpk{display:flex;flex-direction:column;gap:6px;padding:6px;border:2px solid var(--line);border-radius:var(--r-sm);background:var(--card);cursor:pointer;font:inherit;color:var(--ink)}
+.tpk.on{border-color:var(--accent)}.tpl{font-size:var(--fs-sm);font-weight:600;text-align:center}
+.tpv{display:block;pointer-events:none}.tpv .sq{min-height:0;width:100%;padding:6px 8px 8px!important}.tpv .sqs{display:none}.tpv .sqt{font-size:13px!important}
+.tpv .mw{height:18px;margin:3px 0}.tpv .cm{height:22px;margin:2px 0 3px}.tpv .chd{font-size:8px}.tpv .chd span+span{display:none}.tpv .mhd{font-size:9px}.tpv .mic svg{width:14px;height:14px}.tpv .qi{width:28px;height:28px}.tpv .qi svg{width:18px;height:18px}
+.tpv .sq.mon,.tpv .sq.chart{display:flex;flex-direction:column;position:relative;overflow:hidden;border:1px solid;border-radius:8px}
+.tpv .sq.mon{background:var(--mon-bg);color:var(--mon-ink);border-color:#1f2c2e;--lcd:#fbbf24}.tpv .sq.chart{background:var(--pp-bg);border-color:var(--pp-line)}
+.tpv .sq.mon::before{content:"";position:absolute;inset:0;background-image:linear-gradient(var(--mon-grid) 1px,transparent 1px),linear-gradient(90deg,var(--mon-grid) 1px,transparent 1px);background-size:8px 8px}
+.tpv .sq.chart .sqt{color:var(--t);position:relative}.tpv .sq.mon .sqt{color:var(--mon-ink);position:relative}
+.tpv .sq:not(.mon):not(.chart){display:flex;flex-direction:column;gap:4px;align-items:flex-start;background:var(--card);border:1px solid var(--line);border-radius:8px}
 </style>
 </head>
 <body>
@@ -549,7 +572,7 @@ if (window.top !== window.self && /\.github\.io$/.test(location.hostname)) {
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.42.0";
+const APP_VERSION = "2.43.0";
 const APP_DATE = "21 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
@@ -805,6 +828,24 @@ const MON_SEG = {ga:[26,"h6l2-18c5 0 9-1 13-2l3 20h16"], regional:[15,"q5-12 10 
 const monWave = id => { const m = MON_SEG[id];
   const d = m ? `M0 ${m[0]}${m[1].repeat(5)}` : "M0 26h15v-3h15v-2h15v-3h15v-2h15v-3h15v-2h15v-3h15";   // transplant: hourly urine output, still
   return `<svg class="mw" viewBox="0 0 120 30" preserveAspectRatio="none" aria-hidden="true"><g class="${m ? "mwv" : ""}"><path d="${d}"/></g></svg>`; };
+const TILE_STYLES = [["chart","Chart paper"],["monitor","Monitor"],["classic","Classic"]];
+const tileStyle = () => { const v = store.get("tiles","chart"); return TILE_STYLES.some(x=>x[0]===v) ? v : "chart"; };
+const SEC_SHORT = {ga:"General", regional:"Regional", paeds:"Paediatric", obs:"Obstetric", tx:"Transplant"};
+const secSub = g => ({paeds:"Pre-op · Induction · Blocks · Cases", tx:"Kidney recipient &amp; donor"})[g.id] || g.tabs.map(t=>t.label).join(" · ");
+// anaesthetic-record marks: systolic ∨ and diastolic ∧ (red), heart rate dots (section ink). Decoration only.
+const CHART_SEED = {ga:0, regional:1.3, paeds:2.1, obs:3.4, tx:4.6};
+function chartMarks(id){ const k = CHART_SEED[id] || 0;
+  const one = (n, w, cls) => { let bp = "", hr = "";
+    for (let i = 0; i < n; i++){ const x = 5 + i*10, t = i*12/n, sys = 8 + 3*Math.sin(t*.7 + k), dia = 17 + 2*Math.sin(t*.6 + k + .5), h = 29 + 3*Math.cos(t*.8 + k);
+      bp += `M${x-2.2} ${(sys-2.4).toFixed(1)}L${x} ${sys.toFixed(1)}L${x+2.2} ${(sys-2.4).toFixed(1)}M${x-2.2} ${(dia+2.4).toFixed(1)}L${x} ${dia.toFixed(1)}L${x+2.2} ${(dia+2.4).toFixed(1)}`;
+      hr += `M${x} ${h.toFixed(1)}h.01`; }
+    return `<svg class="cm ${cls}" viewBox="0 0 ${w} 36" preserveAspectRatio="none" aria-hidden="true"><path class="cbp" d="${bp}"/><path class="chr" d="${hr}"/></svg>`; };
+  return one(12, 120, "cm-n") + one(24, 240, "cm-w"); }
+function secTile(g, style, tag){ style = style || tileStyle(); tag = tag || "button";
+  const act = tag === "button" ? ` data-go="g-${g.id}"` : "", t = `<span class="sqt">${SEC_SHORT[g.id]}</span><span class="sqs">${secSub(g)}</span>`;
+  if (style === "monitor") return `<${tag} class="sq mon t-${g.id}"${act}><span class="mhd"><span class="mch">${MON_CH[g.id]}</span><span class="mic">${svg(g.id)}</span></span>${monWave(g.id)}${t}</${tag}>`;
+  if (style === "chart") return `<${tag} class="sq chart t-${g.id}"${act}><span class="chd"><span>08:00</span><span>08:15</span><span>08:30</span></span>${chartMarks(g.id)}${t}</${tag}>`;
+  return `<${tag} class="sq t-${g.id}"${act}><span class="qi">${svg(g.id)}</span>${t}</${tag}>`; }
 screens.home = () => {
   const th = store.get("theme","auto"), thLabel = th==="auto" ? "◐" : th==="dark" ? "☾" : "☀";
   const secs = ["ga","regional","paeds","obs","tx"].map(id=>GROUPS.find(g=>g.id===id));
@@ -824,7 +865,7 @@ screens.home = () => {
   <div class="quick">${quickIds().map(quickTile).join("")}</div>
   </div></div>
   <div class="nolabel"></div>
-  <div class="grid2">${secs.map(g=>`<button class="sq mon t-${g.id}" data-go="g-${g.id}"><span class="mhd"><span class="mch">${MON_CH[g.id]}</span><span class="mic">${svg(g.id)}</span></span>${monWave(g.id)}<span class="sqt">${short[g.id]}</span><span class="sqs">${({paeds:"Pre-op · Induction · Blocks · Cases",tx:"Kidney recipient &amp; donor"})[g.id] || g.tabs.map(t=>t.label).join(" · ")}</span></button>`).join("")}</div>` + discFull();
+  <div class="grid2">${secs.map(g=>secTile(g)).join("")}</div>` + discFull();
 };
 setInterval(() => { const c = document.getElementById("clock"); if (c){ c.textContent = clockTxt(); seg1(c.parentElement); } }, 30000);
 
@@ -2957,6 +2998,8 @@ screens.settings = () => (showQuotes(), "") + head("Settings","home") + `<div cl
   <div class="card"><h2>Display colour</h2><p class="sub">Colour of the glowing numbers on the quick tiles, the header clock and the trace. Saved on this phone only.</p>
   <div class="lcdpick">${LCDS.map(([k,l,c]) => `<button class="lcdsw ${lcdNow()===k?"on":""}" data-lcdpick="${k}" aria-pressed="${lcdNow()===k}"><span class="sw" style="${c?`background:${c}`:"background:conic-gradient(#f472b6,#fbbf24,#4ade80,#22d3ee,#f472b6)"}"></span>${l}</button>`).join("")}</div>
   <div class="lcddemo"><span class="clock">12:34</span><span class="qans">6.5–7.0</span></div></div>
+  <div class="card"><h2>Home tiles</h2><p class="sub">Style of the five section tiles on the home screen. Saved on this phone only.</p>
+  <div class="tilepick">${TILE_STYLES.map(([k,l]) => `<button class="tpk ${tileStyle()===k?"on":""}" data-tilestyle="${k}" aria-pressed="${tileStyle()===k}"><span class="tpv">${secTile(GROUPS.find(x=>x.id==="ga"), k, "span")}</span><span class="tpl">${l}</span></button>`).join("")}</div></div>
   <div class="card"><h2>Tips and tricks</h2><p class="sub">The moving line on the home screen. Press and hold to pause; tap a tip to open its card.</p>
   ${seg("quotesSet",[["on","Show quotes"],["off","Tips only"]])}</div>` + disc;
 
@@ -3297,12 +3340,12 @@ function vTicks(){
 }
 /* ---------- ABOUT ---------- */
 const CHANGES = [
+  ["2.43","Home tiles style setting: Chart paper (default), Monitor or Classic"],
   ["2.42","Home section tiles redesigned as monitor channels"],
   ["2.41","Consent note: purpose and procedure first, then side effects and complications"],
   ["2.40","One Consent note card (Anaesthetic / Labour epidural switch); tiles aligned; security hardening and dose-cap lock"],
   ["2.39","Labour epidural consent note"],
-  ["2.38","Paeds transfusion protocol; paeds Hb in g/L"],
-  ["2.37","Share this app; quieter footer; PBW shown with the other weights"]];
+  ["2.38","Paeds transfusion protocol; paeds Hb in g/L"]];
 const SRC_LINKS = [
   ["Emergencies", [["Resuscitation Council UK — ALS / PLS guidelines","https://www.resus.org.uk/library"],["Difficult Airway Society guidelines","https://das.uk.com/guidelines"],["Association of Anaesthetists — guidelines (anaphylaxis, LAST, safety)","https://anaesthetists.org/Home/Resources-publications/Guidelines"],["European Malignant Hyperthermia Group","https://www.emhg.org"],["UK Kidney Association — hyperkalaemia guideline","https://www.ukkidney.org/health-professionals/guidelines"]]],
   ["General", [["ASA standards & practice parameters (fasting, PACU)","https://www.asahq.org/standards-and-practice-parameters"],["Centre for Perioperative Care — diabetes guideline","https://cpoc.org.uk/guidelines-resources-guidelines"],["PROSPECT procedure-specific analgesia (ESRA)","https://esraeurope.org/prospect/"],["ASRA Pain Medicine — guidelines (ketamine, anticoagulation)","https://www.asra.com/guidelines-articles/guidelines"],["Brain Trauma Foundation guidelines","https://braintrauma.org/coma/guidelines"]]],
@@ -3885,6 +3928,7 @@ document.addEventListener("click", e => {
   if (d.print){ try { window.print(); } catch (err) {} return; }
   if (d.qpick){ let c = qSaved(); S.qmsg = ""; if (c.includes(d.qpick)) c = c.filter(x=>x!==d.qpick); else if (c.length >= 3) S.qmsg = "Three are already chosen — remove one first."; else c = [...c, d.qpick]; store.set("quick", c); render(); return; }
   if (d.qreset){ store.set("quick", null); S.qmsg = ""; render(); return; }
+  if (d.tilestyle){ store.set("tiles", d.tilestyle); render(); return; }
   if (d.lcdpick){ store.set("lcd", d.lcdpick); applyLcd(); render(); return; }
   if (d.ptedit){ S.ptEditing = true; render(); return; }
   if (d.ptdone){ S.ptEditing = false; render(); return; }
