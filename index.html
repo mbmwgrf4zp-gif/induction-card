@@ -636,7 +636,7 @@ if (window.top !== window.self && /\.github\.io$/.test(location.hostname)) {
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.62.0";
+const APP_VERSION = "2.62.1";
 const APP_DATE = "21 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
@@ -1393,7 +1393,7 @@ pCards.tiva = () => {
   <h3>Rigid bronchoscopy</h3><ul><li>Deepen (increase remi/propofol)</li><li>May consider relaxant — <b>NOT for foreign body removal</b> (risk of distal movement)</li><li>Connect circuit to 22 mm port; controlled ventilation</li><li>Allow CO₂ retention, SpO₂ &gt; 80%</li><li>Consider intubation to proceed further</li></ul>${psrc()}</div>`;
 };
 
-const PIND_CHECKED = false;
+const PIND_CHECKED = true;
 const pindDraft = () => PIND_CHECKED ? "" : `<div class="warn" style="margin-top:0">DRAFT — paeds induction review (Nov 2026): opioids, gas induction, relaxants, RSI, reversal, bolus pressors, and the review fixes (glucose targets, ventilation by age, blood product doses, omeprazole, RCUK 2025 arrest, difficult airway, tonsil bleed, pyloric). Not yet ticked by you.</div>`;
 pCards.drugs = () => {
   const w = W(), mo = AGEM(), neo = mo < 1;
@@ -3867,7 +3867,7 @@ VGROUPS.find(g => g[0]==="General")[1].push(["IM doses", "22 Nov 2026", [
   "Induction tables also show IM suxamethonium (adult 3–4 mg/kg max 150 mg; paeds 4 mg/kg max 150 mg) with IM atropine (adult 0.6 mg; paeds 20 mcg/kg max 0.6 mg); rocuronium and other IV agents stay IV only",
   "Midazolam IM premed (uncooperative, no IV): adult 0.07–0.1 mg/kg LBW max 5 mg; paeds 0.1–0.15 mg/kg max 5 mg; onset 10–15 min (checked 22 Nov 2026)",
   "Not added: IM glycopyrrolate premed (rarely used); IM opioids for children"]]);
-VGROUPS.find(g => g[0]==="General")[1].push(["Paeds induction review (DRAFT — tick to sign off)", "", [
+VGROUPS.find(g => g[0]==="General")[1].push(["Paeds induction review", "22 Nov 2026", [
   "Induction drugs: fentanyl 1–2 mcg/kg (neonate 0.5–1) max 100 mcg; morphine 0.05–0.1 mg/kg (neonate 0.025–0.05) max 10 mg; thiopentone 5–7 mg/kg (neonate 3–4) max 500 mg; sevoflurane 8% gas induction",
   "Relaxants: suxamethonium 2 mg/kg infant / 1–1.5 mg/kg child max 150 mg; rocuronium 0.6 (RSI 1.2) mg/kg; atracurium 0.5 (neonate 0.3–0.5); cisatracurium 0.15 (> 1 month); vecuronium 0.1 mg/kg; top-ups listed",
   "RSI (child): atropine 20 mcg/kg max 600 mcg; propofol 3–5 or ketamine 1–2 mg/kg; rocuronium 1.2 or suxamethonium 2 (infant) / 1.5 mg/kg; sugammadex 16 mg/kg rescue; gentle mask ventilation < 12 cmH₂O; cricoid not routine",
@@ -3941,8 +3941,8 @@ function vTicks(){
 }
 /* ---------- ABOUT ---------- */
 const CHANGES = [
-  ["2.62","Paeds review fixes: RCUK 2025 arrest, difficult airway / CICO and tonsil bleed cards, glucose targets, ventilation by age, consistent doses (draft)"],
-  ["2.61","Paeds: fentanyl, morphine, gas induction, relaxants, RSI and reversal cards, bolus pressors (draft)"],
+  ["2.62","Paeds review fixes: RCUK 2025 arrest, difficult airway / CICO and tonsil bleed cards, glucose targets, ventilation by age, consistent doses (checked)"],
+  ["2.61","Paeds: fentanyl, morphine, gas induction, relaxants, RSI and reversal cards, bolus pressors (checked)"],
   ["2.60","Cards reorganised: paeds airway kit and laryngospasm & extubation merged, expected BP beside inotropes, IM doses linked from Emergencies"],
   ["2.59","IM suxamethonium + atropine in the induction tables; IM midazolam premed (checked)"],
   ["2.58","IM doses: adult and paeds IM cards, IM promethazine, Pritchard magnesium, glucagon for hypoglycaemia (checked)"],
