@@ -241,7 +241,7 @@ table.dt tr[data-dr]>td.hl .gml{font-size:1.05rem;font-weight:700;color:inherit}
 .dfor{display:none}
 @media screen and (max-width:699px){
   .dfor{display:block;margin:var(--s2) 2px 0;font-size:var(--fs-xs);font-weight:600;color:var(--muted)}
-  .dfor::before{content:"Doses for " attr(data-w) " kg"}.dfor.gtw::before{content:"Doses · the weight used is under each drug"}
+  .dfor::before{content:"Doses for " attr(data-w) " kg"}.dfor.gtw::before{content:"Doses · the weight used is under each drug"}.dfor.fixw::before{content:"Fixed doses"}
   table.dt,table.dt>tbody{display:block}
   table.dt tr.dth{display:none}
   table.dt tr[data-dr]{display:grid;grid-template-columns:minmax(38%,1fr) minmax(0,max-content);grid-template-areas:"name dose" "rule rule" "note note";column-gap:var(--s3);padding:var(--s3) var(--s1);border-bottom:1px solid var(--line)}
@@ -703,7 +703,7 @@ if (window.top !== window.self && /\.github\.io$/.test(location.hostname)) {
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.73.1";
+const APP_VERSION = "2.74.1";
 const APP_DATE = "22 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
@@ -1107,12 +1107,12 @@ obsCards.lStart = () => `<div class="card"><h2>1. Start: test, bolus &amp; loadi
     <p><b>Absolute:</b> coagulopathy · sepsis · uncontrolled hypovolaemia · patient refusal · raised ICP · no resuscitation facilities</p>
     <p><b>Relative:</b> fixed-output cardiac disease · active neurological disease · abnormal spinal anatomy · fetal distress</p>
     <p><b>Bloods:</b> FBC / PT / APTT for severe PE; group &amp; screen if indicated</p></details>
-  <h3>Epidural</h3>
-  <p><b>Bolus — ropivacaine 0.25% 3 mL</b> (1 mL ropi 0.75% diluted to 3 mL).</p>
-  <p><b>Loading</b> — ropi 0.15% + fentanyl 100 mcg, 10 mL, run at <b>40 mL/hr</b><br>2 mL ropi 0.75% + fentanyl 2 mL, dilute to 10 mL — or use 10 mL of the infusion preparation.</p>
+  <h3>Epidural</h3>${f1Draft()}${FT([
+    R("Bolus — ropivacaine 0.25%","1 mL ropi 0.75% diluted to 3 mL","3 mL",null,"epidural"),
+    R("Loading — ropi 0.15% + fentanyl 100 mcg","run at <b>40 mL/hr</b>","10 mL","2 mL ropi 0.75% + fentanyl 2 mL, dilute to 10 mL — or use 10 mL of the infusion preparation.","epidural")])}
   ${src(MINE)}
-  <h3>CSE / single-shot spinal</h3>
-  <p><b>Fentanyl 10–25 mcg</b> diluted to 1 mL NS, 27G pencil-point, aseptic.</p>${protoSrc()}</div>`;
+  <h3>CSE / single-shot spinal</h3>${FT([
+    R("Fentanyl","diluted to 1 mL NS, 27G pencil-point, aseptic","10–25 mcg",null,"intrathecal")])}${protoSrc()}</div>`;
 
 obsCards.lInfusion = () => `<div class="card"><h2>2. Maintain: infusion recipes</h2>
   <h3>Mine — run 8–15 mL/hr</h3>
@@ -1136,13 +1136,18 @@ obsCards.lPump = () => { const p = PUMPS[S.pump] || PUMPS.pcea_cse;
   ${seg("pump",Object.entries(PUMPS).map(([k,v])=>[k,v[0]]))}<h3>${p[0]}</h3>${kv(p[1])}${protoSrc()}</div>`; };
 
 obsCards.lTopup = () => `<div class="card"><h2>Top-up: breakthrough pain</h2>
-  <p><b>Mine — ropi ≈0.23% 5 mL</b>: 1.5 mL ropi 0.75% diluted to 5 mL (true strength 0.225%).<br>± fentanyl 50–100 mcg boluses.</p>${src(MINE)}
-  <p><b>Protocol:</b> 3 mL lignocaine 1% OR 10 mL of cocktail.</p>${protoSrc()}</div>`;
+  ${f1Draft()}<h3>Mine</h3>${FT([
+    R("Ropi ≈0.23%","1.5 mL ropi 0.75% diluted to 5 mL (true strength 0.225%)","5 mL",null,"epidural"),
+    R("± fentanyl","boluses","50–100 mcg",null,"epidural")])}${src(MINE)}
+  <h3>Protocol</h3>${FT([
+    R("Lignocaine 1%","","3 mL",null,"epidural"),
+    R("OR cocktail","","10 mL",null,"epidural")])}${protoSrc()}</div>`;
 
 obsCards.lAdp = () => `<div class="card"><h2>Problem: accidental dural puncture</h2>
   <div class="danger" style="text-align:center"><b>INTRATHECAL CATHETER — SPINAL DOSES ONLY</b></div>
-  <p><b>IT bolus:</b> fentanyl 10–25 mcg + NS to 1 mL total.</p>
-  <p><b>Top-up:</b> cocktail 3 mL every 1–2 hours — assess first.</p>
+  ${f1Draft()}${FT([
+    R("IT bolus: fentanyl","+ NS to 1 mL total","10–25 mcg",null,"intrathecal"),
+    R("Top-up: cocktail","every 1–2 hours — assess first","3 mL",null,"intrathecal")])}
   <p><b>Going for Caesarean:</b> see Caesarean tab, route C.</p>
   <div class="danger"><b>Do NOT flush</b> the catheter before removal (residual LA).</div>${src(MINE)}
   <h3>Departmental protocol</h3>${locNote()}
@@ -1173,8 +1178,13 @@ obsCards.lPca = () => `<div class="card"><h2>No epidural: IV PCA</h2>
 
 /* CAESAREAN */
 obsCards.cAsp = () => `<div class="card"><h2>0. Before theatre: aspiration prophylaxis</h2>${locNote()}
-  <h3>Elective LSCS</h3><ul><li>Nil by mouth from midnight</li><li>Ranitidine <b>150 mg PO</b> at 10 pm and on the morning of surgery</li><li>Sodium citrate 0.3 M <b>30 mL</b> when called to OT</li></ul>
-  <h3>Emergency LSCS</h3><ul><li>Ranitidine <b>50 mg IV</b> as soon as LSCS is decided <b>(ranitidine was withdrawn in 2020 — use omeprazole 40 mg IV or your pharmacy's alternative; confirm departmental protocol)</b></li><li>Sodium citrate 0.3 M <b>30 mL</b> when called to OT</li><li>± Metoclopramide <b>10 mg IV</b></li></ul>
+  ${f1Draft()}<h3>Elective LSCS</h3><ul><li>Nil by mouth from midnight</li></ul>${FT([
+    R("Ranitidine","at 10 pm and on the morning of surgery","150 mg",null,"PO"),
+    R("Sodium citrate 0.3 M","when called to OT","30 mL",null,"PO")])}
+  <h3>Emergency LSCS</h3>${FT([
+    R("Ranitidine","as soon as LSCS is decided","50 mg","<b>(ranitidine was withdrawn in 2020 — use omeprazole 40 mg IV or your pharmacy's alternative; confirm departmental protocol)</b>","IV"),
+    R("Sodium citrate 0.3 M","when called to OT","30 mL",null,"PO"),
+    R("± Metoclopramide","","10 mg",null,"IV")])}
   <p>Transfer supine with left uterine displacement (wedge under right buttock). Group &amp; screen for all elective LSCS; crossmatch if ASA III, anaemia, rare group or anticipated bleeding.</p>
   <div class="warn">Ranitidine has been recalled in several countries — use your pharmacy's H₂-antagonist / PPI alternative if it is not stocked.</div>${protoSrc()}</div>`;
 obsCards.cSpinal = () => `<div class="card"><h2>A1. Spinal: dose by height</h2>${lscsBody()}</div>`;
@@ -1241,13 +1251,19 @@ obsCards.pAnalg = () => { const w = S.morWt, lo = w*0.05, hi = w*0.1;
   <h3>IV morphine after delivery (GA)</h3>${ptiles([ptile("morWt","Weight","kg",30,200,1)])}
   <div class="result"><div class="sub">0.05 – 0.1 mg/kg</div><div class="big">${f1(lo)} – ${f1(hi)} mg</div></div>
   <h3>Other ward options (departmental protocol)</h3>${locNote()}
-  <ul><li><b>PCA morphine</b> 1 mg/mL, 100–200 mL sent with the patient; pump set by OAS</li><li><b>SC morphine 7.5–10 mg 4-hourly</b>, undiluted, regular (not PRN), via SC cannula</li>
-  <li>Oral: NSAID or paracetamol once eating; Oxynorm on POD1 if NSAIDs contraindicated</li></ul>
+  ${f1Draft()}${FT([
+    R("PCA morphine","pump set by OAS","1 mg/mL, 100–200 mL","sent with the patient","IV"),
+    R("SC morphine","4-hourly, undiluted, regular (not PRN), via SC cannula","7.5–10 mg",null,"SC")])}
+  <ul><li>Oral: NSAID or paracetamol once eating; Oxynorm on POD1 if NSAIDs contraindicated</li></ul>
   <div class="warn">After IT/epidural morphine: no other opioids or sedatives for 24 h. OAS follow-up (yellow form).</div>${protoSrc()}</div>`; };
 obsCards.pNsaid = () => `<div class="card"><h2>2. NSAID yes / no</h2>
-  <h3>NSAIDs contraindicated</h3><ul><li>IV paracetamol 1 g stat</li><li>Tab paracetamol 1 g QID × 3 days</li><li>Cap Oxynorm 5 mg 8-hourly (if POD1 or PRN, if needed)</li></ul>
-  <h3>NSAIDs OK</h3><ul><li>Supp diclofenac 100 mg OR 50 mg stat (according to body weight)</li></ul>
-  <ul><li>Then tab diclofenac <b>50 mg TDS × 3 days</b> (max 150 mg/day, including the suppository on day 1)</li></ul>${protoSrc()}</div>`;
+  ${f1Draft()}<h3>NSAIDs contraindicated</h3>${FT([
+    R("IV paracetamol","stat","1 g",null,"IV"),
+    R("Tab paracetamol","QID × 3 days","1 g",null,"PO"),
+    R("Cap Oxynorm","8-hourly (if POD1 or PRN, if needed)","5 mg",null,"PO")])}
+  <h3>NSAIDs OK</h3>${FT([
+    R("Supp diclofenac","stat (according to body weight)","100 mg OR 50 mg",null,"PR"),
+    R("Then tab diclofenac","TDS × 3 days","50 mg","(max 150 mg/day, including the suppository on day 1)","PO")])}${protoSrc()}</div>`;
 obsCards.pPca = () => `<div class="card"><h2>3. PCA morphine (after GA)</h2><p><b>1 mg/mL:</b> 50 mg morphine (5 mL) made up to 50 mL NS.</p>${protoSrc()}</div>`;
 obsCards.pWard = () => `<div class="card"><h2>4. Ward (OAS) problems &amp; catheter care</h2>
   <p class="sub">Instructions for ward / OAS nurses.</p>
@@ -1255,7 +1271,11 @@ obsCards.pWard = () => `<div class="card"><h2>4. Ward (OAS) problems &amp; cathe
   <p>Observations <b>hourly for 4 h, then 4-hourly</b>: RR, sedation score, pain (VAS), BP, pulse.</p>
   <div class="danger" style="font-weight:400"><b>Call anaesthetic doctor / OAS nurse if:</b> RR &lt; 8/min · sedation score &gt; 2 · VAS &gt; 50% · SBP &lt; 90 mmHg (call ward doctor first)</div>
   <h3>Hypotension</h3><p>SBP &lt; 90 mmHg or 20% below baseline: stop epidural infusion; call doctor (OAS or ward); run 250 mL Hartmann's fast.</p>
-  <h3>Pruritus</h3><p>Often self-limiting — reassure. Tab Piriton 4 mg with a little water; severe: IV Piriton 10 mg stat. Persistent: <b>naloxone 0.1–0.4 mg IV</b> or <b>nalbuphine 2.5–5 mg IV</b>.</p>
+  <h3>Pruritus</h3>${f1Draft()}<p>Often self-limiting — reassure.</p>${FT([
+    R("Tab Piriton","with a little water","4 mg",null,"PO"),
+    R("Severe: IV Piriton","stat","10 mg",null,"IV"),
+    R("Persistent: naloxone","","0.1–0.4 mg",null,"IV"),
+    R("or nalbuphine","","2.5–5 mg",null,"IV")])}
   <h3>Nausea &amp; vomiting</h3><p>Check NIBP first. IV metoclopramide (Maxolon) 10 mg.</p>
   <h3>High block</h3><p>Stop epidural infusion; prop up; O₂ by mask; inform OAS / on-call anaesthetist; resus trolley at bedside — KIV intubation; monitor ECG, NIBP, SpO₂.</p>
   <h3>Epidural catheter</h3><ul><li>Disconnected from filter → removed by OAS doctor / nurse immediately</li><li>Only OAS nurse and doctor inject through the catheter</li><li>After dural puncture catheter: do NOT flush before removal</li></ul>${protoSrc()}</div>`;
@@ -2336,6 +2356,10 @@ function GD(name, per, unit, wk, conc, note, max, rt){
   const ml = conc ? (a===b ? `${dz(a/conc,"mL")} mL` : `${dz(a/conc,"mL")}–${dz(b/conc,"mL")} mL`) : "";
   return `<tr class="dz" data-dr="1"><td><span class="dn">${name}</span>${note?`<div class="sub dnote">${note}</div>`:""}</td><td class="sub">${Array.isArray(per)?per.join("–"):per} ${unit}/kg<br><b>${WN[wk]} ${sig(w)} kg</b></td><td class="hl">${doseFmt(dose)}${RT(rt)}${capped?` <span class="sub">(max ${max})</span>`:""}${ml?`<div class="sub gml">${doseFmt(ml)}</div>`:""}</td></tr>`;
 }
+const F1_CHECKED = true;   // checked by author 22 Nov 2026
+const f1Draft = () => F1_CHECKED ? "" : `<div class="warn" style="margin-top:0">DRAFT — doses moved into a dose table (format batch 1, Nov 2026): same words and numbers; routes added where the text had none. Not yet ticked by you.</div>`;
+/* fixed (not weight-based) doses: same row layout as T / GT */
+const FT = rows => `${rtDraft()}<div class="dfor fixw"></div><div style="overflow-x:auto"><table class="dt"><tr class="dth"><th>Drug</th><th>When / how</th><th>Dose</th></tr>${rows.join("")}</table></div>`;
 const GT = rows => `${rtDraft()}<div class="dfor gtw"></div><div style="overflow-x:auto"><table class="dt gt"><tr class="dth"><th>Drug</th><th>Rule · weight used</th><th>Dose</th></tr>${rows.join("")}</table></div>`;
 const GSRC = "Standard references: BNF, Association of Anaesthetists / SOBA obesity guidance, Miller.";
 
@@ -3446,9 +3470,12 @@ gaCards.opioid = () => {
   ${mods.length ? `<div class="warn">${mods.join("<br>")}</div>` : `<p class="sub">Elderly (≥ 65) and obese (BMI ≥ 30) are set from the patient box.</p>`}
   ${ofa ? `<div class="result"><b>Opioid-sparing plan</b><ol style="margin:6px 0 0"><li>Base: paracetamol + ${renal?"(no NSAID)":"NSAID"} + dexamethasone</li><li>Regional block or wound infiltration</li><li>Dexmedetomidine + ketamine${renal?"":" + magnesium"} ± lignocaine (not within 4 h of a block)</li><li>Rescue: fentanyl 0.25–0.5 mcg/kg only</li></ol></div>` : ""}
   <h3>1. Base — every case unless contraindicated</h3>
-  <table><tr><th>Paracetamol IV</th><td>${para}${obese?` (AdjBW)`:""}${liver?" · max 2–3 g/day":""}</td></tr>
-  <tr><th>NSAID</th><td>${renal?`<b>Avoid</b> (kidney)`:"Parecoxib <b>40 mg IV</b> (20 mg if elderly / &lt; 50 kg), or diclofenac PR 1 mg/kg = <b>"+sig(Math.min(W2.tbw,100))+" mg</b> (max 100 mg)"}</td></tr>
-  <tr><th>Dexamethasone</th><td>0.1 mg/kg = <b>${dz(Math.min(0.1*W2.ibw,8),"mg")} mg</b> (usually 8 mg; IBW) — analgesia + PONV; caution diabetes</td></tr></table>
+  ${f1Draft()}${GT([
+    R("Paracetamol IV",(paraW < 50 ? "15 mg/kg" : "")+(obese?` (AdjBW)`:""),paraW < 50 ? `${dz(15*paraW,"mg")} mg` : "1 g",liver?"max 2–3 g/day":null,"IV"),
+    ...(renal ? [R("NSAID","","<b>Avoid</b> (kidney)",null,"nd")] : [
+      R("NSAID: parecoxib","(20 mg if elderly / &lt; 50 kg)","40 mg",null,"IV"),
+      R("or diclofenac","1 mg/kg (max 100 mg)",`${sig(Math.min(W2.tbw,100))} mg`,null,"PR")]),
+    R("Dexamethasone","0.1 mg/kg (usually 8 mg; IBW)",`${dz(Math.min(0.1*W2.ibw,8),"mg")} mg`,"analgesia + PONV; caution diabetes","IV")])}
   <p class="sub"><b>No NSAID if:</b> kidney impairment / AKI risk, bleeding risk or anticoagulated, aspirin-sensitive asthma, active GI ulcer, after CABG, pregnancy &gt; 20 weeks, severe heart failure.</p>
   <h3>2. Opioid${old?" (halved for age)":""}</h3>${GT([
     GD("Fentanyl (induction)",[1*opF,2*opF],"mcg","lbw",50,null,null,"IV"),
@@ -3457,11 +3484,16 @@ gaCards.opioid = () => {
     GD("Tramadol",[1,2],"mg","ibw",50,"max 100 mg; caution seizures, SSRIs",100,"IV")])}
   <p class="sub"><b>On remifentanil:</b> give morphine 0.1 mg/kg IBW = <b>${renal?"— (fentanyl instead)":sig(0.1*W2.ibw*opF)+" mg"}</b> or fentanyl 1–2 mcg/kg = <b>${dz(W2.lbw*opF,"mcg")}–${dz(2*W2.lbw*opF,"mcg")} mcg</b> ≈ 30 min before stopping remi.</p>
   <h3>3. Adjuncts (bolus → infusion, mL/h)</h3>
-  <table><tr><th>Ketamine<div class="sub">2 mg/mL (100 mg / 50 mL)</div></th><td>Bolus 0.15–0.35 mg/kg IBW = <b>${dz(0.15*W2.ibw,"mg")}–${dz(0.35*W2.ibw,"mg")} mg</b>, then 0.1–0.5 mg/kg/h = <b>${dz(0.1*W2.ibw/2,"mL/h")}–${dz(0.5*W2.ibw/2,"mL/h")} mL/h</b> (max 1 mg/kg/h). Stop 30–60 min before end; hallucinations, ↑ secretions</td></tr>
-  <tr><th>Lignocaine IV<div class="sub">2% = 20 mg/mL</div></th><td>${liver?"<b>Reduce / avoid (liver).</b> ":""}1.5 mg/kg IBW over 10 min = <b>${sig(dz(1.5*W2.ibw/20,"mL")*20)} mg</b> (${dz(1.5*W2.ibw/20,"mL")} mL), then ≤ 1.5 mg/kg/h = <b>≤ ${dz(1.5*W2.ibw/20,"mL/h")} mL/h</b>, ≤ 24 h. <b>Not within 4 h of a nerve block</b> (or 4 h after stopping); counts toward LA toxicity</td></tr>
-  <tr><th>Magnesium<div class="sub">100 mg/mL (5 g / 50 mL)</div></th><td>${renal?"<b>Kidney: reduce / check levels.</b> ":""}30–50 mg/kg IBW over 15–20 min = <b>${dz(30*W2.ibw,"mg")}–${dz(Math.min(50*W2.ibw,4000),"mg")} mg</b>, then 10–15 mg/kg/h = <b>${dz(10*W2.ibw/100,"mL/h")}–${dz(15*W2.ibw/100,"mL/h")} mL/h</b>. Potentiates NMB — monitor TOF</td></tr>
-  <tr><th>Dexmedetomidine<div class="sub">4 mcg/mL (200 mcg / 50 mL)</div></th><td>0.5–1 mcg/kg over 10 min = <b>${dz(0.5*W2.ibw,"mcg")}–${dz(W2.ibw,"mcg")} mcg</b>, then 0.2–0.7 mcg/kg/h = <b>${dz(0.2*W2.ibw/4,"mL/h")}–${dz(0.7*W2.ibw/4,"mL/h")} mL/h</b>. Bradycardia, hypotension; slower wake-up</td></tr>
-  <tr><th>Clonidine<div class="sub">150 mcg/mL</div></th><td>1–2 mcg/kg IBW slow = <b>${dz(Math.min(W2.ibw,150),"mcg")}–${dz(Math.min(2*W2.ibw,150),"mcg")} mcg</b> (max 150 mcg); hypotension, sedation</td></tr></table>
+  ${GT([
+    R("Ketamine — bolus","0.15–0.35 mg/kg IBW",`${dz(0.15*W2.ibw,"mg")}–${dz(0.35*W2.ibw,"mg")} mg`,"2 mg/mL (100 mg / 50 mL)","IV"),
+    R("then","0.1–0.5 mg/kg/h (max 1 mg/kg/h)",`${dz(0.1*W2.ibw/2,"mL/h")}–${dz(0.5*W2.ibw/2,"mL/h")} mL/h`,"Stop 30–60 min before end; hallucinations, ↑ secretions","IV infusion"),
+    R("Lignocaine IV — bolus","1.5 mg/kg IBW over 10 min",`${sig(dz(1.5*W2.ibw/20,"mL")*20)} mg (${dz(1.5*W2.ibw/20,"mL")} mL)`,`${liver?"<b>Reduce / avoid (liver).</b> ":""}2% = 20 mg/mL`,"IV"),
+    R("then","≤ 1.5 mg/kg/h, ≤ 24 h",`≤ ${dz(1.5*W2.ibw/20,"mL/h")} mL/h`,"<b>Not within 4 h of a nerve block</b> (or 4 h after stopping); counts toward LA toxicity","IV infusion"),
+    R("Magnesium — bolus","30–50 mg/kg IBW over 15–20 min",`${dz(30*W2.ibw,"mg")}–${dz(Math.min(50*W2.ibw,4000),"mg")} mg`,`${renal?"<b>Kidney: reduce / check levels.</b> ":""}100 mg/mL (5 g / 50 mL)`,"IV"),
+    R("then","10–15 mg/kg/h",`${dz(10*W2.ibw/100,"mL/h")}–${dz(15*W2.ibw/100,"mL/h")} mL/h`,"Potentiates NMB — monitor TOF","IV infusion"),
+    R("Dexmedetomidine — bolus","0.5–1 mcg/kg over 10 min",`${dz(0.5*W2.ibw,"mcg")}–${dz(W2.ibw,"mcg")} mcg`,"4 mcg/mL (200 mcg / 50 mL)","IV"),
+    R("then","0.2–0.7 mcg/kg/h",`${dz(0.2*W2.ibw/4,"mL/h")}–${dz(0.7*W2.ibw/4,"mL/h")} mL/h`,"Bradycardia, hypotension; slower wake-up","IV infusion"),
+    R("Clonidine","1–2 mcg/kg IBW slow (max 150 mcg)",`${dz(Math.min(W2.ibw,150),"mcg")}–${dz(Math.min(2*W2.ibw,150),"mcg")} mcg`,"150 mcg/mL; hypotension, sedation","IV")])}
   <h3>4. Regional / wound infiltration</h3>
   <p>Bupivacaine / levobupivacaine 0.25%: max for this patient <b>${dz(lmax,"mg")} mg = ${dz(infMl,"mL")} mL</b> ${laAddBtn("a","bupi","0.25",+sig(infMl),1,"Wound infiltration")}<br><span class="sub">Includes all other LA given (blocks, IV lignocaine).</span></p>
   <h3>By operation (PROSPECT)</h3>
@@ -3496,18 +3528,22 @@ gaCards.abx = () => { const w = S.aw;
   <tr><th>Colorectal / gynae</th><td>Add metronidazole 500 mg</td></tr></table>
   ${src("ASHP/IDSA/SIS 2013; MOH Malaysia antibiotic guideline. Follow local policy.")}</div>`; };
 gaCards.txa = () => `<div class="card"><h2>8. Tranexamic acid</h2>${gaDraft()}
-  <p><b>1 g IV</b> over 10 min at induction (or 15 mg/kg = ${dz(15*S.aw,"mg")} mg). Repeat 1 g if bleeding continues or long case.</p>
+  ${f1Draft()}${GT([
+    R("Tranexamic acid",`over 10 min at induction (or 15 mg/kg = ${dz(15*S.aw,"mg")} mg)`,"1 g","Repeat 1 g if bleeding continues or long case.","IV")])}
   <p class="sub">Caution: recent VTE, seizure history, severe renal impairment.</p>${src("Common practice.")}</div>`;
 
 /* WAKE & POST-OP */
 gaCards.reversal = () => { const W2 = wts(); const neo = Math.min(0.05*W2.ibw, 5);
   return `<div class="card"><h2>1. Reversal</h2>${gaDraft()}
   <h3>Sugammadex (rocuronium / vecuronium) · TBW ${sig(W2.tbw)} kg · 100 mg/mL</h3>
-  <table><tr><td>TOF ≥ 2 twitches</td><td>2 mg/kg</td><td class="hl">${sig(dz(2*W2.tbw/100,"mL")*100)} mg (${dz(2*W2.tbw/100,"mL")} mL)</td></tr>
-  <tr><td>1–2 post-tetanic counts</td><td>4 mg/kg</td><td class="hl">${sig(dz(4*W2.tbw/100,"mL")*100)} mg (${dz(4*W2.tbw/100,"mL")} mL)</td></tr>
-  <tr><td>Immediate (after RSI dose)</td><td>16 mg/kg</td><td class="hl">${sig(dz(16*W2.tbw/100,"mL")*100)} mg (${dz(16*W2.tbw/100,"mL")} mL)</td></tr></table>
+  ${f1Draft()}${GT([
+    R("TOF ≥ 2 twitches","2 mg/kg",`${sig(dz(2*W2.tbw/100,"mL")*100)} mg (${dz(2*W2.tbw/100,"mL")} mL)`,null,"IV"),
+    R("1–2 post-tetanic counts","4 mg/kg",`${sig(dz(4*W2.tbw/100,"mL")*100)} mg (${dz(4*W2.tbw/100,"mL")} mL)`,null,"IV"),
+    R("Immediate (after RSI dose)","16 mg/kg",`${sig(dz(16*W2.tbw/100,"mL")*100)} mg (${dz(16*W2.tbw/100,"mL")} mL)`,null,"IV")])}
   <h3>Neostigmine + glycopyrrolate · IBW ${sig(W2.ibw)} kg</h3>
-  <p>Neostigmine 0.05 mg/kg = <b>${sig(dz(neo/2.5,"mL")*2.5)} mg</b> (${dz(neo/2.5,"mL")} mL of 2.5 mg/mL, max 5 mg) + glycopyrrolate <b>${dz(neo*0.2,"mg")} mg</b> (200 mcg per 1 mg neostigmine).</p>
+  ${GT([
+    R("Neostigmine","0.05 mg/kg",`${sig(dz(neo/2.5,"mL")*2.5)} mg`,`(${dz(neo/2.5,"mL")} mL of 2.5 mg/mL, max 5 mg)`,"IV"),
+    R("+ glycopyrrolate","(200 mcg per 1 mg neostigmine)",`${dz(neo*0.2,"mg")} mg`,null,"IV")])}
   <p class="sub">Only when TOF ≥ 2–4 twitches. Confirm TOF ratio ≥ 0.9 before extubation.</p>
   <h3 id="reparalysis">Re-paralysis after sugammadex</h3>
   ${(() => { const ib = W2.ibw, roc = k => `${sig(dz(k*ib/10,"mL")*10)} mg (${dz(k*ib/10,"mL")} mL)`, vec = `${dz(0.1*ib,"mg")} mg`;
@@ -3528,11 +3564,12 @@ gaCards.ponv = () => { const f = S.apfel || 0, n = [0,1,2,3].filter(i => f & (1<
   return `<div class="card"><h2>PONV: Apfel score</h2>${gaDraft()}
   <div class="seg">${labels.map((l,i)=>`<button aria-pressed="${!!(f&(1<<i))}" data-apf="${i}">${l}</button>`).join("")}</div>
   <div class="result"><div class="sub">${n} risk factor${n===1?"":"s"}</div><div class="big">${risk}%</div><div class="sub">Prophylaxis: <b>${plan}</b></div></div>
-  <table><tr><td>Dexamethasone</td><td class="hl">4–8 mg</td><td class="sub">at induction</td></tr>
-  <tr><td>Ondansetron</td><td class="hl">4 mg</td><td class="sub">end of surgery</td></tr>
-  <tr><td>Granisetron</td><td class="hl">1 mg</td><td class="sub">end of surgery</td></tr>
-  <tr><td>Droperidol</td><td class="hl">0.625–1.25 mg</td><td class="sub">end; QT caution</td></tr>
-  <tr><td>Propofol TIVA</td><td class="hl">—</td><td class="sub">avoid volatile / N₂O</td></tr></table>
+  ${f1Draft()}${FT([
+    R("Dexamethasone","at induction","4–8 mg",null,"IV"),
+    R("Ondansetron","end of surgery","4 mg",null,"IV"),
+    R("Granisetron","end of surgery","1 mg",null,"IV"),
+    R("Droperidol","end; QT caution","0.625–1.25 mg",null,"IV"),
+    R("Propofol TIVA","avoid volatile / N₂O","—",null,"nd")])}
   <p class="sub">Combine agents from different classes (e.g. 5-HT₃ antagonist + dexamethasone). High risk of nausea after discharge: consider a long-acting antiemetic before going home.</p>
   ${updNote("5th consensus PONV guidelines (2025)","NYSORA + UCT Medicines Information summaries")}${src("Apfel 1999 (still used in the 5th consensus); 5th consensus PONV guidelines 2025.")}</div>`; };
 gaCards.extub = () => `<div class="card"><h2>Extubation criteria</h2>${gaDraft()}
@@ -3540,10 +3577,12 @@ gaCards.extub = () => `<div class="card"><h2>Extubation criteria</h2>${gaDraft()
   <p class="sub">At-risk airway: DAS extubation plan (exchange catheter, awake, ICU).</p>${src("DAS extubation guideline 2012.")}</div>`;
 gaCards.analgesia = () => { const W2 = wts(), w = S.aw;
   return `<div class="card"><h2>4. Analgesia ladder &amp; PCA</h2>${gaDraft()}
-  <table><tr><th>Paracetamol</th><td>${w<50?`15 mg/kg = <b>${dz(15*w,"mg")} mg</b>`:"<b>1 g</b>"} IV/PO 6-hourly, max ${w<50?"60 mg/kg/day":"4 g/day"}</td></tr>
-  <tr><th>NSAID</th><td>Parecoxib 40 mg IV, or diclofenac 50 mg 8-hourly (max 150 mg/day)</td></tr>
-  <tr><th>Weak opioid</th><td>Tramadol 50–100 mg 6-hourly (max 400 mg/day)</td></tr>
-  <tr><th>PACU morphine</th><td>1–2 mg IV every 5 min, titrate; usual max 0.1–0.15 mg/kg IBW = <b>${dz(0.1*W2.ibw,"mg")}–${dz(0.15*W2.ibw,"mg")} mg</b></td></tr></table>
+  ${f1Draft()}${GT([
+    R("Paracetamol",`${w<50?"15 mg/kg · ":""}6-hourly`,w<50?`${dz(15*w,"mg")} mg`:"1 g",`max ${w<50?"60 mg/kg/day":"4 g/day"}`,"IV / PO"),
+    R("NSAID: parecoxib","","40 mg",null,"IV"),
+    R("or diclofenac","8-hourly","50 mg","(max 150 mg/day)","PO / PR"),
+    R("Weak opioid: tramadol","6-hourly","50–100 mg","(max 400 mg/day)","IV / PO"),
+    R("PACU morphine","every 5 min, titrate","1–2 mg",`usual max 0.1–0.15 mg/kg IBW = ${dz(0.1*W2.ibw,"mg")}–${dz(0.15*W2.ibw,"mg")} mg`,"IV")])}
   <h3>Adult PCA</h3>
   <table><tr><th>Morphine 1 mg/mL</th><td>Bolus 1 mg, lockout 5 min, no background</td></tr>
   <tr><th>Fentanyl 10 mcg/mL</th><td>Bolus 10–20 mcg, lockout 5 min, no background</td></tr></table>
@@ -4134,6 +4173,12 @@ VGROUPS.find(g => g[0]==="General")[1].push(["Paeds doses vs local manual & pain
   "Neonates: morphine term 0.05–0.1 / preterm 0.025–0.05 mg/kg; fentanyl 1–2 mcg/kg (neonate start 0.5, protocol 0.5–3); atracurium 0.5 mg/kg (BNFc neonate 0.3–0.5 as note); PR paracetamol not < 3 months (manual lists 30 mg/kg loading); no sedative premed for neonate / PMA < 60 wk; ondansetron not < 1 month; neonatal antibiotic intervals (cefotaxime, metronidazole)",
   "Ibuprofen 3–6 months 5 mg/kg 6–8-hourly max 20 mg/kg/day; ketamine induction 1–2 mg/kg; phenylephrine bolus 2–10 mcg/kg (max 100 mcg); hydrocortisone 2–4 mg/kg max 200 mg; chlorphenamine IV 0.2 mg/kg max 10 mg",
   "Added from the manual: phenylephrine and vasopressin infusions, max per syringe, antihypertensives (nitroprusside, esmolol, labetalol, hydralazine), other drugs (3% saline, mannitol, KCl, insulin, adenosine 0.1–0.25 mg/kg max 12 mg), dehydration table, hypoxia crisis, difficult airway / CICV rebuilt from the manual (≤ 4 laryngoscopy, ≤ 3 SAD attempts, wake if SpO₂ > 80%), ASA paediatric examples, BMI-for-age note, LMA sizes (standard, pending page 11)"]]);
+VGROUPS.find(g => g[0]==="General")[1].push(["Dose tables, batch 1: Obstetric + General", "22 Nov 2026", [
+  "Drug lists in bullets, text and 2-column tables moved into dose tables: same words and numbers (test checks every number)",
+  "Obstetric: labour start / top-up / dural puncture, aspiration prophylaxis, ward analgesia options, NSAID yes / no, pruritus",
+  "General: intra-op analgesia (base, adjuncts as bolus then infusion), TXA, reversal, PONV, analgesia ladder (antibiotics already use name + dose rows)",
+  "Routes added where the text had none: sodium citrate PO; PONV agents IV; diclofenac 50 mg PO / PR; tramadol IV / PO; paracetamol IV / PO; labour boluses epidural; CSE / dural-puncture fentanyl intrathecal",
+  "Unchanged on purpose: syringe recipes (infusion recipes, IT morphine, phenylephrine), pump settings (PCEA, PIEB, PCA), TIVA targets, ventilation, re-paralysis timing"]]);
 VGROUPS.find(g => g[0]==="General")[1].push(["Induction drugs & relaxants combined", "22 Nov 2026", [
   "Adult: General › Induction › 1. Induction drugs & relaxants — Opioid · Hypnotic · Muscle relaxant · No IV access (rows moved unchanged)",
   "Paeds: Paediatric › Induction › 3. Induction drugs & relaxants — Anticholinergic · Opioid · Hypnotic · Muscle relaxant · No IV access (rows moved unchanged)",
@@ -4216,12 +4261,13 @@ function vTicks(){
 }
 /* ---------- ABOUT ---------- */
 const CHANGES = [
+  ["2.74","Dose tables, batch 1 — Obstetric and General: drug lists moved into dose tables, same words and numbers (checked)"],
   ["2.73","Every dose the same large size, bold or not; maximums, thresholds and per-kg rules stay normal (checked)"],
   ["2.72","Large, unbroken doses everywhere: emergency steps, text, syringe and other tables (checked)"],
   ["2.71","Doses large and on one line; on a phone each drug is name + dose, then rule · note in smaller text (checked)"],
   ["2.70","Induction drugs and muscle relaxants in one card (adult and paeds) under Anticholinergic · Opioid · Hypnotic · Muscle relaxant · No IV access (checked)"],
-  ["2.69","Finding cards: search in every section, recent cards on Home, shortcuts between tabs, emergency groups, Clinical Scenarios groups; no clinical text changed (checked)"],
-  ["2.68","Safety audit: age-eligibility checks, metoclopramide, KCl, tramadol, anaphylaxis, calcium, bicarbonate, platelets, ranitidine (checked)"]];
+  ["2.69","Finding cards: search in every section, recent cards on Home, shortcuts between tabs, emergency groups, Clinical Scenarios groups; no clinical text changed (checked)"]];
+
 
 
 
