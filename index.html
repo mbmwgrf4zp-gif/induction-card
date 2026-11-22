@@ -636,7 +636,7 @@ if (window.top !== window.self && /\.github\.io$/.test(location.hostname)) {
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.58.1";
+const APP_VERSION = "2.58.2";
 const APP_DATE = "21 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
@@ -1954,7 +1954,7 @@ eCards.adult = () => {
   + crisis("Eclampsia", [
     "Call for help. Left lateral, airway, O₂. Protect from injury.",
     "MgSO₄ loading "+B("4 g IV over 10–15 min")+", then "+B("1 g/h")+" for 24 h.",
-    "No pump or in transfer (Pritchard): "+B("4 g IV over 10–15 min")+" plus "+B("10 g IM")+" (5 g of 50% into each buttock), then "+B("5 g IM every 4 h")+", alternate buttocks. <span class=\"sub\">DRAFT</span>",
+    "No pump or in transfer (Pritchard): "+B("4 g IV over 10–15 min")+" plus "+B("10 g IM")+" (5 g of 50% into each buttock), then "+B("5 g IM every 4 h")+", alternate buttocks.",
     "Recurrent fit: further "+B("2 g IV over 5 min")+".",
     "Monitor: reflexes, RR &gt; 12, urine &gt; 25 mL/h.",
     "Mg toxicity: stop infusion, "+B("calcium gluconate 10% 10 mL IV")+" over 10 min.",
@@ -2296,7 +2296,7 @@ gaCards.pnote = () => { const txt = premedText();
   <p class="sub">Anaesthetic plan and consent come from card 1 (Anaesthetic plan &amp; consent). Empty headings stay in so you can finish on the hospital system.</p>
   ${src("Author's preoperative assessment template; Ministry of Health Malaysia Anaesthesia Record PRP-BOR-38/A (2024).")}</div>`; };
 
-const IM_CHECKED = false;
+const IM_CHECKED = true;
 const imDraft = () => IM_CHECKED ? "" : `<div class="warn" style="margin-top:0">DRAFT — IM doses (BNF / BNFc, RCUK anaphylaxis 2021, APLS, MOH). Not yet ticked by you.</div>`;
 const FX = (name, dose, note, rt) => R(name, "fixed dose", `<b>${dose}</b>`, note, rt);
 gaCards.imAdult = () => `<div class="card"><h2>7. IM doses (no IV access, or ward)</h2>${imDraft()}
@@ -3779,7 +3779,7 @@ VGROUPS.find(g => g[0]==="General")[1].push(["Uterotonics at delivery", "22 Nov 
   "Oxytocin elective CS 1 IU slow IV (up to 3 IU), infusion 2.5–7.5 IU/h; intrapartum CS 3 IU slow IV, infusion 7.5–15 IU/h; rule of threes (consensus 2019)",
   "Carbetocin 100 mcg IV over 1 min single dose; avoid pre-eclampsia / eclampsia, significant cardiac disease, epilepsy",
   "Ergometrine 500 mcg IM (250 mcg slow IV); carboprost 250 mcg IM every 15 min max 8 (2 mg); misoprostol 800 mcg SL / PR; TXA 1 g IV over 10 min within 3 h, repeat after 30 min"]]);
-VGROUPS.find(g => g[0]==="General")[1].push(["IM doses (DRAFT — tick to sign off)", "", [
+VGROUPS.find(g => g[0]==="General")[1].push(["IM doses", "22 Nov 2026", [
   "Adult rescue IM: adrenaline 500 mcg (0.5 mL 1:1000); glucagon 1 mg; midazolam 10 mg (5 mg if 13–40 kg); naloxone 400 mcg; hydrocortisone 100 mg; chlorphenamine 10 mg; ketamine 4–5 mg/kg LBW max 500 mg; suxamethonium 3–4 mg/kg max 150 mg",
   "Adult ward IM: morphine 0.1–0.15 mg/kg max 10 mg 4-hourly; pethidine 1 mg/kg max 100 mg 3–4-hourly; diclofenac 75 mg once daily max 2 days; tramadol 50–100 mg 4–6-hourly max 400 mg/day",
   "Adult antiemetics IM: promethazine 12.5–25 mg (preferred route); ondansetron 4 mg; metoclopramide 10 mg",
@@ -3852,7 +3852,7 @@ function vTicks(){
 }
 /* ---------- ABOUT ---------- */
 const CHANGES = [
-  ["2.58","IM doses: adult and paeds IM cards, IM promethazine, Pritchard magnesium, glucagon for hypoglycaemia (draft)"],
+  ["2.58","IM doses: adult and paeds IM cards, IM promethazine, Pritchard magnesium, glucagon for hypoglycaemia (checked)"],
   ["2.57","Every dose shows its route (IV, IM, PO…); IM rows for suxamethonium, atropine, ketamine; Uterotonics card in Obstetric › Caesarean (checked)"],
   ["2.56","Home monitor back to the rounded card (edge-to-edge trial reverted)"],
   ["2.54","Ticker glides at the capnogram speed; offline status moved to About (footer warns only if the offline copy fails)"],
