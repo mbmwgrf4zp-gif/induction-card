@@ -255,7 +255,7 @@ table.dt tr[data-dr]>td.hl .gml{font-size:1.05rem;font-weight:700;color:inherit}
   table.dt tr[data-dr]>td.hl>.sub{display:block}
   table.dt tr[data-dr] .addla{grid-column:1/-1;justify-self:start;margin-top:var(--s1)}
   table.dt.gt tr[data-dr]>td:nth-child(2) br{display:none}
-  table.dt.gt tr[data-dr]>td:nth-child(2) b::before{content:" · "}
+  table.dt.gt tr[data-dr]>td:nth-child(2) br+b::before{content:" · "}
   table.dt tr.utr{grid-template-columns:minmax(0,1fr);grid-template-areas:"name" "dose" "note"}
   table.dt tr.utr>td:first-child{display:block;grid-area:name}
   table.dt tr.utr>td:nth-child(2){grid-area:dose;text-align:left;margin-top:var(--s1);font-size:1.2rem;font-weight:700}
@@ -404,6 +404,7 @@ tr.over td{background:var(--danger-bg)}
 table.blk th{width:32%;font-size:var(--fs-xs);text-transform:uppercase;letter-spacing:.04em}
 .bad{color:var(--danger-ink);font-weight:700}
 .jumprow{display:flex;flex-wrap:wrap;gap:var(--s2);margin:0 0 var(--s2)}.jumprow .chip{min-height:40px}h3.irh{scroll-margin-top:72px}
+table.dt tr.rescue,table.dt tr.rescue>td{background:var(--danger-bg)}table.dt tr.rescue .dn,table.dt tr.rescue>td.hl{color:var(--danger-ink)}table.dt tr.dim{opacity:.45}
 .seerow.seeafter{margin-top:var(--s4)}.seerow{display:flex;flex-wrap:wrap;align-items:center;gap:var(--s2);margin:0 0 var(--s3)}.seerow>.sub{flex-basis:100%;margin:0 2px}
 .seechip,.rchip{display:flex;flex-direction:column;justify-content:center;min-height:44px;line-height:1.2}.seechip small,.rchip small{font-weight:400;color:var(--muted);font-size:var(--fs-xs)}
 .recent{margin:var(--s2) 0 var(--s3)}.recent .label{margin:0 2px var(--s1)}.rchips{display:flex;gap:var(--s2);overflow-x:auto;scrollbar-width:none;padding-bottom:2px}.rchips::-webkit-scrollbar{display:none}
@@ -689,6 +690,19 @@ a{color:var(--accent)}
 .scdone{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-top:6px}.scdone .linkbtn{width:auto;margin:0;min-height:36px}
 .offl{font-size:11px;opacity:.85}.offl.fail{color:var(--warn-ink,#f59e0b);opacity:1;font-weight:600}
 .planout{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:8px 0;padding:8px 10px;border:1px solid var(--line);border-radius:var(--r-sm);background:var(--bg)}.planout b{flex:1;min-width:140px}
+
+/* type scale inside cards on section pages (v2.79): body 16 · crisis steps 17 · headings 15 · labels and notes 14 · badges 13 · doses 19–20.
+   Home, the patient box, quick tiles, result boxes and the print sheet keep their own styles. */
+.content details.acc{--t-body:1rem;--t-crisis:1.0625rem;--t-head:.9375rem;--t-small:.875rem;--t-badge:.8125rem}
+.content details.acc p,.content details.acc li,.content details.acc td,.content details.acc .warn,.content details.acc .danger,.content details.acc table.dt .dn{font-size:var(--t-body)}
+.content details.acc ol.crisis>li,.content details.acc ul.crisis>li{font-size:var(--t-crisis)}
+.content details.acc h3{font-size:var(--t-head);font-weight:700}
+.content details.acc th,.content details.acc .sub,.content details.acc small,.content details.acc .dnote,.content details.acc .src,.content details.acc .acchead,.content details.acc .label,
+.content details.acc table.dt tr[data-dr]:not(.utr)>td:nth-child(2),.content details.acc td.sub,.content details.acc p.sub,.content details.acc li .sub,.content details.acc .egoal,.content details.acc .pned>span{font-size:var(--t-small)}
+.content details.acc .rt,.content details.acc .awtag,.content details.acc .stag{font-size:var(--t-badge)}
+.content details.acc b,.content details.acc strong{font-weight:700}
+.content details.acc .mono,.content details.acc .trio span,.content details.acc .abxrow b,.content details.acc .dchip,.content details.acc .linkish,.content details.acc .scopt b{font-family:var(--font-sans)}
+.content details.acc .trio span{font-weight:700}
 </style>
 </head>
 <body>
@@ -703,7 +717,7 @@ if (window.top !== window.self && /\.github\.io$/.test(location.hostname)) {
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.78.1";
+const APP_VERSION = "2.79.1";
 const APP_DATE = "22 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
@@ -2375,6 +2389,9 @@ const F3_CHECKED = true;   // checked by author 22 Nov 2026
 const f3Draft = () => F3_CHECKED ? "" : `<div class="warn" style="margin-top:0">DRAFT — doses moved into a dose table (format batch 3, Nov 2026): same words and numbers; routes added where the text had none. Not yet ticked by you.</div>`;
 const F4_CHECKED = true;   // checked by author 22 Nov 2026
 const f4Draft = () => F4_CHECKED ? "" : `<div class="warn" style="margin-top:0">DRAFT — doses moved into a dose table (format batch 4, Nov 2026): same words and numbers; routes added where the text had none. Not yet ticked by you.</div>`;
+const F5_CHECKED = true;   // checked by author 23 Nov 2026
+const f5Draft = () => F5_CHECKED ? "" : `<div class="warn" style="margin-top:0">DRAFT — RSI doses moved from boxes into a dose table (Nov 2026): same numbers. Not yet ticked by you.</div>`;
+const trCls = (row, cls) => row.replace('<tr class="dz"', `<tr class="dz ${cls}"`);   // rescue / dimmed rows
 const FT = rows => `${rtDraft()}<div class="dfor fixw"></div><div style="overflow-x:auto"><table class="dt"><tr class="dth"><th>Drug</th><th>When / how</th><th>Dose</th></tr>${rows.join("")}</table></div>`;
 const GT = rows => `${rtDraft()}<div class="dfor gtw"></div><div style="overflow-x:auto"><table class="dt gt"><tr class="dth"><th>Drug</th><th>Rule · weight used</th><th>Dose</th></tr>${rows.join("")}</table></div>`;
 const GSRC = "Standard references: BNF, Association of Anaesthetists / SOBA obesity guidance, Miller.";
@@ -3104,10 +3121,10 @@ gaCards.induction = () => `<div class="card"><h2>1. Induction drugs &amp; relaxa
 gaCards.rsi = () => { const W2 = wts();
   return `<div class="card"><h2>2. RSI</h2>${gaDraft()}
   <ol><li>Check: suction on, tipping trolley, bougie, VL, SAD, plan A–D said aloud</li><li>Preoxygenate EtO₂ &gt; 0.9 (± high-flow nasal O₂)</li><li>Cricoid 10 N awake → 30 N after LOC; release if view poor</li><li>Induction agent + relaxant, no bag-mask unless SpO₂ falling (then gentle)</li></ol>
-  <div class="row" style="margin-top:var(--s3)">
-    <div class="result" style="margin:0"><div class="sub">Suxamethonium 1.5 mg/kg · TBW ${sig(W2.tbw)} kg</div><div class="big">${sig(dz(1.5*W2.tbw/50,"mL")*50)} mg</div><div class="sub">${dz(1.5*W2.tbw/50,"mL")} mL of 50 mg/mL</div></div>
-    <div class="result" style="margin:0"><div class="sub">Rocuronium 1.2 mg/kg · IBW ${sig(W2.ibw)} kg</div><div class="big">${sig(dz(1.2*W2.ibw/10,"mL")*10)} mg</div><div class="sub">${dz(1.2*W2.ibw/10,"mL")} mL of 10 mg/mL</div>
-      <div class="danger" style="margin-bottom:0"><b>Rescue:</b> sugammadex 16 mg/kg TBW = <b>${sig(dz(16*W2.tbw/100,"mL")*100)} mg</b> (${dz(16*W2.tbw/100,"mL")} mL)</div></div></div>
+  ${f5Draft()}${GT([
+    R("Suxamethonium",`1.5 mg/kg · TBW ${sig(W2.tbw)} kg`,`${sig(dz(1.5*W2.tbw/50,"mL")*50)} mg`,`${dz(1.5*W2.tbw/50,"mL")} mL of 50 mg/mL`,"IV"),
+    R("Rocuronium",`1.2 mg/kg · IBW ${sig(W2.ibw)} kg`,`${sig(dz(1.2*W2.ibw/10,"mL")*10)} mg`,`${dz(1.2*W2.ibw/10,"mL")} mL of 10 mg/mL`,"IV"),
+    trCls(R("<b>Rescue:</b> sugammadex","16 mg/kg TBW",`${sig(dz(16*W2.tbw/100,"mL")*100)} mg`,`(${dz(16*W2.tbw/100,"mL")} mL)`,"IV"), "rescue")])}
   <p class="sub">Sux: avoid in hyperkalaemia, burns &gt; 48 h, denervation, MH history.</p>${src(GSRC)}</div>`; };
 gaCards.kit = () => { const w = S.aw;
   const lma = w < 30 ? "2.5" : w < 50 ? "3" : w < 70 ? "4" : w <= 100 ? "5" : "5 (or 6 if available)";
@@ -3327,11 +3344,11 @@ txCards.drugs = () => `<div class="card"><h2>Kidney: induction drugs</h2>${tx2Dr
 txCards.rsi = () => { const W2 = wts(), hi = kHigh();
   return `<div class="card"><h2>Kidney: RSI &amp; relaxant plan</h2>${tx2Draft()}
   <p class="sub">${kTxt()} — ${hi?"<b>rocuronium RSI</b>":"suxamethonium acceptable"}</p>
-  <div class="row">
-    <div class="result" style="margin:0;${hi?"opacity:.45":""}"><div class="sub">Suxamethonium 1.5 mg/kg · TBW ${sig(W2.tbw)} kg ${hi?"— <b>NOT if K⁺ ≥ 5.5 / unknown</b>":""}</div><div class="big">${sig(dz(1.5*W2.tbw/50,"mL")*50)} mg</div><div class="sub">${dz(1.5*W2.tbw/50,"mL")} mL of 50 mg/mL · raises K⁺ ≈ 0.5 · single dose only</div></div>
-    <div class="result" style="margin:0"><div class="sub">Rocuronium 1.2 mg/kg · IBW ${sig(W2.ibw)} kg</div><div class="big">${sig(dz(1.2*W2.ibw/10,"mL")*10)} mg</div><div class="sub">${dz(1.2*W2.ibw/10,"mL")} mL of 10 mg/mL</div>
-      <div class="danger" style="margin-bottom:0">Sugammadex not recommended in kidney failure — <b>CICO rescue only</b>: 16 mg/kg TBW = ${sig(dz(16*W2.tbw/100,"mL")*100)} mg (${dz(16*W2.tbw/100,"mL")} mL)</div></div></div>
-  ${GT([GD("Atracurium (intubation, non-RSI)",0.5,"mg","ibw",10,"Hofmann — not prolonged in renal failure",null,"IV"),
+  ${f5Draft()}${GT([
+    trCls(R("Suxamethonium",`1.5 mg/kg · TBW ${sig(W2.tbw)} kg ${hi?"— <b>NOT if K⁺ ≥ 5.5 / unknown</b>":""}`,`${sig(dz(1.5*W2.tbw/50,"mL")*50)} mg`,`${dz(1.5*W2.tbw/50,"mL")} mL of 50 mg/mL · raises K⁺ ≈ 0.5 · single dose only`,"IV"), hi ? "dim" : ""),
+    R("Rocuronium",`1.2 mg/kg · IBW ${sig(W2.ibw)} kg`,`${sig(dz(1.2*W2.ibw/10,"mL")*10)} mg`,`${dz(1.2*W2.ibw/10,"mL")} mL of 10 mg/mL`,"IV"),
+    trCls(R("Sugammadex","not recommended in kidney failure — <b>CICO rescue only</b>: 16 mg/kg TBW",`${sig(dz(16*W2.tbw/100,"mL")*100)} mg`,`(${dz(16*W2.tbw/100,"mL")} mL)`,"IV"), "rescue"),
+        GD("Atracurium (intubation, non-RSI)",0.5,"mg","ibw",10,"Hofmann — not prolonged in renal failure",null,"IV"),
         GD("Atracurium top-up",[0.1,0.15],"mg","ibw",10,null,null,"IV"),
         GD("Cisatracurium",0.15,"mg","ibw",2,"Alternative",null,"IV")])}
   <p class="sub">Infusion: see Intra-op › Syringes. <b>Avoid vecuronium and pancuronium</b> (renal clearance). Keep fully relaxed during the anastomosis and retractor removal.</p>
@@ -4204,6 +4221,10 @@ VGROUPS.find(g => g[0]==="General")[1].push(["Paeds doses vs local manual & pain
   "Neonates: morphine term 0.05–0.1 / preterm 0.025–0.05 mg/kg; fentanyl 1–2 mcg/kg (neonate start 0.5, protocol 0.5–3); atracurium 0.5 mg/kg (BNFc neonate 0.3–0.5 as note); PR paracetamol not < 3 months (manual lists 30 mg/kg loading); no sedative premed for neonate / PMA < 60 wk; ondansetron not < 1 month; neonatal antibiotic intervals (cefotaxime, metronidazole)",
   "Ibuprofen 3–6 months 5 mg/kg 6–8-hourly max 20 mg/kg/day; ketamine induction 1–2 mg/kg; phenylephrine bolus 2–10 mcg/kg (max 100 mcg); hydrocortisone 2–4 mg/kg max 200 mg; chlorphenamine IV 0.2 mg/kg max 10 mg",
   "Added from the manual: phenylephrine and vasopressin infusions, max per syringe, antihypertensives (nitroprusside, esmolol, labetalol, hydralazine), other drugs (3% saline, mannitol, KCl, insulin, adenosine 0.1–0.25 mg/kg max 12 mg), dehydration table, hypoxia crisis, difficult airway / CICV rebuilt from the manual (≤ 4 laryngoscopy, ≤ 3 SAD attempts, wake if SpO₂ > 80%), ASA paediatric examples, BMI-for-age note, LMA sizes (standard, pending page 11)"]]);
+VGROUPS.find(g => g[0]==="General")[1].push(["RSI doses as a dose table", "23 Nov 2026", [
+  "General › RSI and Kidney Transplant › RSI & relaxant plan: suxamethonium, rocuronium and sugammadex rescue moved from boxes into the dose table (same numbers, test-checked)",
+  "Rescue row tinted red; kidney suxamethonium row faded with 'NOT if K⁺ ≥ 5.5 / unknown' when K⁺ is high (as before)",
+  "Kept as single-answer boxes: LSCS and non-obstetric spinal dose, neonatal spinal, paeds maintenance fluid, expected BP, score results"]]);
 VGROUPS.find(g => g[0]==="General")[1].push(["Dose tables, batch 4: Kidney Transplant", "22 Nov 2026", [
   "Moved into dose tables (same words and numbers, test-checked): antibiotic, syringes & infusions, anastomosis & reperfusion drugs, reversal, analgesia & PONV, donor antibiotic and mannitol",
   "Routes added: furosemide IV; tramadol IV / PO; ondansetron IV; neostigmine and glycopyrrolate IV; infusions (fentanyl, atracurium, noradrenaline, mannitol, methylprednisolone, thymoglobulin) IV infusion",
@@ -4306,12 +4327,13 @@ function vTicks(){
 }
 /* ---------- ABOUT ---------- */
 const CHANGES = [
+  ["2.79","One type scale inside cards (body 16, emergency steps 17, headings 15, notes 14); RSI doses as a dose table (checked)"],
   ["2.78","Syringe recipes at normal size, so only the doses you give stand out (checked)"],
   ["2.77","Dose tables, batch 4 — Kidney Transplant: antibiotic, infusions, reperfusion drugs, reversal, analgesia, donor (checked)"],
   ["2.76","Dose tables, batch 3 — Paediatric: remifentanil, hypoglycaemia, penile block, discharge analgesia, MRI sedation (checked)"],
   ["2.75","Dose tables, batch 2 — Pre-op and Regional: blocks, epidural, adjuncts, steroid cover, hypoglycaemia (checked)"],
-  ["2.74","Dose tables, batch 1 — Obstetric and General: drug lists moved into dose tables, same words and numbers (checked)"],
-  ["2.73","Every dose the same large size, bold or not; maximums, thresholds and per-kg rules stay normal (checked)"]];
+  ["2.74","Dose tables, batch 1 — Obstetric and General: drug lists moved into dose tables, same words and numbers (checked)"]];
+
 
 
 
