@@ -232,6 +232,35 @@ th{color:var(--muted);font-weight:600}
 td.hl{font-weight:700}
 .mono,.trio span{font-family:var(--font-mono)}
 tr.hl td{background:var(--gc-soft);font-weight:700}
+/* dose tables (v2.71): large dose that never breaks; on a phone each drug is two lines — name + dose, then rule · note */
+.nw{white-space:nowrap}
+table.dt tr[data-dr]>td.hl{font-size:1.2rem;line-height:1.25}
+table.dt tr[data-dr]>td.hl .sub,table.dt tr[data-dr]>td.hl .rt{font-size:var(--fs-xs)}
+table.dt tr[data-dr]>td.hl .gml{font-size:1.05rem;font-weight:700;color:inherit}
+.dfor{display:none}
+@media screen and (max-width:699px){
+  .dfor{display:block;margin:var(--s2) 2px 0;font-size:var(--fs-xs);font-weight:600;color:var(--muted)}
+  .dfor::before{content:"Doses for " attr(data-w) " kg"}.dfor.gtw::before{content:"Doses · the weight used is under each drug"}
+  table.dt,table.dt>tbody{display:block}
+  table.dt tr.dth{display:none}
+  table.dt tr[data-dr]{display:grid;grid-template-columns:minmax(38%,1fr) minmax(0,max-content);grid-template-areas:"name dose" "rule rule" "note note";column-gap:var(--s3);padding:var(--s3) var(--s1);border-bottom:1px solid var(--line)}
+  table.dt tr[data-dr]>td{border:0;padding:0}
+  table.dt tr[data-dr]>td:first-child{display:contents}
+  table.dt tr[data-dr] .dn{grid-area:name;align-self:start;font-weight:600}
+  table.dt tr[data-dr]>td:nth-child(2){grid-area:rule;margin-top:var(--s1);font-size:var(--fs-sm);font-weight:700}
+  table.dt tr[data-dr] .dnote{grid-area:note;margin-top:2px;font-size:var(--fs-sm)}
+  table.dt tr[data-dr]>td.hl{grid-area:dose;text-align:right;font-size:1.25rem}
+  table.dt tr[data-dr] .eqbr{display:block}
+  table.dt tr[data-dr]>td.hl>.sub{display:block}
+  table.dt tr[data-dr] .addla{grid-column:1/-1;justify-self:start;margin-top:var(--s1)}
+  table.dt.gt tr[data-dr]>td:nth-child(2) br{display:none}
+  table.dt.gt tr[data-dr]>td:nth-child(2) b::before{content:" · "}
+  table.dt tr.utr{grid-template-columns:minmax(0,1fr);grid-template-areas:"name" "dose" "note"}
+  table.dt tr.utr>td:first-child{display:block;grid-area:name}
+  table.dt tr.utr>td:nth-child(2){grid-area:dose;text-align:left;margin-top:var(--s1);font-size:1.2rem;font-weight:700}
+  table.dt tr.utr>td:nth-child(3){grid-area:note;margin-top:var(--s1);font-size:var(--fs-sm);font-weight:400}
+}
+tr.hl[data-dr]{background:var(--gc-soft)}
 ol,ul{margin:var(--s1) 0;padding-left:22px}
 li{margin:var(--s1) 0}
 
@@ -673,7 +702,7 @@ if (window.top !== window.self && /\.github\.io$/.test(location.hostname)) {
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.70.1";
+const APP_VERSION = "2.71.1";
 const APP_DATE = "22 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
@@ -1176,17 +1205,17 @@ obsCards.cTopup = () => { const t = TOPUP[S.topup] || TOPUP.lig;
   <div class="warn">Keep epidural catheter in situ &amp; stoppered post-op.</div>${protoSrc()}</div>`; };
 const UT_CHECKED = true, RT_CHECKED = true;
 const utDraft = () => UT_CHECKED ? "" : `<div class="warn" style="margin-top:0">DRAFT — uterotonics card (international consensus 2019, RCOG, WHO). Not yet ticked by you.</div>`;
-const UTR = (d, dose, rt, avoid) => `<tr class="dz"><td><b>${d}</b></td><td class="hl">${dose}${RT(rt)}</td><td class="sub">${avoid}</td></tr>`;
+const UTR = (d, dose, rt, avoid) => `<tr class="dz utr" data-dr="1"><td><b>${d}</b></td><td class="hl">${dose}${RT(rt)}</td><td class="sub">${avoid}</td></tr>`;
 obsCards.utero = () => `<div class="card"><h2>D. Uterotonics at delivery</h2>${utDraft()}${rtDraft()}
   <h3>First line — at delivery of the baby</h3>
-  <div style="overflow-x:auto"><table><tr><th>Drug</th><th>Dose · route</th><th>Caution / avoid</th></tr>
+  <div style="overflow-x:auto"><table class="dt"><tr class="dth"><th>Drug</th><th>Dose · route</th><th>Caution / avoid</th></tr>
   ${UTR("Oxytocin — elective CS","1 IU slow (≥ 30 s), may repeat to 3 IU; then 2.5–7.5 IU/h","IV","Rapid bolus: hypotension, tachycardia, ST changes. Smaller, slower doses in cardiac disease")}
   ${UTR("Oxytocin — in labour (intrapartum CS)","3 IU slow (≥ 30 s); then 7.5–15 IU/h","IV","Oxytocin-exposed uterus responds less; move to second line early")}
   ${UTR("Carbetocin (alternative)","100 mcg over 1 min, single dose","IV","Avoid in pre-eclampsia / eclampsia, significant cardiac disease, epilepsy")}
   </table></div>
   <p class="sub"><b>Rule of threes:</b> oxytocin 3 IU slow IV, assess tone at 3 min, up to 3 doses in total, then second line. Common local infusion: 40 IU in 500 mL at 125 mL/h (10 IU/h). Your unit's protocol (e.g. 5 IU bolus) takes precedence.</p>
   <h3>Second line — uterine atony</h3>
-  <div style="overflow-x:auto"><table><tr><th>Drug</th><th>Dose · route</th><th>Caution / avoid</th></tr>
+  <div style="overflow-x:auto"><table class="dt"><tr class="dth"><th>Drug</th><th>Dose · route</th><th>Caution / avoid</th></tr>
   ${UTR("Ergometrine","500 mcg (or 250 mcg slow IV over 1 min)","IM","Avoid in hypertension, pre-eclampsia, cardiac disease. Vomiting: give an antiemetic")}
   ${UTR("Carboprost (15-methyl PGF2α)","250 mcg every 15 min, max 8 doses (2 mg); intramyometrial by surgeon","IM","Avoid in asthma (bronchospasm). Diarrhoea, fever, hypertension")}
   ${UTR("Misoprostol","800 mcg","SL / PR","Sublingual or rectal. Slower onset. Shivering and fever common")}
@@ -1285,8 +1314,11 @@ const ROUTES = ["IV","IV infusion","IO","IM","SC","PO","SL","buccal","PR","IN","
 const rtNorm = rt => { const parts = rt.split(" / "); if (!parts.every(x => ROUTES.includes(x))) return null; return parts.sort((a, b) => ROUTES.indexOf(a) - ROUTES.indexOf(b)).join(" / "); };
 const RT = rt => { if (rt === "nd" || rt === "inline") return ""; const n = rt && rtNorm(rt); return n ? ` <span class="rt">${n}</span>` : ` <span class="rt rtmiss">route?</span>`; };
 const rtDraft = () => RT_CHECKED ? "" : `<p class="sub" style="margin:2px 0 4px"><b>DRAFT routes</b> — not yet ticked by you.</p>`;
-const R = (name, rule, res, note, rt) => `<tr class="${rt==="nd"?"nd":"dz"}"><td>${name}${note?`<div class="sub">${note}</div>`:""}</td><td class="sub">${rule}</td><td class="hl">${res}${RT(rt)}</td></tr>`;
-const T = rows => `${rtDraft()}<div style="overflow-x:auto"><table><tr><th>Drug / item</th><th>Rule</th><th>For ${sig(W())} kg</th></tr>${rows.join("")}</table></div>`;
+const doseFmt = res => String(res).replace(/(\d) – (\d)/g, "$1–$2")
+  .replace(/(\d[\d.,]*(?:–[\d.,]+)?\s(?:mg\/kg\/h|mcg\/kg\/min|mL\/h|mmol\/h|mg|mcg|mL|g|units?|mmol|J|kg)(?![a-zA-Z]))/g, '<span class="nw">$1</span>')
+  .replace(/ = /g, '<span class="eqbr"> = </span>');
+const R = (name, rule, res, note, rt) => `<tr class="${rt==="nd"?"nd":"dz"}" data-dr="1"><td><span class="dn">${name}</span>${note?`<div class="sub dnote">${note}</div>`:""}</td><td class="sub">${rule}</td><td class="hl">${doseFmt(res)}${RT(rt)}</td></tr>`;
+const T = rows => `${rtDraft()}<div class="dfor" data-w="${sig(W())}"></div><div style="overflow-x:auto"><table class="dt"><tr class="dth"><th>Drug / item</th><th>Rule</th><th>For ${sig(W())} kg</th></tr>${rows.join("")}</table></div>`;
 const DR = (name, per, unit, note, max, rt) => R(name, perTxt(per,unit), pk(per,unit,max), note, rt);
 function unvP(what, why, prop){ return `<div class="unv"><b>UNVERIFIED — HIDDEN.</b> ${what}<br>${why}${prop?`<br><b>Proposed:</b> ${prop}`:""}</div>`; }
 const psrc = () => src(PSRC);
@@ -1299,7 +1331,7 @@ function LAR(name, ml, mgml, max, note, capml, rt){
   if (capml!=null){ if (a>capml){a=capml;cap=true;} if (b>capml){b=capml;cap=true;} }
   const mgkg = b*mgml/w, over = mgkg > max + 1e-9;
   const add = `<button class="addla mini" data-addla="${esc(JSON.stringify({d:"bupi",c:String(mgml/10),ml:+sig(b),bi:1,l:name.split(" · ")[0]}))}" data-lt="p">+ add</button>`;
-  return `<tr class="dz ${over?"over":""}"><td>${name}${note?`<div class="sub">${note}</div>`:""}${add}</td><td class="sub">${ml[0]===ml[1]?ml[0]:ml.join("–")} mL/kg · ${sig(mgkg)} mg/kg</td><td class="hl">${a===b?sig(a):sig(a)+"–"+dz(b,"mL")} mL${RT(rt)}${cap?` <span class="sub">(max ${capml} mL)</span>`:""}${over?`<div class="danger" style="margin:4px 0 0;font-weight:700">Above max ${max} mg/kg</div>`:""}</td></tr>`;
+  return `<tr class="dz ${over?"over":""}" data-dr="1"><td><span class="dn">${name}</span>${note?`<div class="sub dnote">${note}</div>`:""}${add}</td><td class="sub">${ml[0]===ml[1]?ml[0]:ml.join("–")} mL/kg · ${sig(mgkg)} mg/kg</td><td class="hl">${a===b?sig(a):sig(a)+"–"+dz(b,"mL")} mL${RT(rt)}${cap?` <span class="sub">(max ${capml} mL)</span>`:""}${over?`<div class="danger" style="margin:4px 0 0;font-weight:700">Above max ${max} mg/kg</div>`:""}</td></tr>`;
 }
 
 function pInputs(forEtt){
@@ -2301,9 +2333,9 @@ function GD(name, per, unit, wk, conc, note, max, rt){
   a = rr(a); b = rr(b);
   const dose = a===b ? `${a} ${unit}` : `${a}–${b} ${unit}`;
   const ml = conc ? (a===b ? `${dz(a/conc,"mL")} mL` : `${dz(a/conc,"mL")}–${dz(b/conc,"mL")} mL`) : "";
-  return `<tr class="dz"><td>${name}${note?`<div class="sub">${note}</div>`:""}</td><td class="sub">${Array.isArray(per)?per.join("–"):per} ${unit}/kg<br><b>${WN[wk]} ${sig(w)} kg</b></td><td class="hl">${dose}${RT(rt)}${capped?` <span class="sub">(max ${max})</span>`:""}${ml?`<div class="sub">${ml}</div>`:""}</td></tr>`;
+  return `<tr class="dz" data-dr="1"><td><span class="dn">${name}</span>${note?`<div class="sub dnote">${note}</div>`:""}</td><td class="sub">${Array.isArray(per)?per.join("–"):per} ${unit}/kg<br><b>${WN[wk]} ${sig(w)} kg</b></td><td class="hl">${doseFmt(dose)}${RT(rt)}${capped?` <span class="sub">(max ${max})</span>`:""}${ml?`<div class="sub gml">${doseFmt(ml)}</div>`:""}</td></tr>`;
 }
-const GT = rows => `${rtDraft()}<div style="overflow-x:auto"><table><tr><th>Drug</th><th>Rule · weight used</th><th>Dose</th></tr>${rows.join("")}</table></div>`;
+const GT = rows => `${rtDraft()}<div class="dfor gtw"></div><div style="overflow-x:auto"><table class="dt gt"><tr class="dth"><th>Drug</th><th>Rule · weight used</th><th>Dose</th></tr>${rows.join("")}</table></div>`;
 const GSRC = "Standard references: BNF, Association of Anaesthetists / SOBA obesity guidance, Miller.";
 
 function ptile(key, label, unit, min, max, stp){
@@ -4183,12 +4215,13 @@ function vTicks(){
 }
 /* ---------- ABOUT ---------- */
 const CHANGES = [
+  ["2.71","Doses large and on one line; on a phone each drug is name + dose, then rule · note in smaller text (checked)"],
   ["2.70","Induction drugs and muscle relaxants in one card (adult and paeds) under Anticholinergic · Opioid · Hypnotic · Muscle relaxant · No IV access (checked)"],
   ["2.69","Finding cards: search in every section, recent cards on Home, shortcuts between tabs, emergency groups, Clinical Scenarios groups; no clinical text changed (checked)"],
   ["2.68","Safety audit: age-eligibility checks, metoclopramide, KCl, tramadol, anaphylaxis, calcium, bicarbonate, platelets, ranitidine (checked)"],
   ["2.67","Patient box: three tiles in the monitor font while entering, one-line summary bar once set (shows the case name)"],
-  ["2.66","Paeds doses checked against the local manual and pain protocol; new: other drugs, antihypertensives, dehydration, hypoxia, LMA sizes; CICO rebuilt (checked)"],
-  ["2.65","Neonatal age: day of life, gestation and birth weight; fluids, blood volume, SpO₂ and ex-prem calculated from them (checked)"]];
+  ["2.66","Paeds doses checked against the local manual and pain protocol; new: other drugs, antihypertensives, dehydration, hypoxia, LMA sizes; CICO rebuilt (checked)"]];
+
 const SRC_LINKS = [
   ["Emergencies", [["Resuscitation Council UK — ALS / PLS guidelines","https://www.resus.org.uk/library"],["Difficult Airway Society guidelines","https://das.uk.com/guidelines"],["Association of Anaesthetists — guidelines (anaphylaxis, LAST, safety)","https://anaesthetists.org/Home/Resources-publications/Guidelines"],["European Malignant Hyperthermia Group","https://www.emhg.org"],["UK Kidney Association — hyperkalaemia guideline","https://www.ukkidney.org/health-professionals/guidelines"]]],
   ["General", [["ASA standards & practice parameters (fasting, PACU)","https://www.asahq.org/standards-and-practice-parameters"],["Centre for Perioperative Care — diabetes guideline","https://cpoc.org.uk/guidelines-resources-guidelines"],["PROSPECT procedure-specific analgesia (ESRA)","https://esraeurope.org/prospect/"],["ASRA Pain Medicine — guidelines (ketamine, anticoagulation)","https://www.asra.com/guidelines-articles/guidelines"],["Brain Trauma Foundation guidelines","https://braintrauma.org/coma/guidelines"]]],
