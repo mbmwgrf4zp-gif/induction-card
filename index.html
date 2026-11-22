@@ -636,7 +636,7 @@ if (window.top !== window.self && /\.github\.io$/.test(location.hostname)) {
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.66.2";
+const APP_VERSION = "2.66.3";
 const APP_DATE = "21 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
@@ -4315,8 +4315,8 @@ const printBtn = (gid, tab) => (gid==="paeds" || (gid==="tx" && tab!=="don")) ? 
 
 const GROUPS = [
  {id:"emerg", name:"Emergencies", sub:"Adult & obstetric · Paeds — crisis steps with doses", tabKey:"emTab", tabs:[
-   {id:"adult", label:"Adult / Obstetric", input:()=>step("aw","Weight","kg",30,200,1), top:()=>`<button class="homebtn" data-open="7. IM doses (no IV access, or ward)" data-g="ga" data-tab="post">No IV access: IM doses → General › Post-op ›</button>`, cards:EMERG_ADULT},
-   {id:"paeds", label:"Paeds", input:()=>pInputs(), top:()=>`<button class="homebtn" data-open="9. IM doses (no IV access)" data-g="paeds" data-tab="post">No IV access: IM doses → Paeds › Post-op ›</button>`, cards:EMERG_PAEDS}], cards:[]},
+   {id:"adult", label:"Adult / Obstetric", input:()=>step("aw","Weight","kg",30,200,1), cards:EMERG_ADULT},
+   {id:"paeds", label:"Paeds", input:()=>pInputs(), cards:EMERG_PAEDS}], cards:[]},
  {id:"premed", name:"Premed", sub:"Assess · Prepare · Plan & note", tabKey:"pmTab", tabs:[
    {id:"assess", label:"Assess", input:()=>gaInputs(), top:()=>preSummary(), hint:"Examine → score → decide. The summary bar collects the scores to copy.",
     cards:["§Examine","1. Airway assessment & plan",["Echo report: what matters","2. Echo report: what matters"],
