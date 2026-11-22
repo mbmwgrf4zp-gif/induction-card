@@ -636,7 +636,7 @@ if (window.top !== window.self && /\.github\.io$/.test(location.hostname)) {
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.63.2";
+const APP_VERSION = "2.64.0";
 const APP_DATE = "21 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
@@ -1310,7 +1310,11 @@ const PAEDS = [
 
 
 const pCards = {};
-pCards.ett = () => `<div class="card"><h2>Paeds ETT</h2>${ettBlock(paedEtt())}</div>`;
+const isNeo = () => AGEM() < 1;
+const neoHl = () => isNeo() ? ' class="hl"' : "";
+pCards.ett = () => { const w = W(), ett = w < 2 ? "2.5" : w < 3.5 ? "3.0" : "3.5";
+  return `<div class="card"><h2>Paeds ETT</h2>${ettBlock(paedEtt())}
+  <table><tr${neoHl()}><th>Neonate</th><td>Uncuffed <b>${ett}</b> for ${sig(w)} kg <span class="sub">(&lt; 2 kg 2.5 · 2–3.5 kg 3.0 · &gt; 3.5 kg 3.5; cuffed 3.0 from about 3 kg)</span> · oral depth at lip <b>${sig(6 + w)} cm</b> (6 + weight in kg)</td></tr></table></div>`; };
 pCards.airway = () => {
   const w = W(), e = paedEtt(), ett = e.useCuff ? e.cuffed : e.plain, tv = 7*w;
   const hm = tv < 35 ? 0 : tv <= 90 ? 1 : tv <= 200 ? 2 : 3;
@@ -1343,7 +1347,7 @@ pCards.vent = () => {
   <table><tr><th>TV</th><td class="hl">4–7 mL/kg = ${dz(4*w,"mL")}–${dz(7*w,"mL")} mL</td></tr><tr><th>PIP</th><td>&lt; 20</td></tr>
   <tr><th>PEEP</th><td>4–6 (pneumonia may need higher)</td></tr><tr><th>RR</th><td class="hl">${mo<1?"30–40 (neonate)":mo<12?"25–35 (infant)":y<6?"20–30 (1–5 y)":y<=12?"15–25 (6–12 y)":"12–20 (&gt; 12 y)"}</td></tr>
   <tr><th>I:E</th><td class="hl">${ie}</td></tr><tr><th></th><td class="sub">1:2 standard; RR &gt; 35, pneumonia or BPD: 1:1.5. Neonate 1:1, infant 1:1.5, &gt; 8 y 1:2</td></tr>
-  <tr><th>Recruitment</th><td>Consider IP &gt; 10, higher at start of op</td></tr></table>
+  <tr><th>Recruitment</th><td>Consider IP &gt; 10, higher at start of op</td></tr><tr${neoHl()}><th>SpO₂ (preterm)</th><td>91–95% — avoid hyperoxia (retinopathy). No N₂O for bowel or chest surgery.</td></tr></table>
   <div class="warn">CGA &lt; 48–52 weeks or Hb &lt; 7: consider post-op ventilation (apnoea risk).</div>
   <h3>Neonatal extubation criteria</h3><ol><li>No medical illness</li><li>Weight &gt; 3 kg</li><li>Term baby</li></ol>
   <p class="sub">NICU: &lt; 1 month or weight &lt; 5 kg. Neonate = up to 28 days of life.</p>${psrc()}</div>`;
@@ -1401,6 +1405,7 @@ pCards.drugs = () => {
   return `<div class="card"><h2>Paeds induction drugs</h2>${pindDraft()}${T([
     (()=>{ const mo=AGEM(), b = mo<1 ? ["neonate",[2,2]] : ["healthy child",[4,5]]; return R(`Propofol (${b[0]})`,`${b[1][0]===b[1][1]?b[1][0]:b[1].join("–")} mg/kg`,`${pk(b[1],"mg")} = ${pk([b[1][0]/10,b[1][1]/10],"mL")}`,"local: healthy 4–5 · ill, liver transplant or neonate 2 mg/kg (titrate) · laryngospasm 1–2","IV"); })(),
     DR("Ketamine","2","mg","haemodynamically unstable, asthma",null,"IV"), DR("Ketamine (no IV access)",[4,5],"mg","onset 3–5 min · site IV once settled",500,"IM"),
+    R("Atropine (neonate, before laryngoscopy)","20 mcg/kg",pk(20,"mcg",600),"vagal bradycardia at laryngoscopy; neonates and young infants","IV").replace('<tr class="dz"', isNeo() ? '<tr class="dz hl"' : '<tr class="dz"'),
     R("Thiopentone 2.5% (if stocked)",neo?"3–4 mg/kg (neonate)":"5–7 mg/kg",pk(neo?[3,4]:[5,7],"mg",500),"","IV"),
     R("Sevoflurane (gas induction)","8% in O₂ ± N₂O","<b>8%</b>, reduce once deep","site IV once asleep; not for a full stomach","inhaled"),
     R("Fentanyl",neo?"0.5–1 mcg/kg (neonate)":"1–2 mcg/kg",pk(neo?[0.5,1]:[1,2],"mcg",100),"remifentanil: TIVA card","IV"),
@@ -1460,6 +1465,11 @@ pCards.fluids = () => {
   <tr><td>3</td><td>${sig(maint)} + ${sig(def/4)}</td><td class="hl">${dz(maint+def/4,"mL/h")} mL/h</td></tr>
   <tr><td>4 +</td><td>maintenance</td><td class="hl">${dz(maint,"mL/h")} mL/h</td></tr></table>
   <p class="sub">Add insensible loss below. &gt; 20 kg: direct set; &lt; 20 kg: chamber (burette).</p>
+  <h3${neoHl()}>Neonate (local manual)</h3><p class="sub">If fluids are running from NICU, continue them. Maintenance mL/kg/day by birth weight and day of life:</p>
+  <table${neoHl()}><tr><th>Birth weight</th><th>Day 1</th><th>Day 2</th><th>Day 3–4</th><th>Day 5+</th></tr>
+  <tr><td>600–800 g</td><td>80–100</td><td>100–125</td><td>130</td><td>150</td></tr>
+  <tr><td>800 g–1 kg</td><td>60–100</td><td>90–115</td><td>120</td><td>150</td></tr>
+  <tr><td>&gt; 1 kg</td><td>60</td><td>70</td><td>100</td><td>150</td></tr></table>
   <h3>Insensible loss</h3><table><tr><td>Minor &lt; 1 h</td><td>none</td></tr><tr><td>Minor &gt; 1 h</td><td class="hl">2 mL/kg/h = ${dz(2*w,"mL/h")} mL/h</td></tr>
   <tr><td>Moderate</td><td class="hl">4 mL/kg/h = ${dz(4*w,"mL/h")} mL/h</td></tr><tr><td>Major</td><td class="hl">&gt; 10 mL/kg/h = &gt; ${dz(10*w,"mL/h")} mL/h</td></tr></table>
   <p><b>Exposed bowel:</b> insensible loss 10–20 mL/kg/h (${dz(10*w,"mL/h")}–${dz(20*w,"mL/h")} mL/h), up to 30 if losses high, until bowel back inside. Guide by HR, CRT, urine.</p>
@@ -1469,6 +1479,7 @@ pCards.fluids = () => {
   ${(()=>{ const g = AGEM()<1?0:1; const h=i=>i===g?' class="hl"':"";
     return `<table><tr${h(0)}><td>Neonate</td><td>keep &gt; 2.6 mmol/L</td></tr><tr${h(1)}><td>Infant and child</td><td>keep 4–10 mmol/L</td></tr></table>`; })()}
   <p>Hypoglycaemia (any age): D10 2.5 mL/kg = <b>${dz(2.5*w,"mL")} mL</b> IV slow bolus (2 mL D50 in 10 mL NS), recheck in 5–10 min <span class="sub">(local manual; RCUK 2025: 2 mL/kg)</span>. No IV: glucagon IM (Post-op › IM doses).</p>
+  <p${neoHl()}><b>Neonate:</b> maintenance <b>D10 in ½ saline</b> (local manual). Glucose need 4–6 mg/kg/min = D10 <b>${dz(2.4*w,"mL/h")}–${dz(3.6*w,"mL/h")} mL/h</b>.</p>
   <h3>Glucose maintenance if high risk of hypoglycaemia</h3><p>HMD2 = 2 mL D50 + 48 mL Hartmann's (2%)</p>
   <p>SD5 = 5 mL D50 + 45 mL Sterofundin = 50 mL of 5%</p>${psrc()}</div>
   <div class="card"><h2>Blood products</h2>${pindDraft()}${neoDraft()}<p>Neonate: Hb &gt; 10–12 g/dL. Colostomy: GXM. Bowel resection = blood loss.</p><button class="homebtn" data-open="3. Fluids: transfusion protocol" data-g="paeds" data-tab="intra">When to transfuse, which product → Transfusion protocol ›</button>
@@ -1572,26 +1583,22 @@ const neoDraft = () => NEO_CHECKED ? "" : `<div class="warn" style="margin-top:0
 const INTL = "International reference — not in the local manual: Coté, A Practice of Anesthesia for Infants and Children; BJA Education neonatal reviews";
 function neoCards(){ const w = W(), mo = AGEM(), ett = w < 2 ? "2.5" : w < 3.5 ? "3.0" : "3.5";
   const d10lo = dz(2.4*w,"mL/h"), d10hi = dz(3.6*w,"mL/h");
-  return `<div class="card"><h2>Neonate: basics</h2>${neoDraft()}
-  <h3>Airway</h3><p>ETT (uncuffed) <b>${ett}</b> for ${sig(w)} kg <span class="sub">(&lt; 2 kg 2.5 · 2–3.5 kg 3.0 · &gt; 3.5 kg 3.5; cuffed 3.0 from about 3 kg)</span> · oral depth at lip <b>${sig(6 + w)} cm</b> (6 + weight in kg). Atropine 20 mcg/kg before laryngoscopy (vagal). Suxamethonium 3 mg/kg.</p>
-  <h3>Fluids (local manual)</h3><p class="sub">If fluids are running from NICU, continue them. Maintenance mL/kg/day by birth weight and day of life:</p>
-  <table><tr><th>Birth weight</th><th>Day 1</th><th>Day 2</th><th>Day 3–4</th><th>Day 5+</th></tr>
-  <tr><td>600–800 g</td><td>80–100</td><td>100–125</td><td>130</td><td>150</td></tr>
-  <tr><td>800 g–1 kg</td><td>60–100</td><td>90–115</td><td>120</td><td>150</td></tr>
-  <tr><td>&gt; 1 kg</td><td>60</td><td>70</td><td>100</td><td>150</td></tr></table>
-  <p>Maintenance fluid: <b>D10 in ½ saline</b> (check glucose). Glucose need 4–6 mg/kg/min = D10 <b>${d10lo}–${d10hi} mL/h</b>. Keep glucose &gt; 2.6 mmol/L; low: D10 2.5 mL/kg = <b>${dz(2.5*w,"mL")} mL</b>.</p>
-  <h3>Oxygen, temperature, drugs</h3><ul>
-  <li>Preterm SpO₂ target 91–95% (retinopathy); avoid hyperoxia</li>
-  <li>Theatre ≥ 26 °C, overhead heater, warm fluids and gases, hat, plastic wrap — cold neonates become apnoeic and acidotic</li>
-  <li>Propofol 2 mg/kg (hypotension above 3 mg/kg); fentanyl 0.5–1 mcg/kg; paracetamol: Post-op › Analgesia by age</li>
-  <li>No N₂O for bowel or chest surgery</li>
-  <li>Apnoea risk to 60 weeks post-menstrual age: Pre-op › Ex-prem card</li></ul>
-  <h3>Other neonatal operations</h3><ul>
-  <li><b>Duodenal atresia:</b> Down syndrome and cardiac anomalies common; aspirate NG, then RSI</li>
-  <li><b>Anorectal malformation:</b> check VACTERL (echo, spine, kidneys); colostomy usually; caudal helps</li>
-  <li><b>Hirschsprung:</b> enterocolitis can make them septic; Duhamel / pull-through — large fluid losses</li></ul>
-  <button class="homebtn" data-open="3. Fluids: transfusion protocol" data-g="paeds" data-tab="intra">Neonatal transfusion thresholds → Transfusion protocol ›</button>
-  ${src("Local paediatric anaesthesia manual (Nov 2025) for fluids, glucose and propofol; " + INTL + ".")}</div>
+  return `<div class="card"><h2>Duodenal atresia</h2><ul>
+  <li>Down syndrome in about a third; cardiac anomalies common — echo</li>
+  <li>Bilious vomiting, dehydration and electrolyte loss — correct first</li>
+  <li>Aspirate the NG tube, then RSI (RSI (child) card)</li>
+  <li>Neonatal basics are on the Tube, Fluids, Glucose and Keeping warm cards</li></ul>
+  ${src(INTL + ".")}</div>
+  <div class="card"><h2>Anorectal malformation</h2><ul>
+  <li>Check VACTERL: echo, spine, kidneys, limbs; oesophageal atresia</li>
+  <li>Usually a defunctioning colostomy first; caudal or wound infiltration helps (spinal anomalies — check before caudal)</li>
+  <li>Later repair (PSARP) may be prone</li></ul>
+  ${src(INTL + ".")}</div>
+  <div class="card"><h2>Hirschsprung disease</h2><ul>
+  <li>Enterocolitis can make the baby septic — resuscitate, antibiotics, rectal washouts first</li>
+  <li>Pull-through (e.g. Duhamel): long case, large fluid losses — insensible loss on the Fluids card</li>
+  <li>Epidural or caudal catheter for analgesia if no contraindication</li></ul>
+  ${src(INTL + ".")}</div>
   <div class="card"><h2>Oesophageal atresia / TOF</h2>${neoDraft()}<ul>
   <li>Replogle tube on continuous suction; head up — aspiration of saliva</li>
   <li>Echo first: cardiac defects (VACTERL) and a right-sided aortic arch (changes the side of thoracotomy)</li>
@@ -1663,7 +1670,7 @@ pCards.procs = () => {
   <ul><li>Femoral in &lt; 5 kg (neonate): consider single-lumen Arrow 22G — double lumen femoral can cause leg congestion</li><li>IJ: can use double lumen 4 Fr</li></ul>
   <h3>Preparation</h3><ul><li><b>Don't open the set first</b> (open only when guidewire confirmed in vessel)</li><li>Blue/yellow branula, Arrow guidewire, linear US probe</li></ul>
   <h3>Steps</h3><ol><li>US-guided vein scan</li><li>Puncture with blue/yellow (22G/24G), through-and-through; remove needle, leave catheter</li><li>Withdraw catheter slowly until venous backflow</li><li>Insert Arrow guidewire</li><li>Keep guidewire, remove cannula</li><li>Skin nick with needle tip, then dilator — follow anatomical direction, stretch skin</li><li>Remove Arrow guidewire, insert set guidewire</li><li>Remove dilator, insert double lumen</li><li>Remove guidewire</li><li>Anchor at 3 points</li></ol>${psrc()}</div>
-  <div class="card"><h2>Keeping warm</h2><ul><li>Bair Hugger (× 2) — &lt; 10 kg put warmer below</li><li>Radiant warmer, warming mattress</li><li>S-line / fluid / blood warmer</li><li>Plastic taped properly around patient</li><li>Off warmers once temperature reaches 36 °C</li></ul></div>
+  <div class="card"><h2>Keeping warm</h2><ul><li${neoHl()}><b>Neonate:</b> theatre ≥ 26 °C, overhead heater, warm fluids and gases, hat, plastic wrap — a cold neonate becomes apnoeic and acidotic</li><li>Bair Hugger (× 2) — &lt; 10 kg put warmer below</li><li>Radiant warmer, warming mattress</li><li>S-line / fluid / blood warmer</li><li>Plastic taped properly around patient</li><li>Off warmers once temperature reaches 36 °C</li></ul></div>
   <div class="card"><h2>T-tube</h2><p>Problems on insertion: spontaneous breathing, cannot ventilate, no barking during insertion, difficult suctioning.<br>Attach ETT connector by T-tube size (ETT 5.0 for T-tube 7).</p>${psrc()}</div>`;
 };
 
@@ -3952,7 +3959,7 @@ VGROUPS.find(g => g[0]==="General")[1].push(["Paeds induction review", "22 Nov 2
 VGROUPS.find(g => g[0]==="General")[1].push(["Neonatal cards & local manual", "22 Nov 2026", [
   "Local manual wins where it gives a dose (international shown as a note): magnesium for bronchospasm 50 mg/kg max 2 g (RCUK 2025: 40); D10 for hypoglycaemia 2.5 mL/kg (RCUK: 2 mL/kg)",
   "Suxamethonium: neonate 3 mg/kg, infant 2 mg/kg, child 1–1.5 mg/kg (max 150 mg) on Relaxants and RSI",
-  "Neonate basics: ETT 2.5 (< 2 kg) / 3.0 / 3.5 (> 3.5 kg), oral depth 6 + kg; local maintenance table by birth weight and day of life; D10 in ½ saline; glucose 4–6 mg/kg/min; preterm SpO₂ 91–95%; theatre ≥ 26 °C",
+  "Neonatal basics (now inside the Tube, Induction drugs, Fluids, Glucose, Ventilation and Keeping warm cards, highlighted for a neonate): ETT 2.5 (< 2 kg) / 3.0 / 3.5 (> 3.5 kg), oral depth 6 + kg; atropine 20 mcg/kg before laryngoscopy; local maintenance table by birth weight and day of life; D10 in ½ saline; glucose 4–6 mg/kg/min; preterm SpO₂ 91–95%; theatre ≥ 26 °C",
   "Cross-check with the local manual: FFP 10–20, platelets 10–15 mL/kg (BSH as note); EBV by age (term 80–90, infant 75–80, child 70–75, adolescent 65–70, premature 90–100); hydrocortisone 4 mg/kg max 200 mg (bronchospasm, anaphylaxis, intra-op); salbutamol neb < 5 y 2.5 mg / ≥ 5 y 5 mg, IV 5 mcg/kg (1–23 months) or 15 mcg/kg (2–17 y) over 5 min max 250 mcg",
   "Anaphylaxis: IV adrenaline moderate 1–2, life-threatening 4–10 mcg/kg; IM age bands 150 / 300 / 500 mcg; crystalloid 20 mL/kg (RCUK as note). Laryngospasm propofol 1–2 mg/kg; bronchospasm adrenaline 0.5–1 mcg/kg; emergence delirium adds propofol 0.5–1, midazolam 0.02–0.1, ketamine 0.5–1 mg/kg",
   "Manual's internal conflicts resolved to its drug table: D10 2.5 mL/kg, ondansetron 0.15 mg/kg",
@@ -4022,12 +4029,12 @@ function vTicks(){
 }
 /* ---------- ABOUT ---------- */
 const CHANGES = [
+  ["2.64","Neonatal basics folded into the paediatric Tube, Drugs, Fluids, Glucose, Ventilation and Warming cards; duodenal atresia, anorectal and Hirschsprung cards"],
   ["2.63","Neonatal cards: basics plus OA / TOF, CDH, gastroschisis, NEC, PDA, malrotation, myelomeningocele; local manual doses restored (checked)"],
   ["2.62","Paeds review fixes: RCUK 2025 arrest, difficult airway / CICO and tonsil bleed cards, glucose targets, ventilation by age, consistent doses (checked)"],
   ["2.61","Paeds: fentanyl, morphine, gas induction, relaxants, RSI and reversal cards, bolus pressors (checked)"],
   ["2.60","Cards reorganised: paeds airway kit and laryngospasm & extubation merged, expected BP beside inotropes, IM doses linked from Emergencies"],
-  ["2.59","IM suxamethonium + atropine in the induction tables; IM midazolam premed (checked)"],
-  ["2.58","IM doses: adult and paeds IM cards, IM promethazine, Pritchard magnesium, glucagon for hypoglycaemia (checked)"]];
+  ["2.59","IM suxamethonium + atropine in the induction tables; IM midazolam premed (checked)"]];
 const SRC_LINKS = [
   ["Emergencies", [["Resuscitation Council UK — ALS / PLS guidelines","https://www.resus.org.uk/library"],["Difficult Airway Society guidelines","https://das.uk.com/guidelines"],["Association of Anaesthetists — guidelines (anaphylaxis, LAST, safety)","https://anaesthetists.org/Home/Resources-publications/Guidelines"],["European Malignant Hyperthermia Group","https://www.emhg.org"],["UK Kidney Association — hyperkalaemia guideline","https://www.ukkidney.org/health-professionals/guidelines"]]],
   ["General", [["ASA standards & practice parameters (fasting, PACU)","https://www.asahq.org/standards-and-practice-parameters"],["Centre for Perioperative Care — diabetes guideline","https://cpoc.org.uk/guidelines-resources-guidelines"],["PROSPECT procedure-specific analgesia (ESRA)","https://esraeurope.org/prospect/"],["ASRA Pain Medicine — guidelines (ketamine, anticoagulation)","https://www.asra.com/guidelines-articles/guidelines"],["Brain Trauma Foundation guidelines","https://braintrauma.org/coma/guidelines"]]],
@@ -4300,11 +4307,12 @@ const GROUPS = [
       ["Emergence delirium","4. Emergence delirium"],["Paeds pain scores","5. Pain scores"],["Paeds analgesia by age","6. Analgesia by age"],["Paeds opioid / ketamine infusions & PCA","7. Infusions & PCA"],["Paeds discharge","8. Discharge (recovery & home)"],["Paeds IM doses (no IV access)","9. IM doses (no IV access)"]],
     links:[["Laryngospasm","paeds","Laryngospasm"],["Paeds bronchospasm","paeds","Bronchospasm"],["Paeds PACU crises","paeds","PACU crises"]]},
    {id:"cases", label:"Cases", input:()=>pInputs(), hint:"Neonates and infants first, then older children and procedures.",
-    cards:["§Neonate & infant",["Neonate: basics","1. Neonate: basics"],["Oesophageal atresia / TOF","2. Oesophageal atresia / TOF"],["CDH (congenital diaphragmatic hernia)","3. CDH"],
-      ["Gastroschisis / exomphalos","4. Gastroschisis / exomphalos"],["NEC (necrotising enterocolitis)","5. NEC"],["PDA ligation","6. PDA ligation"],["Malrotation / volvulus","7. Malrotation / volvulus"],
-      ["Myelomeningocele","8. Myelomeningocele"],["Pyloric stenosis","9. Pyloric stenosis"],
-      "§Older child",["OSA for tonsillectomy — opioid-free","10. OSA / tonsillectomy (opioid-free)"],["Hypospadias repair","11. Hypospadias repair (whole plan)"],["Cyanotic heart disease / Fallot spell","12. Cyanotic heart disease / Fallot spell"],
-      "§Procedures",["MRI under sedation","13. MRI / sedation outside theatre"],["Dynamic airway assessment (spontaneous breathing)","14. Dynamic airway / bronchoscopy"],["T-tube","15. T-tube"]],
+    cards:["§Neonate & infant",["Oesophageal atresia / TOF","1. Oesophageal atresia / TOF"],["CDH (congenital diaphragmatic hernia)","2. CDH"],
+      ["Gastroschisis / exomphalos","3. Gastroschisis / exomphalos"],["NEC (necrotising enterocolitis)","4. NEC"],["PDA ligation","5. PDA ligation"],["Malrotation / volvulus","6. Malrotation / volvulus"],
+      ["Duodenal atresia","7. Duodenal atresia"],["Anorectal malformation","8. Anorectal malformation"],["Hirschsprung disease","9. Hirschsprung disease"],
+      ["Myelomeningocele","10. Myelomeningocele"],["Pyloric stenosis","11. Pyloric stenosis"],
+      "§Older child",["OSA for tonsillectomy — opioid-free","12. OSA / tonsillectomy (opioid-free)"],["Hypospadias repair","13. Hypospadias repair (whole plan)"],["Cyanotic heart disease / Fallot spell","14. Cyanotic heart disease / Fallot spell"],
+      "§Procedures",["MRI under sedation","15. MRI / sedation outside theatre"],["Dynamic airway assessment (spontaneous breathing)","16. Dynamic airway / bronchoscopy"],["T-tube","17. T-tube"]],
     links:[["Cyanotic heart disease / Fallot spell","paeds","Fallot spell"],["Laryngospasm","paeds","Laryngospasm"]]}], cards:[]},
  {id:"obs", name:"Obstetric", sub:"Labour · Caesarean · After delivery", tabKey:"obTab", tabs:[
    {id:"labour", label:"Labour", hint:"Epidural, in the order you do it.",
@@ -4355,14 +4363,16 @@ const SEARCH_EXTRA = {
   "Paeds IM doses (no IV access)":"paeds child im intramuscular no iv access adrenaline glucagon midazolam naloxone hydrocortisone chlorphenamine promethazine",
   "Paeds difficult airway / CICO":"paeds child difficult airway cico cannot intubate cannot oxygenate cricothyroidotomy front of neck das apa",
   "Post-tonsillectomy bleed":"paeds child tonsillectomy bleed haemorrhage ent rsi",
-  "1. Neonate: basics":"neonate neonatal newborn preterm ett depth fluids day of life glucose d10 temperature duodenal atresia anorectal hirschsprung",
-  "2. Oesophageal atresia / TOF":"oesophageal esophageal atresia tof tracheo oesophageal fistula replogle vacterl neonate",
-  "3. CDH":"cdh congenital diaphragmatic hernia pulmonary hypertension nitric oscillator neonate",
-  "4. Gastroschisis / exomphalos":"gastroschisis exomphalos omphalocele abdominal wall defect compartment silo neonate",
-  "5. NEC":"nec necrotising necrotizing enterocolitis preterm laparotomy neonate",
-  "6. PDA ligation":"pda patent ductus arteriosus ligation preterm thoracotomy neonate",
-  "7. Malrotation / volvulus":"malrotation volvulus bilious vomiting neonate infant",
-  "8. Myelomeningocele":"myelomeningocele spina bifida neural tube latex chiari neonate",
+  "7. Duodenal atresia":"duodenal atresia down syndrome neonate bilious",
+  "8. Anorectal malformation":"anorectal malformation imperforate anus psarp colostomy vacterl neonate",
+  "9. Hirschsprung disease":"hirschsprung enterocolitis duhamel pull through neonate",
+  "1. Oesophageal atresia / TOF":"oesophageal esophageal atresia tof tracheo oesophageal fistula replogle vacterl neonate",
+  "2. CDH":"cdh congenital diaphragmatic hernia pulmonary hypertension nitric oscillator neonate",
+  "3. Gastroschisis / exomphalos":"gastroschisis exomphalos omphalocele abdominal wall defect compartment silo neonate",
+  "4. NEC":"nec necrotising necrotizing enterocolitis preterm laparotomy neonate",
+  "5. PDA ligation":"pda patent ductus arteriosus ligation preterm thoracotomy neonate",
+  "6. Malrotation / volvulus":"malrotation volvulus bilious vomiting neonate infant",
+  "10. Myelomeningocele":"myelomeningocele spina bifida neural tube latex chiari neonate",
   "1. Airway assessment & plan":"pre-op preop assessment risk airway checklist lemon moans mallampati thyromental difficult intubation mask ventilation awake intubation cricothyroid front of neck aspiration rsi glp-1 semaglutide",
   "5. Intra-op analgesia":"analgesia intraop intra-op multimodal opioid fentanyl morphine tramadol remifentanil ketamine lignocaine lidocaine infusion magnesium dexmedetomidine clonidine paracetamol parecoxib diclofenac dexamethasone opioid-free opioid-sparing prospect infiltration",
   "1. Fasting (child)":"paeds child fasting clear fluid breast milk formula",
