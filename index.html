@@ -177,10 +177,13 @@ header h1{font-size:var(--fs-lg);font-weight:700;margin:0;flex:1;display:flex;al
 .emtabs.six{flex-wrap:wrap}@media (min-width:700px){.emtabs.six{flex-wrap:nowrap}.emtabs.five.six button{flex:1 1 0}}.emtabs.five.six button{flex:1 1 30%;font-size:var(--fs-sm);padding:0 var(--s1)}.acchead{margin:var(--s4) 2px var(--s1)}.rellink{display:block;width:calc(100% - 2*var(--s4));box-sizing:border-box;text-align:left;margin-top:var(--s3);padding:var(--s2) var(--s3);border:1px dashed var(--line);border-radius:var(--r-sm);background:none;color:var(--muted);font:inherit;font-size:var(--fs-sm);font-weight:600;cursor:pointer}.emtabs.five{gap:4px}.emtabs.five button{font-size:var(--fs-xs);padding:0 2px;letter-spacing:-.01em}
 /* patient tiles: number in the 7-segment font of the home monitor, section colour */
 .pthead{display:flex;justify-content:space-between;align-items:center;gap:var(--s2);margin-bottom:var(--s2)}
-.pthead .t{font-weight:700;font-size:var(--fs-sm)}
+.pthead .t{font-size:var(--fs-xs);font-weight:700;color:var(--muted);letter-spacing:.06em;text-transform:uppercase}
 .segmini{display:inline-grid;grid-template-columns:1fr 1fr;border:1px solid var(--line);border-radius:10px;overflow:hidden}
-.segmini button{border:0;background:var(--card);color:var(--ink);min-height:36px;padding:0 12px;font:600 var(--fs-sm) var(--font-sans);cursor:pointer}
+.segmini button{border:0;background:var(--card);color:var(--muted);width:44px;height:36px;padding:0;display:grid;place-items:center;cursor:pointer}
+.segmini button svg{width:18px;height:18px;display:block}
+.segmini button+button{border-left:1px solid var(--line)}
 .segmini button[aria-pressed="true"]{background:var(--gc,var(--accent));color:var(--on)}
+.segmini button[aria-pressed="true"] svg{color:var(--on)}
 .segmini.sample{border-style:dashed;border-color:var(--warn-line)}
 .ptiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(72px,1fr));gap:6px}
 .ptile{border:1px solid var(--line);border-radius:12px;padding:5px;display:flex;flex-direction:column;align-items:center;gap:2px;min-width:0;background:var(--card)}
@@ -660,7 +663,7 @@ if (window.top !== window.self && /\.github\.io$/.test(location.hostname)) {
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.67.0";
+const APP_VERSION = "2.67.1";
 const APP_DATE = "21 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
@@ -2276,7 +2279,7 @@ function ptile(key, label, unit, min, max, stp){
     <div class="pm"><button aria-label="${label} down" data-step="${key}" data-d="${-stp}" data-min="${min}" data-max="${max}">−</button><button aria-label="${label} up" data-step="${key}" data-d="${stp}" data-min="${min}" data-max="${max}">+</button></div></div>`;
 }
 const ptiles = list => `<div class="ptiles">${list.join("")}</div>`;
-const sexMini = (title="Patient") => `<div class="pthead"><span class="t">${title}</span><div class="segmini ${isSample("sex")?"sample":""}" role="group" aria-label="Sex">${[["F","♀ F"],["M","♂ M"]].map(([v,l])=>`<button data-seg="sex" data-val="${v}" aria-pressed="${!isSample("sex") && S.sex===v}">${l}</button>`).join("")}</div></div>`;
+const sexMini = (title="Patient") => `<div class="pthead"><span class="t">${title}</span><div class="segmini ${isSample("sex")?"sample":""}" role="group" aria-label="Sex">${[["F","Female"],["M","Male"]].map(([v,l])=>`<button data-seg="sex" data-val="${v}" aria-label="${l}" title="${l}" aria-pressed="${!isSample("sex") && S.sex===v}">${sxi(v)}</button>`).join("")}</div></div>`;
 const dLine = W2 => `<div class="dline">BMI <b>${sig(W2.bmi)}</b> · IBW/PBW <b>${sig(W2.ibwRaw)}</b> · LBW <b>${sig(W2.lbw)}</b> · AdjBW <b>${sig(W2.adj)}</b> kg</div>`;
 const awStep = () => S.aw < 40 ? 0.5 : 1;
 function gaInputs(){
