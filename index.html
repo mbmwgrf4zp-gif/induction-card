@@ -703,7 +703,7 @@ if (window.top !== window.self && /\.github\.io$/.test(location.hostname)) {
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.75.1";
+const APP_VERSION = "2.76.1";
 const APP_DATE = "22 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
@@ -1484,8 +1484,10 @@ pCards.tiva = () => {
   <p class="sub">Avoid &gt; 4 mg/kg/h for &gt; 48 h (PRIS); avoid in mitochondrial / fatty-acid oxidation disease.</p>
   <h3>Propofol TCI (Paedfusor, Alaris)</h3><ul><li>GA induction: at least <b>5 mcg/mL</b> (high Vd)</li><li>GA maintenance: &gt; <b>3.5 mcg/mL</b></li><li>Spontaneous breathing (dynamic airway): 2.5–4 mcg/mL</li></ul></div>
   <div class="card"><h2>Remifentanil 10 mcg/mL</h2><p class="sub">1 mg in 100 mL NS; 20 mL syringe. ${w>30?"Weight &gt; 30 kg: <b>Minto</b>.":"Weight &lt; 30 kg: <b>mass rate</b>."}</p>
-  <ul><li>Induction ${remiR(0.15,0.3)} over 90 s (neonate: no induction time). Faster = severe bradycardia.</li>
-  <li>Maintenance ${remiR(0.3,1)}</li><li>Sedation ${remiR(0.05,0.2)}</li></ul>
+  ${f3Draft()}${T([
+    R("Induction","0.15–0.3 mcg/kg/min over 90 s",`${mlh10(0.15,w)}–${mlh10(0.3,w)} mL/h`,"(neonate: no induction time). Faster = severe bradycardia.","IV infusion"),
+    R("Maintenance","0.3–1 mcg/kg/min",`${mlh10(0.3,w)}–${mlh10(1,w)} mL/h`,null,"IV infusion"),
+    R("Sedation","0.05–0.2 mcg/kg/min",`${mlh10(0.05,w)}–${mlh10(0.2,w)} mL/h`,null,"IV infusion")])}
   <p>Start remi first, then propofol (reduces propofol use). Propofol 1% in 20 mL.</p>
   <h3>Items</h3><ul><li>Tubing 210 cm × 2</li><li>One-way valve (white) × 2</li><li>Three-way valve</li></ul>
   <h3>Adrenaline 1:10 000 (dilute in 10 mL)</h3><p>1 mL per 10 kg = <b>${dz(w/10,"mL")} mL</b> (${dz(w*10,"mcg")} mcg)</p>
@@ -1497,10 +1499,15 @@ pCards.tiva = () => {
     DR("Propofol",[0.5,1],"mg",null,null,"IV"), DR("Midazolam",[0.02,0.1],"mg","local manual",null,"IV"), DR("Ketamine",[0.5,1],"mg","local manual",null,"IV")])}</div>
   <div class="card"><h2>MRI under sedation</h2>
   <p>&lt; 6 months: tube. &gt; 6 months: consider sedation. Drip + FM5L + capnography.<br>Snoring, difficult airway, enlarged tonsils: try to avoid sedation.</p>
-  <h3>Option 1 — propofol single pump</h3><p>150–180 mcg/kg/min = <b>${dz(150*w*60/10000,"mL/h")}–${dz(180*w*60/10000,"mL/h")} mL/h</b> of 1%<br>+ bolus 2 mg/kg = <b>${sig(dz(2*w/10,"mL")*10)} mg (${dz(2*w/10,"mL")} mL)</b></p>
-  <h3>Option 2 — ketofol 3:1 (single pump)</h3><p>Propofol 150 mg + ketamine 50 mg in 20 mL = <b>propofol 7.5 + ketamine 2.5 mg/mL</b>.<br>Run 1–1.5 mL/kg/h = <b>${dz(w,"mL/h")}–${dz(1.5*w,"mL/h")} mL/h</b> (propofol 125–190 mcg/kg/min).</p>
-  <h3>Option 3 — double pumps</h3><p>Dexmedetomidine 4 mcg/mL (0.8 mL in 20 mL): loading 1 mcg/kg over 10 min = <b>${sig(dz(w/4,"mL")*4)} mcg (${dz(w/4,"mL")} mL)</b>, then 0.5–1 mcg/kg/h = <b>${dz(w*0.5/4,"mL/h")}–${dz(w/4,"mL/h")} mL/h</b><br>
-  Propofol 1 mg/kg bolus if anxious = <b>${dz(w,"mg")} mg</b>, then 2 mL/h.</p>${psrc()}</div>
+  ${f3Draft()}<h3>Option 1 — propofol single pump</h3>${T([
+    R("Propofol 1%","150–180 mcg/kg/min",`${dz(150*w*60/10000,"mL/h")}–${dz(180*w*60/10000,"mL/h")} mL/h`,null,"IV infusion"),
+    R("+ bolus","2 mg/kg",`${sig(dz(2*w/10,"mL")*10)} mg (${dz(2*w/10,"mL")} mL)`,null,"IV")])}
+  <h3>Option 2 — ketofol 3:1 (single pump)</h3><p>Propofol 150 mg + ketamine 50 mg in 20 mL = <b>propofol 7.5 + ketamine 2.5 mg/mL</b>.</p>${T([
+    R("Run","1–1.5 mL/kg/h (propofol 125–190 mcg/kg/min)",`${dz(w,"mL/h")}–${dz(1.5*w,"mL/h")} mL/h`,null,"IV infusion")])}
+  <h3>Option 3 — double pumps</h3><p>Dexmedetomidine 4 mcg/mL (0.8 mL in 20 mL):</p>${T([
+    R("loading","1 mcg/kg over 10 min",`${sig(dz(w/4,"mL")*4)} mcg (${dz(w/4,"mL")} mL)`,null,"IV"),
+    R("then","0.5–1 mcg/kg/h",`${dz(w*0.5/4,"mL/h")}–${dz(w/4,"mL/h")} mL/h`,null,"IV infusion"),
+    R("Propofol bolus if anxious","1 mg/kg",`${dz(w,"mg")} mg`,"then 2 mL/h.","IV")])}${psrc()}</div>
   <div class="card"><h2>Dynamic airway assessment (spontaneous breathing)</h2>
   <p>Flexible scope: vocal cord movement, tracheomalacia. Maintain spontaneous breathing — <b>no paralysis</b>.<br>Airway options: NPO₂ with capno; nasal airway to universal port.</p>
   ${T([DR("Glycopyrrolate","4","mcg",null,200,"IV"), DR("Ketamine (optional)",[1,2],"mg",null,null,"IV"),
@@ -1631,7 +1638,8 @@ pCards.fluids = () => {
   <div class="card"><h2>Glucose (neonate / paeds)</h2>${pindDraft()}<p>Check glucose in neonates, infants, long fasts and long cases.</p>
   ${(()=>{ const g = AGEM()<1?0:1; const h=i=>i===g?' class="hl"':"";
     return `<table><tr${h(0)}><td>Neonate</td><td>keep &gt; 2.6 mmol/L</td></tr><tr${h(1)}><td>Infant and child</td><td>keep 4–10 mmol/L</td></tr></table>`; })()}
-  <p>Hypoglycaemia (any age): D10 2.5 mL/kg = <b>${dz(2.5*w,"mL")} mL</b> IV slow bolus (2 mL D50 in 10 mL NS), recheck in 5–10 min <span class="sub">(local manual; RCUK 2025: 2 mL/kg)</span>. No IV: glucagon IM (Post-op › IM doses).</p>
+  <h3>Hypoglycaemia (any age)</h3>${f3Draft()}${T([
+    R("D10","2.5 mL/kg · slow bolus (2 mL D50 in 10 mL NS)",`${dz(2.5*w,"mL")} mL`,`recheck in 5–10 min <span class="sub">(local manual; RCUK 2025: 2 mL/kg)</span>. No IV: glucagon IM (Post-op › IM doses).`,"IV")])}
   <p${neoHl()}><b>Neonate:</b> maintenance <b>D10 in ½ saline</b> (local manual). Glucose need 4–6 mg/kg/min = D10 <b>${dz(2.4*w,"mL/h")}–${dz(3.6*w,"mL/h")} mL/h</b>.</p>
   <h3>Glucose maintenance if high risk of hypoglycaemia</h3><p>HMD2 = 2 mL D50 + 48 mL Hartmann's (2%)</p>
   <p>SD5 = 5 mL D50 + 45 mL Sterofundin = 50 mL of 5%</p>${psrc()}</div>
@@ -1667,7 +1675,9 @@ pCards.regional = () => {
   <h3>Caudal with branula (sheath fully in)</h3><p>For ${sig(w)} kg: <b>${bran}</b> (&lt; 5 kg yellow, &lt; 15 kg blue, &lt; 40 kg pink, &gt; 40 kg green)</p>${psrc()}</div>
   <div class="card"><h2>Ilioinguinal block</h2><p>Levobupivacaine 0.25%. Less volume is better.<br>Landmark: 1 cm medial and caudal to ASIS, above panty line.<br>Double pop: 3 mL (internal oblique); 1st pop: 3 mL (external oblique); distribute laterally.</p>
   ${laLine()}${T([LAR("Per side · levobupi 0.25%",[0.3,0.3],2.5,PBUP(),"US-guided: 0.1–0.2 mL/kg is enough",null,"perineural"),LAR("Both sides",[0.6,0.6],2.5,PBUP(),null,null,"perineural")])}${psrc()}</div>
-  <div class="card"><h2>Penile block</h2><p>Levobupivacaine 0.25%, max 10 mL. 0.1 mL/kg + 1 mL = <b>${dz(Math.min(0.1*w+1,10),"mL")} mL</b> (${sig(Math.min(0.1*w+1,10)*2.5/w)} mg/kg) ${laAddBtn("p","bupi","0.25",Math.min(0.1*w+1,10),1,"Penile block")}<br>Dorsum fan-like; ventral at 10 and 2 o'clock, 1st pop.</p>${psrc()}</div>
+  <div class="card"><h2>Penile block</h2>${f3Draft()}${T([
+    R("Levobupivacaine 0.25%","0.1 mL/kg + 1 mL, max 10 mL",`${dz(Math.min(0.1*w+1,10),"mL")} mL`,`(${sig(Math.min(0.1*w+1,10)*2.5/w)} mg/kg)`,"perineural")])}
+  ${laAddBtn("p","bupi","0.25",Math.min(0.1*w+1,10),1,"Penile block")}<p>Dorsum fan-like; ventral at 10 and 2 o'clock, 1st pop.</p>${psrc()}</div>
   <div class="card"><h2>Paeds lumbar / thoracic epidural</h2>
   <p>&gt; 3 months: consider lumbar/thoracic. &lt; 3 months: caudal epidural.</p>
   ${laLine()}${T([R("Skin to space",AGEM()<1?"neonate ≈ 1 cm":AGEM()<6?"&lt; 6 months: 5–12 mm (not weight-related)":w<=25?"10–25 kg: 1 mm/kg":"&gt; 25 kg: 0.8 + 0.05 × kg cm",AGEM()<1?"≈ 10 mm":AGEM()<6?"5–12 mm":w<=25?`${sig(w)} mm`:`${sig(0.8+0.05*w)} cm`,null,"nd"),R("Max air (LOR)","0.1 mL/kg",pk(0.1,"mL"),null,"nd"),LAR("Bolus · levobupi 0.25%",[0.5,0.5],2.5,PBUP(),null,null,"epidural")])}
@@ -2361,6 +2371,8 @@ const f1Draft = () => F1_CHECKED ? "" : `<div class="warn" style="margin-top:0">
 /* fixed (not weight-based) doses: same row layout as T / GT */
 const F2_CHECKED = true;   // checked by author 22 Nov 2026
 const f2Draft = () => F2_CHECKED ? "" : `<div class="warn" style="margin-top:0">DRAFT — doses moved into a dose table (format batch 2, Nov 2026): same words and numbers; routes added where the text had none. Not yet ticked by you.</div>`;
+const F3_CHECKED = true;   // checked by author 22 Nov 2026
+const f3Draft = () => F3_CHECKED ? "" : `<div class="warn" style="margin-top:0">DRAFT — doses moved into a dose table (format batch 3, Nov 2026): same words and numbers; routes added where the text had none. Not yet ticked by you.</div>`;
 const FT = rows => `${rtDraft()}<div class="dfor fixw"></div><div style="overflow-x:auto"><table class="dt"><tr class="dth"><th>Drug</th><th>When / how</th><th>Dose</th></tr>${rows.join("")}</table></div>`;
 const GT = rows => `${rtDraft()}<div class="dfor gtw"></div><div style="overflow-x:auto"><table class="dt gt"><tr class="dth"><th>Drug</th><th>Rule · weight used</th><th>Dose</th></tr>${rows.join("")}</table></div>`;
 const GSRC = "Standard references: BNF, Association of Anaesthetists / SOBA obesity guidance, Miller.";
@@ -3988,8 +4000,10 @@ pCards.disch = () => { const w = W();
   <li><b>Ex-premature:</b> &lt; 44 wk PMA NICU · 44–55 wk monitored bed 12–24 h · 55–60 wk 24-h admission · &gt; 60 wk daycare if well (see Pre-op › Ex-prem card)</li>
   <li><b>Tonsillectomy &lt; 3 y</b> or significant OSA: overnight stay</li></ul>
   <h3>Going home</h3><ul><li>Two adults for the car journey if the child is small (one to drive); car seat</li>
-  <li>Written instructions; regular paracetamol <b>${dz(Math.min(15*w,1000),"mg")} mg</b> 6-hourly (15 mg/kg) ± ibuprofen <b>${dz(Math.min(10*w,400),"mg")} mg</b> 8-hourly (10 mg/kg)</li>
-  <li>24-h contact number</li></ul>
+  <li>Written instructions</li>
+  <li>24-h contact number</li></ul>${f3Draft()}${T([
+    R("Paracetamol","regular · 6-hourly (15 mg/kg)",`${dz(Math.min(15*w,1000),"mg")} mg`,null,"PO"),
+    ageRow("ibuprofen", R("Ibuprofen","± · 8-hourly (10 mg/kg)",`${dz(Math.min(10*w,400),"mg")} mg`,null,"PO"), "Ibuprofen", "PO")])}
   ${REDFLAGS}${src("Aldrete 1995; APA / RCoA day-case paediatric guidance; my paeds notes.")}</div>`; };
 
 /* ---------- VALUES SHEET ---------- */
@@ -4182,6 +4196,11 @@ VGROUPS.find(g => g[0]==="General")[1].push(["Paeds doses vs local manual & pain
   "Neonates: morphine term 0.05–0.1 / preterm 0.025–0.05 mg/kg; fentanyl 1–2 mcg/kg (neonate start 0.5, protocol 0.5–3); atracurium 0.5 mg/kg (BNFc neonate 0.3–0.5 as note); PR paracetamol not < 3 months (manual lists 30 mg/kg loading); no sedative premed for neonate / PMA < 60 wk; ondansetron not < 1 month; neonatal antibiotic intervals (cefotaxime, metronidazole)",
   "Ibuprofen 3–6 months 5 mg/kg 6–8-hourly max 20 mg/kg/day; ketamine induction 1–2 mg/kg; phenylephrine bolus 2–10 mcg/kg (max 100 mcg); hydrocortisone 2–4 mg/kg max 200 mg; chlorphenamine IV 0.2 mg/kg max 10 mg",
   "Added from the manual: phenylephrine and vasopressin infusions, max per syringe, antihypertensives (nitroprusside, esmolol, labetalol, hydralazine), other drugs (3% saline, mannitol, KCl, insulin, adenosine 0.1–0.25 mg/kg max 12 mg), dehydration table, hypoxia crisis, difficult airway / CICV rebuilt from the manual (≤ 4 laryngoscopy, ≤ 3 SAD attempts, wake if SpO₂ > 80%), ASA paediatric examples, BMI-for-age note, LMA sizes (standard, pending page 11)"]]);
+VGROUPS.find(g => g[0]==="General")[1].push(["Dose tables, batch 3: Paediatric", "22 Nov 2026", [
+  "Moved into dose tables (same words and numbers, test-checked): remifentanil rates, hypoglycaemia (D10), penile block, discharge analgesia, MRI sedation options 1–3",
+  "Discharge ibuprofen now follows the app's age rule (not under 3 months) like every other paediatric ibuprofen row",
+  "Routes added: remifentanil / propofol / dexmedetomidine infusions IV infusion; penile block perineural; discharge paracetamol and ibuprofen PO",
+  "Unchanged on purpose: fluids and blood volumes, airway kit, TIVA targets, ventilation, PCA / infusion settings, LA-maximum lines, antibiotics, emergency steps"]]);
 VGROUPS.find(g => g[0]==="General")[1].push(["Dose tables, batch 2: Pre-op + Regional", "22 Nov 2026", [
   "Moved into dose tables (same words and numbers, test-checked): all 12 nerve-block cards (drug & volume), epidural (test dose, loading, top-up, infusion, breakthrough), adjuncts, steroid cover, hypoglycaemia",
   "Routes added: block LA perineural (including the trunk plane blocks: ESP, serratus, rectus sheath, TAP); epidural doses epidural; IT fentanyl / morphine intrathecal; minor-surgery hydrocortisone IV",
@@ -4275,12 +4294,13 @@ function vTicks(){
 }
 /* ---------- ABOUT ---------- */
 const CHANGES = [
+  ["2.76","Dose tables, batch 3 — Paediatric: remifentanil, hypoglycaemia, penile block, discharge analgesia, MRI sedation (checked)"],
   ["2.75","Dose tables, batch 2 — Pre-op and Regional: blocks, epidural, adjuncts, steroid cover, hypoglycaemia (checked)"],
   ["2.74","Dose tables, batch 1 — Obstetric and General: drug lists moved into dose tables, same words and numbers (checked)"],
   ["2.73","Every dose the same large size, bold or not; maximums, thresholds and per-kg rules stay normal (checked)"],
   ["2.72","Large, unbroken doses everywhere: emergency steps, text, syringe and other tables (checked)"],
-  ["2.71","Doses large and on one line; on a phone each drug is name + dose, then rule · note in smaller text (checked)"],
-  ["2.70","Induction drugs and muscle relaxants in one card (adult and paeds) under Anticholinergic · Opioid · Hypnotic · Muscle relaxant · No IV access (checked)"]];
+  ["2.71","Doses large and on one line; on a phone each drug is name + dose, then rule · note in smaller text (checked)"]];
+
 
 
 
