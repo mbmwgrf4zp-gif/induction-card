@@ -636,7 +636,7 @@ if (window.top !== window.self && /\.github\.io$/.test(location.hostname)) {
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.66.0";
+const APP_VERSION = "2.66.1";
 const APP_DATE = "21 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
@@ -1213,7 +1213,7 @@ function dz(x, unit, max){
 }
 const W = () => S.pw;
 const AGEM = () => S.pY*12 + S.pM;
-const PB_CHECKED = false;
+const PB_CHECKED = true;
 const pbDraft = () => PB_CHECKED ? "" : `<div class="warn" style="margin-top:0">DRAFT — paediatric doses checked against the local manual and pain protocol (Nov 2026). Not yet ticked by you.</div>`;
 /* Neonatal age: day of life, gestation at birth, birth weight (only asked when age is 0 y 0 m) */
 const NEOA_CHECKED = true;
@@ -4031,7 +4031,7 @@ VGROUPS.find(g => g[0]==="General")[1].push(["Neonatal age inputs", "22 Nov 2026
   "Fluids: highlights the local-manual cell (birth weight band × day band; day 0 counts as day 1) and gives mL/h = mL/kg/day × current weight ÷ 24",
   "EBV premature 95 (90–100) vs term 85 (80–90) mL/kg; preterm SpO₂ row highlighted while PMA < 44 wk; Ex-prem card uses the same gestation and the patient's age",
   "Cases store day, gestation and birth weight for a neonate; Today's list shows \"day 5 · 34 wk GA\""]]);
-VGROUPS.find(g => g[0]==="General")[1].push(["Paeds doses vs local manual & pain protocol (DRAFT — tick to sign off)", "", [
+VGROUPS.find(g => g[0]==="General")[1].push(["Paeds doses vs local manual & pain protocol", "22 Nov 2026", [
   "Neonates: morphine term 0.05–0.1 / preterm 0.025–0.05 mg/kg; fentanyl 1–2 mcg/kg (neonate start 0.5, protocol 0.5–3); atracurium 0.5 mg/kg (BNFc neonate 0.3–0.5 as note); PR paracetamol not < 3 months (manual lists 30 mg/kg loading); no sedative premed for neonate / PMA < 60 wk; ondansetron not < 1 month; neonatal antibiotic intervals (cefotaxime, metronidazole)",
   "Ibuprofen 3–6 months 5 mg/kg 6–8-hourly max 20 mg/kg/day; ketamine induction 1–2 mg/kg; phenylephrine bolus 2–10 mcg/kg (max 100 mcg); hydrocortisone 2–4 mg/kg max 200 mg; chlorphenamine IV 0.2 mg/kg max 10 mg",
   "Added from the manual: phenylephrine and vasopressin infusions, max per syringe, antihypertensives (nitroprusside, esmolol, labetalol, hydralazine), other drugs (3% saline, mannitol, KCl, insulin, adenosine 0.1–0.25 mg/kg max 12 mg), dehydration table, hypoxia crisis, difficult airway / CICV rebuilt from the manual (≤ 4 laryngoscopy, ≤ 3 SAD attempts, wake if SpO₂ > 80%), ASA paediatric examples, BMI-for-age note, LMA sizes (standard, pending page 11)"]]);
@@ -4101,7 +4101,7 @@ function vTicks(){
 }
 /* ---------- ABOUT ---------- */
 const CHANGES = [
-  ["2.66","Paeds doses checked against the local manual and pain protocol; new: other drugs, antihypertensives, dehydration, hypoxia, LMA sizes; CICO rebuilt (draft)"],
+  ["2.66","Paeds doses checked against the local manual and pain protocol; new: other drugs, antihypertensives, dehydration, hypoxia, LMA sizes; CICO rebuilt (checked)"],
   ["2.65","Neonatal age: day of life, gestation and birth weight; fluids, blood volume, SpO₂ and ex-prem calculated from them (checked)"],
   ["2.64","Neonatal basics folded into the paediatric Tube, Drugs, Fluids, Glucose, Ventilation and Warming cards; duodenal atresia, anorectal and Hirschsprung cards"],
   ["2.63","Neonatal cards: basics plus OA / TOF, CDH, gastroschisis, NEC, PDA, malrotation, myelomeningocele; local manual doses restored (checked)"],
