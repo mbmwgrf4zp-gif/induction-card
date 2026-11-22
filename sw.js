@@ -1,6 +1,6 @@
 // Offline cache. Bump CACHE when any file changes so phones pick up the new version.
 const PREFIX = "induction-card-";
-const CACHE = PREFIX + "v2.68.1";
+const CACHE = PREFIX + "v2.69.1";
 const FILES = ["./", "index.html", "manifest.json", "icon-180.png", "icon-192.png", "icon-512.png", "fonts/DSEG7Classic-Italic.woff2",
   "fonts/plex-sans-118b75.woff2", "fonts/plex-mono-db14f4.woff2", "fonts/plex-mono-ed96d0.woff2"];
 // Install: store fresh copies of every file (bypass the browser's HTTP cache).

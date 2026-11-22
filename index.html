@@ -373,6 +373,15 @@ tr.over td{background:var(--danger-bg)}
 .rmla{width:32px;height:32px;border-radius:8px;border:1px solid var(--line);background:var(--card);cursor:pointer;font-size:var(--fs-lg);line-height:1}
 table.blk th{width:32%;font-size:var(--fs-xs);text-transform:uppercase;letter-spacing:.04em}
 .bad{color:var(--danger-ink);font-weight:700}
+.seerow.seeafter{margin-top:var(--s4)}.seerow{display:flex;flex-wrap:wrap;align-items:center;gap:var(--s2);margin:0 0 var(--s3)}.seerow>.sub{flex-basis:100%;margin:0 2px}
+.seechip,.rchip{display:flex;flex-direction:column;justify-content:center;min-height:44px;line-height:1.2}.seechip small,.rchip small{font-weight:400;color:var(--muted);font-size:var(--fs-xs)}
+.recent{margin:var(--s2) 0 var(--s3)}.recent .label{margin:0 2px var(--s1)}.rchips{display:flex;gap:var(--s2);overflow-x:auto;scrollbar-width:none;padding-bottom:2px}.rchips::-webkit-scrollbar{display:none}
+.rchip{flex:0 0 auto;max-width:70vw;white-space:nowrap}.rchip,.rchip small{overflow:hidden;text-overflow:ellipsis}
+details.catgrp{margin:var(--s2) 0}details.catgrp>summary{list-style:none;display:flex;align-items:center;gap:var(--s2);min-height:48px;padding:0 var(--s3);border:1px solid var(--line);border-radius:var(--r-sm);background:var(--card);font-weight:700;cursor:pointer}
+details.catgrp>summary::-webkit-details-marker{display:none}details.catgrp>summary::after{content:"▸";color:var(--muted)}details.catgrp[open]>summary::after{content:"▾"}details.catgrp[open]>summary{margin-bottom:var(--s2)}
+.catn{margin-left:auto;color:var(--muted);font-weight:600;font-size:var(--fs-sm)}.ctag{display:inline-block;margin-right:6px;padding:0 6px;border-radius:999px;border:1px solid var(--line);font-size:var(--fs-xs);font-weight:700}
+.ctag-child{color:var(--danger-ink);border-color:var(--danger-line)}.srchbtn svg{width:20px;height:20px}.gsearch{margin-bottom:var(--s2)}.rellink.relem{border-color:var(--danger-line);color:var(--danger-ink)}
+.spcalc>.card{border:0;box-shadow:none;background:none;padding:0;margin:0 0 var(--s3)}.spcalc>.card>h2{font-size:var(--fs-base);margin-top:var(--s3)}
 .chip.on{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
 .chip.add{border-style:dashed;color:var(--accent)} .chip.ghost{background:none;color:var(--muted)}
 .activebar{display:flex;justify-content:space-between;align-items:center;gap:var(--s2);box-sizing:border-box;width:100%;text-align:left;margin:0 0 var(--s3);padding:var(--s2) var(--s3);border-radius:var(--r-sm);border:1px solid var(--accent);background:var(--accent-soft);color:var(--ink);font-size:var(--fs-sm);cursor:pointer}
@@ -663,7 +672,7 @@ if (window.top !== window.self && /\.github\.io$/.test(location.hostname)) {
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.68.1";
+const APP_VERSION = "2.69.1";
 const APP_DATE = "22 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
@@ -736,7 +745,7 @@ function head(title, back, icon){
   const th = store.get("theme","auto");
   const thLabel = th==="auto" ? "◐" : th==="dark" ? "☾" : "☀";
   return `<header>${back?`<button class="iconbtn" data-go="${back}" aria-label="Back">‹ Back</button>`:""}
-    <h1>${icon?`<span class="hico">${svg(icon)}</span>`:""}<span>${title}</span></h1><button class="iconbtn themebtn" data-theme-toggle aria-label="Theme: ${th}" title="Theme: ${th}">${thLabel}</button></header>` + (VALUES_CHECKED ? "" : banner());
+    <h1>${icon?`<span class="hico">${svg(icon)}</span>`:""}<span>${title}</span></h1>${GROUPS.some(x=>x.id===icon) ? `<button class="iconbtn srchbtn" data-srch="1" aria-label="Search all cards" aria-pressed="${!!S.srch}">${svg("search")}</button>` : ""}<button class="iconbtn themebtn" data-theme-toggle aria-label="Theme: ${th}" title="Theme: ${th}">${thLabel}</button></header>` + (VALUES_CHECKED ? "" : banner());
 }
 
 const screens = {};
@@ -922,8 +931,8 @@ const monWave = id => { const m = MON_SEG[id];
   return `<svg class="mw" viewBox="0 0 120 30" preserveAspectRatio="none" aria-hidden="true"><g class="${m ? "mwv" : ""}"><path d="${d}"/></g></svg>`; };
 const TILE_STYLES = [["chart","Chart paper"],["monitor","Monitor"],["ecg","ECG paper"],["pump","Infusion pump"],["flow","Flowmeter"],["editorial","Editorial"],["classic","Classic"]];
 const tileStyle = () => { const v = store.get("tiles","chart"); return TILE_STYLES.some(x=>x[0]===v) ? v : "chart"; };
-const SEC_SHORT = {premed:"Premed", ga:"General", regional:"Regional", paeds:"Paediatric", obs:"Obstetric", tx:"Transplant"};
-const secSub = g => ({paeds:"Pre-op · Induction · Blocks · Cases", tx:"Kidney recipient &amp; donor"})[g.id] || g.tabs.map(t=>t.label).join(" · ");
+const SEC_SHORT = {premed:"Pre-op", ga:"General", regional:"Regional", paeds:"Paediatric", obs:"Obstetric", tx:"Kidney Transplant"};
+const secSub = g => ({paeds:"Pre-op · Induction · Blocks · Scenarios", tx:"Kidney recipient &amp; donor"})[g.id] || g.tabs.map(t=>t.label).join(" · ");
 // anaesthetic-record marks: systolic ∨ and diastolic ∧ (red), heart rate dots (section ink). Decoration only.
 const CHART_SEED = {premed:5.6, ga:0, regional:1.3, paeds:2.1, obs:3.4, tx:4.6};
 function chartMarks(id){ const k = CHART_SEED[id] || 0;
@@ -957,7 +966,7 @@ function secTile(g, style, tag){ style = style || tileStyle(); tag = tag || "but
 screens.home = () => {
   const th = store.get("theme","auto"), thLabel = th==="auto" ? "◐" : th==="dark" ? "☾" : "☀";
   const secs = ["premed","ga","regional","paeds","obs","tx"].map(id=>GROUPS.find(g=>g.id===id));
-  const short = {premed:"Premed", ga:"General", regional:"Regional", paeds:"Paediatric", obs:"Obstetric", tx:"Transplant"};
+  const short = {premed:"Pre-op", ga:"General", regional:"Regional", paeds:"Paediatric", obs:"Obstetric", tx:"Kidney Transplant"};
   return `<section class="hero"><div class="hero-in">
     <svg class="capno" viewBox="0 0 400 48" preserveAspectRatio="none" aria-hidden="true"><g class="trace"><path d="${CAPNO}"/></g></svg>
     <div class="hero-top"><span class="brand">${svg("capno")} Induction Card</span>
@@ -967,6 +976,7 @@ screens.home = () => {
     ${ticker()}
   </section>
   <div class="searchbox">${svg("search")}<input id="q" class="search" type="search" placeholder="Search caudal, remi, LSCS…" autocomplete="off" aria-label="Search cards"></div><div id="results"></div>
+  ${recentRow()}
   ${caseStrip()}
   <div class="toprow"><div class="tr-emerg"><div class="label wideonly" aria-hidden="true">&nbsp;</div>${tile("t-emerg","emerg","Emergencies","Crisis steps with doses",'data-go="g-emerg"')}</div><div class="tr-quick">
   <div class="label qhead"><span>Quick</span><button class="aboutlink" data-go="quick">Edit</button></div>
@@ -2045,7 +2055,7 @@ pCards.latex = () => `<div class="card"><h2>Latex allergy</h2>${p3Draft()}
   <li><b>Drug vials with rubber stoppers: remove the stopper</b> (don't pierce) — e.g. ketamine, thiopentone, rocuronium, sugammadex, remifentanil, parecoxib, bupivacaine, many antibiotics, heparin, hydrocortisone, methylprednisolone</li>
   <li>Go straight to OT (skip holding bay); recover in OT if severe, or a latex-safe PACU</li></ul>
   <div class="danger">Unexplained hypotension, bronchospasm, urticaria or collapse → <b>think latex anaphylaxis</b>.</div>
-  <button class="emlink" data-open="Paeds anaphylaxis" data-g="emerg" data-tab="paeds">⚠ Paeds anaphylaxis → Emergencies</button>
+  <button class="emlink" data-ctx="anaph" data-open="Paeds anaphylaxis" data-g="emerg" data-tab="paeds">⚠ Paeds anaphylaxis → Emergencies</button>
   ${src(PLOC+".")}</div>`;
 /* PONV by risk (replaces old paeds PONV card) */
 const PPF = [["hx","Previous PONV / POV, motion sickness, or relative with PONV"],["surg","Strabismus, tonsillectomy, ENT, middle ear, dental, laparoscopic, GU"],["dur","Surgery ≥ 30 min"],["pub","Post-pubertal girl"]];
@@ -3560,6 +3570,7 @@ function blk(o){
   ${laAddBtn("a","bupi",conc,o.vol[1],bi,o.t)}${src(RSRC)}</div>`;
 }
 const raCards = {};
+raCards.spinalNonObs = () => `<div class="card"><h2>Spinal dose: non-obstetric</h2><div class="spcalc">${nonObsCalc()}</div></div>`;   // the calculator, listed as a card (v2.69)
 raCards.calc = () => `<div class="card"><h2>LA dose calculator</h2>${raDraft()}${laCalc("a")}</div>`;
 raCards.sbyb = () => `<div class="card"><h2>Stop Before You Block &amp; safe injection</h2>${raDraft()}
   <ol><li>Consent, site and side marked</li><li><b>Stop Before You Block</b>: anaesthetist + assistant re-check the mark immediately before needle insertion</li>
@@ -4148,12 +4159,12 @@ function vTicks(){
 }
 /* ---------- ABOUT ---------- */
 const CHANGES = [
+  ["2.69","Finding cards: search in every section, recent cards on Home, shortcuts between tabs, emergency groups, Clinical Scenarios groups; no clinical text changed (checked)"],
   ["2.68","Safety audit: age-eligibility checks, metoclopramide, KCl, tramadol, anaphylaxis, calcium, bicarbonate, platelets, ranitidine (checked)"],
   ["2.67","Patient box: three tiles in the monitor font while entering, one-line summary bar once set (shows the case name)"],
   ["2.66","Paeds doses checked against the local manual and pain protocol; new: other drugs, antihypertensives, dehydration, hypoxia, LMA sizes; CICO rebuilt (checked)"],
   ["2.65","Neonatal age: day of life, gestation and birth weight; fluids, blood volume, SpO₂ and ex-prem calculated from them (checked)"],
-  ["2.64","Neonatal basics folded into the paediatric Tube, Drugs, Fluids, Glucose, Ventilation and Warming cards; duodenal atresia, anorectal and Hirschsprung cards"],
-  ["2.63","Neonatal cards: basics plus OA / TOF, CDH, gastroschisis, NEC, PDA, malrotation, myelomeningocele; local manual doses restored (checked)"]];
+  ["2.64","Neonatal basics folded into the paediatric Tube, Drugs, Fluids, Glucose, Ventilation and Warming cards; duodenal atresia, anorectal and Hirschsprung cards"]];
 const SRC_LINKS = [
   ["Emergencies", [["Resuscitation Council UK — ALS / PLS guidelines","https://www.resus.org.uk/library"],["Difficult Airway Society guidelines","https://das.uk.com/guidelines"],["Association of Anaesthetists — guidelines (anaphylaxis, LAST, safety)","https://anaesthetists.org/Home/Resources-publications/Guidelines"],["European Malignant Hyperthermia Group","https://www.emhg.org"],["UK Kidney Association — hyperkalaemia guideline","https://www.ukkidney.org/health-professionals/guidelines"]]],
   ["General", [["ASA standards & practice parameters (fasting, PACU)","https://www.asahq.org/standards-and-practice-parameters"],["Centre for Perioperative Care — diabetes guideline","https://cpoc.org.uk/guidelines-resources-guidelines"],["PROSPECT procedure-specific analgesia (ESRA)","https://esraeurope.org/prospect/"],["ASRA Pain Medicine — guidelines (ketamine, anticoagulation)","https://www.asra.com/guidelines-articles/guidelines"],["Brain Trauma Foundation guidelines","https://braintrauma.org/coma/guidelines"]]],
@@ -4214,8 +4225,8 @@ screens.values = () => {
 
 /* ================= ROUTER & EVENTS ================= */
 /* ================= GROUPS (by situation) ================= */
-const EMERG_ADULT = ["§Airway & breathing","Failed intubation / CICO","Bronchospasm","Anaphylaxis","Latex allergy","§Circulation & drugs","Bradycardia & cardiac arrest","High / total spinal","Hypotension after spinal","LA toxicity (LAST)","Malignant hyperthermia","Hyperkalaemia","§Obstetric","Massive obstetric haemorrhage","Eclampsia"];
-const EMERG_PAEDS = ["§Airway","Paeds hypoxia / desaturation","Laryngospasm","Paeds bronchospasm","Paeds difficult airway / CICO","Post-tonsillectomy bleed","§Circulation","Paeds cardiac arrest","Paeds anaphylaxis","Cyanotic heart disease / Fallot spell","Paeds massive transfusion","§Drugs","Paeds LA toxicity (LAST)","Paeds malignant hyperthermia","Latex allergy","§Recovery","Paeds PACU crises"];
+const EMERG_ADULT = ["§Airway & oxygenation","Failed intubation / CICO","Bronchospasm","Anaphylaxis","§Circulation & cardiac arrest","Bradycardia & cardiac arrest","§Drug-related & metabolic","LA toxicity (LAST)","Malignant hyperthermia","Hyperkalaemia","Latex allergy","§Neuraxial & obstetric","High / total spinal","Hypotension after spinal","Massive obstetric haemorrhage","Eclampsia"];
+const EMERG_PAEDS = ["§Airway & breathing","Paeds hypoxia / desaturation","Laryngospasm","Paeds bronchospasm","Paeds difficult airway / CICO","Post-tonsillectomy bleed","§Circulation","Paeds cardiac arrest","Paeds anaphylaxis","Cyanotic heart disease / Fallot spell","Paeds massive transfusion","§Drug-related","Paeds LA toxicity (LAST)","Paeds malignant hyperthermia","Latex allergy","§Recovery","Paeds PACU crises"];
 /* ---------- PRINT PLAN SHEETS (paper copy for theatre) ---------- */
 const PRINT_CHECKED = true;
 const PR_KEYS = {paeds:["pw","pY"], tx:["aw","height","k","hb"]};
@@ -4369,22 +4380,24 @@ const printBtn = (gid, tab) => (gid==="paeds" || (gid==="tx" && tab!=="don")) ? 
 
 const GROUPS = [
  {id:"emerg", name:"Emergencies", sub:"Adult & obstetric · Paeds — crisis steps with doses", tabKey:"emTab", tabs:[
-   {id:"adult", label:"Adult / Obstetric", input:()=>ptiles([ptile("aw","Weight","kg",30,200,1)]), cards:EMERG_ADULT},
-   {id:"paeds", label:"Paeds", input:()=>pInputs(), cards:EMERG_PAEDS}], cards:[]},
- {id:"premed", name:"Premed", sub:"Assess · Prepare · Plan & note", tabKey:"pmTab", tabs:[
+   {id:"adult", label:"Adult / Obstetric", input:()=>ptiles([ptile("aw","Weight","kg",30,200,1)]), cards:EMERG_ADULT, see:[["ga-post-im-doses-no-iv-access-or-ward","No IV access: IM doses"]], seeLabel:"Also"},
+   {id:"paeds", label:"Paeds", input:()=>pInputs(), cards:EMERG_PAEDS, see:[["paeds-post-im-doses-no-iv-access","No IV access: IM doses"]], seeLabel:"Also"}], cards:[]},
+ {id:"premed", name:"Pre-op", sub:"Assess · Prepare · Plan & note", tabKey:"pmTab", tabs:[
    {id:"assess", label:"Assess", input:()=>gaInputs(), top:()=>preSummary(), hint:"Examine → score → decide. The summary bar collects the scores to copy.",
     cards:["§Examine","1. Airway assessment & plan",["Echo report: what matters","2. Echo report: what matters"],
       "§Score",["Functional capacity (METs / DASI)","3. Functional capacity (METs / DASI)"],["Cardiac risk (RCRI)","4. Cardiac risk (RCRI)"],["Lung risk (ARISCAT)","5. Lung risk (ARISCAT)"],["OSA screen (STOP-BANG)","6. OSA screen (STOP-BANG)"],["Frailty (Clinical Frailty Scale)","7. Frailty (CFS)"],["ASA physical status","8. ASA physical status"],
       "§Decide",["Which tests to order","9. Which tests to order"],"10. Optimise or postpone"],
     links:[["Failed intubation / CICO","adult","Failed intubation / CICO"]]},
    {id:"prepare", label:"Prepare", input:()=>gaInputs(), hint:"Instructions for the patient and the ward.",
+    see:[["regional-safety-anticoagulants","Neuraxial / deep-block anticoagulant timing"]],
     cards:["§Medications","1. Regular drugs: stop or continue","2. Anticoagulants & antiplatelets","3. Diabetes: day-of-surgery plan","4. Steroid cover",
       "§Before theatre","5. Fasting","6. Premedication drugs","7. Pacemaker / ICD"], links:[]},
    {id:"consent", label:"Plan & note", input:()=>gaInputs(), hint:"Decide the plan and explain it, then copy the full premed note.",
-    cards:[["Anaesthetic plan & consent","1. Anaesthetic plan & consent"],"2. Premed note"], links:[]}], cards:[]},
+    see:[["premed-assess-airway-assessment-and-plan","Airway assessment"],["premed-prepare-anticoagulants-and-antiplatelets","Anticoagulants"],["regional-safety-anticoagulants","Neuraxial anticoagulant timing"]],
+    cards:[["Anaesthetic plan & consent","1. Anaesthetic plan & consent"],"2. Premed note"], links:[["Failed intubation / CICO","adult","Failed intubation / CICO"]]}], cards:[]},
  {id:"ga", name:"General", sub:"Induction · Intra-op · Post-op", tabKey:"gaTab", tabs:[
    {id:"ind", label:"Induction", input:()=>gaInputs(), hint:"Drugs → RSI → relaxant → tube & airway kit.",
-    cards:["1. Induction drugs","2. RSI","3. Muscle relaxants","4. Tube & airway kit"],
+    cards:["1. Induction drugs","2. RSI","3. Muscle relaxants","4. Tube & airway kit"], see:[["ga-post-im-doses-no-iv-access-or-ward","No IV access: IM doses"]], seeLabel:"Also",
     links:[["Failed intubation / CICO","adult","Failed intubation / CICO"],["Anaphylaxis","adult","Anaphylaxis"],["Bronchospasm","adult","Bronchospasm"]]},
    {id:"maint", label:"Intra-op", input:()=>gaInputs(), hint:"Ventilate → keep them asleep and stable.",
     cards:["1. Ventilation strategies","2. One-lung ventilation","3. TIVA","4. Volatile: MAC by age","5. Intra-op analgesia","6. Vasopressors & inotropes","7. Antibiotic prophylaxis","8. Tranexamic acid"],
@@ -4396,16 +4409,17 @@ const GROUPS = [
    {id:"safety", label:"Safety", input:()=>gaInputs(), hint:"Before every block: dose limits, checklist, anticoagulants.",
     cards:[["LA dose calculator","1. LA dose calculator"],["Stop Before You Block & safe injection","2. Stop Before You Block"],["Neuraxial & deep blocks: anticoagulant timing","3. Anticoagulant timing"]],
     links:[["LA toxicity (LAST)","adult","LA toxicity"]]},
-   {id:"neuraxial", label:"Neuraxial", input:()=>gaInputs(), top:()=>nonObsCalc(), hint:"Spinal dose above; then epidural, CSE and problems.",
-    cards:[["Epidural (adult)","1. Epidural"],["CSE (combined spinal–epidural)","2. CSE"],["Adjuncts","3. Adjuncts"],["Failed or patchy block","4. Failed or patchy block"],["Post-dural puncture headache","5. Post-dural puncture headache"],["Dermatomes & block height","6. Dermatomes & block height"]],
+   {id:"neuraxial", label:"Neuraxial", input:()=>gaInputs(), hint:"Spinal dose (0); then epidural, CSE and problems.",
+    see:[["regional-safety-la-dose-calculator","LA dose calculator"],["regional-safety-stop-before-you-block","Stop Before You Block"],["regional-safety-anticoagulants","Anticoagulant timing"]], seeLabel:"Safety",
+    cards:[["Spinal dose: non-obstetric","0. Spinal dose (non-obstetric)"],["Epidural (adult)","1. Epidural"],["CSE (combined spinal–epidural)","2. CSE"],["Adjuncts","3. Adjuncts"],["Failed or patchy block","4. Failed or patchy block"],["Post-dural puncture headache","5. Post-dural puncture headache"],["Dermatomes & block height","6. Dermatomes & block height"]],
     links:[["High / total spinal","adult","High / total spinal"],["Hypotension after spinal","adult","Hypotension"],["LA toxicity (LAST)","adult","LA toxicity"]]},
-   {id:"upper", label:"Upper", input:()=>gaInputs(), hint:"Shoulder → hand.", cards:[["Interscalene","1. Interscalene"],["Supraclavicular","2. Supraclavicular"],["Axillary","3. Axillary"]],
+   {id:"upper", see:[["regional-safety-la-dose-calculator","LA dose calculator"],["regional-safety-stop-before-you-block","Stop Before You Block"]], seeLabel:"Safety", label:"Upper", input:()=>gaInputs(), hint:"Shoulder → hand.", cards:[["Interscalene","1. Interscalene"],["Supraclavicular","2. Supraclavicular"],["Axillary","3. Axillary"]],
     links:[["LA toxicity (LAST)","adult","LA toxicity"]]},
-   {id:"lower", label:"Lower", input:()=>gaInputs(), hint:"Hip → foot.", cards:[["Fascia iliaca (suprainguinal)","1. Fascia iliaca"],["PENG","2. PENG"],["Femoral","3. Femoral"],["Adductor canal","4. Adductor canal"],["Popliteal sciatic","5. Popliteal sciatic"]],
+   {id:"lower", see:[["regional-safety-la-dose-calculator","LA dose calculator"],["regional-safety-stop-before-you-block","Stop Before You Block"]], seeLabel:"Safety", label:"Lower", input:()=>gaInputs(), hint:"Hip → foot.", cards:[["Fascia iliaca (suprainguinal)","1. Fascia iliaca"],["PENG","2. PENG"],["Femoral","3. Femoral"],["Adductor canal","4. Adductor canal"],["Popliteal sciatic","5. Popliteal sciatic"]],
     links:[["LA toxicity (LAST)","adult","LA toxicity"]]},
-   {id:"trunk", label:"Trunk", input:()=>gaInputs(), hint:"Chest → abdomen. Bilateral blocks: check the calculator.", cards:[["Erector spinae (ESP)","1. Erector spinae (ESP)"],["Serratus anterior","2. Serratus anterior"],["Rectus sheath","3. Rectus sheath"],["TAP","4. TAP"]],
+   {id:"trunk", see:[["regional-safety-la-dose-calculator","LA dose calculator"],["regional-safety-stop-before-you-block","Stop Before You Block"]], seeLabel:"Safety", label:"Trunk", input:()=>gaInputs(), hint:"Chest → abdomen. Bilateral blocks: check the calculator.", cards:[["Erector spinae (ESP)","1. Erector spinae (ESP)"],["Serratus anterior","2. Serratus anterior"],["Rectus sheath","3. Rectus sheath"],["TAP","4. TAP"]],
     links:[["LA toxicity (LAST)","adult","LA toxicity"]]}], cards:[]},
- {id:"paeds", name:"Paediatric", sub:"Pre-op · Induction · Intra-op · Blocks · Post-op · Cases", tabKey:"pTab", tabs:[
+ {id:"paeds", name:"Paediatric", sub:"Pre-op · Induction · Intra-op · Blocks · Post-op · Clinical Scenarios", tabKey:"pTab", tabs:[
    {id:"pre", label:"Pre-op", input:()=>pInputs(), hint:"Assess the child: fasting, premed, airway, OSA, URTI, ex-prem, syndromes.",
     cards:[["Paeds fasting","1. Fasting (child)"],["Paeds premedication","2. Premedication"],["Paeds airway score (PAAS)","3. Airway score (PAAS)"],["OSA screen (STBUR)","4. OSA screen (STBUR)"],["URTI & asthma: go or delay","5. URTI & asthma: go or delay"],
       ["Ex-prem: apnoea risk & admission","6. Ex-prem: apnoea risk & admission"],["Congenital conditions (A–Z)","7. Congenital conditions (A–Z)"],["Dehydration (child)","8. Dehydration"]],
@@ -4417,7 +4431,8 @@ const GROUPS = [
       "§Ventilation",["Paeds ventilation","9. Ventilation settings"],["One-lung ventilation (Storz)","10. One-lung ventilation (Storz)"],
       "§Lines",["Double-lumen CVC","11. Lines: double-lumen CVC"]],
     links:[["Laryngospasm","paeds","Laryngospasm"],["Paeds bronchospasm","paeds","Bronchospasm"],["Paeds anaphylaxis","paeds","Anaphylaxis"]]},
-   {id:"intra", label:"Intra-op", input:()=>pInputs(), hint:"Keep them stable: fluids → drugs → warmth.",
+   {id:"intra", label:"Intra-op", input:()=>pInputs(), hint:"Keep them stable: fluids → drugs → warmth.", seeLabel:"From Induction",
+    see:[["paeds-ind-tiva-model-check","TIVA & propofol targets"],["paeds-ind-remifentanil","Remifentanil"],["paeds-ind-ventilation","Ventilation"],["paeds-ind-one-lung-ventilation-storz","One-lung ventilation"],["paeds-ind-double-lumen-cvc","Central line (CVC)"]],
     cards:["§Fluids",["Maintenance (4/2/1)","1. Fluids: maintenance & insensible loss"],["Glucose (neonate / paeds)","2. Fluids: glucose"],["Transfusion protocol","3. Fluids: transfusion protocol"],["Blood products","4. Fluids: blood products"],
       "§Drugs",["Paeds intra-op drugs","5. Drugs: TXA, steroids, calcium…"],["Inotropes (50 mL syringe)","6. Drugs: expected BP, pressors & inotropes"],["Paeds resuscitation","7. Drugs: resuscitation"],["Other drugs (child)","8. Drugs: other (saline 3%, mannitol, KCl, insulin, adenosine)"],["Paeds antibiotic prophylaxis","9. Antibiotic prophylaxis (child)"],
       "§Other",["Keeping warm","10. Keeping warm"]],
@@ -4427,11 +4442,11 @@ const GROUPS = [
       "§Central",["Caudal block","3. Caudal"],["Paeds lumbar / thoracic epidural","4. Lumbar / thoracic epidural"],["Neonatal / infant spinal","5. Neonatal / infant spinal"],
       "§Peripheral",["Ilioinguinal block","6. Ilioinguinal"],["Penile block","7. Penile"],["Block volumes (paeds)","8. Volumes for other blocks"],["Intrapleural block","9. Intrapleural"]],
     links:[["Paeds LA toxicity (LAST)","paeds","LA toxicity"]]},
-   {id:"post", label:"Post-op", input:()=>pInputs(), hint:"Wake-up and after: reverse → PONV → extubation → delirium → analgesia → IM doses.",
-    cards:[["Reversal (child)","1. Reversal"],["Paeds PONV by risk","2. PONV by risk"],["Laryngospasm & extubation","3. Laryngospasm & extubation"],
-      ["Emergence delirium","4. Emergence delirium"],["Paeds pain scores","5. Pain scores"],["Paeds analgesia by age","6. Analgesia by age"],["Paeds opioid / ketamine infusions & PCA","7. Infusions & PCA"],["Paeds discharge","8. Discharge (recovery & home)"],["Paeds IM doses (no IV access)","9. IM doses (no IV access)"]],
+   {id:"post", label:"Post-op", input:()=>pInputs(), hint:"Wake-up and after: reverse → extubate → pain → analgesia → PONV → delirium → discharge → IM doses.",
+    cards:[["Reversal (child)","1. Reversal"],["Laryngospasm & extubation","2. Laryngospasm & extubation"],["Paeds pain scores","3. Pain scores"],["Paeds analgesia by age","4. Analgesia by age"],
+      ["Paeds opioid / ketamine infusions & PCA","5. Infusions & PCA"],["Paeds PONV by risk","6. PONV by risk"],["Emergence delirium","7. Emergence delirium"],["Paeds discharge","8. Discharge (recovery & home)"],["Paeds IM doses (no IV access)","9. IM doses (no IV access)"]],
     links:[["Laryngospasm","paeds","Laryngospasm"],["Paeds bronchospasm","paeds","Bronchospasm"],["Paeds PACU crises","paeds","PACU crises"]]},
-   {id:"cases", label:"Cases", input:()=>pInputs(), hint:"Neonates and infants first, then older children and procedures.",
+   {id:"cases", label:"Clinical Scenarios", input:()=>pInputs(), collapse:true, hint:"Tap a group to open it. Search finds every scenario.",
     cards:["§Neonate & infant",["Oesophageal atresia / TOF","1. Oesophageal atresia / TOF"],["CDH (congenital diaphragmatic hernia)","2. CDH"],
       ["Gastroschisis / exomphalos","3. Gastroschisis / exomphalos"],["NEC (necrotising enterocolitis)","4. NEC"],["PDA ligation","5. PDA ligation"],["Malrotation / volvulus","6. Malrotation / volvulus"],
       ["Duodenal atresia","7. Duodenal atresia"],["Anorectal malformation","8. Anorectal malformation"],["Hirschsprung disease","9. Hirschsprung disease"],
@@ -4441,23 +4456,24 @@ const GROUPS = [
     links:[["Cyanotic heart disease / Fallot spell","paeds","Fallot spell"],["Laryngospasm","paeds","Laryngospasm"]]}], cards:[]},
  {id:"obs", name:"Obstetric", sub:"Labour · Caesarean · After delivery", tabKey:"obTab", tabs:[
    {id:"labour", label:"Labour", hint:"Epidural, in the order you do it.",
-    top:()=>`<button class="homebtn" data-open="1. Anaesthetic plan & consent" data-g="premed" data-tab="consent">Consent note: labour epidural → Premed › Plan &amp; note ›</button>`,
+    top:()=>`<button class="homebtn" data-open="1. Anaesthetic plan & consent" data-g="premed" data-tab="consent">Consent note: labour epidural → Pre-op › Plan &amp; note ›</button>`,
     cards:["1. Start: test, bolus & loading","2. Maintain: infusion recipes",["Maintain: pump settings","3. Maintain: pump settings"],["Top-up: breakthrough pain","4. Top-up: breakthrough pain"],["Problem: accidental dural puncture","5. Problem: accidental dural puncture"],["Problems: catheter troubleshooting","6. Problems: catheter troubleshooting"],["No epidural: IV PCA","7. No epidural: IV PCA"]],
     links:[["High / total spinal","adult","High block"],["LA toxicity (LAST)","adult","LA toxicity"]]},
-   {id:"lscs", label:"Caesarean", hint:"Pick your route: A spinal · B epidural top-up · C dural puncture catheter · D uterotonics.",
+   {id:"lscs", label:"Caesarean", hint:"Pick your route: A spinal · B epidural top-up · C dural puncture catheter · GA (below) · D uterotonics.", seeLabel:"If GA",
+    see:[["ga-ind-induction-drugs","Induction drugs"],["ga-ind-rsi","RSI"],["ga-intra-ventilation-strategies","Ventilation (pregnancy)"],["ga-post-extubation-criteria","Extubation"],["obs-after-pca-morphine-after-ga","PCA after GA"]],
     cards:["0. Before theatre: aspiration prophylaxis","A1. Spinal: dose by height","A2. Spinal: IT morphine & fentanyl","A3. Spinal: phenylephrine","B. Epidural top-up for LSCS","C. Dural puncture catheter: LSCS dosing","D. Uterotonics at delivery"],
     links:[["Hypotension after spinal","adult","Hypotension after spinal"],["High / total spinal","adult","High / total spinal"],["LA toxicity (LAST)","adult","LA toxicity (top-up)"],["Failed intubation / CICO","adult","GA: failed intubation / CICO"],["Massive obstetric haemorrhage","adult","Massive haemorrhage"]]},
    {id:"post", label:"After delivery", hint:"Analgesia, then ward problems.",
     cards:["1. Analgesia by technique","2. NSAID yes / no","3. PCA morphine (after GA)","4. Ward (OAS) problems & catheter care"],
     links:[["Eclampsia","adult","Eclampsia"],["Massive obstetric haemorrhage","adult","Massive haemorrhage"]]}], cards:[]},
- {id:"tx", name:"Transplant", sub:"Kidney: Pre-op · Induction · Intra-op · Post-op · Donor", tabKey:"txTab", tabs:[
-   {id:"pre", label:"Pre-op", input:()=>txInputs(true), top:()=>txFlags(), hint:"Kidney recipient: workup → dialysis → heart → airway → drugs.",
+ {id:"tx", name:"Kidney Transplant", sub:"Kidney: Pre-op · Induction · Intra-op · Post-op · Donor", tabKey:"txTab", tabs:[
+   {id:"pre", label:"Pre-op", input:()=>txInputs(true), top:()=>txFlags(), see:[["tx-post-theatre-checklist","Theatre checklist"]], seeLabel:"Prepare", hint:"Kidney recipient: workup → dialysis → heart → airway → drugs.",
     cards:[["Kidney: workup checklist","1. Workup checklist"],["Kidney: dialysis & fluid status","2. Dialysis & fluid status"],["Kidney: cardiac risk","3. Cardiac risk"],["Kidney: airway & aspiration","4. Airway & aspiration"],["Kidney: drugs stop or continue","5. Drugs: stop or continue"],["Kidney: deceased-donor / emergency recipient","6. Deceased-donor / emergency"]],
     links:[["Hyperkalaemia","adult","Hyperkalaemia"]]},
    {id:"ind", label:"Induction", input:()=>txInputs(false), hint:"Drugs → RSI plan by K⁺ → tube, NG, CVC → lines.",
     cards:[["Kidney: induction drugs","1. Drugs, renal-adjusted"],["Kidney: RSI & relaxant plan","2. RSI & relaxant plan"],["Kidney: tube, NG & CVC","3. Tube, NG & CVC"],["Kidney: lines, monitoring & antibiotic","4. Lines, monitoring & antibiotic"]],
     links:[["Failed intubation / CICO","adult","Failed intubation / CICO"],["Hyperkalaemia","adult","Hyperkalaemia"],["Anaphylaxis","adult","Anaphylaxis"]]},
-   {id:"intra", label:"Intra-op", input:()=>txInputs(false), hint:"Maintain → infusions → BP → fluids → reperfusion.",
+   {id:"intra", label:"Intra-op", input:()=>txInputs(false), see:[["tx-post-theatre-checklist","Theatre checklist"]], seeLabel:"During", hint:"Maintain → infusions → BP → fluids → reperfusion.",
     cards:[["Kidney: maintenance","1. Maintenance: volatile or TIVA"],["Kidney: syringes & infusions","2. Syringes & infusions"],["Kidney: BP target & pressors","3. BP target & pressors"],["Kidney: fluids & blood","4. Fluids & blood"],["5. Anastomosis & reperfusion","5. Anastomosis & reperfusion"]],
     links:[["Hyperkalaemia","adult","Hyperkalaemia"],["Anaphylaxis","adult","Anaphylaxis"],["Bradycardia & cardiac arrest","adult","Bradycardia / arrest"]]},
    {id:"post", label:"Post-op", input:()=>txInputs(false), hint:"Reverse → analgesia → PACU → checklist.",
@@ -4465,138 +4481,387 @@ const GROUPS = [
     links:[["Hyperkalaemia","adult","Hyperkalaemia"]]},
    {id:"don", label:"Donor", input:()=>donInputs(), hint:"Living donor nephrectomy.",
     cards:["1. Donor pre-op","2. Donor intra-op","3. Donor post-op"], links:[]}], cards:[]}];
-const SEARCH_EXTRA = {
-  "2. Anticoagulants & antiplatelets":"anticoagulant antiplatelet doac apixaban rivaroxaban edoxaban dabigatran warfarin bridging lmwh aspirin clopidogrel ticagrelor prasugrel crcl creatinine",
-  "3. Diabetes: day-of-surgery plan":"diabetes insulin glargine detemir degludec premixed basal bolus pump vrii vriii sliding scale sulfonylurea gliclazide sglt2 metformin glucose ketones",
-  "7. Pacemaker / ICD":"pacemaker icd cied crt defibrillator magnet diathermy asynchronous voo doo pacing dependent",
-  "6. Premedication drugs":"premedication premed anxiolysis midazolam temazepam omeprazole famotidine sodium citrate metoclopramide paracetamol glycopyrrolate",
-  "2. Premed note":"premed note preoperative assessment template documentation copy allergy dentition diagnosis underlying physical status airway back examination investigations consent plan",
-  "3. Fluids: transfusion protocol":"paeds paediatric neonate transfusion blood red cells prbc packed cells platelets ffp cryo cryoprecipitate trigger threshold hb irradiated cmv negative paedipack taco trali hyperkalaemia jehovah",
-  "2. Echo report: what matters":"echo echocardiogram tte report ejection fraction ef lvef diastolic e/e aortic stenosis mitral stenosis regurgitation ava mva pulmonary hypertension pasp trv tapse hocm lvot sam rwma pericardial effusion tamponade pfo asd thrombus prosthetic valve ivc valve",
-  "1. Reversal":"reversal sugammadex neostigmine glycopyrrolate re-paralysis reparalysis re-administration redose rocuronium vecuronium waiting time after sugammadex",
-  "1. Anaesthetic plan & consent":"consent explanation note labour epidural husband dural puncture headache haematoma abscess paralysis documentation risks explained anaesthesia general spinal epidural nerve block sedation high risk cardiac parents",
-  "8. ASA physical status":"pre-op preop assessment risk asa grade physical status classification",
-  "3. Functional capacity (METs / DASI)":"pre-op preop assessment risk mets met functional capacity dasi duke activity stairs exercise tolerance",
-  "4. Cardiac risk (RCRI)":"pre-op preop assessment risk rcri revised cardiac risk index lee cardiac mace",
-  "6. OSA screen (STOP-BANG)":"pre-op preop assessment risk stop-bang stopbang stop bang osa sleep apnoea snoring",
-  "5. Lung risk (ARISCAT)":"pre-op preop assessment risk ariscat pulmonary complications lung risk ppc",
-  "7. Frailty (CFS)":"pre-op preop assessment risk frailty clinical frailty scale cfs rockwood elderly",
-  "9. Which tests to order":"pre-op preop assessment risk investigations tests bloods ecg echo fbc renal profile coagulation hba1c nice ng45",
-  "10. Optimise or postpone":"pre-op preop assessment risk postpone cancel proceed elective optimise cut-off blood pressure hypertension diabetes hba1c ketones potassium sodium anaemia platelets inr mi myocardial infarction stent stroke tia heart failure aortic stenosis pacemaker icd asthma copd urti thyroid smoking common conditions",
-  "D. Uterotonics at delivery":"uterotonic oxytocin syntocinon carbetocin duratocin ergometrine carboprost hemabate misoprostol tranexamic pph atony caesarean lscs rule of threes",
-  "7. IM doses (no IV access, or ward)":"im intramuscular no iv access adrenaline glucagon midazolam naloxone hydrocortisone chlorphenamine piriton ketamine suxamethonium morphine pethidine diclofenac voren voltaren tramadol promethazine phenergan ondansetron metoclopramide maxolon",
-  "Paeds IM doses (no IV access)":"paeds child im intramuscular no iv access adrenaline glucagon midazolam naloxone hydrocortisone chlorphenamine promethazine",
-  "Paeds difficult airway / CICO":"paeds child difficult airway cico cannot intubate cannot oxygenate cricothyroidotomy front of neck das apa",
-  "Post-tonsillectomy bleed":"paeds child tonsillectomy bleed haemorrhage ent rsi",
-  "7. Duodenal atresia":"duodenal atresia down syndrome neonate bilious",
-  "8. Anorectal malformation":"anorectal malformation imperforate anus psarp colostomy vacterl neonate",
-  "9. Hirschsprung disease":"hirschsprung enterocolitis duhamel pull through neonate",
-  "1. Oesophageal atresia / TOF":"oesophageal esophageal atresia tof tracheo oesophageal fistula replogle vacterl neonate",
-  "2. CDH":"cdh congenital diaphragmatic hernia pulmonary hypertension nitric oscillator neonate",
-  "3. Gastroschisis / exomphalos":"gastroschisis exomphalos omphalocele abdominal wall defect compartment silo neonate",
-  "4. NEC":"nec necrotising necrotizing enterocolitis preterm laparotomy neonate",
-  "5. PDA ligation":"pda patent ductus arteriosus ligation preterm thoracotomy neonate",
-  "6. Malrotation / volvulus":"malrotation volvulus bilious vomiting neonate infant",
-  "10. Myelomeningocele":"myelomeningocele spina bifida neural tube latex chiari neonate",
-  "Paeds hypoxia / desaturation":"paeds child hypoxia desaturation cyanosis low spo2 oxygen",
-  "1. Airway assessment & plan":"pre-op preop assessment risk airway checklist lemon moans mallampati thyromental difficult intubation mask ventilation awake intubation cricothyroid front of neck aspiration rsi glp-1 semaglutide",
-  "5. Intra-op analgesia":"analgesia intraop intra-op multimodal opioid fentanyl morphine tramadol remifentanil ketamine lignocaine lidocaine infusion magnesium dexmedetomidine clonidine paracetamol parecoxib diclofenac dexamethasone opioid-free opioid-sparing prospect infiltration",
-  "1. Fasting (child)":"paeds child fasting clear fluid breast milk formula",
-  "2. Premedication":"premed premedication midazolam oral buccal intranasal dexmedetomidine anxiety",
-  "3. Airway score (PAAS)":"paas airway score difficult intubation mallampati paeds",
-  "4. OSA screen (STBUR)":"stbur osa sleep apnoea snoring tonsillectomy",
-  "5. URTI & asthma: go or delay":"urti cold cough asthma postpone delay cancel",
-  "6. Ex-prem: apnoea risk & admission":"ex-prem premature preterm apnoea pma pca post-conceptual post-menstrual admission nicu daycare",
-  "8. Dehydration":"dehydration deficit fluid shock paeds child infant",
-  "7. Congenital conditions (A–Z)":"syndrome congenital pierre robin goldenhar treacher collins mps mucopolysaccharidosis down craniosynostosis beckwith turner klippel charge vacterl digeorge mitochondrial myopathy duchenne myotonic sma epidermolysis osteogenesis",
-  "5. Neonatal / infant spinal":"neonatal spinal infant spinal ex-prem hernia subarachnoid",
-  "8. Volumes for other blocks":"block volume ilioinguinal penile axillary supraclavicular femoral sciatic tap rectus sheath erector spinae esp quadratus lumborum",
-  "4. Muscle relaxants":"paeds child relaxant suxamethonium scoline rocuronium atracurium cisatracurium vecuronium",
-  "5. RSI (child)":"paeds child rsi rapid sequence full stomach pyloric bowel obstruction",
-  "1. Reversal":"paeds child reversal neostigmine glycopyrrolate atropine sugammadex tof",
-  "2. PONV by risk":"ponv paeds vomiting ondansetron dexamethasone droperidol metoclopramide eberhart",
-  "5. Pain scores":"pain score flacc nips faces numerical",
-  "6. Analgesia by age":"analgesia paracetamol ibuprofen diclofenac parecoxib tramadol oxycodone morphine fentanyl ketamine clonidine naloxone",
-  "7. Infusions & PCA":"pca morphine fentanyl ketamine oxycodone infusion nca",
-  "Paeds massive transfusion":"massive transfusion mtp haemorrhage bleeding paeds tranexamic fibrinogen novoseven",
-  "Paeds PACU crises":"pacu recovery croup stridor seizure svt delirium tonsillectomy bleed",
-  "Latex allergy":"latex allergy anaphylaxis spina bifida",
-  "1. Workup checklist":"kidney renal transplant ktx esrd dialysis hd workup hla crossmatch flow cytometry abo infection screen echo spirometry",
-  "2. Dialysis & fluid status":"kidney renal transplant ktx esrd dialysis hd dry weight uf ultrafiltration last hd heparin potassium k+ residual urine",
-  "3. Cardiac risk":"kidney renal transplant ktx esrd dialysis hd cardiac echo ef mets stress test coronary angiogram ctca",
-  "4. Airway & aspiration":"kidney renal transplant ktx esrd dialysis hd rsi fasting omeprazole ranitidine gastroparesis fistula",
-  "5. Drugs: stop or continue":"kidney renal transplant ktx esrd dialysis hd medications stop continue oral hypoglycaemic sglt2 ace arb insulin epo binder",
-  "6. Deceased-donor / emergency":"kidney renal transplant ktx esrd dialysis hd cadaveric deceased donor emergency recipient",
-  "1. Drugs, renal-adjusted":"kidney renal transplant ktx esrd dialysis hd induction propofol fentanyl ketamine midazolam",
-  "2. RSI & relaxant plan":"kidney renal transplant ktx esrd dialysis hd rsi suxamethonium rocuronium atracurium cisatracurium sugammadex relaxant",
-  "3. Tube, NG & CVC":"kidney renal transplant ktx esrd dialysis hd ett tube ng cvc central line peres ijv depth",
-  "4. Lines, monitoring & antibiotic":"kidney renal transplant ktx esrd dialysis hd arterial line fistula bis cefuroxime",
-  "1. Maintenance: volatile or TIVA":"kidney renal transplant ktx esrd dialysis hd volatile sevoflurane isoflurane desflurane mac tiva",
-  "2. Syringes & infusions":"kidney renal transplant ktx esrd dialysis hd fentanyl atracurium noradrenaline mannitol infusion syringe",
-  "3. BP target & pressors":"kidney renal transplant ktx esrd dialysis hd map blood pressure noradrenaline",
-  "4. Fluids & blood":"kidney renal transplant ktx esrd dialysis hd fluid sterofundin saline albumin transfusion leucocyte filter",
-  "5. Anastomosis & reperfusion":"kidney renal transplant ktx esrd dialysis hd methylprednisolone mannitol furosemide frusemide thymoglobulin basiliximab immunosuppressant reperfusion",
-  "1. Reversal (atracurium)":"kidney renal transplant ktx esrd dialysis hd reversal neostigmine glycopyrrolate sugammadex",
-  "2. Analgesia & PONV, renal":"kidney renal transplant ktx esrd dialysis hd analgesia paracetamol tramadol pca fentanyl ondansetron ponv",
-  "3. PACU & urine output":"kidney renal transplant ktx esrd dialysis hd pacu diuresis urine output",
-  "4. Theatre checklist":"kidney renal transplant ktx esrd dialysis hd checklist",
-  "1. Donor pre-op":"kidney renal transplant ktx esrd dialysis hd living donor nephrectomy",
-  "2. Donor intra-op":"kidney renal transplant ktx esrd dialysis hd living donor nephrectomy mannitol lateral cefuroxime",
-  "3. Donor post-op":"kidney renal transplant ktx esrd dialysis hd living donor nephrectomy pca analgesia",
-  "Hyperkalaemia":"hyperkalaemia hyperkalemia potassium k+ calcium insulin dextrose glucose salbutamol dialysis",
-  "5. Discharge from recovery":"discharge recovery pacu aldrete score ward",
-  "6. Discharge home (daycare)":"discharge home daycare day case padss escort void voiding driving",
-  "6. Discharge (recovery & home)":"discharge paeds child aldrete home ex-prem apnoea tonsillectomy",
-  "6. Dermatomes & block height":"dermatome dermatomes block height level t4 t10 nipple umbilicus xiphoid bromage sensory testing cold pinprick",
-  "1. Ventilation strategies":"ventilation ventilator ventilate lung protective tidal volume tv peep recruitment recruit driving pressure plateau pcv vcv pcv-vg prvc ards asthma copd auto-peep laparoscopy trendelenburg obese neuro icp hyperventilation pregnancy lscs dopes desaturation hypoxia high airway pressure",
-  "2. One-lung ventilation":"one-lung ventilation olv dlt double-lumen double lumen tube bronchial blocker arndt thoracic vats lung isolation thoracotomy cpap",
-  "7. Antibiotic prophylaxis":"antibiotic prophylaxis cefazolin unasyn ampicillin sulbactam augmentin metronidazole gentamicin clindamycin vancomycin cefuroxime azithromycin endocarditis uro gynae ortho dental hpb colorectal",
-  "8. Drugs: other (saline 3%, mannitol, KCl, insulin, adenosine)":"hypertonic saline mannitol potassium kcl insulin adenosine bicarbonate paeds",
-  "9. Antibiotic prophylaxis (child)":"antibiotic prophylaxis cefazolin unasyn metronidazole gentamicin clindamycin vancomycin paeds endocarditis",
-  "4. Tube & airway kit":"ett tube endotracheal chula lma igel i-gel supraglottic laryngoscope video adult",
-  "Neuraxial & deep blocks: anticoagulant timing":"anticoagulant antiplatelet clopidogrel enoxaparin clexane heparin warfarin doac rivaroxaban apixaban dabigatran asra platelets",
-  "A1. Spinal: dose by height":"lscs caesarean cesarean c-section sab spinal heavy bupivacaine marcaine dose height obstetric",
-  "A2. Spinal: IT morphine & fentanyl":"lscs caesarean intrathecal it opioid",
-  "A3. Spinal: phenylephrine":"lscs caesarean vasopressor hypotension",
-  "3. Maintain: pump settings":"pcea pieb cse labour epidural pump",
-  "1. Start: test, bolus & loading":"labour epidural initiate loading cse",
-  "2. Maintain: infusion recipes":"labour epidural cocktail ropivacaine levobupivacaine infusion"};
-const CALC_KW = {ga:"ett tube endotracheal depth size cuffed plain anchor intubation neonate chula suction laryngoscope", regional:"spinal sab heavy bupivacaine marcaine height dose turp urology hernia perineal saddle lower limb hip knee ortho"};
-const CALC_TITLES = {regional:"Spinal dose – non-obstetric (TURP, hernia, perineal, lower limb)"};
+const SEARCH_EXTRA = {   // keyed by stable card id
+  "premed-prepare-anticoagulants-and-antiplatelets":"anticoagulant antiplatelet doac apixaban rivaroxaban edoxaban dabigatran warfarin bridging lmwh aspirin clopidogrel ticagrelor prasugrel crcl creatinine",
+  "premed-prepare-diabetes-day-of-surgery-plan":"diabetes insulin glargine detemir degludec premixed basal bolus pump vrii vriii sliding scale sulfonylurea gliclazide sglt2 metformin glucose ketones",
+  "premed-prepare-pacemaker-icd":"pacemaker icd cied crt defibrillator magnet diathermy asynchronous voo doo pacing dependent",
+  "premed-prepare-premedication-drugs":"premedication premed anxiolysis midazolam temazepam omeprazole famotidine sodium citrate metoclopramide paracetamol glycopyrrolate",
+  "premed-plan-premed-note":"premed note preoperative assessment template documentation copy allergy dentition diagnosis underlying physical status airway back examination investigations consent plan",
+  "paeds-intra-transfusion-protocol":"paeds paediatric neonate transfusion blood red cells prbc packed cells platelets ffp cryo cryoprecipitate trigger threshold hb irradiated cmv negative paedipack taco trali hyperkalaemia jehovah",
+  "premed-assess-echo-report-what-matters":"echo echocardiogram tte report ejection fraction ef lvef diastolic e/e aortic stenosis mitral stenosis regurgitation ava mva pulmonary hypertension pasp trv tapse hocm lvot sam rwma pericardial effusion tamponade pfo asd thrombus prosthetic valve ivc valve",
+  "ga-post-reversal":"reversal sugammadex neostigmine glycopyrrolate re-paralysis reparalysis re-administration redose rocuronium vecuronium waiting time after sugammadex tof train-of-four train of four adult",
+  "premed-plan-anaesthetic-plan-and-consent":"consent explanation note labour epidural husband dural puncture headache haematoma abscess paralysis documentation risks explained anaesthesia general spinal epidural nerve block sedation high risk cardiac parents",
+  "premed-assess-asa-physical-status":"pre-op preop assessment risk asa grade physical status classification",
+  "premed-assess-functional-capacity-mets-dasi":"pre-op preop assessment risk mets met functional capacity dasi duke activity stairs exercise tolerance",
+  "premed-assess-cardiac-risk-rcri":"pre-op preop assessment risk rcri revised cardiac risk index lee cardiac mace",
+  "premed-assess-osa-screen-stop-bang":"pre-op preop assessment risk stop-bang stopbang stop bang osa sleep apnoea snoring",
+  "premed-assess-lung-risk-ariscat":"pre-op preop assessment risk ariscat pulmonary complications lung risk ppc",
+  "premed-assess-frailty-clinical-frailty-scale":"pre-op preop assessment risk frailty clinical frailty scale cfs rockwood elderly",
+  "premed-assess-which-tests-to-order":"pre-op preop assessment risk investigations tests bloods ecg echo fbc renal profile coagulation hba1c nice ng45",
+  "premed-assess-optimise-or-postpone":"pre-op preop assessment risk postpone cancel proceed elective optimise cut-off blood pressure hypertension diabetes hba1c ketones potassium sodium anaemia platelets inr mi myocardial infarction stent stroke tia heart failure aortic stenosis pacemaker icd asthma copd urti thyroid smoking common conditions",
+  "obs-lscs-uterotonics":"uterotonic oxytocin syntocinon carbetocin duratocin ergometrine carboprost hemabate misoprostol tranexamic pph atony caesarean lscs rule of threes",
+  "ga-post-im-doses-no-iv-access-or-ward":"im intramuscular no iv access adrenaline glucagon midazolam naloxone hydrocortisone chlorphenamine piriton ketamine suxamethonium morphine pethidine diclofenac voren voltaren tramadol promethazine phenergan ondansetron metoclopramide maxolon no cannula no line",
+  "paeds-post-im-doses-no-iv-access":"paeds child im intramuscular no iv access adrenaline glucagon midazolam naloxone hydrocortisone chlorphenamine promethazine no cannula no line",
+  "emerg-paeds-difficult-airway-cico":"paeds child difficult airway cico cannot intubate cannot oxygenate cricothyroidotomy front of neck das apa",
+  "emerg-paeds-post-tonsillectomy-bleed":"paeds child tonsillectomy bleed haemorrhage ent rsi",
+  "paeds-cases-duodenal-atresia":"duodenal atresia down syndrome neonate bilious",
+  "paeds-cases-anorectal-malformation":"anorectal malformation imperforate anus psarp colostomy vacterl neonate",
+  "paeds-cases-hirschsprung-disease":"hirschsprung enterocolitis duhamel pull through neonate",
+  "paeds-cases-oesophageal-atresia-tof":"oesophageal esophageal atresia tof tracheo oesophageal fistula replogle vacterl neonate",
+  "paeds-cases-cdh-congenital-diaphragmatic":"cdh congenital diaphragmatic hernia pulmonary hypertension nitric oscillator neonate",
+  "paeds-cases-gastroschisis-exomphalos":"gastroschisis exomphalos omphalocele abdominal wall defect compartment silo neonate",
+  "paeds-cases-nec-necrotising-enterocolitis":"nec necrotising necrotizing enterocolitis preterm laparotomy neonate",
+  "paeds-cases-pda-ligation":"pda patent ductus arteriosus ligation preterm thoracotomy neonate",
+  "paeds-cases-malrotation-volvulus":"malrotation volvulus bilious vomiting neonate infant",
+  "paeds-cases-myelomeningocele":"myelomeningocele spina bifida neural tube latex chiari neonate",
+  "emerg-paeds-hypoxia-desaturation":"paeds child hypoxia desaturation cyanosis low spo2 oxygen",
+  "premed-assess-airway-assessment-and-plan":"pre-op preop assessment risk airway checklist lemon moans mallampati thyromental difficult intubation mask ventilation awake intubation cricothyroid front of neck aspiration rsi glp-1 semaglutide",
+  "ga-intra-analgesia":"analgesia intraop intra-op multimodal opioid fentanyl morphine tramadol remifentanil ketamine lignocaine lidocaine infusion magnesium dexmedetomidine clonidine paracetamol parecoxib diclofenac dexamethasone opioid-free opioid-sparing prospect infiltration",
+  "paeds-pre-fasting":"paeds child fasting clear fluid breast milk formula",
+  "paeds-pre-premedication":"premed premedication midazolam oral buccal intranasal dexmedetomidine anxiety",
+  "paeds-pre-airway-score-paas":"paas airway score difficult intubation mallampati paeds",
+  "paeds-pre-osa-screen-stbur":"stbur osa sleep apnoea snoring tonsillectomy",
+  "paeds-pre-urti-and-asthma-go-or-delay":"urti cold cough asthma postpone delay cancel",
+  "paeds-pre-ex-prem-apnoea-risk-and-admission":"ex-prem premature preterm apnoea pma pca post-conceptual post-menstrual admission nicu daycare neonate neonatal postoperative apnoea",
+  "paeds-pre-dehydration":"dehydration deficit fluid shock paeds child infant",
+  "paeds-pre-congenital-conditions-a-z":"syndrome congenital pierre robin goldenhar treacher collins mps mucopolysaccharidosis down craniosynostosis beckwith turner klippel charge vacterl digeorge mitochondrial myopathy duchenne myotonic sma epidermolysis osteogenesis",
+  "paeds-blocks-neonatal-infant-spinal":"neonatal spinal infant spinal ex-prem hernia subarachnoid",
+  "paeds-blocks-block-volumes-paeds":"block volume ilioinguinal penile axillary supraclavicular femoral sciatic tap rectus sheath erector spinae esp quadratus lumborum",
+  "paeds-ind-muscle-relaxants":"paeds child relaxant suxamethonium scoline rocuronium atracurium cisatracurium vecuronium",
+  "paeds-ind-rsi":"paeds child rsi rapid sequence full stomach pyloric bowel obstruction",
+  "paeds-post-reversal":"paeds child reversal neostigmine glycopyrrolate atropine sugammadex tof train-of-four train of four",
+  "paeds-post-ponv-by-risk":"ponv paeds vomiting ondansetron dexamethasone droperidol metoclopramide eberhart",
+  "paeds-post-pain-scores":"pain score flacc nips faces numerical",
+  "paeds-post-analgesia-by-age":"analgesia paracetamol ibuprofen diclofenac parecoxib tramadol oxycodone morphine fentanyl ketamine clonidine naloxone",
+  "paeds-post-opioid-ketamine-infusions-and-pca":"pca morphine fentanyl ketamine oxycodone infusion nca",
+  "emerg-paeds-massive-transfusion":"massive transfusion mtp haemorrhage bleeding paeds tranexamic fibrinogen novoseven",
+  "emerg-paeds-pacu-crises":"pacu recovery croup stridor seizure svt delirium tonsillectomy bleed",
+  "emerg-latex-allergy":"latex allergy anaphylaxis spina bifida latex rubber",
+  "tx-pre-workup-checklist":"kidney renal transplant ktx esrd dialysis hd workup hla crossmatch flow cytometry abo infection screen echo spirometry",
+  "tx-pre-dialysis-and-fluid-status":"kidney renal transplant ktx esrd dialysis hd dry weight uf ultrafiltration last hd heparin potassium k+ residual urine",
+  "tx-pre-cardiac-risk":"kidney renal transplant ktx esrd dialysis hd cardiac echo ef mets stress test coronary angiogram ctca",
+  "tx-pre-airway-and-aspiration":"kidney renal transplant ktx esrd dialysis hd rsi fasting omeprazole ranitidine gastroparesis fistula",
+  "tx-pre-drugs-stop-or-continue":"kidney renal transplant ktx esrd dialysis hd medications stop continue oral hypoglycaemic sglt2 ace arb insulin epo binder",
+  "tx-pre-deceased-donor-emergency-recipient":"kidney renal transplant ktx esrd dialysis hd cadaveric deceased donor emergency recipient",
+  "tx-ind-induction-drugs":"kidney renal transplant ktx esrd dialysis hd induction propofol fentanyl ketamine midazolam",
+  "tx-ind-rsi-and-relaxant-plan":"kidney renal transplant ktx esrd dialysis hd rsi suxamethonium rocuronium atracurium cisatracurium sugammadex relaxant",
+  "tx-ind-tube-ng-and-cvc":"kidney renal transplant ktx esrd dialysis hd ett tube ng cvc central line peres ijv depth",
+  "tx-ind-lines-monitoring-and-antibiotic":"kidney renal transplant ktx esrd dialysis hd arterial line fistula bis cefuroxime",
+  "tx-intra-maintenance":"kidney renal transplant ktx esrd dialysis hd volatile sevoflurane isoflurane desflurane mac tiva",
+  "tx-intra-syringes-and-infusions":"kidney renal transplant ktx esrd dialysis hd fentanyl atracurium noradrenaline mannitol infusion syringe",
+  "tx-intra-bp-target-and-pressors":"kidney renal transplant ktx esrd dialysis hd map blood pressure noradrenaline",
+  "tx-intra-fluids-and-blood":"kidney renal transplant ktx esrd dialysis hd fluid sterofundin saline albumin transfusion leucocyte filter",
+  "tx-intra-anastomosis-and-reperfusion":"kidney renal transplant ktx esrd dialysis hd methylprednisolone mannitol furosemide frusemide thymoglobulin basiliximab immunosuppressant reperfusion",
+  "tx-post-reversal":"kidney renal transplant ktx esrd dialysis hd reversal neostigmine glycopyrrolate sugammadex tof train-of-four train of four kidney renal",
+  "tx-post-analgesia-and-ponv":"kidney renal transplant ktx esrd dialysis hd analgesia paracetamol tramadol pca fentanyl ondansetron ponv",
+  "tx-post-pacu-and-urine-output":"kidney renal transplant ktx esrd dialysis hd pacu diuresis urine output",
+  "tx-post-theatre-checklist":"kidney renal transplant ktx esrd dialysis hd checklist checklist pre-op intra-op preparation immunosuppression reperfusion vascular access",
+  "tx-donor-pre-op":"kidney renal transplant ktx esrd dialysis hd living donor nephrectomy",
+  "tx-donor-intra-op":"kidney renal transplant ktx esrd dialysis hd living donor nephrectomy mannitol lateral cefuroxime",
+  "tx-donor-post-op":"kidney renal transplant ktx esrd dialysis hd living donor nephrectomy pca analgesia",
+  "emerg-adult-hyperkalaemia":"hyperkalaemia hyperkalemia potassium k+ calcium insulin dextrose glucose salbutamol dialysis",
+  "ga-post-discharge-from-recovery":"discharge recovery pacu aldrete score ward",
+  "ga-post-discharge-home-daycare":"discharge home daycare day case padss escort void voiding driving",
+  "paeds-post-discharge":"discharge paeds child aldrete home ex-prem apnoea tonsillectomy",
+  "regional-neuraxial-dermatomes-and-block-height":"dermatome dermatomes block height level t4 t10 nipple umbilicus xiphoid bromage sensory testing cold pinprick",
+  "ga-intra-ventilation-strategies":"ventilation ventilator ventilate lung protective tidal volume tv peep recruitment recruit driving pressure plateau pcv vcv pcv-vg prvc ards asthma copd auto-peep laparoscopy trendelenburg obese neuro icp hyperventilation pregnancy lscs dopes desaturation hypoxia high airway pressure",
+  "ga-intra-one-lung-ventilation":"one-lung ventilation olv dlt double-lumen double lumen tube bronchial blocker arndt thoracic vats lung isolation thoracotomy cpap",
+  "ga-intra-antibiotic-prophylaxis":"antibiotic prophylaxis cefazolin unasyn ampicillin sulbactam augmentin metronidazole gentamicin clindamycin vancomycin cefuroxime azithromycin endocarditis uro gynae ortho dental hpb colorectal",
+  "paeds-intra-other-drugs":"hypertonic saline mannitol potassium kcl insulin adenosine bicarbonate paeds",
+  "paeds-intra-antibiotic-prophylaxis":"antibiotic prophylaxis cefazolin unasyn metronidazole gentamicin clindamycin vancomycin paeds endocarditis",
+  "ga-ind-muscle-relaxants":"relaxant nmb neuromuscular blocker suxamethonium scoline succinylcholine rocuronium atracurium cisatracurium vecuronium",
+  "ga-ind-tube-and-airway-kit":"ett tube endotracheal chula lma igel i-gel supraglottic laryngoscope video adult",
+  "regional-safety-anticoagulants":"anticoagulant antiplatelet clopidogrel enoxaparin clexane heparin warfarin doac rivaroxaban apixaban dabigatran asra platelets",
+  "obs-lscs-spinal-dose":"lscs caesarean cesarean c-section sab spinal heavy bupivacaine marcaine dose height obstetric",
+  "obs-lscs-spinal-it-morphine-and-fentanyl":"lscs caesarean intrathecal it opioid",
+  "obs-lscs-spinal-phenylephrine":"lscs caesarean vasopressor hypotension",
+  "obs-labour-maintain-pump-settings":"pcea pieb cse labour epidural pump",
+  "obs-labour-start-test-bolus-and-loading":"labour epidural initiate loading cse",
+  "obs-labour-maintain-infusion-recipes":"labour epidural cocktail ropivacaine levobupivacaine infusion",
+  "emerg-paeds-fallot-spell":"tof tetralogy of fallot tet spell cyanotic hypercyanotic",
+  "regional-neuraxial-spinal-non-obstetric":"spinal sab subarachnoid heavy bupivacaine marcaine height dose turp urology hernia perineal saddle lower limb hip knee ortho non-obstetric calculator",
+  "paeds-ind-ett":"neonate neonatal newborn airway tube",
+  "paeds-ind-induction-drugs":"neonate neonatal newborn",
+  "paeds-intra-maintenance-4-2-1":"neonate neonatal newborn fluids maintenance",
+  "paeds-intra-glucose-neonate-paeds":"neonate neonatal newborn hypoglycaemia dextrose",
+  "paeds-ind-ventilation":"neonate neonatal newborn ventilation",
+  "emerg-adult-failed-intubation-cico":"cicv cannot intubate cannot oxygenate front of neck fona scalpel bougie das",
+  "emerg-adult-la-toxicity-last":"lipid intralipid local anaesthetic systemic toxicity",
+  "emerg-paeds-la-toxicity-last":"lipid intralipid local anaesthetic systemic toxicity",
+  "emerg-adult-malignant-hyperthermia":"dantrolene mh",
+  "emerg-paeds-malignant-hyperthermia":"dantrolene mh",
+  "obs-lscs-epidural-top-up":"lscs caesarean epidural top-up extension",
+  "obs-lscs-dural-puncture-catheter":"lscs caesarean intrathecal catheter dpc"};
 
-function cardMap(){
-  const html = Object.keys(obsCards).map(k=>obsCards[k]()).join("") + Object.keys(pCards).map(k=>pCards[k]()).join("") + eCards.adult() + eCards.paeds() + Object.keys(gaCards).map(k=>gaCards[k]()).join("") + Object.keys(raCards).map(k=>raCards[k]()).join("") + Object.keys(txCards).map(k=>txCards[k]()).join("");
-  const tpl = document.createElement("template"); tpl.innerHTML = html;
-  const m = {};
-  Array.from(tpl.content.children).forEach(c => { if (!c.classList.contains("card")) return;
-    const h = c.querySelector("h2"); if (h && h.parentElement===c) m[h.textContent.trim()] = c; });
-  return m;
+const CARD_IDS = {
+  "Failed intubation / CICO":"emerg-adult-failed-intubation-cico",
+  "Bronchospasm":"emerg-adult-bronchospasm",
+  "Anaphylaxis":"emerg-adult-anaphylaxis",
+  "Latex allergy":"emerg-latex-allergy",
+  "Bradycardia & cardiac arrest":"emerg-adult-bradycardia-and-cardiac-arrest",
+  "High / total spinal":"emerg-adult-high-total-spinal",
+  "Hypotension after spinal":"emerg-adult-hypotension-after-spinal",
+  "LA toxicity (LAST)":"emerg-adult-la-toxicity-last",
+  "Malignant hyperthermia":"emerg-adult-malignant-hyperthermia",
+  "Hyperkalaemia":"emerg-adult-hyperkalaemia",
+  "Massive obstetric haemorrhage":"emerg-adult-massive-obstetric-haemorrhage",
+  "Eclampsia":"emerg-adult-eclampsia",
+  "Paeds hypoxia / desaturation":"emerg-paeds-hypoxia-desaturation",
+  "Laryngospasm":"emerg-paeds-laryngospasm",
+  "Paeds bronchospasm":"emerg-paeds-bronchospasm",
+  "Paeds difficult airway / CICO":"emerg-paeds-difficult-airway-cico",
+  "Post-tonsillectomy bleed":"emerg-paeds-post-tonsillectomy-bleed",
+  "Paeds cardiac arrest":"emerg-paeds-cardiac-arrest",
+  "Paeds anaphylaxis":"emerg-paeds-anaphylaxis",
+  "Cyanotic heart disease / Fallot spell":"emerg-paeds-fallot-spell",
+  "Paeds massive transfusion":"emerg-paeds-massive-transfusion",
+  "Paeds LA toxicity (LAST)":"emerg-paeds-la-toxicity-last",
+  "Paeds malignant hyperthermia":"emerg-paeds-malignant-hyperthermia",
+  "Paeds PACU crises":"emerg-paeds-pacu-crises",
+  "1. Airway assessment & plan":"premed-assess-airway-assessment-and-plan",
+  "Echo report: what matters":"premed-assess-echo-report-what-matters",
+  "Functional capacity (METs / DASI)":"premed-assess-functional-capacity-mets-dasi",
+  "Cardiac risk (RCRI)":"premed-assess-cardiac-risk-rcri",
+  "Lung risk (ARISCAT)":"premed-assess-lung-risk-ariscat",
+  "OSA screen (STOP-BANG)":"premed-assess-osa-screen-stop-bang",
+  "Frailty (Clinical Frailty Scale)":"premed-assess-frailty-clinical-frailty-scale",
+  "ASA physical status":"premed-assess-asa-physical-status",
+  "Which tests to order":"premed-assess-which-tests-to-order",
+  "10. Optimise or postpone":"premed-assess-optimise-or-postpone",
+  "1. Regular drugs: stop or continue":"premed-prepare-regular-drugs-stop-or-continue",
+  "2. Anticoagulants & antiplatelets":"premed-prepare-anticoagulants-and-antiplatelets",
+  "3. Diabetes: day-of-surgery plan":"premed-prepare-diabetes-day-of-surgery-plan",
+  "4. Steroid cover":"premed-prepare-steroid-cover",
+  "5. Fasting":"premed-prepare-fasting",
+  "6. Premedication drugs":"premed-prepare-premedication-drugs",
+  "7. Pacemaker / ICD":"premed-prepare-pacemaker-icd",
+  "Anaesthetic plan & consent":"premed-plan-anaesthetic-plan-and-consent",
+  "2. Premed note":"premed-plan-premed-note",
+  "1. Induction drugs":"ga-ind-induction-drugs",
+  "2. RSI":"ga-ind-rsi",
+  "3. Muscle relaxants":"ga-ind-muscle-relaxants",
+  "4. Tube & airway kit":"ga-ind-tube-and-airway-kit",
+  "1. Ventilation strategies":"ga-intra-ventilation-strategies",
+  "2. One-lung ventilation":"ga-intra-one-lung-ventilation",
+  "3. TIVA":"ga-intra-tiva",
+  "4. Volatile: MAC by age":"ga-intra-volatile-mac-by-age",
+  "5. Intra-op analgesia":"ga-intra-analgesia",
+  "6. Vasopressors & inotropes":"ga-intra-vasopressors-and-inotropes",
+  "7. Antibiotic prophylaxis":"ga-intra-antibiotic-prophylaxis",
+  "8. Tranexamic acid":"ga-intra-tranexamic-acid",
+  "1. Reversal":"ga-post-reversal",
+  "Extubation criteria":"ga-post-extubation-criteria",
+  "PONV: Apfel score":"ga-post-ponv-apfel-score",
+  "4. Analgesia ladder & PCA":"ga-post-analgesia-ladder-and-pca",
+  "Discharge from recovery":"ga-post-discharge-from-recovery",
+  "Discharge home (daycare)":"ga-post-discharge-home-daycare",
+  "7. IM doses (no IV access, or ward)":"ga-post-im-doses-no-iv-access-or-ward",
+  "LA dose calculator":"regional-safety-la-dose-calculator",
+  "Stop Before You Block & safe injection":"regional-safety-stop-before-you-block",
+  "Neuraxial & deep blocks: anticoagulant timing":"regional-safety-anticoagulants",
+  "Epidural (adult)":"regional-neuraxial-epidural",
+  "CSE (combined spinal–epidural)":"regional-neuraxial-cse-combined-spinal-epidural",
+  "Adjuncts":"regional-neuraxial-adjuncts",
+  "Failed or patchy block":"regional-neuraxial-failed-or-patchy-block",
+  "Post-dural puncture headache":"regional-neuraxial-post-dural-puncture-headache",
+  "Dermatomes & block height":"regional-neuraxial-dermatomes-and-block-height",
+  "Interscalene":"regional-upper-interscalene",
+  "Supraclavicular":"regional-upper-supraclavicular",
+  "Axillary":"regional-upper-axillary",
+  "Fascia iliaca (suprainguinal)":"regional-lower-fascia-iliaca-suprainguinal",
+  "PENG":"regional-lower-peng",
+  "Femoral":"regional-lower-femoral",
+  "Adductor canal":"regional-lower-adductor-canal",
+  "Popliteal sciatic":"regional-lower-popliteal-sciatic",
+  "Erector spinae (ESP)":"regional-trunk-erector-spinae-esp",
+  "Serratus anterior":"regional-trunk-serratus-anterior",
+  "Rectus sheath":"regional-trunk-rectus-sheath",
+  "TAP":"regional-trunk-tap",
+  "Paeds fasting":"paeds-pre-fasting",
+  "Paeds premedication":"paeds-pre-premedication",
+  "Paeds airway score (PAAS)":"paeds-pre-airway-score-paas",
+  "OSA screen (STBUR)":"paeds-pre-osa-screen-stbur",
+  "URTI & asthma: go or delay":"paeds-pre-urti-and-asthma-go-or-delay",
+  "Ex-prem: apnoea risk & admission":"paeds-pre-ex-prem-apnoea-risk-and-admission",
+  "Congenital conditions (A–Z)":"paeds-pre-congenital-conditions-a-z",
+  "Dehydration (child)":"paeds-pre-dehydration",
+  "Paeds ETT":"paeds-ind-ett",
+  "Paeds airway kit: NPA, HMEF, bag":"paeds-ind-airway-kit-npa-hmef-bag",
+  "Paeds induction drugs":"paeds-ind-induction-drugs",
+  "Muscle relaxants (child)":"paeds-ind-muscle-relaxants",
+  "RSI (child)":"paeds-ind-rsi",
+  "Ketamine anaesthesia":"paeds-ind-ketamine-anaesthesia",
+  "TCI model check":"paeds-ind-tiva-model-check",
+  "Remifentanil 10 mcg/mL":"paeds-ind-remifentanil",
+  "Paeds ventilation":"paeds-ind-ventilation",
+  "One-lung ventilation (Storz)":"paeds-ind-one-lung-ventilation-storz",
+  "Double-lumen CVC":"paeds-ind-double-lumen-cvc",
+  "Maintenance (4/2/1)":"paeds-intra-maintenance-4-2-1",
+  "Glucose (neonate / paeds)":"paeds-intra-glucose-neonate-paeds",
+  "Transfusion protocol":"paeds-intra-transfusion-protocol",
+  "Blood products":"paeds-intra-blood-products",
+  "Paeds intra-op drugs":"paeds-intra-drugs",
+  "Inotropes (50 mL syringe)":"paeds-intra-inotropes-50-ml-syringe",
+  "Paeds resuscitation":"paeds-intra-resuscitation",
+  "Other drugs (child)":"paeds-intra-other-drugs",
+  "Paeds antibiotic prophylaxis":"paeds-intra-antibiotic-prophylaxis",
+  "Keeping warm":"paeds-intra-keeping-warm",
+  "Paeds LA dose calculator":"paeds-blocks-la-dose-calculator",
+  "Which block (paeds)":"paeds-blocks-which-block-paeds",
+  "Caudal block":"paeds-blocks-caudal-block",
+  "Paeds lumbar / thoracic epidural":"paeds-blocks-lumbar-thoracic-epidural",
+  "Neonatal / infant spinal":"paeds-blocks-neonatal-infant-spinal",
+  "Ilioinguinal block":"paeds-blocks-ilioinguinal-block",
+  "Penile block":"paeds-blocks-penile-block",
+  "Block volumes (paeds)":"paeds-blocks-block-volumes-paeds",
+  "Intrapleural block":"paeds-blocks-intrapleural-block",
+  "Reversal (child)":"paeds-post-reversal",
+  "Paeds PONV by risk":"paeds-post-ponv-by-risk",
+  "Laryngospasm & extubation":"paeds-post-laryngospasm-and-extubation",
+  "Emergence delirium":"paeds-post-emergence-delirium",
+  "Paeds pain scores":"paeds-post-pain-scores",
+  "Paeds analgesia by age":"paeds-post-analgesia-by-age",
+  "Paeds opioid / ketamine infusions & PCA":"paeds-post-opioid-ketamine-infusions-and-pca",
+  "Paeds discharge":"paeds-post-discharge",
+  "Paeds IM doses (no IV access)":"paeds-post-im-doses-no-iv-access",
+  "Oesophageal atresia / TOF":"paeds-cases-oesophageal-atresia-tof",
+  "CDH (congenital diaphragmatic hernia)":"paeds-cases-cdh-congenital-diaphragmatic",
+  "Gastroschisis / exomphalos":"paeds-cases-gastroschisis-exomphalos",
+  "NEC (necrotising enterocolitis)":"paeds-cases-nec-necrotising-enterocolitis",
+  "PDA ligation":"paeds-cases-pda-ligation",
+  "Malrotation / volvulus":"paeds-cases-malrotation-volvulus",
+  "Duodenal atresia":"paeds-cases-duodenal-atresia",
+  "Anorectal malformation":"paeds-cases-anorectal-malformation",
+  "Hirschsprung disease":"paeds-cases-hirschsprung-disease",
+  "Myelomeningocele":"paeds-cases-myelomeningocele",
+  "Pyloric stenosis":"paeds-cases-pyloric-stenosis",
+  "OSA for tonsillectomy — opioid-free":"paeds-cases-osa-for-tonsillectomy-opioid-free",
+  "Hypospadias repair":"paeds-cases-hypospadias-repair",
+  "MRI under sedation":"paeds-cases-mri-under-sedation",
+  "Dynamic airway assessment (spontaneous breathing)":"paeds-cases-dynamic-airway-assessment",
+  "T-tube":"paeds-cases-t-tube",
+  "1. Start: test, bolus & loading":"obs-labour-start-test-bolus-and-loading",
+  "2. Maintain: infusion recipes":"obs-labour-maintain-infusion-recipes",
+  "Maintain: pump settings":"obs-labour-maintain-pump-settings",
+  "Top-up: breakthrough pain":"obs-labour-top-up-breakthrough-pain",
+  "Problem: accidental dural puncture":"obs-labour-problem-accidental-dural-puncture",
+  "Problems: catheter troubleshooting":"obs-labour-problems-catheter-troubleshooting",
+  "No epidural: IV PCA":"obs-labour-no-epidural-iv-pca",
+  "0. Before theatre: aspiration prophylaxis":"obs-lscs-aspiration-prophylaxis",
+  "A1. Spinal: dose by height":"obs-lscs-spinal-dose",
+  "A2. Spinal: IT morphine & fentanyl":"obs-lscs-spinal-it-morphine-and-fentanyl",
+  "A3. Spinal: phenylephrine":"obs-lscs-spinal-phenylephrine",
+  "B. Epidural top-up for LSCS":"obs-lscs-epidural-top-up",
+  "C. Dural puncture catheter: LSCS dosing":"obs-lscs-dural-puncture-catheter",
+  "D. Uterotonics at delivery":"obs-lscs-uterotonics",
+  "1. Analgesia by technique":"obs-after-analgesia-by-technique",
+  "2. NSAID yes / no":"obs-after-nsaid-yes-no",
+  "3. PCA morphine (after GA)":"obs-after-pca-morphine-after-ga",
+  "4. Ward (OAS) problems & catheter care":"obs-after-ward-oas-problems-and-catheter",
+  "Kidney: workup checklist":"tx-pre-workup-checklist",
+  "Kidney: dialysis & fluid status":"tx-pre-dialysis-and-fluid-status",
+  "Kidney: cardiac risk":"tx-pre-cardiac-risk",
+  "Kidney: airway & aspiration":"tx-pre-airway-and-aspiration",
+  "Kidney: drugs stop or continue":"tx-pre-drugs-stop-or-continue",
+  "Kidney: deceased-donor / emergency recipient":"tx-pre-deceased-donor-emergency-recipient",
+  "Kidney: induction drugs":"tx-ind-induction-drugs",
+  "Kidney: RSI & relaxant plan":"tx-ind-rsi-and-relaxant-plan",
+  "Kidney: tube, NG & CVC":"tx-ind-tube-ng-and-cvc",
+  "Kidney: lines, monitoring & antibiotic":"tx-ind-lines-monitoring-and-antibiotic",
+  "Kidney: maintenance":"tx-intra-maintenance",
+  "Kidney: syringes & infusions":"tx-intra-syringes-and-infusions",
+  "Kidney: BP target & pressors":"tx-intra-bp-target-and-pressors",
+  "Kidney: fluids & blood":"tx-intra-fluids-and-blood",
+  "5. Anastomosis & reperfusion":"tx-intra-anastomosis-and-reperfusion",
+  "Kidney: reversal":"tx-post-reversal",
+  "Kidney: analgesia & PONV":"tx-post-analgesia-and-ponv",
+  "Kidney: PACU & urine output":"tx-post-pacu-and-urine-output",
+  "Kidney: theatre checklist":"tx-post-theatre-checklist",
+  "1. Donor pre-op":"tx-donor-pre-op",
+  "2. Donor intra-op":"tx-donor-intra-op",
+  "3. Donor post-op":"tx-donor-post-op",
+  "Spinal dose: non-obstetric":"regional-neuraxial-spinal-non-obstetric"};
+/* Card registry. Every card is still drawn fresh from its renderer on every render (no cached doses);
+   the registry only records which renderer draws which card, so a screen draws the renderers it needs. */
+const CARD_FAMS = () => [...Object.keys(obsCards).map(k=>[obsCards,k]), ...Object.keys(pCards).map(k=>[pCards,k]), [eCards,"adult"], [eCards,"paeds"],
+  ...Object.keys(gaCards).map(k=>[gaCards,k]), ...Object.keys(raCards).map(k=>[raCards,k]), ...Object.keys(txCards).map(k=>[txCards,k])];
+const cardsIn = html => { const tpl = document.createElement("template"); tpl.innerHTML = html; const m = {};
+  Array.from(tpl.content.children).forEach(c => { if (!c.classList.contains("card")) return; const h = c.querySelector("h2"); if (h && h.parentElement===c) m[h.textContent.trim()] = c; }); return m; };
+let CARD_SRC = null, CARDMAP_FULL = false;   // CARDMAP_FULL: tests compare against drawing every card
+function cardSrc(){ if (CARD_SRC) return CARD_SRC; const src = {};
+  CARD_FAMS().forEach(([o,k], i) => Object.keys(cardsIn(o[k]())).forEach(h => src[h] = i)); return (CARD_SRC = src); }
+function cardMap(only){
+  let fams = CARD_FAMS();
+  if (only && only.length && !CARDMAP_FULL){ const src = cardSrc(), need = new Set();
+    for (const o of only){ if (!(o in src)){ need.clear(); break; } need.add(src[o]); }
+    if (need.size) fams = fams.filter((f,i) => need.has(i)); }
+  return cardsIn(fams.map(([o,k]) => o[k]()).join(""));
 }
-/* "Same topic elsewhere" links */
+/* Navigation entries: one per place a card is listed. A card (one id) may be listed in several places. */
+let NAV_CACHE = null;
+function navEntries(){ if (NAV_CACHE) return NAV_CACHE; const out = [];
+  for (const g of GROUPS) for (const t of (g.tabs||[])){ let cat = "";
+    for (const it of t.cards){ if (typeof it==="string" && it[0]==="§"){ cat = it.slice(1); continue; }
+      const [o,l] = Array.isArray(it) ? it : [it,it]; out.push({id: CARD_IDS[o] || null, orig: o, label: l, g: g.id, tab: t.id, cat}); } }
+  return (NAV_CACHE = out); }
+const tabOf = (g, t) => { const gg = GROUPS.find(x=>x.id===g); return gg && gg.tabs ? gg.tabs.find(x=>x.id===t) || null : null; };
+function findEntry(id, g, tab){ const es = navEntries().filter(e => e.id===id); return es.find(e => e.g===g && e.tab===tab) || es.find(e => e.g===g) || es[0] || null; }
+const idOf = (g, tab, label) => { const e = navEntries().find(e => e.g===g && (!tab || e.tab===tab) && e.label===label); return e ? e.id : null; };
+const ctxOf = (g, tab) => g==="paeds" || (g==="emerg" && tab==="paeds") ? "child" : g==="obs" ? "obstetric" : g==="tx" ? "kidney" : "adult";
+const CTX_TAG = {child:"Child", adult:"Adult", obstetric:"Obstetric", kidney:"Kidney Tx"};
+const bareLabel = l => l.replace(/^[A-D]?\d+[a-z]?\.\s*/, "");
+/* metadata for one card (existing data, gathered in one place) */
+function cardMeta(id){ const es = navEntries().filter(e => e.id===id); if (!es.length) return null; const e = es[0], c = cardMap([e.orig])[e.orig];
+  return {id, source: e.orig, title: e.label, section: e.g, tab: e.tab, category: e.cat, locations: es.map(x => `${x.g}/${x.tab}`), patient: ctxOf(e.g, e.tab),
+    terms: SEARCH_EXTRA[id] || "", related: REL_PAIRS.filter(p => p[0]===id || p[1]===id).map(p => p[0]===id ? p[1] : p[0]),
+    verified: c ? !Array.from(c.querySelectorAll(".warn, .draft")).some(w => /DRAFT/.test(w.textContent)) : null}; }
+/* links whose target depends on where the card is opened (one card, several patient groups) */
+const CTX_LINKS = {anaph: {adult: ["emerg-adult-anaphylaxis", "⚠ Anaphylaxis (adult) → Emergencies"], child: ["emerg-paeds-anaphylaxis", "⚠ Paeds anaphylaxis → Emergencies"]}};
+function ctxLink(b, gid, tab){ const L = CTX_LINKS[b.dataset.ctx]; if (!L) return; const [id, txt] = ctxOf(gid, tab)==="child" ? L.child : L.adult, e = findEntry(id); if (!e) return;
+  b.dataset.id = id; b.dataset.open = e.label; b.dataset.g = e.g; b.dataset.tab = e.tab; b.textContent = txt; }
+/* "Same topic elsewhere" links, by stable card id: [a, b, text on a's link to b, text on b's link to a] */
 const REL_PAIRS = [
-  [["premed","prepare","5. Fasting"],["paeds","pre","1. Fasting (child)"]],
-  [["premed","assess","8. ASA physical status"],["tx","pre","1. Workup checklist"]],
-  [["ga","maint","1. Ventilation strategies"],["paeds","ind","9. Ventilation settings"]],
-  [["ga","maint","2. One-lung ventilation"],["paeds","ind","10. One-lung ventilation (Storz)"]],
-  [["ga","maint","3. TIVA"],["paeds","ind","7. TIVA: model check & propofol targets"]],
-  [["ga","maint","7. Antibiotic prophylaxis"],["paeds","intra","9. Antibiotic prophylaxis (child)"]],
-  [["ga","post","3. PONV: Apfel score"],["paeds","post","2. PONV by risk"]],
-  [["ga","post","4. Analgesia ladder & PCA"],["paeds","post","6. Analgesia by age"]],
-  [["ga","post","5. Discharge from recovery"],["paeds","post","8. Discharge (recovery & home)"]],
-  [["regional","safety","1. LA dose calculator"],["paeds","blocks","1. LA dose calculator (child)"]],
-  [["regional","neuraxial","1. Epidural"],["paeds","blocks","4. Lumbar / thoracic epidural"]]];
-const GNAME = {premed:"Premed", ga:"General", regional:"Regional", paeds:"Paediatric", obs:"Obstetric", tx:"Transplant"};
-function relLinks(gid, t){
-  const out = [];
-  REL_PAIRS.forEach(([a,b]) => { if (a[0]===gid && a[2]===t) out.push(b); else if (b[0]===gid && b[2]===t) out.push(a); });
-  return out.map(([g,tab,l]) => { const tb = GROUPS.find(x=>x.id===g).tabs.find(x=>x.id===tab); return `<button class="rellink" data-open="${esc(l)}" data-g="${g}" data-tab="${tab}">Same topic: ${GNAME[g]} › ${tb?tb.label:""} › ${esc(l.replace(/^\d+\.\s*/,""))} ›</button>`; }).join("");
-}
+  ["premed-prepare-fasting", "paeds-pre-fasting"],
+  ["premed-assess-asa-physical-status", "tx-pre-workup-checklist"],
+  ["ga-intra-ventilation-strategies", "paeds-ind-ventilation"],
+  ["ga-intra-one-lung-ventilation", "paeds-ind-one-lung-ventilation-storz"],
+  ["ga-intra-tiva", "paeds-ind-tiva-model-check"],
+  ["ga-intra-antibiotic-prophylaxis", "paeds-intra-antibiotic-prophylaxis"],
+  ["ga-post-ponv-apfel-score", "paeds-post-ponv-by-risk"],
+  ["ga-post-analgesia-ladder-and-pca", "paeds-post-analgesia-by-age"],
+  ["ga-post-discharge-from-recovery", "paeds-post-discharge"],
+  ["regional-safety-la-dose-calculator", "paeds-blocks-la-dose-calculator"],
+  ["regional-neuraxial-epidural", "paeds-blocks-lumbar-thoracic-epidural"],
+  ["premed-prepare-anticoagulants-and-antiplatelets", "regional-safety-anticoagulants", "Neuraxial / deep-block timing", "Peri-op stopping & bridging"],
+  ["ga-ind-rsi", "emerg-adult-failed-intubation-cico"],
+  ["premed-assess-airway-assessment-and-plan", "emerg-adult-failed-intubation-cico"],
+  ["paeds-ind-ett", "emerg-paeds-difficult-airway-cico"],
+  ["paeds-pre-airway-score-paas", "emerg-paeds-difficult-airway-cico"],
+  ["paeds-intra-blood-products", "emerg-paeds-massive-transfusion"],
+  ["paeds-intra-transfusion-protocol", "emerg-paeds-massive-transfusion"],
+  ["paeds-post-laryngospasm-and-extubation", "emerg-paeds-laryngospasm"],
+  ["obs-lscs-spinal-dose", "emerg-adult-high-total-spinal"],
+  ["obs-lscs-epidural-top-up", "emerg-adult-high-total-spinal"],
+  ["regional-neuraxial-spinal-non-obstetric", "emerg-adult-high-total-spinal"],
+  ["obs-lscs-spinal-phenylephrine", "emerg-adult-hypotension-after-spinal"],
+  ["tx-ind-rsi-and-relaxant-plan", "emerg-adult-hyperkalaemia"],
+  ["tx-intra-anastomosis-and-reperfusion", "emerg-adult-hyperkalaemia"],
+  ["regional-safety-la-dose-calculator", "emerg-adult-la-toxicity-last"],
+  ["paeds-blocks-la-dose-calculator", "emerg-paeds-la-toxicity-last"],
+  ["ga-post-reversal", "paeds-post-reversal", "Child", "Adult"],
+  ["ga-post-reversal", "tx-post-reversal", "Kidney transplant", "Adult (general)"]];
+const GNAME = {emerg:"Emergencies", premed:"Pre-op", ga:"General", regional:"Regional", paeds:"Paediatric", obs:"Obstetric", tx:"Kidney Transplant"};
+function relLinks(gid, tab, id){
+  if (!id) return "";
+  return REL_PAIRS.map(([a,b,ab,ba]) => a===id ? [b,ab] : b===id ? [a,ba] : null).filter(Boolean).map(([o,txt]) => { const e = findEntry(o), tb = e && tabOf(e.g, e.tab); if (!tb) return "";
+    return `<button class="rellink${e.g==="emerg"?" relem":""}" data-id="${e.id}" data-open="${esc(e.label)}" data-g="${e.g}" data-tab="${e.tab}">${e.g==="emerg"?"⚠ ":""}${txt ? esc(txt) : "Same topic"}: ${GNAME[e.g]} › ${tb.label} › ${esc(bareLabel(e.label))} ›</button>`; }).join(""); }
 const isWide = () => window.matchMedia("(min-width: 1100px)").matches;
-function accordion(c, t, gid, label){
+function accordion(c, t, gid, label, tab, id){
   const cl = c.cloneNode(true), h = cl.querySelector("h2"), sum = label ? esc(label) : h.innerHTML; h.remove();
+  cl.querySelectorAll("[data-ctx]").forEach(b => ctxLink(b, gid, tab));
   const mm = sum.match(/^([A-C]?\d+[a-z]?)\.\s+(.*)$/s);
   const summ = mm ? `<span class="stepno">${mm[1]}</span><span class="st">${mm[2]}</span>` : `<span class="st">${sum}</span>`;
-  return `<details class="card acc" ${isWide()?"":'name="acc"'} data-t="${esc(t)}" data-g="${gid}"><summary>${summ}</summary>${cl.innerHTML}${relLinks(gid, t)}</details>`;
+  return `<details class="card acc" ${isWide()?"":'name="acc"'} data-t="${esc(t)}" data-g="${gid}" data-tab="${tab||""}" data-id="${id||""}"><summary>${summ}</summary>${cl.innerHTML}${relLinks(gid, tab, id)}</details>`;
 }
 function ptBar(gid, tab){
   const W2 = wts(), n = v => `<span class="n7">${v}</span>`, acx = activeCase(); let t, sub = "";
@@ -4606,10 +4871,21 @@ function ptBar(gid, tab){
   else { t = `${sxi(S.sex)} ${n(S.height)} cm · ${n(sig(S.aw))} kg · ${n(S.age)} y`; sub = `BMI ${sig(W2.bmi)} · IBW/PBW ${sig(W2.ibwRaw)} · LBW ${sig(W2.lbw)} · AdjBW ${sig(W2.adj)} kg`; if (gid==="tx") sub += ` · K⁺ ${S.k} · Hb ${S.hb}`; }
   return `<button class="ptbar" data-ptedit="1"><span>${acx ? `<span class="pbc">${caseName(acx)}</span>` : ""}<span class="pbm">${t}</span>${sub ? `<span class="pbs">${sub}</span>` : ""}</span><span class="sub">edit ✎</span></button>`;
 }
+const isHead = it => typeof it==="string" && it[0]==="§";
+const shortcut = (id, lab, gid, tid, row) => { const e = findEntry(id), tb = e && tabOf(e.g, e.tab); if (!tb) return ""; const where = (e.g===gid ? "" : GNAME[e.g] + " › ") + tb.label;
+  return `<button class="chip seechip" data-id="${e.id}" data-open="${esc(e.label)}" data-g="${e.g}" data-tab="${e.tab}">${esc(lab || bareLabel(e.label))}${where===row ? "" : `<small>${esc(where)}</small>`}</button>`; };
+const NEO_JUMPS = [["paeds-ind-ett","Airway & tube"],["paeds-ind-induction-drugs","Induction drugs"],["paeds-intra-maintenance-4-2-1","Fluids"],["paeds-intra-glucose-neonate-paeds","Glucose"],
+  ["paeds-ind-ventilation","Ventilation"],["paeds-pre-ex-prem-apnoea-risk-and-admission","Ex-prem & apnoea"]];
 function groupScreen(g){
-  const m = cardMap();
-  const acc = list => list.map(it => { if (typeof it==="string" && it[0]==="§") return `<div class="label acchead">${esc(it.slice(1))}</div>`; const [o,l] = Array.isArray(it) ? it : [it,it];
-    return m[o] ? accordion(m[o], l, g.id, l!==o ? l : null) : `<div class="danger">Missing card: ${esc(o)}</div>`; }).join("");
+  const tab0 = g.tabs ? (g.tabs.find(t=>t.id===S[g.tabKey]) || g.tabs[0]) : null;
+  const m = cardMap((tab0 ? tab0.cards : g.cards).filter(it => !isHead(it)).map(it => Array.isArray(it) ? it[0] : it));
+  const entry = (it, tid) => { const [o,l] = Array.isArray(it) ? it : [it,it];
+    return m[o] ? accordion(m[o], l, g.id, l!==o ? l : null, tid, CARD_IDS[o]) : `<div class="danger">Missing card: ${esc(o)}</div>`; };
+  const acc = (list, tid, collapse) => { if (!collapse) return list.map(it => isHead(it) ? `<div class="label acchead">${esc(it.slice(1))}</div>` : entry(it, tid)).join("");
+    const parts = []; list.forEach(it => { if (isHead(it)) parts.push({h: it.slice(1), items: []}); else { if (!parts.length) parts.push({h: "", items: []}); parts[parts.length-1].items.push(it); } });
+    return parts.map(pt => { const key = `${g.id}:${tid}:${pt.h}`, labs = pt.items.map(it => Array.isArray(it) ? it[1] : it), open = (S.catOpen && S.catOpen.has(key)) || labs.includes(S.open);
+      return `<details class="catgrp" data-cat="${esc(key)}"${open?" open":""}><summary><span class="st">${esc(pt.h)}</span><span class="catn">${pt.items.length}</span></summary>${pt.items.map(it => entry(it, tid)).join("")}</details>`; }).join(""); };
+  const sbox = S.srch ? `<div class="searchbox gsearch">${svg("search")}<input id="q" class="search" type="search" placeholder="Search all cards…" autocomplete="off" aria-label="Search all cards"></div><div id="results"></div>` : "";
   if (g.tabs){
     const tab = g.tabs.find(t=>t.id===S[g.tabKey]) || g.tabs[0];
     const acx = activeCase(), childWarn = acx && acx.y < 16 && ["premed","ga","regional","tx"].includes(g.id) ? `<div class="danger"><b>Child case active (${caseAgeTxt(acx)}, ${sig(acx.w)} kg).</b> This section is for adults — use Paediatric for doses. Notes here use the case age.</div>` : "";
@@ -4618,36 +4894,67 @@ function groupScreen(g){
     const keys = SAMPLE_BY[g.id] ? (SAMPLE_BY[g.id][tab.id] || SAMPLE_BY[g.id]["*"] || []) : [];
     const filled = !!tab.input && keys.length > 0 && !keys.some(isSample), slim = filled && !S.ptEditing;
     const side = ab + (tab.input ? (slim ? ptBar(g.id, tab.id) : `<div class="card">${tab.input()}${filled?`<button class="linkbtn" data-ptdone="1">Done ✓</button>`:""}</div>`) : "") + printBtn(g.id, tab.id);
-    return head(g.name,"home",g.id) + (g.tabs.length>1 ? `<div class="seg emtabs${g.tabs.length>=6?" five six":g.tabs.length>=5?" five":""}">${g.tabs.map(t=>`<button aria-pressed="${t===tab}" data-seg="${g.tabKey}" data-val="${t.id}">${t.label}</button>`).join("")}</div>` : `<div class="label" style="margin-top:0">${tab.label}</div>`) +
+    const see = (tab.see||[]).map(([id, lab]) => shortcut(id, lab, g.id, tab.id, tab.seeLabel)).join("");
+    const neo = g.id==="paeds" && AGEM() < 1 ? NEO_JUMPS.map(([id, lab]) => shortcut(id, lab, g.id, tab.id)).join("") + `<button class="chip seechip" data-cat-open="paeds:cases:Neonate &amp; infant">Neonatal scenarios<small>Clinical Scenarios</small></button>` : "";
+    const seeRow = see ? `<div class="seerow${g.id==="emerg"?" seeafter":""}"><span class="sub">${esc(tab.seeLabel || "Also here")}</span>${see}</div>` : "";
+    const rows = (neo ? `<div class="seerow"><span class="sub">Neonate</span>${neo}</div>` : "") + (g.id==="emerg" ? "" : seeRow);   // emergencies: algorithms first
+    return head(g.name,"home",g.id) + sbox + (g.tabs.length>1 ? `<div class="seg emtabs${g.tabs.length>=6?" five six":g.tabs.length>=5?" five":""}">${g.tabs.map(t=>`<button aria-pressed="${t===tab}" data-seg="${g.tabKey}" data-val="${t.id}">${t.label}</button>`).join("")}</div>` : `<div class="label" style="margin-top:0">${tab.label}</div>`) +
       `<div class="gwrap${side.trim()?"":" noside"}"><aside class="gside${slim?" slim":""}">${side}</aside><div class="gmain">` + (tab.top ? tab.top() : "") +
-      (tab.cards.length ? `<div class="hint">${tab.hint || "Tap a heading to open it."}${isWide()?" Several can be open at once.":""}</div>` + acc(tab.cards) : "") +
+      (tab.cards.length ? `<div class="hint">${tab.hint || "Tap a heading to open it."}${isWide()?" Several can be open at once.":""}</div>` + rows + acc(tab.cards, tab.id, tab.collapse) + (g.id==="emerg" ? seeRow : "") : "") +
       (links ? `<div class="card emlinks"><div class="sub">If it goes wrong</div>${links}</div>` : "") + `</div></div>` + disc;
   }
-  return head(g.name,"home",g.id) + (g.calc ? g.calc() : "") + (g.weight ? `<div class="card">${pInputs()}</div>` : "") +
-    (g.cards.length?`<div class="hint">Tap a heading to open it.</div>`:"") + acc(g.cards) + disc;
+  return head(g.name,"home",g.id) + sbox + (g.calc ? g.calc() : "") + (g.weight ? `<div class="card">${pInputs()}</div>` : "") +
+    (g.cards.length?`<div class="hint">Tap a heading to open it.</div>`:"") + acc(g.cards, null) + disc;
 }
-const GKW = {premed:" premed pre-op preop pre-operative assessment clinic", ga:" ga general anaesthesia anesthesia", regional:" ra regional anaesthesia anesthesia block"};
+const GKW = {premed:" premed pre-op preop pre-operative assessment clinic", ga:" ga general anaesthesia anesthesia", regional:" ra regional anaesthesia anesthesia block",
+  paeds:" paeds paediatric pediatric child", obs:" obstetric obs pregnant pregnancy", tx:" kidney renal transplant ktx"};
+/* abbreviations and spellings that mean the same thing. TOF is deliberately absent (train-of-four, tetralogy of Fallot and
+   tracheo-oesophageal fistula are different cards): each of those cards carries "tof" itself, so all three are found and labelled. */
+const ALIASES = [["lscs","caesarean","cesarean","c-section"],["sab","spinal","subarachnoid"],["last","la toxicity","lipid"],["mh","malignant hyperthermia","dantrolene"],
+  ["ett","endotracheal","tracheal tube"],["cico","cicv","cannot intubate","front of neck"],["roc","rocuronium"],["sux","scoline","suxamethonium","succinylcholine"],["txa","tranexamic"],
+  ["ponv","vomiting","nausea","antiemetic"],["remi","remifentanil"],["tiva","tci"],["ga","general anaesthesia"],["k+","potassium","hyperkalaemia"],["anaesthesia","anesthesia"],
+  ["haemorrhage","hemorrhage","bleed"],["oesophageal","esophageal"],["paeds","paediatric","pediatric","child"],["cvc","central line","central venous"],["olv","one-lung"],
+  ["pph","postpartum haemorrhage","obstetric haemorrhage"],["neonate","neonatal","newborn"],["dlt","double-lumen"],["pdph","post-dural puncture headache"],["ktx","kidney transplant"]];
+const reEsc = x => x.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+function wordTest(w){ const grp = ALIASES.find(a => a.includes(w)), alts = grp || [w];
+  // short words: a whole token if it is a known abbreviation, otherwise the start of a word (so typing "rem" still finds remifentanil)
+  const rx = alts.map(x => x.length <= 3 ? new RegExp(`(?:^|[^a-z0-9])${reEsc(x)}${grp ? "(?![a-z0-9])" : ""}`) : null);
+  return txt => alts.some((x, i) => rx[i] ? rx[i].test(txt) : txt.includes(x)); }
 function searchIndex(){
   if (searchIndex.cache) return searchIndex.cache;
   const m = cardMap(), idx = [], seen = {};
   const order = GROUPS.filter(g=>g.id!=="emerg").concat(GROUPS.filter(g=>g.id==="emerg"));
-  for (const g of order){
-    if (CALC_TITLES[g.id]) idx.push({t:CALC_TITLES[g.id], g:g.id, calc:true, tab:g.id==="regional"?"neuraxial":(g.tabs?g.tabs[0].id:null), text:(CALC_TITLES[g.id]+" "+CALC_KW[g.id]).toLowerCase()});
-    const lists = g.tabs ? g.tabs.map(t=>[t.id,t.cards]) : [[null,g.cards]];
-    for (const [tab,list] of lists) for (const it of list){ const [o,t] = Array.isArray(it) ? it : [it,it]; if (seen[t] || !m[o]) continue; seen[t]=1; idx.push({t, g:g.id, tab, text:(t+" "+o+" "+m[o].textContent+" "+(SEARCH_EXTRA[t]||"")+(g.id==="emerg"?" emergency crisis":"")+(GKW[g.id]||"")).toLowerCase()}); }
-  }
+  for (const g of order) for (const t of (g.tabs||[])) for (const it of t.cards){ if (isHead(it)) continue;
+    const [o,l] = Array.isArray(it) ? it : [it,it], id = CARD_IDS[o], key = `${id}@${g.id}/${t.id}`; if (!id || seen[key] || !m[o]) continue; seen[key] = 1;
+    const ctx = ctxOf(g.id, t.id);
+    idx.push({key, id, t:l, g:g.id, tab:t.id, ctx, title:(l+" "+o).toLowerCase(), terms:((SEARCH_EXTRA[id]||"")+(g.id==="emerg"?" emergency crisis":"")+(GKW[g.id]||"")+(ctx==="child"?" paeds paediatric child":"")+" "+(t.label||"")).toLowerCase(), body:m[o].textContent.toLowerCase()}); }
   return (searchIndex.cache = idx);
+}
+function searchHits(q, here){
+  const words = q.trim().toLowerCase().split(/\s+/).filter(Boolean); if (!words.length) return [];
+  const tests = words.map(wordTest), hereCtx = here ? ctxOf(here[0], here[1]) : null;
+  return searchIndex().map((e, i) => { let lo = 9, sum = 0;
+      for (const ts of tests){ const v = ts(e.title) ? 3 : ts(e.terms) ? 2 : ts(e.body) ? 1 : 0; lo = Math.min(lo, v); sum += v; }
+      return {e, i, lo, sum}; }).filter(x => x.lo > 0)
+    .sort((a, b) => b.lo - a.lo || b.sum - a.sum || (b.e.g==="emerg") - (a.e.g==="emerg") || (hereCtx ? (b.e.ctx===hereCtx) - (a.e.ctx===hereCtx) : 0) || a.i - b.i).slice(0, 12).map(x => x.e);
 }
 function runSearch(q){
   const el = $("#results"); if (!el) return;
-  q = q.trim().toLowerCase(); if (!q){ el.innerHTML = ""; return; }
-  const words = q.split(/\s+/);
-  const hits = searchIndex().map(e => ({e, score: words.every(w=>e.text.includes(w)) ? (words.every(w=>e.t.toLowerCase().includes(w))?2:1) : 0}))
-    .filter(x=>x.score).sort((a,b)=>b.score-a.score).slice(0,12);
-  el.innerHTML = hits.length ? hits.map(({e})=>`<button class="hit" data-open="${esc(e.t)}" data-g="${e.g}" ${e.tab?`data-tab="${e.tab}"`:""} ${e.calc?'data-calc="1"':""}>${esc(e.t)}<small>${(()=>{const g=GROUPS.find(g=>g.id===e.g), tb=g.tabs&&e.tab?g.tabs.find(t=>t.id===e.tab):null; return esc(g.name+(tb?" › "+tb.label:""));})()}</small></button>`).join("")
-    : `<div class="sub" style="padding:6px">No card matches "${esc(q)}".</div>`;
+  if (!q.trim()){ el.innerHTML = ""; return; }
+  const h = (location.hash||"").slice(1), gid = h.startsWith("g-") ? h.slice(2) : null, og = gid && GROUPS.find(x=>x.id===gid);
+  const hits = searchHits(q, og && og.tabs ? [gid, S[og.tabKey] || og.tabs[0].id] : null);
+  el.innerHTML = hits.length ? hits.map(e => { const g = GROUPS.find(x=>x.id===e.g), tb = tabOf(e.g, e.tab);
+      return `<button class="hit" data-id="${e.id}" data-open="${esc(e.t)}" data-g="${e.g}" data-tab="${e.tab}">${esc(e.t)}<small><span class="ctag ctag-${e.ctx}">${CTX_TAG[e.ctx]}</span>${esc(g.name+(tb?" › "+tb.label:""))}</small></button>`; }).join("")
+    : `<div class="sub" style="padding:6px">No card matches "${esc(q.trim())}".</div>`;
 }
-function remember(g, t){ const r = store.get("recent",[]).filter(x=>x.t!==t); r.unshift({g,t}); store.set("recent", r.slice(0,5)); }
+/* recently opened cards: stable id + where it was opened. No patient data. Old {g, t} records are still read. */
+const recentRaw = () => { const r = store.get("recent", []); return Array.isArray(r) ? r : []; };
+function remember(g, tab, id){ if (!id) return; const r = recentRaw().filter(x => !(x && x.id===id && x.g===g && x.tab===tab)); r.unshift({id, g, tab}); store.set("recent", r.slice(0,5)); }
+function recentList(){ return recentRaw().map(x => !x ? null : x.id ? findEntry(x.id, x.g, x.tab) : x.t ? navEntries().find(e => e.g===x.g && e.label===x.t) || null : null).filter(Boolean)
+  .filter((e, i, a) => a.findIndex(y => y.id===e.id && y.g===e.g && y.tab===e.tab)===i).slice(0,5); }
+function recentRow(){ const r = recentList(); if (!r.length) return "";
+  return `<div class="recent"><div class="label">Recent</div><div class="rchips">${r.map(e => { const tb = tabOf(e.g, e.tab);
+    return `<button class="chip rchip" data-id="${e.id}" data-open="${esc(e.label)}" data-g="${e.g}" data-tab="${e.tab}">${esc(bareLabel(e.label))}<small>${esc(e.g==="emerg" ? "Emergency · " + tb.label : GNAME[e.g] + " · " + tb.label)}</small></button>`; }).join("")}</div></div>`; }
 
 let rendering = false, renderAgain = false;
 function render(){
@@ -4665,7 +4972,7 @@ function renderNow(){
   const app = $("#app"), active = document.activeElement && document.activeElement.dataset ? document.activeElement.dataset.in : null;
   const y = window.scrollY;
   app.dataset.group = h.startsWith("g-") ? h.slice(2) : "";
-  const navItems = [["home","Home","search","home"],["g-emerg","Emergencies","emerg","emerg"],["g-premed","Premed","premed","premed"],["g-ga","General","ga","ga"],["g-regional","Regional","regional","regional"],["g-paeds","Paediatric","paeds","paeds"],["g-obs","Obstetric","obs","obs"],["g-tx","Transplant","tx","tx"],["about","About","about","values"]];
+  const navItems = [["home","Home","search","home"],["g-emerg","Emergencies","emerg","emerg"],["g-premed","Pre-op","premed","premed"],["g-ga","General","ga","ga"],["g-regional","Regional","regional","regional"],["g-paeds","Paediatric","paeds","paeds"],["g-obs","Obstetric","obs","obs"],["g-tx","Kidney Transplant","tx","tx"],["about","About","about","values"]];
   const nav = `<nav class="sidenav" aria-label="Sections"><div class="snbrand">${svg("capno")} Induction Card</div>${navItems.map(([hh,l,ic,cls])=>`<button class="snitem sn-${cls} ${h===hh||(hh==="home"&&!h.startsWith("g-")&&h!=="values"&&h!=="about")?"on":""}" data-go="${hh}"><span class="snico">${svg(ic)}</span>${l}</button>`).join("")}
     <div class="snkeys">Keys: <b>/</b> search · <b>Esc</b> back · <b>1–6</b> tabs</div></nav>`;
   app.innerHTML = `<div class="shell">${nav}<div class="content">${html}</div></div>`;
@@ -4677,6 +4984,7 @@ function renderNow(){
   if (S.open){ const d = app.querySelector(`details[data-t="${CSS.escape(S.open)}"]`); if (d){ d.open = true; if (S.scrollTo){ d.scrollIntoView({block:"start"}); } } }
   if (!S.scrollTo) window.scrollTo(0, y);
   S.scrollTo = false;
+  if (S.srchFocus){ S.srchFocus = false; const q = app.querySelector("#q"); if (q) q.focus(); }
   if (active){ const el = app.querySelector(`[data-in="${active}"]`); if (el){ el.focus(); const v=el.value; el.value=""; el.value=v; } }
 }
 /* ---------- MOTION ---------- */
@@ -4729,10 +5037,12 @@ document.addEventListener("toggle", e => {
   S.openSet = S.openSet || new Set();
   if (d.open){ const user = d._userOpen || performance.now() - restoredAt > 80; d._userOpen = false;
     if (user && !reduceMotion()){ d.classList.add("anim"); setTimeout(()=>d.classList.remove("anim"), 260); }
-    S.open = d.dataset.t; S.openSet.add(d.dataset.t); remember(d.dataset.g, d.dataset.t);
+    S.open = d.dataset.t; S.openSet.add(d.dataset.t); remember(d.dataset.g, d.dataset.tab, d.dataset.id);
     if (!isWide()) document.querySelectorAll("details.acc[open]").forEach(o => { if (o!==d){ if (user && !reduceMotion() && o.dataset.g !== "emerg") collapseAcc(o); else o.open = false; } }); }
   else { S.openSet.delete(d.dataset.t); if (S.open === d.dataset.t) S.open = null; }
 }, true);
+document.addEventListener("toggle", e => { const d = e.target; if (!d.matches || !d.matches("details.catgrp")) return; S.catOpen = S.catOpen || new Set();
+  if (d.open) S.catOpen.add(d.dataset.cat); else { S.catOpen.delete(d.dataset.cat); if (d.querySelector("details.acc[open]")) S.open = null; } }, true);
 document.addEventListener("click", e => { const t = e.target.closest && e.target.closest("[data-dl]"); if (!t) return; S.derm = t.getAttribute("data-dl"); render(); });
 let vtaps = 0, vtimer = null;
 document.addEventListener("click", e => { if (!e.target.closest || !e.target.closest(".vtap")) return; vtaps++; clearTimeout(vtimer); vtimer = setTimeout(()=>vtaps=0, 1500); if (vtaps >= 5){ vtaps = 0; location.hash = "#values"; window.scrollTo(0,0); } });
@@ -4772,11 +5082,16 @@ document.addEventListener("click", e => {
   if (d.csclear){ delete S.sc.cs; delete S.sc.csc; delete S.sc.pl; delete S.sc.dx; S.csDec = ""; S.csNote = ""; S.csWho = "patient"; S.csLang = "English"; S.csOut = "full"; S.csLen = "brief"; render(); return; }
   if (d.screset){ S.sc[d.screset] = {}; render(); return; }
   if (d.derm){ S.derm = d.derm; if (!d.open){ render(); return; } }
-  if (d.open){ const og = GROUPS.find(x=>x.id===d.g); if (og && og.tabs) S[og.tabKey] = d.tab || (og.tabs.find(t=>t.cards.some(c=>(Array.isArray(c)?c[1]:c)===d.open))||og.tabs[0]).id;
-    S.open = d.calc ? null : d.open; S.scrollTo = !d.calc; if (!d.calc) remember(d.g, d.open);
-    const target = "#g-"+d.g; if (location.hash===target) render(); else { location.hash = target; } if (d.calc) window.scrollTo(0,0); return; }
+  if (d.srch){ S.srch = !S.srch; S.srchFocus = S.srch; render(); if (S.srch) window.scrollTo(0,0); return; }
+  if (d.catOpen){ const [gid, tid] = d.catOpen.split(":"), og = GROUPS.find(x=>x.id===gid); S.catOpen = S.catOpen || new Set(); S.catOpen.add(d.catOpen); if (og) S[og.tabKey] = tid; S.open = null; S.srch = false;
+    if (location.hash==="#g-"+gid) render(); else location.hash = "#g-"+gid; window.scrollTo(0,0); return; }
+  if (d.open || d.id){ let open = d.open, gid = d.g, tab = d.tab;
+    if (d.id){ const en = findEntry(d.id, gid, tab); if (en){ open = en.label; gid = en.g; tab = en.tab; } }
+    const og = GROUPS.find(x=>x.id===gid); if (og && og.tabs){ tab = tab || (og.tabs.find(t=>t.cards.some(c=>(Array.isArray(c)?c[1]:c)===open))||og.tabs[0]).id; S[og.tabKey] = tab; }
+    S.srch = false; S.open = d.calc ? null : open; S.scrollTo = !d.calc; if (!d.calc) remember(gid, tab, d.id || idOf(gid, tab, open));
+    const target = "#g-"+gid; if (location.hash===target) render(); else { location.hash = target; } if (d.calc) window.scrollTo(0,0); return; }
   if (d.lscs){ S.spOp="lscs"; S.open=null; location.hash="#g-spinal"; window.scrollTo(0,0); return; }
-  if (d.go){ S.ptEditing = false; S.open = null; S.openSet = new Set(); S.txck = {}; if ((location.hash||"#home")==="#"+d.go){ render(); window.scrollTo(0,0); } else { S.navTop = true; location.hash = "#"+d.go; } return; }
+  if (d.go){ S.ptEditing = false; S.srch = false; S.open = null; S.openSet = new Set(); S.txck = {}; if ((location.hash||"#home")==="#"+d.go){ render(); window.scrollTo(0,0); } else { S.navTop = true; location.hash = "#"+d.go; } return; }
   if (d.savename){ const v = cleanName(S.dname ?? doctorName()); store.set("doctor", v || "Dr X"); S.dname = undefined; location.hash = "#home"; return; }
   if (d.case){ const c = getCases().find(x=>x.id===d.case); if (c){ switchClin(store.get("active",null), c.id); store.set("active", c.id); applyCase(c); } if ((location.hash||"#home")==="#cases") render(); else render(); return; }
   if (d.delcase){ const cs = getCases().filter(x=>x.id!==d.delcase); store.set("cases", cs); if (store.get("active",null)===d.delcase){ CASE_CLIN[d.delcase] = null; switchClin(d.delcase, null); store.set("active", null); } delete CASE_CLIN[d.delcase]; render(); return; }
@@ -4821,7 +5136,7 @@ window.addEventListener("hashchange", onHash);
 let wideNow = isWide(); window.addEventListener("resize", () => { if (isWide() !== wideNow){ wideNow = isWide(); render(); } });
 document.addEventListener("keydown", e => {
   const tag = (e.target.tagName||"").toLowerCase(), typing = tag==="input" || tag==="textarea";
-  if (e.key === "/" && !typing){ e.preventDefault(); if ((location.hash||"#home") !== "#home" && location.hash !== ""){ location.hash = "#home"; setTimeout(()=>{ const q=$("#q"); if(q) q.focus(); }, 50); } else { const q=$("#q"); if(q) q.focus(); } return; }
+  if (e.key === "/" && !typing){ e.preventDefault(); if ((location.hash||"").startsWith("#g-")){ S.srch = true; S.srchFocus = true; render(); return; } if ((location.hash||"#home") !== "#home" && location.hash !== ""){ location.hash = "#home"; setTimeout(()=>{ const q=$("#q"); if(q) q.focus(); }, 50); } else { const q=$("#q"); if(q) q.focus(); } return; }
   if (e.key === "Escape"){ if (typing){ e.target.blur(); return; }
     const open = document.querySelectorAll("details.acc[open]"); if (open.length){ open[open.length-1].open = false; return; }
     if ((location.hash||"#home") !== "#home") location.hash = "#home"; return; }
