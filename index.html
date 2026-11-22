@@ -619,7 +619,7 @@ a{color:var(--accent)}
 .pnf{margin-top:var(--s3)}.pnrow{display:flex;gap:var(--s2);flex-wrap:wrap;align-items:flex-end}.pned{display:flex;flex-direction:column;gap:3px;flex:1;min-width:120px;font-size:var(--fs-xs);color:var(--muted)}.pned .seg{margin:0}.pngrid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}.pngrid .pned{min-width:0}.pngrid .pnin{padding:6px 8px;font-size:var(--fs-sm)}.pnf>label,.pnf>span{display:block;font-weight:600;margin-bottom:4px}.pnin{padding-left:12px}
 .cwt{margin:0 0 6px;font-size:var(--fs-sm);color:var(--muted)}.cwt b{color:var(--ink)}
 .scdone{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-top:6px}.scdone .linkbtn{width:auto;margin:0;min-height:36px}
-.offl{font-size:11px;opacity:.85}
+.offl{font-size:11px;opacity:.85}.offl.fail{color:var(--warn-ink,#f59e0b);opacity:1;font-weight:600}
 .planout{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:8px 0;padding:8px 10px;border:1px solid var(--line);border-radius:var(--r-sm);background:var(--bg)}.planout b{flex:1;min-width:140px}
 </style>
 </head>
@@ -635,7 +635,7 @@ if (window.top !== window.self && /\.github\.io$/.test(location.hostname)) {
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.53.1";
+const APP_VERSION = "2.54.0";
 const APP_DATE = "21 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
@@ -681,7 +681,7 @@ const discFull = () => `<footer class="disc full"><div class="dsig" aria-hidden=
   <p class="d1">Memory aid only — clinical judgement decides.</p>
   <p class="d2"><span class="vtap mono">v${APP_VERSION}</span><span class="dsep">·</span>${VALUES_CHECKED ? "reviewed Nov 2026" : "<b>DRAFT – values not checked</b>"}<span class="dsep">·</span><button class="flink" data-go="about">${svg("about")}About</button><span class="dsep">·</span><button class="flink" data-shareapp="1">${svg("share")}Share</button></p>
   ${S.copied && (location.hash||"#home")==="#home" ? `<p class="d2">Link copied ✓</p>` : ""}
-  <p class="d2 offl">${OFFLINE === "ready" ? `● Ready offline · v${APP_VERSION}` : OFFLINE === "fail" ? `Offline copy unavailable <button class="flink" data-offretry="1">Retry</button>` : OFFLINE === "na" ? "" : "Saving offline copy…"}</p></footer>`;
+  ${OFFLINE === "fail" ? `<p class="d2 offl fail">⚠ Offline copy unavailable <button class="flink" data-offretry="1">Retry</button></p>` : ""}</footer>`;
 
 /* ================= SCREENS ================= */
 function banner(){
@@ -781,7 +781,8 @@ function ticker(){
   return `<section class="ticker" aria-label="Tips and tricks">
     <div class="tkwin"><div class="tktrack">${row}<span class="tkdup" aria-hidden="true">${row}</span></div></div></section>`;
 }
-const TK_SPEED = 40; // px per second
+// ticker glides at the capnogram sweep speed: 100 of 400 viewBox units every 6 s (10 breaths/min) = width / 24 px per second
+const tkSpeed = () => { const c = document.querySelector(".capno"); return Math.max(12, (c ? c.getBoundingClientRect().width : Math.min(innerWidth, 900)) / 24); };
 function tickerInit(){
   if (tkTimer){ clearInterval(tkTimer); tkTimer = null; }
   const tk = document.querySelector(".ticker"); if (!tk) return;
@@ -793,7 +794,7 @@ function tickerInit(){
     show(); tkTimer = setInterval(() => { if (!document.body.contains(tk)){ clearInterval(tkTimer); tkTimer = null; return; } if (!document.hidden){ tkIdx++; show(); } }, 6000);
     return;
   }
-  const half = track.scrollWidth / 2, dur = Math.max(20, half / TK_SPEED);
+  const half = track.scrollWidth / 2, dur = Math.max(20, half / tkSpeed());
   if (!tkT0) tkT0 = performance.now();
   track.style.setProperty("--tkdur", dur + "s");
   track.style.setProperty("--tkdel", -(((performance.now() - tkT0) / 1000) % dur) + "s");
@@ -3773,12 +3774,12 @@ function vTicks(){
 }
 /* ---------- ABOUT ---------- */
 const CHANGES = [
+  ["2.54","Ticker glides at the capnogram speed; offline status moved to About (footer warns only if the offline copy fails)"],
   ["2.53","Airway assessment rebuilt as a checklist with plan tier and aspiration risk; Optimise or postpone merged into one card (checked)"],
   ["2.52","Consent notes copy as plain text: paragraphs, blank lines and hyphen bullets"],
   ["2.51","NAP3 permanent-harm figures in the detailed spinal / epidural and labour notes (checked)"],
   ["2.50","Labour epidural note laid out like the GA and spinal notes (checked)"],
-  ["2.49","Consent wording revised: decision switch, discussion ticks, clearer language / interpreter, revised risk lists (checked)"],
-  ["2.48","Premed reorganised: Assess (examine → score → decide), Prepare (medications, before theatre), Plan & note (plan inside consent, then the note)"]];
+  ["2.49","Consent wording revised: decision switch, discussion ticks, clearer language / interpreter, revised risk lists (checked)"]];
 const SRC_LINKS = [
   ["Emergencies", [["Resuscitation Council UK — ALS / PLS guidelines","https://www.resus.org.uk/library"],["Difficult Airway Society guidelines","https://das.uk.com/guidelines"],["Association of Anaesthetists — guidelines (anaphylaxis, LAST, safety)","https://anaesthetists.org/Home/Resources-publications/Guidelines"],["European Malignant Hyperthermia Group","https://www.emhg.org"],["UK Kidney Association — hyperkalaemia guideline","https://www.ukkidney.org/health-professionals/guidelines"]]],
   ["General", [["ASA standards & practice parameters (fasting, PACU)","https://www.asahq.org/standards-and-practice-parameters"],["Centre for Perioperative Care — diabetes guideline","https://cpoc.org.uk/guidelines-resources-guidelines"],["PROSPECT procedure-specific analgesia (ESRA)","https://esraeurope.org/prospect/"],["ASRA Pain Medicine — guidelines (ketamine, anticoagulation)","https://www.asra.com/guidelines-articles/guidelines"],["Brain Trauma Foundation guidelines","https://braintrauma.org/coma/guidelines"]]],
@@ -3809,7 +3810,8 @@ screens.about = () => head("About","home") + shareCard() + `
   ${SRC_LINKS.map(([g,ls])=>`<h3>${g}</h3><ul class="srcl">${ls.map(([t,u])=>`<li><a href="${u}" target="_blank" rel="noopener noreferrer">${t} ↗</a></li>`).join("")}</ul>`).join("")}
   <h3>Local and personal sources</h3><ul>${LOCAL_SRC.map(t=>`<li>${t}</li>`).join("")}</ul>
   <p class="sub">Local documents are summarised, not reproduced, and are not linked. Sources reviewed Nov 2026; next review Nov 2027.</p></div>
-  <div class="card"><h2>Version</h2><p><span class="mono">v${APP_VERSION}</span> · built ${APP_DATE} · values and sources reviewed Nov 2026, next review Nov 2027.</p></div>
+  <div class="card"><h2>Version</h2><p><span class="mono">v${APP_VERSION}</span> · built ${APP_DATE} · values and sources reviewed Nov 2026, next review Nov 2027.</p>
+  <p>Offline copy: ${OFFLINE === "ready" ? `<b>ready</b> (v${APP_VERSION}) — works in flight mode` : OFFLINE === "fail" ? `<b>unavailable</b> <button class="flink" data-offretry="1">Retry</button>` : OFFLINE === "na" ? "not available in this browser view" : "saving…"}</p></div>
   <div class="card"><h2>Privacy</h2><ul><li>Nothing you enter leaves this phone. No accounts, no tracking, no analytics.</li><li>Anonymous cases (sex, age, height, weight) are kept on this phone only and deleted after 36 hours.</li><li>Works offline once opened.</li></ul></div>
   <div class="card"><h2>What changed recently</h2><table>${CHANGES.map(([v,t])=>`<tr><td class="mono">${v}</td><td>${t}</td></tr>`).join("")}</table></div>
   <div class="card"><h2>Licences</h2><p class="sub">IBM Plex Sans / Mono and DSEG7 (keshikan) fonts — SIL Open Font License 1.1.</p></div>` + disc;
