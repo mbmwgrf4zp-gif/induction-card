@@ -703,7 +703,7 @@ if (window.top !== window.self && /\.github\.io$/.test(location.hostname)) {
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.77.1";
+const APP_VERSION = "2.78.1";
 const APP_DATE = "22 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
@@ -1189,7 +1189,7 @@ obsCards.cAsp = () => `<div class="card"><h2>0. Before theatre: aspiration proph
   <div class="warn">Ranitidine has been recalled in several countries — use your pharmacy's H₂-antagonist / PPI alternative if it is not stocked.</div>${protoSrc()}</div>`;
 obsCards.cSpinal = () => `<div class="card"><h2>A1. Spinal: dose by height</h2>${lscsBody()}</div>`;
 obsCards.cIt = () => `<div class="card"><h2>A2. Spinal: IT morphine &amp; fentanyl</h2>
-  <h3>Fentanyl (syringe 2)</h3><ol><li>Fentanyl 50 mcg/mL. 1 mL syringe: draw <b>10 mcg (0.2 mL)</b>.</li><li>Add into the intended dose of 0.5% heavy bupivacaine.</li></ol>
+  <h3>Fentanyl (syringe 2)</h3><ol><li class="give">Fentanyl 50 mcg/mL. 1 mL syringe: draw <b>10 mcg (0.2 mL)</b>.</li><li>Add into the intended dose of 0.5% heavy bupivacaine.</li></ol>
   <h3>Morphine (syringe 1)</h3><p>Dose: <b>0.1 mg = 0.1 mL of 1 mg/mL diluted morphine</b>.</p>
   <ol><li>Morphine <b>10 mg/mL preservative-free</b>: 1 mL syringe, draw <b>0.1 mL (1 mg)</b>.</li><li>Make up to <b>1 mL with NS</b> = 1 mg/mL.</li><li>Give <b>0.1 mL = 0.1 mg</b> into the heavy bupivacaine syringe.</li></ol>
   <p class="sub">After IT morphine: no other opioids or sedatives for 24 h; OAS follow-up.</p>${protoSrc()}</div>`;
@@ -4306,12 +4306,13 @@ function vTicks(){
 }
 /* ---------- ABOUT ---------- */
 const CHANGES = [
+  ["2.78","Syringe recipes at normal size, so only the doses you give stand out (checked)"],
   ["2.77","Dose tables, batch 4 — Kidney Transplant: antibiotic, infusions, reperfusion drugs, reversal, analgesia, donor (checked)"],
   ["2.76","Dose tables, batch 3 — Paediatric: remifentanil, hypoglycaemia, penile block, discharge analgesia, MRI sedation (checked)"],
   ["2.75","Dose tables, batch 2 — Pre-op and Regional: blocks, epidural, adjuncts, steroid cover, hypoglycaemia (checked)"],
   ["2.74","Dose tables, batch 1 — Obstetric and General: drug lists moved into dose tables, same words and numbers (checked)"],
-  ["2.73","Every dose the same large size, bold or not; maximums, thresholds and per-kg rules stay normal (checked)"],
-  ["2.72","Large, unbroken doses everywhere: emergency steps, text, syringe and other tables (checked)"]];
+  ["2.73","Every dose the same large size, bold or not; maximums, thresholds and per-kg rules stay normal (checked)"]];
+
 
 
 
@@ -5012,14 +5013,22 @@ const isWide = () => window.matchMedia("(min-width: 1100px)").matches;
    small notes, placeholders, ventilation and echo values. */
 const DOSE_RX = /\d[\d.,]*(?:\s?[–-]\s?\d[\d.,]*)?\s?(?:mL\/h|mg\/h|mcg\/h|mmol\/h|units?\/h|IU\/h|mg|mcg|mL|g|units?|IU|mmol|J)(?![\w\/⁰¹²³⁴⁵⁶⁷⁸⁹])/g;
 const DOSE_SKIP = "table.dt tr[data-dr], .result, .big, .sub, small, button, .rt, .nw, .dzb, svg, textarea, select, label, .ptile, .chip, .jumprow";
+/* recipes (v2.78): amounts in a make-up / dilution line stay normal size; a line that says what to give keeps its doses large */
+const RECIPE_RX = /\bin\s+\d+(?:\.\d+)?\s*mL\b|made up|make up|\bdilut|reconstitut|\bdraw\b|\d\s*mL\s+(?:NS|saline|D5|D50|Hartmann|Sterofundin)/i,
+  GIVE_RX = /\b(?:give|dose|bolus|run|loading|stat)\b/i, ROUTE_RX = /\b(?:IV|IM|PO|PR|SC|SL|IO)\b/;
+// the visual line holding a text node: its block (row, list item, paragraph…) split at <br>
+function lineOf(t){ const blk = t.parentElement.closest("li, p, tr, h3, div") || t.parentElement, w = blk.ownerDocument.createTreeWalker(blk, NodeFilter.SHOW_TEXT | NodeFilter.SHOW_ELEMENT);
+  let txt = "", at = -1, n; while ((n = w.nextNode())) { if (n.nodeType === 1) { txt += n.tagName === "BR" ? "\n" : " "; continue; } if (n === t) at = txt.length; txt += n.data; }
+  const a = txt.lastIndexOf("\n", at) + 1, b = txt.indexOf("\n", at); return txt.slice(a, b < 0 ? txt.length : b); }
+const isRecipe = t => { if (t.parentElement.closest(".give")) return false; const l = lineOf(t); return RECIPE_RX.test(l) && !GIVE_RX.test(l) && !ROUTE_RX.test(l); };
 const DOSE_NOBIG = new Set(["ga-intra-ventilation-strategies", "ga-intra-one-lung-ventilation", "paeds-ind-ventilation", "paeds-ind-one-lung-ventilation-storz", "premed-assess-echo-report-what-matters"]);
 function markDoses(root, id){
   const big = !DOSE_NOBIG.has(id), doc = root.ownerDocument, nodes = [], w = doc.createTreeWalker(root, NodeFilter.SHOW_TEXT);
   let n; while ((n = w.nextNode())) { DOSE_RX.lastIndex = 0; if (DOSE_RX.test(n.data) && !n.parentElement.closest(DOSE_SKIP)) nodes.push(n); }
-  for (const t of nodes) { const txt = t.data, bold = !!t.parentElement.closest("b, strong, td.hl, th.hl, .hl"), frag = doc.createDocumentFragment(); let last = 0, m; DOSE_RX.lastIndex = 0;
+  for (const t of nodes) { const recipe = isRecipe(t), txt = t.data, bold = !!t.parentElement.closest("b, strong, td.hl, th.hl, .hl"), frag = doc.createDocumentFragment(); let last = 0, m; DOSE_RX.lastIndex = 0;
     while ((m = DOSE_RX.exec(txt))) { const before = txt.slice(Math.max(0, m.index - 3), m.index);
       if (/[≥≤<>]\s*$/.test(before) || /(max\.?|every)\s*$/i.test(txt.slice(Math.max(0, m.index - 6), m.index))) continue;   // a threshold or a maximum, not a dose
-      frag.append(txt.slice(last, m.index)); const sp = doc.createElement("span"); sp.className = big ? "nw dzb" : "nw"; sp.textContent = m[0]; frag.append(sp); last = m.index + m[0].length; }
+      frag.append(txt.slice(last, m.index)); const sp = doc.createElement("span"); sp.className = big && !recipe ? "nw dzb" : "nw"; sp.textContent = m[0]; frag.append(sp); last = m.index + m[0].length; }
     if (last) { frag.append(txt.slice(last)); t.replaceWith(frag); } }
 }
 function accordion(c, t, gid, label, tab, id){
