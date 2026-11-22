@@ -703,7 +703,7 @@ if (window.top !== window.self && /\.github\.io$/.test(location.hostname)) {
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.74.1";
+const APP_VERSION = "2.75.1";
 const APP_DATE = "22 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
@@ -2359,6 +2359,8 @@ function GD(name, per, unit, wk, conc, note, max, rt){
 const F1_CHECKED = true;   // checked by author 22 Nov 2026
 const f1Draft = () => F1_CHECKED ? "" : `<div class="warn" style="margin-top:0">DRAFT — doses moved into a dose table (format batch 1, Nov 2026): same words and numbers; routes added where the text had none. Not yet ticked by you.</div>`;
 /* fixed (not weight-based) doses: same row layout as T / GT */
+const F2_CHECKED = true;   // checked by author 22 Nov 2026
+const f2Draft = () => F2_CHECKED ? "" : `<div class="warn" style="margin-top:0">DRAFT — doses moved into a dose table (format batch 2, Nov 2026): same words and numbers; routes added where the text had none. Not yet ticked by you.</div>`;
 const FT = rows => `${rtDraft()}<div class="dfor fixw"></div><div style="overflow-x:auto"><table class="dt"><tr class="dth"><th>Drug</th><th>When / how</th><th>Dose</th></tr>${rows.join("")}</table></div>`;
 const GT = rows => `${rtDraft()}<div class="dfor gtw"></div><div style="overflow-x:auto"><table class="dt gt"><tr class="dth"><th>Drug</th><th>Rule · weight used</th><th>Dose</th></tr>${rows.join("")}</table></div>`;
 const GSRC = "Standard references: BNF, Association of Anaesthetists / SOBA obesity guidance, Miller.";
@@ -2485,7 +2487,9 @@ gaCards.dmplan = () => `<div class="card"><h2>3. Diabetes: day-of-surgery plan</
   <tr><th>GLP-1 agonists</th><td>Usually continue; check the fasting card for GI symptoms</td></tr></table>
   <h3>Variable-rate insulin infusion when</h3><ul><li>More than one missed meal expected</li><li>Poorly controlled (glucose &gt; 12 mmol/L on two readings)</li><li>Type 1 diabetes without basal insulin, or emergency surgery with high glucose</li></ul>
   <p class="sub">Check capillary glucose at least hourly in theatre and recovery. Ketones ≥ 3 mmol/L: treat as DKA.</p>
-  <p>Hypoglycaemia (&lt; 4 mmol/L): 20% glucose 75–100 mL IV (or 10% 150–200 mL); recheck in 15 min. <b>No IV access: glucagon 1 mg IM</b>. ${IM_CHECKED ? "" : `<span class="sub">DRAFT</span>`}</p>
+  <h3>Hypoglycaemia (&lt; 4 mmol/L)</h3>${f2Draft()}${FT([
+    R("20% glucose","recheck in 15 min","75–100 mL","(or 10% 150–200 mL)","IV"),
+    R("No IV access: glucagon","","1 mg",null,"IM")])}${IM_CHECKED ? "" : `<span class="sub">DRAFT</span>`}
   <button class="homebtn" data-open="1. Regular drugs: stop or continue" data-g="premed" data-tab="prepare">Other regular drugs → Regular drugs ›</button>
   ${src("CPOC perioperative diabetes guideline (2021, updated 2023); Association of Anaesthetists diabetes guideline; local adaptations.")}</div>`;
 
@@ -2655,7 +2659,9 @@ gaCards.imAdult = () => `<div class="card"><h2>7. IM doses (no IV access, or war
   ${src("BNF (2026); Resuscitation Council UK anaphylaxis 2021; Association of Anaesthetists 2020 steroid guideline; product information (promethazine, diclofenac, pethidine).")}</div>`;
 gaCards.steroid = () => `<div class="card"><h2>4. Steroid cover</h2>${gaDraft()}
   <p>On ≥ 5 mg prednisolone (or equivalent) for &gt; 4 weeks:</p>
-  <ul><li>Give usual morning dose</li><li>Major / moderate surgery: <b>hydrocortisone 100 mg IV</b> (or IM if no IV) at induction, then 200 mg / 24 h infusion (or 50 mg 6-hourly)</li><li>Minor surgery: usual dose ± 100 mg at induction</li></ul>
+  <ul><li>Give usual morning dose</li></ul>${f2Draft()}${FT([
+    R("Major / moderate surgery: hydrocortisone","at induction (or IM if no IV)","100 mg","then 200 mg / 24 h infusion (or 50 mg 6-hourly)","IV"),
+    R("Minor surgery: usual dose ±","at induction","100 mg",null,"IV")])}
   ${src("Association of Anaesthetists 2020 steroid guideline · latest available, checked Nov 2026")}</div>`;
 const AWOP_CHECKED = true;
 const awopDraft = () => AWOP_CHECKED ? "" : `<div class="warn" style="margin-top:0">DRAFT — airway checklist rebuilt (history, examination, rescue, aspiration risk, plan tier) and Proceed / Common conditions merged into one card with conflicts resolved. Not yet ticked by you.</div>`;
@@ -3656,8 +3662,9 @@ function blk(o){
   <tr><th>Position &amp; probe</th><td>${o.pos}</td></tr>
   <tr><th>Sonoanatomy</th><td>${o.sono}</td></tr>
   <tr><th>Needle</th><td>${o.needle}</td></tr>
-  <tr><th>Drug &amp; volume</th><td><b>${o.vol[0]}–${o.vol[1]} mL${o.bilat?" per side":""}</b> bupi/levobupi <b>${conc}%</b> (${o.anal?"analgesia":"surgical"})<br>= ${dz(mgLo,"mg")}–${dz(mgHi,"mg")} mg${o.bilat?" both sides":""} · <span class="${pct>100?"bad":""}">${Math.round(pct)}% of max</span></td></tr>
   <tr><th>Cautions</th><td>${o.caut}</td></tr></table>
+  <h3>Drug &amp; volume</h3>${f2Draft()}${FT([
+    R(`bupi/levobupi ${conc}%`,`(${o.anal?"analgesia":"surgical"})`,`${o.vol[0]}–${o.vol[1]} mL${o.bilat?" per side":""}`,`= ${dz(mgLo,"mg")}–${dz(mgHi,"mg")} mg${o.bilat?" both sides":""} · <span class="${pct>100?"bad":""}">${Math.round(pct)}% of max</span>`,"perineural")])}
   ${laAddBtn("a","bupi",conc,o.vol[1],bi,o.t)}${src(RSRC)}</div>`;
 }
 const raCards = {};
@@ -3674,12 +3681,13 @@ raCards.sbyb = () => `<div class="card"><h2>Stop Before You Block &amp; safe inj
 raCards.epidural = () => `<div class="card"><h2>Epidural (adult)</h2>${raDraft()}
   <table class="blk"><tr><th>Level</th><td>Thoracotomy / upper abdo: T4–T10 · lower abdo: T10–L1 · lower limb: L2–L4</td></tr>
   <tr><th>Catheter</th><td>4–5 cm in the space</td></tr>
-  <tr><th>Test dose</th><td><b>3 mL lignocaine 2% + adrenaline 1:200 000</b>. Intravascular: HR ↑ &gt; 20 within 30 s. Intrathecal: dense block within 3–5 min</td></tr>
-  <tr><th>Loading</th><td>Levobupi 0.25%, 3–5 mL increments: ~1–1.5 mL per segment thoracic, 1.5–2 mL lumbar</td></tr>
-  <tr><th>Surgical top-up</th><td>Levobupi 0.5% or lignocaine 2% + adrenaline, 5 mL increments</td></tr>
-  <tr><th>Infusion</th><td><b>Bupi/levobupi 0.1% + fentanyl 2 mcg/mL</b>: thoracic <b>4–10 mL/h</b> · lumbar <b>6–14 mL/h</b></td></tr>
-  <tr><th>Breakthrough</th><td>3–5 mL bolus, check block and BP</td></tr>
-  <tr><th>Removal</th><td>Check anticoagulant timing (Safety tab)</td></tr></table>${src("Common acute pain service practice.")}</div>`;
+  <tr><th>Removal</th><td>Check anticoagulant timing (Safety tab)</td></tr></table>
+  ${f2Draft()}${FT([
+    R("Test dose — lignocaine 2% + adrenaline 1:200 000","","3 mL","Intravascular: HR ↑ &gt; 20 within 30 s. Intrathecal: dense block within 3–5 min","epidural"),
+    R("Loading — levobupi 0.25%","3–5 mL increments","~1–1.5 mL per segment thoracic, 1.5–2 mL lumbar",null,"epidural"),
+    R("Surgical top-up — levobupi 0.5% or lignocaine 2% + adrenaline","","5 mL increments",null,"epidural"),
+    R("Infusion — bupi/levobupi 0.1% + fentanyl 2 mcg/mL","","thoracic 4–10 mL/h · lumbar 6–14 mL/h",null,"epidural"),
+    R("Breakthrough","check block and BP","3–5 mL bolus",null,"epidural")])}${src("Common acute pain service practice.")}</div>`;
 raCards.cse = () => `<div class="card"><h2>CSE (combined spinal–epidural)</h2>${raDraft()}
   <ul><li>When: long or uncertain duration, high-risk patient needing slow titration, post-op epidural analgesia</li>
   <li>Needle-through-needle at L3–4 or below; spinal first, then thread epidural catheter</li>
@@ -3702,12 +3710,13 @@ raCards.failed = () => `<div class="card"><h2>Failed or patchy block</h2>${raDra
   <h3>Epidural</h3><ul><li>Unilateral: withdraw catheter 1–2 cm, top up with patient lying on the weak side</li><li>Patchy: stronger LA (0.5% levobupi or 2% lignocaine + adrenaline)</li><li>No block after adequate dose: re-site, or GA</li></ul>${src(RSRC)}</div>`;
 raCards.adjuncts = () => { const x = wts();
   return `<div class="card"><h2>Adjuncts</h2>${raDraft()}
-  <table class="blk"><tr><th>Dexamethasone</th><td>4 mg perineural prolongs block ~6–8 h; <b>IV 0.1–0.15 mg/kg</b> has similar effect — IV preferred (off-label perineural)</td></tr>
-  <tr><th>Dexmedetomidine</th><td>Perineural 0.5–1 mcg/kg = <b>${dz(0.5*x.ibw,"mcg")}–${dz(x.ibw,"mcg")} mcg</b> (IBW); sedation, bradycardia</td></tr>
-  <tr><th>Clonidine</th><td>Perineural 0.5–1 mcg/kg = <b>${dz(0.5*x.ibw,"mcg")}–${dz(x.ibw,"mcg")} mcg</b>; hypotension, sedation</td></tr>
-  <tr><th>Adrenaline</th><td>1:200 000 (5 mcg/mL): intravascular marker, prolongs lignocaine, raises lignocaine max to 7 mg/kg</td></tr>
-  <tr><th>IT fentanyl</th><td>10–25 mcg</td></tr>
-  <tr><th>IT morphine</th><td>100–150 mcg (e.g. TKR, hip, laparotomy); monitor RR and sedation for 24 h</td></tr></table>${src("ASRA / NYSORA adjunct reviews.")}</div>`; };
+  ${f2Draft()}${GT([
+    R("Dexamethasone","perineural prolongs block ~6–8 h","4 mg","<b>IV 0.1–0.15 mg/kg</b> has similar effect — IV preferred (off-label perineural)","perineural"),
+    R("Dexmedetomidine","Perineural 0.5–1 mcg/kg (IBW)",`${dz(0.5*x.ibw,"mcg")}–${dz(x.ibw,"mcg")} mcg`,"sedation, bradycardia","perineural"),
+    R("Clonidine","Perineural 0.5–1 mcg/kg",`${dz(0.5*x.ibw,"mcg")}–${dz(x.ibw,"mcg")} mcg`,"hypotension, sedation","perineural"),
+    R("Adrenaline","1:200 000 (5 mcg/mL)","—","intravascular marker, prolongs lignocaine, raises lignocaine max to 7 mg/kg","nd"),
+    R("IT fentanyl","","10–25 mcg",null,"intrathecal"),
+    R("IT morphine","(e.g. TKR, hip, laparotomy)","100–150 mcg","monitor RR and sedation for 24 h","intrathecal")])}${src("ASRA / NYSORA adjunct reviews.")}</div>`; };
 
 /* UPPER LIMB */
 raCards.isb = () => blk({t:"Interscalene", ind:"Shoulder, proximal humerus, lateral clavicle", pos:"Semi-sitting, head turned away · linear probe transverse at C6 (cricoid)", sono:"C5–C6 roots (\"traffic lights\") between anterior and middle scalene", needle:"22G 50 mm, in-plane lateral → medial", vol:[10,15], caut:"Phrenic palsy ~100% — avoid in severe respiratory disease or contralateral palsy · Horner's, hoarseness · vertebral artery / intrathecal injection"});
@@ -4173,6 +4182,11 @@ VGROUPS.find(g => g[0]==="General")[1].push(["Paeds doses vs local manual & pain
   "Neonates: morphine term 0.05–0.1 / preterm 0.025–0.05 mg/kg; fentanyl 1–2 mcg/kg (neonate start 0.5, protocol 0.5–3); atracurium 0.5 mg/kg (BNFc neonate 0.3–0.5 as note); PR paracetamol not < 3 months (manual lists 30 mg/kg loading); no sedative premed for neonate / PMA < 60 wk; ondansetron not < 1 month; neonatal antibiotic intervals (cefotaxime, metronidazole)",
   "Ibuprofen 3–6 months 5 mg/kg 6–8-hourly max 20 mg/kg/day; ketamine induction 1–2 mg/kg; phenylephrine bolus 2–10 mcg/kg (max 100 mcg); hydrocortisone 2–4 mg/kg max 200 mg; chlorphenamine IV 0.2 mg/kg max 10 mg",
   "Added from the manual: phenylephrine and vasopressin infusions, max per syringe, antihypertensives (nitroprusside, esmolol, labetalol, hydralazine), other drugs (3% saline, mannitol, KCl, insulin, adenosine 0.1–0.25 mg/kg max 12 mg), dehydration table, hypoxia crisis, difficult airway / CICV rebuilt from the manual (≤ 4 laryngoscopy, ≤ 3 SAD attempts, wake if SpO₂ > 80%), ASA paediatric examples, BMI-for-age note, LMA sizes (standard, pending page 11)"]]);
+VGROUPS.find(g => g[0]==="General")[1].push(["Dose tables, batch 2: Pre-op + Regional", "22 Nov 2026", [
+  "Moved into dose tables (same words and numbers, test-checked): all 12 nerve-block cards (drug & volume), epidural (test dose, loading, top-up, infusion, breakthrough), adjuncts, steroid cover, hypoglycaemia",
+  "Routes added: block LA perineural (including the trunk plane blocks: ESP, serratus, rectus sheath, TAP); epidural doses epidural; IT fentanyl / morphine intrathecal; minor-surgery hydrocortisone IV",
+  "Not a dose any more: 'aspirate every 5 mL' (Stop Before You Block) no longer drawn large",
+  "Unchanged on purpose: anticoagulant timing table, PDPH blood patch and CSE example (single procedural doses), airway card"]]);
 VGROUPS.find(g => g[0]==="General")[1].push(["Dose tables, batch 1: Obstetric + General", "22 Nov 2026", [
   "Drug lists in bullets, text and 2-column tables moved into dose tables: same words and numbers (test checks every number)",
   "Obstetric: labour start / top-up / dural puncture, aspiration prophylaxis, ward analgesia options, NSAID yes / no, pruritus",
@@ -4261,12 +4275,13 @@ function vTicks(){
 }
 /* ---------- ABOUT ---------- */
 const CHANGES = [
+  ["2.75","Dose tables, batch 2 — Pre-op and Regional: blocks, epidural, adjuncts, steroid cover, hypoglycaemia (checked)"],
   ["2.74","Dose tables, batch 1 — Obstetric and General: drug lists moved into dose tables, same words and numbers (checked)"],
   ["2.73","Every dose the same large size, bold or not; maximums, thresholds and per-kg rules stay normal (checked)"],
   ["2.72","Large, unbroken doses everywhere: emergency steps, text, syringe and other tables (checked)"],
   ["2.71","Doses large and on one line; on a phone each drug is name + dose, then rule · note in smaller text (checked)"],
-  ["2.70","Induction drugs and muscle relaxants in one card (adult and paeds) under Anticholinergic · Opioid · Hypnotic · Muscle relaxant · No IV access (checked)"],
-  ["2.69","Finding cards: search in every section, recent cards on Home, shortcuts between tabs, emergency groups, Clinical Scenarios groups; no clinical text changed (checked)"]];
+  ["2.70","Induction drugs and muscle relaxants in one card (adult and paeds) under Anticholinergic · Opioid · Hypnotic · Muscle relaxant · No IV access (checked)"]];
+
 
 
 
@@ -4970,7 +4985,7 @@ function markDoses(root, id){
   let n; while ((n = w.nextNode())) { DOSE_RX.lastIndex = 0; if (DOSE_RX.test(n.data) && !n.parentElement.closest(DOSE_SKIP)) nodes.push(n); }
   for (const t of nodes) { const txt = t.data, bold = !!t.parentElement.closest("b, strong, td.hl, th.hl, .hl"), frag = doc.createDocumentFragment(); let last = 0, m; DOSE_RX.lastIndex = 0;
     while ((m = DOSE_RX.exec(txt))) { const before = txt.slice(Math.max(0, m.index - 3), m.index);
-      if (/[≥≤<>]\s*$/.test(before) || /max\.?\s*$/i.test(txt.slice(Math.max(0, m.index - 5), m.index))) continue;   // a threshold or a maximum, not a dose
+      if (/[≥≤<>]\s*$/.test(before) || /(max\.?|every)\s*$/i.test(txt.slice(Math.max(0, m.index - 6), m.index))) continue;   // a threshold or a maximum, not a dose
       frag.append(txt.slice(last, m.index)); const sp = doc.createElement("span"); sp.className = big ? "nw dzb" : "nw"; sp.textContent = m[0]; frag.append(sp); last = m.index + m[0].length; }
     if (last) { frag.append(txt.slice(last)); t.replaceWith(frag); } }
 }
