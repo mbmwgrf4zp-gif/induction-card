@@ -636,7 +636,7 @@ if (window.top !== window.self && /\.github\.io$/.test(location.hostname)) {
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.63.1";
+const APP_VERSION = "2.63.2";
 const APP_DATE = "21 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
@@ -1567,7 +1567,7 @@ pCards.reversal = () => { const w = W();
     DR("Sugammadex — immediate (after rocuronium 1.2 mg/kg)","16","mg",null,null,"IV")])}
   <ul><li>Quantitative TOF where available; aim for TOF ratio ≥ 0.9 before extubation</li><li>Sugammadex in children under 2: licence varies by country — check local policy</li><li>Neostigmine does not reverse a deep block; wait for TOF ≥ 2</li></ul>
   ${src("BNFc 2026; sugammadex product information; Association of Anaesthetists monitoring guidance 2021.")}</div>`; };
-const NEO_CHECKED = false;
+const NEO_CHECKED = true;
 const neoDraft = () => NEO_CHECKED ? "" : `<div class="warn" style="margin-top:0">DRAFT — neonatal cards and local-manual cross-check (Nov 2026). Not yet ticked by you.</div>`;
 const INTL = "International reference — not in the local manual: Coté, A Practice of Anesthesia for Infants and Children; BJA Education neonatal reviews";
 function neoCards(){ const w = W(), mo = AGEM(), ett = w < 2 ? "2.5" : w < 3.5 ? "3.0" : "3.5";
@@ -3949,7 +3949,7 @@ VGROUPS.find(g => g[0]==="General")[1].push(["Paeds induction review", "22 Nov 2
   "Review fixes: ranitidine → omeprazole 1 mg/kg max 40 mg; glucose neonate > 2.6, child 4–10 mmol/L, D10 2 mL/kg; Fallot esmolol shown in mg, phenylephrine up to 5 mcg/kg in a spell; PACU ondansetron 0.15 mg/kg max 4 mg and MgSO₄ 40 mg/kg max 2 g (RCUK 2025); FFP 15–20, platelets 10–20 mL/kg (BSH); furosemide spelling; RR by age",
   "Paeds arrest to RCUK 2025: adrenaline 10 mcg/kg max 1 mg; amiodarone 5 mg/kg max 300 mg after 3rd shock, max 150 mg after 5th; lidocaine 1 mg/kg alternative; cardiogenic fluid 5 mL/kg; calcium gluconate 10% 0.5 mL/kg max 30 mL",
   "New emergencies: paeds difficult airway / CICO (DAS/APA 2015: max 4 attempts, SAD, cannula cricothyroidotomy < 8 y with O₂ 1 L/min per year, scalpel ≥ 8 y); post-tonsillectomy bleed. Pyloric stenosis card expanded (Cl ≥ 100, HCO₃ ≤ 28, K ≥ 3.5, Na ≥ 132)"]]);
-VGROUPS.find(g => g[0]==="General")[1].push(["Neonatal cards & local manual (DRAFT — tick to sign off)", "", [
+VGROUPS.find(g => g[0]==="General")[1].push(["Neonatal cards & local manual", "22 Nov 2026", [
   "Local manual wins where it gives a dose (international shown as a note): magnesium for bronchospasm 50 mg/kg max 2 g (RCUK 2025: 40); D10 for hypoglycaemia 2.5 mL/kg (RCUK: 2 mL/kg)",
   "Suxamethonium: neonate 3 mg/kg, infant 2 mg/kg, child 1–1.5 mg/kg (max 150 mg) on Relaxants and RSI",
   "Neonate basics: ETT 2.5 (< 2 kg) / 3.0 / 3.5 (> 3.5 kg), oral depth 6 + kg; local maintenance table by birth weight and day of life; D10 in ½ saline; glucose 4–6 mg/kg/min; preterm SpO₂ 91–95%; theatre ≥ 26 °C",
@@ -4022,7 +4022,7 @@ function vTicks(){
 }
 /* ---------- ABOUT ---------- */
 const CHANGES = [
-  ["2.63","Neonatal cards: basics plus OA / TOF, CDH, gastroschisis, NEC, PDA, malrotation, myelomeningocele; local manual doses restored (draft)"],
+  ["2.63","Neonatal cards: basics plus OA / TOF, CDH, gastroschisis, NEC, PDA, malrotation, myelomeningocele; local manual doses restored (checked)"],
   ["2.62","Paeds review fixes: RCUK 2025 arrest, difficult airway / CICO and tonsil bleed cards, glucose targets, ventilation by age, consistent doses (checked)"],
   ["2.61","Paeds: fentanyl, morphine, gas induction, relaxants, RSI and reversal cards, bolus pressors (checked)"],
   ["2.60","Cards reorganised: paeds airway kit and laryngospasm & extubation merged, expected BP beside inotropes, IM doses linked from Emergencies"],
