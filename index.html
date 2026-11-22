@@ -703,7 +703,7 @@ if (window.top !== window.self && /\.github\.io$/.test(location.hostname)) {
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.76.1";
+const APP_VERSION = "2.77.1";
 const APP_DATE = "22 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
@@ -2373,6 +2373,8 @@ const F2_CHECKED = true;   // checked by author 22 Nov 2026
 const f2Draft = () => F2_CHECKED ? "" : `<div class="warn" style="margin-top:0">DRAFT — doses moved into a dose table (format batch 2, Nov 2026): same words and numbers; routes added where the text had none. Not yet ticked by you.</div>`;
 const F3_CHECKED = true;   // checked by author 22 Nov 2026
 const f3Draft = () => F3_CHECKED ? "" : `<div class="warn" style="margin-top:0">DRAFT — doses moved into a dose table (format batch 3, Nov 2026): same words and numbers; routes added where the text had none. Not yet ticked by you.</div>`;
+const F4_CHECKED = true;   // checked by author 22 Nov 2026
+const f4Draft = () => F4_CHECKED ? "" : `<div class="warn" style="margin-top:0">DRAFT — doses moved into a dose table (format batch 4, Nov 2026): same words and numbers; routes added where the text had none. Not yet ticked by you.</div>`;
 const FT = rows => `${rtDraft()}<div class="dfor fixw"></div><div style="overflow-x:auto"><table class="dt"><tr class="dth"><th>Drug</th><th>When / how</th><th>Dose</th></tr>${rows.join("")}</table></div>`;
 const GT = rows => `${rtDraft()}<div class="dfor gtw"></div><div style="overflow-x:auto"><table class="dt gt"><tr class="dth"><th>Drug</th><th>Rule · weight used</th><th>Dose</th></tr>${rows.join("")}</table></div>`;
 const GSRC = "Standard references: BNF, Association of Anaesthetists / SOBA obesity guidance, Miller.";
@@ -3344,8 +3346,8 @@ txCards.lines = () => `<div class="card"><h2>Kidney: lines, monitoring &amp; ant
   <table><tr><th>Arterial line</th><td>Invasive BP; <b>not on the fistula arm</b></td></tr>
   <tr><th>CVC</th><td>Triple-lumen, R-IJV preferred (scan); both IJVs thrombosed → <b>discuss with nephrologist / urologist</b> (femoral on the side opposite the graft)</td></tr>
   <tr><th>Monitoring</th><td>Standard + temperature, urine output, ± TOF, ± BIS (uraemic patients are sensitive)</td></tr>
-  <tr><th>Fistula arm</th><td>No cuff, no lines; pad and protect; check thrill at end</td></tr>
-  <tr><th>Antibiotic</th><td>Cefuroxime <b>1.5 g IV</b> (sent from ward) or equivalent</td></tr></table>
+  <tr><th>Fistula arm</th><td>No cuff, no lines; pad and protect; check thrill at end</td></tr></table>
+  <h3>Antibiotic</h3>${f4Draft()}${FT([R("Cefuroxime","(sent from ward) or equivalent","1.5 g",null,"IV")])}
   ${src(TXP+".")}</div>`;
 /* Intra-op */
 txCards.maint = () => { const a = S.age, f = Math.pow(10, -0.00269*(a-40)), r = m => sig(m*f);
@@ -3358,10 +3360,11 @@ txCards.maint = () => { const a = S.age, f = Math.pow(10, -0.00269*(a-40)), r = 
   ${src("Mapleson 1996; "+TXP+".")}</div>`; };
 txCards.syr = () => { const w = txW(), W2 = wts(), nor = (lo,hi) => `${dz(lo*w*60/80,"mL/h")}–${dz(hi*w*60/80,"mL/h")} mL/h`;
   return `<div class="card"><h2>Kidney: syringes &amp; infusions</h2>${tx2Draft()}
-  <table><tr><th>Fentanyl 10 mcg/mL (50 mL)</th><td>0.5–2 mcg/kg/h · LBW ${sig(W2.lbw)} kg = <b>${dz(0.05*W2.lbw,"mL/h")}–${dz(0.2*W2.lbw,"mL/h")} mL/h</b></td></tr>
-  <tr><th>Atracurium 10 mg/mL (20 mL)</th><td>0.3–0.6 mg/kg/h = <b>${dz(0.03*w,"mL/h")}–${dz(0.06*w,"mL/h")} mL/h</b></td></tr>
-  <tr><th>Noradrenaline 4 mg/50 mL (80 mcg/mL)</th><td>0.05–0.3 mcg/kg/min = <b>${nor(0.05,0.3)}</b></td></tr>
-  <tr><th>Mannitol 20%</th><td>0.5 g/kg = ${mann(w)} via infusion pump</td></tr></table>
+  ${f4Draft()}${GT([
+    R("Fentanyl 10 mcg/mL (50 mL)",`0.5–2 mcg/kg/h · LBW ${sig(W2.lbw)} kg`,`${dz(0.05*W2.lbw,"mL/h")}–${dz(0.2*W2.lbw,"mL/h")} mL/h`,null,"IV infusion"),
+    R("Atracurium 10 mg/mL (20 mL)","0.3–0.6 mg/kg/h",`${dz(0.03*w,"mL/h")}–${dz(0.06*w,"mL/h")} mL/h`,null,"IV infusion"),
+    R("Noradrenaline 4 mg/50 mL (80 mcg/mL)","0.05–0.3 mcg/kg/min",nor(0.05,0.3),null,"IV infusion"),
+    R("Mannitol 20%","0.5 g/kg",mann(w),"via infusion pump","IV infusion")])}
   <p class="sub">Dry weight ${sig(w)} kg unless stated.</p>${src(TXP+"; atracurium product label; standard fentanyl infusion ranges.")}</div>`; };
 txCards.bp = () => `<div class="card"><h2>Kidney: BP target &amp; pressors</h2>${tx2Draft()}
   <table><tr><th>Target</th><td>Patient's own baseline (often 140–150 / 80–90); highest need at <b>reperfusion</b></td></tr>
@@ -3382,12 +3385,13 @@ txCards.fluid = () => { const w = txW(), hi = kHigh();
   ${src(TXP+"; Mayhew BJA Education 2016; Jaszczuk J Clin Med 2022.")}</div>`; };
 txCards.reperf = () => { const w = txW();
   return `<div class="card"><h2>5. Anastomosis &amp; reperfusion</h2>${txDraft()}${txBox()}
-  <table><tr><th>Methylprednisolone</th><td><b>500 mg IV</b> slow infusion — start during renal artery anastomosis, <b>complete before reperfusion</b></td></tr>
-  <tr><th>Mannitol 20%</th><td>0.5 g/kg = ${mann(w)} — start after induction, <b>complete before reperfusion</b></td></tr>
-  <tr><th>Furosemide</th><td>0.5–1 mg/kg = <b>${dz(0.5*w,"mg")}–${dz(w,"mg")} mg</b> after reperfusion</td></tr>
-  <tr><th>Urine output aim</th><td>&gt; 1 mL/kg/h = <b>${dz(w,"mL/h")} mL/h</b></td></tr>
-  <tr><th>Thymoglobulin ±</th><td><b>Drug and dose by nephrologist.</b> Protocol example: 75 mg in NS 500 mL, start after induction over 4–6 h, <b>light-protected tubing</b>; may finish in PACU. Fast infusion → cytokine release / allergic reaction: watch BP, HR, temperature</td></tr>
-  <tr><th>Basiliximab ±</th><td>By nephrologist (usually given in the ward)</td></tr></table>
+  ${f4Draft()}${GT([
+    R("Methylprednisolone","slow infusion","500 mg","start during renal artery anastomosis, <b>complete before reperfusion</b>","IV infusion"),
+    R("Mannitol 20%","0.5 g/kg",mann(w),"start after induction, <b>complete before reperfusion</b>","IV infusion"),
+    R("Furosemide","0.5–1 mg/kg · after reperfusion",`${dz(0.5*w,"mg")}–${dz(w,"mg")} mg`,null,"IV"),
+    R("Thymoglobulin ±","<b>Drug and dose by nephrologist.</b> Protocol example:","75 mg in NS 500 mL","start after induction over 4–6 h, <b>light-protected tubing</b>; may finish in PACU. Fast infusion → cytokine release / allergic reaction: watch BP, HR, temperature","IV infusion"),
+    R("Basiliximab ±","By nephrologist (usually given in the ward)","—",null,"nd")])}
+  <table><tr><th>Urine output aim</th><td>&gt; 1 mL/kg/h = <b>${dz(w,"mL/h")} mL/h</b></td></tr></table>
   <h3>At reperfusion</h3><ul><li>BP at or above baseline <b>before</b> clamps come off</li><li>Watch for <b>K⁺ rise</b> and hypotension from washout; ABG after reperfusion</li>
   <li>Keep the patient fully relaxed until retractors are out</li><li>Expect / allow a raised arterial pressure after graft reperfusion</li></ul>
   <button class="emlink" data-open="Hyperkalaemia" data-g="emerg" data-tab="adult">⚠ Hyperkalaemia → Emergencies</button>
@@ -3395,18 +3399,21 @@ txCards.reperf = () => { const w = txW();
 /* Post-op */
 txCards.rev = () => { const W2 = wts(), neo = Math.min(0.05*W2.ibw, 5);
   return `<div class="card"><h2>Kidney: reversal</h2>${tx2Draft()}
-  <p>Atracurium: <b>neostigmine 0.05 mg/kg</b> · IBW ${sig(W2.ibw)} kg = <b>${sig(dz(neo/2.5,"mL")*2.5)} mg</b> (${dz(neo/2.5,"mL")} mL of 2.5 mg/mL, max 5 mg) + glycopyrrolate <b>${dz(neo*0.2,"mg")} mg</b></p>
+  <h3>Atracurium</h3>${f4Draft()}${GT([
+    R("Neostigmine",`0.05 mg/kg · IBW ${sig(W2.ibw)} kg`,`${sig(dz(neo/2.5,"mL")*2.5)} mg`,`(${dz(neo/2.5,"mL")} mL of 2.5 mg/mL, max 5 mg)`,"IV"),
+    R("+ glycopyrrolate","",`${dz(neo*0.2,"mg")} mg`,null,"IV")])}
   <p class="sub">Only when TOF ≥ 2–4 twitches; confirm TOF ratio ≥ 0.9 before extubation. Neostigmine is renally cleared (longer action) — no need to change the dose.</p>
   <div class="warn">Sugammadex: not recommended if CrCl &lt; 30 / on dialysis — rescue use only (rocuronium CICO).</div>
   ${src(GSRC+" Sugammadex UK product labels.")}</div>`; };
 txCards.analg = () => { const w = S.aw, W2 = wts();
   return `<div class="card"><h2>Kidney: analgesia &amp; PONV</h2>${tx2Draft()}
-  <table><tr><th>Paracetamol</th><td>${w<50?`15 mg/kg = <b>${dz(15*w,"mg")} mg</b>`:"<b>1 g</b>"} IV/PO 6-hourly</td></tr>
-  <tr><th>Tramadol</th><td><b>50 mg</b>, 12-hourly in kidney failure (CrCl &lt; 30), <b>max 200 mg/day</b></td></tr>
-  <tr><th>PCA</th><td><b>Fentanyl 10 mcg/mL preferred</b>: bolus 10–20 mcg, lockout 5 min, no background. Morphine PCA only with caution (metabolites accumulate)</td></tr>
-  <tr><th>PACU titration</th><td>Fentanyl 10–25 mcg IV every 5 min</td></tr>
-  <tr><th>NSAIDs</th><td><b>None</b></td></tr>
-  <tr><th>PONV</th><td>Ondansetron 4 mg. <b>No extra dexamethasone</b> — methylprednisolone 500 mg already given</td></tr></table>
+  ${f4Draft()}${GT([
+    R("Paracetamol",`${w<50?"15 mg/kg · ":""}6-hourly`,w<50?`${dz(15*w,"mg")} mg`:"1 g",null,"IV / PO"),
+    R("Tramadol","12-hourly in kidney failure (CrCl &lt; 30)","50 mg","<b>max 200 mg/day</b>","IV / PO"),
+    R("PACU titration: fentanyl","every 5 min","10–25 mcg",null,"IV"),
+    R("NSAIDs","","<b>None</b>",null,"nd"),
+    R("PONV: ondansetron","","4 mg","<b>No extra dexamethasone</b> — methylprednisolone 500 mg already given","IV")])}
+  <table><tr><th>PCA</th><td><b>Fentanyl 10 mcg/mL preferred</b>: bolus 10–20 mcg, lockout 5 min, no background. Morphine PCA only with caution (metabolites accumulate)</td></tr></table>
   ${src(TXP+"; tramadol product label (renal dosing); acute pain service protocols.")}</div>`; };
 txCards.pacu = () => { const w = txW();
   return `<div class="card"><h2>Kidney: PACU &amp; urine output</h2>${tx2Draft()}
@@ -3433,12 +3440,13 @@ txCards.dintra = () => { const w = txW();
   return `<div class="card"><h2>2. Donor intra-op</h2>${txDraft()}
   <table><tr><th>Anaesthesia</th><td>Standard induction and intubation, IPPV, NG tube, 2 venous access, catheter; ± invasive BP</td></tr>
   <tr><th>Position</th><td>Left / right lateral (pad, check eyes, pressure points)</td></tr>
-  <tr><th>Antibiotic</th><td>Cefuroxime <b>1.5 g IV</b> or equivalent</td></tr>
   <tr><th>BP</th><td>Maintain baseline MAP; vasopressor boluses as needed</td></tr>
   <tr><th>Fluid</th><td>Crystalloid / colloid up to 20 mL/kg/h = <b>${dz(20*w,"mL/h")} mL/h</b></td></tr>
-  <tr><th>Mannitol 20%</th><td>0.5 g/kg = ${mann(w)} — start after induction, <b>complete before arterial clamping</b></td></tr>
   <tr><th>Urine output aim</th><td>&gt; 1 mL/kg/h = <b>${dz(w,"mL/h")} mL/h</b></td></tr>
   <tr><th>Analgesia</th><td>Opioid + paracetamol</td></tr></table>
+  ${f4Draft()}${GT([
+    R("Antibiotic: cefuroxime","or equivalent","1.5 g",null,"IV"),
+    R("Mannitol 20%","0.5 g/kg",mann(w),"start after induction, <b>complete before arterial clamping</b>","IV infusion")])}
   <p class="sub">Weight box = donor's weight on this tab. Drug doses: General section.</p>
   ${src(TXP+".")}</div>`; };
 txCards.dpost = () => `<div class="card"><h2>3. Donor post-op</h2>${txDraft()}
@@ -4196,6 +4204,10 @@ VGROUPS.find(g => g[0]==="General")[1].push(["Paeds doses vs local manual & pain
   "Neonates: morphine term 0.05–0.1 / preterm 0.025–0.05 mg/kg; fentanyl 1–2 mcg/kg (neonate start 0.5, protocol 0.5–3); atracurium 0.5 mg/kg (BNFc neonate 0.3–0.5 as note); PR paracetamol not < 3 months (manual lists 30 mg/kg loading); no sedative premed for neonate / PMA < 60 wk; ondansetron not < 1 month; neonatal antibiotic intervals (cefotaxime, metronidazole)",
   "Ibuprofen 3–6 months 5 mg/kg 6–8-hourly max 20 mg/kg/day; ketamine induction 1–2 mg/kg; phenylephrine bolus 2–10 mcg/kg (max 100 mcg); hydrocortisone 2–4 mg/kg max 200 mg; chlorphenamine IV 0.2 mg/kg max 10 mg",
   "Added from the manual: phenylephrine and vasopressin infusions, max per syringe, antihypertensives (nitroprusside, esmolol, labetalol, hydralazine), other drugs (3% saline, mannitol, KCl, insulin, adenosine 0.1–0.25 mg/kg max 12 mg), dehydration table, hypoxia crisis, difficult airway / CICV rebuilt from the manual (≤ 4 laryngoscopy, ≤ 3 SAD attempts, wake if SpO₂ > 80%), ASA paediatric examples, BMI-for-age note, LMA sizes (standard, pending page 11)"]]);
+VGROUPS.find(g => g[0]==="General")[1].push(["Dose tables, batch 4: Kidney Transplant", "22 Nov 2026", [
+  "Moved into dose tables (same words and numbers, test-checked): antibiotic, syringes & infusions, anastomosis & reperfusion drugs, reversal, analgesia & PONV, donor antibiotic and mannitol",
+  "Routes added: furosemide IV; tramadol IV / PO; ondansetron IV; neostigmine and glycopyrrolate IV; infusions (fentanyl, atracurium, noradrenaline, mannitol, methylprednisolone, thymoglobulin) IV infusion",
+  "Unchanged on purpose: fluids, urine output targets, PCA settings, omeprazole line, donor anaesthesia / position / BP rows"]]);
 VGROUPS.find(g => g[0]==="General")[1].push(["Dose tables, batch 3: Paediatric", "22 Nov 2026", [
   "Moved into dose tables (same words and numbers, test-checked): remifentanil rates, hypoglycaemia (D10), penile block, discharge analgesia, MRI sedation options 1–3",
   "Discharge ibuprofen now follows the app's age rule (not under 3 months) like every other paediatric ibuprofen row",
@@ -4294,12 +4306,13 @@ function vTicks(){
 }
 /* ---------- ABOUT ---------- */
 const CHANGES = [
+  ["2.77","Dose tables, batch 4 — Kidney Transplant: antibiotic, infusions, reperfusion drugs, reversal, analgesia, donor (checked)"],
   ["2.76","Dose tables, batch 3 — Paediatric: remifentanil, hypoglycaemia, penile block, discharge analgesia, MRI sedation (checked)"],
   ["2.75","Dose tables, batch 2 — Pre-op and Regional: blocks, epidural, adjuncts, steroid cover, hypoglycaemia (checked)"],
   ["2.74","Dose tables, batch 1 — Obstetric and General: drug lists moved into dose tables, same words and numbers (checked)"],
   ["2.73","Every dose the same large size, bold or not; maximums, thresholds and per-kg rules stay normal (checked)"],
-  ["2.72","Large, unbroken doses everywhere: emergency steps, text, syringe and other tables (checked)"],
-  ["2.71","Doses large and on one line; on a phone each drug is name + dose, then rule · note in smaller text (checked)"]];
+  ["2.72","Large, unbroken doses everywhere: emergency steps, text, syringe and other tables (checked)"]];
+
 
 
 
