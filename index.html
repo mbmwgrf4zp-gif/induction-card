@@ -175,6 +175,30 @@ header h1{font-size:var(--fs-lg);font-weight:700;margin:0;flex:1;display:flex;al
 .emtabs button{flex:1 1 0;padding:0 var(--s1);min-width:0}
 .emtabs button{min-height:48px;font-size:var(--fs-base)}
 .emtabs.six{flex-wrap:wrap}@media (min-width:700px){.emtabs.six{flex-wrap:nowrap}.emtabs.five.six button{flex:1 1 0}}.emtabs.five.six button{flex:1 1 30%;font-size:var(--fs-sm);padding:0 var(--s1)}.acchead{margin:var(--s4) 2px var(--s1)}.rellink{display:block;width:calc(100% - 2*var(--s4));box-sizing:border-box;text-align:left;margin-top:var(--s3);padding:var(--s2) var(--s3);border:1px dashed var(--line);border-radius:var(--r-sm);background:none;color:var(--muted);font:inherit;font-size:var(--fs-sm);font-weight:600;cursor:pointer}.emtabs.five{gap:4px}.emtabs.five button{font-size:var(--fs-xs);padding:0 2px;letter-spacing:-.01em}
+/* patient tiles: number in the 7-segment font of the home monitor, section colour */
+.pthead{display:flex;justify-content:space-between;align-items:center;gap:var(--s2);margin-bottom:var(--s2)}
+.pthead .t{font-weight:700;font-size:var(--fs-sm)}
+.segmini{display:inline-grid;grid-template-columns:1fr 1fr;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.segmini button{border:0;background:var(--card);color:var(--ink);min-height:36px;padding:0 12px;font:600 var(--fs-sm) var(--font-sans);cursor:pointer}
+.segmini button[aria-pressed="true"]{background:var(--gc,var(--accent));color:var(--on)}
+.segmini.sample{border-style:dashed;border-color:var(--warn-line)}
+.ptiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(72px,1fr));gap:6px}
+.ptile{border:1px solid var(--line);border-radius:12px;padding:5px;display:flex;flex-direction:column;align-items:center;gap:2px;min-width:0;background:var(--card)}
+.ptile.sample{border-style:dashed;border-color:var(--warn-line)}
+.ptile small{font:600 10.5px var(--font-sans);letter-spacing:.04em;text-transform:uppercase;color:var(--muted);display:flex;align-items:center;gap:4px;white-space:nowrap}
+.ptile small .stag{margin:0;font-size:10px;text-transform:none;letter-spacing:0}
+.ptile input{width:100%;min-width:0;text-align:center;border:0;background:transparent;font-family:'DSEG7',var(--font-mono);font-size:22px;line-height:1.15;color:var(--gc,var(--accent));padding:2px 0;border-radius:8px}
+.ptile.sample input{color:var(--muted);opacity:.75}
+.ptile input:focus{outline:2px solid var(--gc,var(--accent));background:var(--field)}
+.ptile .u{font-size:11px;color:var(--muted);text-transform:none;letter-spacing:0;font-weight:400}
+.ptile .pm{display:grid;grid-template-columns:1fr 1fr;gap:3px;width:100%;margin-top:2px}
+.ptile .pm button{height:36px;border:1px solid var(--line);background:var(--field);color:var(--ink);border-radius:8px;font-size:1.15rem;line-height:1;cursor:pointer;touch-action:manipulation}
+.dline{font-size:var(--fs-xs);color:var(--muted);margin-top:var(--s2);font-variant-numeric:tabular-nums}
+.dline b{color:var(--ink)}
+.ptbar .pbm{display:block;font-weight:700}
+.ptbar .pbm .n7{font-family:'DSEG7',var(--font-mono);font-weight:400;color:var(--gc,var(--accent));font-size:1.05em;letter-spacing:.02em}
+.ptbar .pbs{display:block;font-size:var(--fs-xs);color:var(--muted);font-weight:400}
+.ptbar .pbc{display:block;font-size:var(--fs-xs);color:var(--gc,var(--accent));font-weight:700;text-transform:uppercase;letter-spacing:.04em}
 .step{display:flex;align-items:center;gap:var(--s2);margin:var(--s2) 0}
 .step label{flex:1;font-weight:600;font-size:var(--fs-base);min-width:0}
 .step button{width:48px;height:48px;border-radius:var(--r-sm);border:1px solid var(--line);background:var(--card);font-size:var(--fs-xl);line-height:1;cursor:pointer}
@@ -636,7 +660,7 @@ if (window.top !== window.self && /\.github\.io$/.test(location.hostname)) {
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.66.3";
+const APP_VERSION = "2.67.0";
 const APP_DATE = "21 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
@@ -988,7 +1012,7 @@ const rng = (a,b,u="") => a===b ? `${fmt(a)}${u}` : `${fmt(a)} – ${fmt(b)}${u}
 /* ---------- SPINAL: LSCS dose (used inside Caesarean tab) ---------- */
 const lscsBody = () => {
   const h = Math.round(S.spHt), row = LSCS.find(r => h <= r[0]);
-  return step("spHt","Height","cm",140,200,1) + `<div class="result">
+  return ptiles([ptile("spHt","Height","cm",140,200,1)]) + `<div class="result">
     <div class="sub">Heavy bupivacaine 0.5% (height ${row[5]} cm)</div>
     <div class="big">${rng(row[1],row[2])} mL</div>
     <div class="sub">= ${rng(row[1]*5,row[2]*5)} mg</div>
@@ -1170,7 +1194,7 @@ obsCards.pAnalg = () => { const w = S.morWt, lo = w*0.05, hi = w*0.1;
   <tr><th>SAB</th><td>With 0.1 mg IT morphine; or without → TAP block or LA skin infiltration</td></tr>
   <tr><th>CSE</th><td>0.1 mg IT morphine; or without → epidural morphine 2 mg in 5 mL NS stat at end of surgery</td></tr>
   <tr><th>Epidural</th><td>Epidural top-ups → epidural morphine 2 mg in 5 mL NS stat at end of surgery</td></tr></table>
-  <h3>IV morphine after delivery (GA)</h3>${step("morWt","Weight","kg",30,200,1)}
+  <h3>IV morphine after delivery (GA)</h3>${ptiles([ptile("morWt","Weight","kg",30,200,1)])}
   <div class="result"><div class="sub">0.05 – 0.1 mg/kg</div><div class="big">${f1(lo)} – ${f1(hi)} mg</div></div>
   <h3>Other ward options (departmental protocol)</h3>${locNote()}
   <ul><li><b>PCA morphine</b> 1 mg/mL, 100–200 mL sent with the patient; pump set by OAS</li><li><b>SC morphine 7.5–10 mg 4-hourly</b>, undiluted, regular (not PRN), via SC cannula</li>
@@ -1259,12 +1283,12 @@ function LAR(name, ml, mgml, max, note, capml, rt){
 function pInputs(forEtt){
   const y = S.pY, mo = AGEM();
   const est = mo < 1 ? null : y < 1 ? [0.5*mo+4, "0.5 × months + 4"] : y <= 5 ? [2*y+8, "2 × age + 8"] : y <= 12 ? [3*y+7, "3 × age + 7"] : null;
-  return `${step("pw","Weight","kg",0.4,90,0.5)}${step("pY","Age","y",0,16,1)}${step("pM","+ months","m",0,11,1)}
+  return `<div class="pthead"><span class="t">Child</span></div>${ptiles([ptile("pw","Weight","kg",0.4,90,0.5), ptile("pY","Age","y",0,16,1), ptile("pM","Months","m",0,11,1), ptile("pHt","Height","cm",30,190,1), ...(AGEM() >= 1 && AGEM() < 14 ? [ptile("gaB","Born at","wk",22,42,1)] : [])])}
     ${est?`<div class="sub">Estimated weight (APLS): ${est[1]} = <b>${sig(est[0])} kg</b> <button class="iconbtn" style="height:34px;min-width:0" data-setw="${sig(est[0])}">Use</button></div>`:""}
     ${W()>40?`<div class="warn" style="margin-bottom:0">Weight &gt; 40 kg: doses are capped at adult maximums — consider the General (adult) section.</div>`:""}
-    ${AGEM() < 1 ? `<div class="label" style="margin:8px 0 0">Neonate</div>${step("pD","Day of life","d",0,28,1)}${step("gaB","Gestation at birth","wk",22,42,1)}${step("bw","Birth weight","kg",0.4,5,0.1)}
+    ${AGEM() < 1 ? `<div class="pthead" style="margin:8px 0"><span class="t">Neonate</span></div>${ptiles([ptile("pD","Day","d",0,28,1), ptile("gaB","Gestation","wk",22,42,1), ptile("bw","Birth wt","kg",0.4,5,0.1)])}
       <div class="sub">${neoAgeTxt()}${S.touched.bw ? "" : " · birth weight = current weight until entered"}</div>`
-      : AGEM() < 14 ? `<div class="sub" style="margin-top:4px">Born early? ${step("gaB","Gestation at birth","wk",22,42,1)} PMA ${sig(pmaWk())} wk</div>` : `<div class="sub" style="margin-top:4px">Neonate &lt; 28 days: set age 0 y 0 m — day of life and gestation appear.</div>`}`;
+      : AGEM() < 14 ? (isPreterm() ? `<div class="sub" style="margin-top:6px">Born at ${S.gaB} wk · PMA <b>${sig(pmaWk())} wk</b></div>` : "") : `<div class="sub" style="margin-top:4px">Neonate: set 0 y 0 m.</div>`}`;
 }
 
 function paedEtt(){
@@ -2245,16 +2269,20 @@ function GD(name, per, unit, wk, conc, note, max, rt){
 const GT = rows => `${rtDraft()}<div style="overflow-x:auto"><table><tr><th>Drug</th><th>Rule · weight used</th><th>Dose</th></tr>${rows.join("")}</table></div>`;
 const GSRC = "Standard references: BNF, Association of Anaesthetists / SOBA obesity guidance, Miller.";
 
+function ptile(key, label, unit, min, max, stp){
+  const smp = isSample(key);
+  return `<div class="ptile ${smp?"sample":""}"><small>${label} <span class="u">${unit}</span></small>
+    <input id="in-${key}" inputmode="decimal" aria-label="${label} (${unit})${smp?", sample value":""}" data-in="${key}" data-min="${min}" data-max="${max}" value="${S[key]}">
+    <div class="pm"><button aria-label="${label} down" data-step="${key}" data-d="${-stp}" data-min="${min}" data-max="${max}">−</button><button aria-label="${label} up" data-step="${key}" data-d="${stp}" data-min="${min}" data-max="${max}">+</button></div></div>`;
+}
+const ptiles = list => `<div class="ptiles">${list.join("")}</div>`;
+const sexMini = (title="Patient") => `<div class="pthead"><span class="t">${title}</span><div class="segmini ${isSample("sex")?"sample":""}" role="group" aria-label="Sex">${[["F","♀ F"],["M","♂ M"]].map(([v,l])=>`<button data-seg="sex" data-val="${v}" aria-pressed="${!isSample("sex") && S.sex===v}">${l}</button>`).join("")}</div></div>`;
+const dLine = W2 => `<div class="dline">BMI <b>${sig(W2.bmi)}</b> · IBW/PBW <b>${sig(W2.ibwRaw)}</b> · LBW <b>${sig(W2.lbw)}</b> · AdjBW <b>${sig(W2.adj)}</b> kg</div>`;
+const awStep = () => S.aw < 40 ? 0.5 : 1;
 function gaInputs(){
   const W2 = wts();
-  return seg("sex",[["F",sxi("F")+" Female"],["M",sxi("M")+" Male"]]) + step("height","Height","cm",130,210,1) + step("aw","Weight","kg",30,250,1) + step("age","Age","y",16,100,1) +
-    `<div class="chips" style="margin-top:var(--s2)">
-      <span class="chip" style="cursor:default">BMI <b>${sig(W2.bmi)}</b></span>
-      <span class="chip" style="cursor:default">IBW <b>${sig(W2.ibw)}</b> kg</span>
-      <span class="chip" style="cursor:default">LBW <b>${sig(W2.lbw)}</b> kg</span>
-      <span class="chip" style="cursor:default">AdjBW <b>${sig(W2.adj)}</b> kg</span>
-      <span class="chip" style="cursor:default">PBW <b>${sig(W2.ibwRaw)}</b> kg</span></div>
-    ${S.aw < W2.ibwRaw ? `<div class="sub" style="margin-top:4px">Actual weight below ideal: actual weight used for IBW / AdjBW doses. PBW (for tidal volume) stays height-based.</div>` : ""}`;
+  return sexMini() + ptiles([ptile("height","Height","cm",130,210,1), ptile("aw","Weight","kg",30,250,awStep()), ptile("age","Age","y",16,100,1)]) + dLine(W2) +
+    `${S.aw < W2.ibwRaw ? `<div class="sub" style="margin-top:4px">Actual weight below ideal: actual weight used for IBW / AdjBW doses. PBW (for tidal volume) stays height-based.</div>` : ""}`;
 }
 
 const gaCards = {};
@@ -3100,12 +3128,9 @@ const mann = w => `${dz(0.5*w,"g")} g = <b>${dz(2.5*w,"mL")} mL</b> of 20%`;
 const txCards = {};
 function txInputs(pre){
   const W2 = wts();
-  return seg("sex",[["F",sxi("F")+" Female"],["M",sxi("M")+" Male"]]) + step("height","Height","cm",130,210,1) + step("aw","Dry weight (post-HD)","kg",30,200,1) + step("age","Age","y",16,100,1)
-    + step("k","K⁺","mmol/L",2.5,8,0.1) + step("hb","Hb","g/dL",4,18,0.1)
-    + (pre ? step("todayWt","Today's weight","kg",30,220,0.5) + step("hdH","Hours since last HD","h",0,120,1) : "")
-    + `<div class="chips" style="margin-top:var(--s2)"><span class="chip" style="cursor:default">BMI <b>${sig(W2.bmi)}</b></span>
-      <span class="chip" style="cursor:default">IBW <b>${sig(W2.ibw)}</b> kg</span><span class="chip" style="cursor:default">LBW <b>${sig(W2.lbw)}</b> kg</span>
-      <span class="chip" style="cursor:default">AdjBW <b>${sig(W2.adj)}</b> kg</span><span class="chip" style="cursor:default">PBW <b>${sig(W2.ibwRaw)}</b> kg</span></div>`
+  return sexMini("Kidney recipient") + ptiles([ptile("height","Height","cm",130,210,1), ptile("aw","Dry wt","kg",30,200,awStep()), ptile("age","Age","y",16,100,1),
+      ptile("k","K⁺","mmol/L",2.5,8,0.1), ptile("hb","Hb","g/dL",4,18,0.1), ...(pre ? [ptile("todayWt","Today wt","kg",30,220,0.5), ptile("hdH","Since HD","h",0,120,1)] : [])])
+    + dLine(W2)
     + (!isSample("k") && S.k >= 5.5 ? `<div class="danger" style="margin:var(--s2) 0 0"><b>K⁺ ${S.k} ≥ 5.5:</b> no suxamethonium · 0.9% saline · discuss dialysis.</div>` : "")
     + (!isSample("hb") && S.hb < 7 ? `<div class="danger" style="margin:var(--s2) 0 0"><b>Hb ${S.hb} &lt; 7:</b> discuss transfusion with nephrology (leucocyte filter).</div>` : "");
 }
@@ -3305,7 +3330,7 @@ txCards.dpost = () => `<div class="card"><h2>3. Donor post-op</h2>${txDraft()}
   <ul><li>Reverse and extubate; nurse in ward</li><li><b>Open:</b> ± PCA morphine · <b>Laparoscopic:</b> ± SC morphine</li>
   <li>Paracetamol + tramadol</li><li>Antibiotic 5–7 days</li></ul>
   ${src(TXP+".")}</div>`;
-function donInputs(){ return step("aw","Donor weight","kg",30,200,1); }
+function donInputs(){ return ptiles([ptile("aw","Donor weight","kg",30,200,1)]); }
 
 /* MAINTENANCE */
 gaCards.tiva = () => { const W2 = wts(), w = W2.lbw;
@@ -4054,11 +4079,12 @@ function applyCase(c){
   if (Number.isFinite(c.d)){ S.pD = c.d; S.gaB = c.ga; S.bw = c.bw; S.touched.bw = true; }
   if (c.sex === "F") S.spHt = Math.min(200, Math.max(140, c.h));
   S.emTab = c.y < 16 ? "paeds" : "adult";
+  S.ptEditing = false;
 }
-const SAMPLE_BY = {emerg:{adult:["aw"], paeds:["pw","pY"]}, premed:{"*":["height","aw"]}, ga:{"*":["height","aw"]}, regional:{"*":["height","aw"]}, paeds:{"*":["pw","pY"]}, obs:{lscs:["spHt"], post:["morWt"]}, tx:{pre:["aw","height","k","hb"], ind:["aw","height","k"], intra:["aw","k","hb"], post:["aw","height"], don:["aw"]}};
+const SAMPLE_BY = {emerg:{adult:["aw"], paeds:["pw","pY"]}, premed:{"*":["sex","height","aw","age"]}, ga:{"*":["sex","height","aw","age"]}, regional:{"*":["sex","height","aw","age"]}, paeds:{"*":["pw","pY"]}, obs:{lscs:["spHt"], post:["morWt"]}, tx:{pre:["sex","aw","height","age","k","hb"], ind:["sex","aw","height","k"], intra:["aw","k","hb"], post:["sex","aw","height"], don:["aw"]}};
 function sampleWarn(keys){ const k = keys.filter(isSample); if (!k.length) return "";
-  const names = {k:"K⁺", hb:"Hb", height:"height", aw:"weight", pw:"weight", pY:"age", spHt:"height", morWt:"weight"};
-  return `<div class="samplewarn"><b>Sample values</b> — ${[...new Set(k.map(x=>names[x]))].join(" and ")} not entered. Enter the patient or tap a case.</div>`; }
+  const names = {k:"K⁺", hb:"Hb", height:"height", aw:"weight", pw:"weight", pY:"age", spHt:"height", morWt:"weight", sex:"sex", age:"age"};
+  return `<div class="samplewarn"><b>Sample values</b> — ${(a => a.length > 1 ? a.slice(0,-1).join(", ") + " and " + a[a.length-1] : a[0])([...new Set(k.map(x=>names[x]))])} not entered. Enter the patient or tap a case.</div>`; }
 /* Each case keeps its own clinical entries, in memory only (never saved). */
 const CLIN = ["csDec","sc","asa","met","pnF","pnMP","pnNeck","pnPonv","pnUrg","pnLay","csNote","leNote","pnNote","csWho","csLang","csOut","csLen","leLen","csMode","crea","k","hb","todayWt","hdH","hbNow","hbLow","hbTarget","fastH","pBE","laA","txck","derm"];
 const CLIN_T = ["crea","k","hb","todayWt","hdH"];
@@ -4101,12 +4127,12 @@ function vTicks(){
 }
 /* ---------- ABOUT ---------- */
 const CHANGES = [
+  ["2.67","Patient box: three tiles in the monitor font while entering, one-line summary bar once set (shows the case name)"],
   ["2.66","Paeds doses checked against the local manual and pain protocol; new: other drugs, antihypertensives, dehydration, hypoxia, LMA sizes; CICO rebuilt (checked)"],
   ["2.65","Neonatal age: day of life, gestation and birth weight; fluids, blood volume, SpO₂ and ex-prem calculated from them (checked)"],
   ["2.64","Neonatal basics folded into the paediatric Tube, Drugs, Fluids, Glucose, Ventilation and Warming cards; duodenal atresia, anorectal and Hirschsprung cards"],
   ["2.63","Neonatal cards: basics plus OA / TOF, CDH, gastroschisis, NEC, PDA, malrotation, myelomeningocele; local manual doses restored (checked)"],
-  ["2.62","Paeds review fixes: RCUK 2025 arrest, difficult airway / CICO and tonsil bleed cards, glucose targets, ventilation by age, consistent doses (checked)"],
-  ["2.61","Paeds: fentanyl, morphine, gas induction, relaxants, RSI and reversal cards, bolus pressors (checked)"]];
+  ["2.62","Paeds review fixes: RCUK 2025 arrest, difficult airway / CICO and tonsil bleed cards, glucose targets, ventilation by age, consistent doses (checked)"]];
 const SRC_LINKS = [
   ["Emergencies", [["Resuscitation Council UK — ALS / PLS guidelines","https://www.resus.org.uk/library"],["Difficult Airway Society guidelines","https://das.uk.com/guidelines"],["Association of Anaesthetists — guidelines (anaphylaxis, LAST, safety)","https://anaesthetists.org/Home/Resources-publications/Guidelines"],["European Malignant Hyperthermia Group","https://www.emhg.org"],["UK Kidney Association — hyperkalaemia guideline","https://www.ukkidney.org/health-professionals/guidelines"]]],
   ["General", [["ASA standards & practice parameters (fasting, PACU)","https://www.asahq.org/standards-and-practice-parameters"],["Centre for Perioperative Care — diabetes guideline","https://cpoc.org.uk/guidelines-resources-guidelines"],["PROSPECT procedure-specific analgesia (ESRA)","https://esraeurope.org/prospect/"],["ASRA Pain Medicine — guidelines (ketamine, anticoagulation)","https://www.asra.com/guidelines-articles/guidelines"],["Brain Trauma Foundation guidelines","https://braintrauma.org/coma/guidelines"]]],
@@ -4315,7 +4341,7 @@ const printBtn = (gid, tab) => (gid==="paeds" || (gid==="tx" && tab!=="don")) ? 
 
 const GROUPS = [
  {id:"emerg", name:"Emergencies", sub:"Adult & obstetric · Paeds — crisis steps with doses", tabKey:"emTab", tabs:[
-   {id:"adult", label:"Adult / Obstetric", input:()=>step("aw","Weight","kg",30,200,1), cards:EMERG_ADULT},
+   {id:"adult", label:"Adult / Obstetric", input:()=>ptiles([ptile("aw","Weight","kg",30,200,1)]), cards:EMERG_ADULT},
    {id:"paeds", label:"Paeds", input:()=>pInputs(), cards:EMERG_PAEDS}], cards:[]},
  {id:"premed", name:"Premed", sub:"Assess · Prepare · Plan & note", tabKey:"pmTab", tabs:[
    {id:"assess", label:"Assess", input:()=>gaInputs(), top:()=>preSummary(), hint:"Examine → score → decide. The summary bar collects the scores to copy.",
@@ -4545,11 +4571,12 @@ function accordion(c, t, gid, label){
   return `<details class="card acc" ${isWide()?"":'name="acc"'} data-t="${esc(t)}" data-g="${gid}"><summary>${summ}</summary>${cl.innerHTML}${relLinks(gid, t)}</details>`;
 }
 function ptBar(gid, tab){
-  const W2 = wts(); let t;
-  if (gid==="paeds" || (gid==="emerg" && tab==="paeds")) t = AGEM() < 1 ? `${sig(S.pw)} kg · ${neoAgeTxt()}` : `${sig(S.pw)} kg · ${S.pY} y${S.pM?` ${S.pM} m`:""}${isPreterm() && AGEM() < 14 ? ` · ex-prem ${S.gaB} wk, PMA ${sig(pmaWk())} wk` : ""}`;
-  else if (gid==="emerg" || (gid==="tx" && tab==="don")) t = `${sig(S.aw)} kg`;
-  else { t = `${sxi(S.sex)} ${S.height} cm · ${sig(S.aw)} kg · ${S.age} y · BMI ${sig(W2.bmi)}`; if (gid==="tx") t += ` · K⁺ ${S.k} · Hb ${S.hb}`; }
-  return `<button class="ptbar" data-ptedit="1"><span>${t}</span><span class="sub">edit ✎</span></button>`;
+  const W2 = wts(), n = v => `<span class="n7">${v}</span>`, acx = activeCase(); let t, sub = "";
+  if (gid==="paeds" || (gid==="emerg" && tab==="paeds")) { t = AGEM() < 1 ? `${n(sig(S.pw))} kg · day ${n(S.pD)} · ${n(S.gaB)} wk GA` : `${n(sig(S.pw))} kg · ${n(S.pY)} y${S.pM?` ${n(S.pM)} m`:""} · ${n(S.pHt)} cm`;
+    sub = AGEM() < 1 ? `${isPreterm()?"preterm · ":""}PMA ${sig(pmaWk())} wk · birth weight ${sig(bwKg())} kg` : isPreterm() && AGEM() < 14 ? `ex-prem ${S.gaB} wk · PMA ${sig(pmaWk())} wk` : ""; }
+  else if (gid==="emerg" || (gid==="tx" && tab==="don")) t = `${n(sig(S.aw))} kg`;
+  else { t = `${sxi(S.sex)} ${n(S.height)} cm · ${n(sig(S.aw))} kg · ${n(S.age)} y`; sub = `BMI ${sig(W2.bmi)} · IBW/PBW ${sig(W2.ibwRaw)} · LBW ${sig(W2.lbw)} · AdjBW ${sig(W2.adj)} kg`; if (gid==="tx") sub += ` · K⁺ ${S.k} · Hb ${S.hb}`; }
+  return `<button class="ptbar" data-ptedit="1"><span>${acx ? `<span class="pbc">${caseName(acx)}</span>` : ""}<span class="pbm">${t}</span>${sub ? `<span class="pbs">${sub}</span>` : ""}</span><span class="sub">edit ✎</span></button>`;
 }
 function groupScreen(g){
   const m = cardMap();
@@ -4684,6 +4711,17 @@ document.addEventListener("click", e => { if (!e.target.closest || !e.target.clo
 document.addEventListener("change", e => { if (e.target.id==="csNote"){ S.csNote = e.target.value.slice(0,300); render(); } if (e.target.id==="leNote"){ S.leNote = e.target.value.slice(0,300); render(); } if (e.target.id==="pnNote"){ S.pnNote = e.target.value.slice(0,300); render(); } if (e.target.dataset && e.target.dataset.pnf){ const f = e.target.dataset.pnf, v = e.target.value.slice(0,300); (S.pnF = S.pnF || {})[f] = v; if (f === "cr"){ const n = parseFloat(v); if (n >= 30 && n <= 1200){ S.crea = n; S.touched.crea = true; } } render(); } });
 document.addEventListener("input", e => { if (e.target.id==="csNote") S.csNote = e.target.value.slice(0,300); if (e.target.id==="leNote"){ S.leNote = e.target.value.slice(0,300); store.set("consLast","le"); } if (e.target.id==="pnNote") S.pnNote = e.target.value.slice(0,300); if (e.target.dataset && e.target.dataset.pnf) (S.pnF = S.pnF || {})[e.target.dataset.pnf] = e.target.value.slice(0,300); if (e.target.id==="q") runSearch(e.target.value); if (e.target.id==="vq"){ S.vq = e.target.value; const pos = e.target.selectionStart; render(); const el = document.getElementById("vq"); if (el){ el.focus(); try{ el.setSelectionRange(pos,pos); }catch(_){} } } if (e.target.id==="cNick") S.cNick = e.target.value.slice(0,12); if (e.target.id==="dname") S.dname = e.target.value.slice(0,24); });
 function clamp(v,min,max){ return Math.min(max, Math.max(min, v)); }
+/* hold − / + : repeat, speeding up; the click after a hold is ignored */
+(() => { let tm = null, n = 0, held = false, key = null, dd = 0, mn = 0, mx = 0;
+  const tick = () => { n++; const st = dd * (n > 15 ? 5 : n > 6 ? 2 : 1); S.ptEditing = true; S.touched[key] = true; if (key === "pw") S.pwEst = false;
+    S[key] = clamp(Math.round(((parseFloat(S[key])||0) + st)*10)/10, mn, mx); render(); };
+  const stop = () => { clearTimeout(tm); clearInterval(tm); tm = null; };
+  document.addEventListener("pointerdown", e => { const b = e.target.closest && e.target.closest(".ptile [data-step]"); if (!b) return;
+    held = false; n = 0; key = b.dataset.step; dd = parseFloat(b.dataset.d); mn = +b.dataset.min; mx = +b.dataset.max;
+    tm = setTimeout(() => { held = true; tm = setInterval(tick, 110); }, 450); });
+  ["pointerup","pointercancel","pointerleave"].forEach(ev => document.addEventListener(ev, stop));
+  document.addEventListener("click", e => { if (held && e.target.closest && e.target.closest(".ptile [data-step]")) { e.stopImmediatePropagation(); e.preventDefault(); held = false; } }, true);
+})();
 document.addEventListener("click", e => {
   const b = e.target.closest("button, input[type=checkbox]"); if (!b) return;
   const d = b.dataset;
