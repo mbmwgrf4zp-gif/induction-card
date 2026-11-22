@@ -636,7 +636,7 @@ if (window.top !== window.self && /\.github\.io$/.test(location.hostname)) {
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.65.0";
+const APP_VERSION = "2.65.1";
 const APP_DATE = "21 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
@@ -1214,7 +1214,7 @@ function dz(x, unit, max){
 const W = () => S.pw;
 const AGEM = () => S.pY*12 + S.pM;
 /* Neonatal age: day of life, gestation at birth, birth weight (only asked when age is 0 y 0 m) */
-const NEOA_CHECKED = false;
+const NEOA_CHECKED = true;
 const neoaDraft = () => NEOA_CHECKED ? "" : `<div class="warn" style="margin-top:0">DRAFT — neonatal age inputs (day of life, gestation, birth weight) and what they calculate. Not yet ticked by you.</div>`;
 const wksSinceBirth = () => AGEM() < 1 ? S.pD/7 : AGEM()*4.345;
 const pmaWk = () => Math.round((S.gaB + wksSinceBirth())*10)/10;
@@ -3978,7 +3978,7 @@ VGROUPS.find(g => g[0]==="General")[1].push(["Neonatal cards & local manual", "2
   "Anaphylaxis: IV adrenaline moderate 1–2, life-threatening 4–10 mcg/kg; IM age bands 150 / 300 / 500 mcg; crystalloid 20 mL/kg (RCUK as note). Laryngospasm propofol 1–2 mg/kg; bronchospasm adrenaline 0.5–1 mcg/kg; emergence delirium adds propofol 0.5–1, midazolam 0.02–0.1, ketamine 0.5–1 mg/kg",
   "Manual's internal conflicts resolved to its drug table: D10 2.5 mL/kg, ondansetron 0.15 mg/kg",
   "Condition cards (international, not in local manual): OA / TOF, CDH (PIP ≤ 25, PaCO₂ 45–60, preductal SpO₂ 80–95%), gastroschisis / exomphalos (compartment: PIP > 25–30, bladder > 20 mmHg), NEC, PDA ligation (test clamp), malrotation / volvulus, myelomeningocele"]]);
-VGROUPS.find(g => g[0]==="General")[1].push(["Neonatal age inputs (DRAFT — tick to sign off)", "", [
+VGROUPS.find(g => g[0]==="General")[1].push(["Neonatal age inputs", "22 Nov 2026", [
   "At age 0 y 0 m the patient box asks day of life (0–28), gestation at birth (22–42 wk, default 40) and birth weight (defaults to current weight)",
   "Weeks since birth = day / 7 for a neonate, months × 4.345 for an infant; PMA = gestation + weeks since birth; preterm = gestation < 37 wk",
   "Fluids: highlights the local-manual cell (birth weight band × day band; day 0 counts as day 1) and gives mL/h = mL/kg/day × current weight ÷ 24",
@@ -4050,7 +4050,7 @@ function vTicks(){
 }
 /* ---------- ABOUT ---------- */
 const CHANGES = [
-  ["2.65","Neonatal age: day of life, gestation and birth weight; fluids, blood volume, SpO₂ and ex-prem calculated from them (draft)"],
+  ["2.65","Neonatal age: day of life, gestation and birth weight; fluids, blood volume, SpO₂ and ex-prem calculated from them (checked)"],
   ["2.64","Neonatal basics folded into the paediatric Tube, Drugs, Fluids, Glucose, Ventilation and Warming cards; duodenal atresia, anorectal and Hirschsprung cards"],
   ["2.63","Neonatal cards: basics plus OA / TOF, CDH, gastroschisis, NEC, PDA, malrotation, myelomeningocele; local manual doses restored (checked)"],
   ["2.62","Paeds review fixes: RCUK 2025 arrest, difficult airway / CICO and tonsil bleed cards, glucose targets, ventilation by age, consistent doses (checked)"],
