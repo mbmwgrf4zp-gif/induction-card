@@ -373,6 +373,7 @@ tr.over td{background:var(--danger-bg)}
 .rmla{width:32px;height:32px;border-radius:8px;border:1px solid var(--line);background:var(--card);cursor:pointer;font-size:var(--fs-lg);line-height:1}
 table.blk th{width:32%;font-size:var(--fs-xs);text-transform:uppercase;letter-spacing:.04em}
 .bad{color:var(--danger-ink);font-weight:700}
+.jumprow{display:flex;flex-wrap:wrap;gap:var(--s2);margin:0 0 var(--s2)}.jumprow .chip{min-height:40px}h3.irh{scroll-margin-top:72px}
 .seerow.seeafter{margin-top:var(--s4)}.seerow{display:flex;flex-wrap:wrap;align-items:center;gap:var(--s2);margin:0 0 var(--s3)}.seerow>.sub{flex-basis:100%;margin:0 2px}
 .seechip,.rchip{display:flex;flex-direction:column;justify-content:center;min-height:44px;line-height:1.2}.seechip small,.rchip small{font-weight:400;color:var(--muted);font-size:var(--fs-xs)}
 .recent{margin:var(--s2) 0 var(--s3)}.recent .label{margin:0 2px var(--s1)}.rchips{display:flex;gap:var(--s2);overflow-x:auto;scrollbar-width:none;padding-bottom:2px}.rchips::-webkit-scrollbar{display:none}
@@ -672,7 +673,7 @@ if (window.top !== window.self && /\.github\.io$/.test(location.hostname)) {
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.69.1";
+const APP_VERSION = "2.70.1";
 const APP_DATE = "22 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
@@ -756,8 +757,8 @@ const PEARLS = [
   ["Exactly 150 cm → 1.8 mL heavy bupivacaine for LSCS.","A1. Spinal: dose by height","obs","lscs"],
   ["IT morphine is 1 mg/mL diluted: 0.1 mL = 0.1 mg. Never straight from the 10 mg/mL ampoule.","A2. Spinal: IT morphine & fentanyl","obs","lscs"],
   ["Sugammadex 16 mg/kg (total weight) for immediate reversal after RSI rocuronium.","2. RSI","ga","ind"],
-  ["Rocuronium is dosed on ideal weight; suxamethonium on total weight.","3. Muscle relaxants","ga","ind"],
-  ["Chula formula: oral ETT depth = 4 + height/10 cm.","4. Tube & airway kit","ga","ind"],
+  ["Rocuronium is dosed on ideal weight; suxamethonium on total weight.","1. Induction drugs & relaxants","ga","ind"],
+  ["Chula formula: oral ETT depth = 4 + height/10 cm.","3. Tube & airway kit","ga","ind"],
   ["Paeds ETT anchor: term 9 cm, 1 year 12 cm, then age/2 + 12.","1. Tube: size, depth, blade, suction","paeds","ind"],
   ["Caudal: more than 1.2 mL/kg of 0.25% bupivacaine = toxicity.","3. Caudal","paeds","blocks"],
   ["Neonatal epidural: never exceed 0.2 mg/kg/h of local anaesthetic.","4. Lumbar / thoracic epidural","paeds","blocks"],
@@ -853,7 +854,7 @@ const QT = (() => {
   return {
   lscs:{lab:"LSCS spinal", ic:"obs", cls:"t-obs", kind:"obs", keys:["spHt"], inp:()=>`${Math.round(S.spHt)} cm`, open:["A1. Spinal: dose by height","obs","lscs"],
     ans:()=>{ const h=Math.round(S.spHt), row=LSCS.find(r=>h<=r[0]); return sm(row[1]===row[2]?fmt(row[1]):fmt(row[1])+"–"+fmt(row[2]),"mL heavy bupi"); }},
-  aett:{lab:"Adult ETT", ic:"airway", cls:"t-ga", kind:"adult", keys:["height"], inp:aHt, open:["4. Tube & airway kit","ga","ind"],
+  aett:{lab:"Adult ETT", ic:"airway", cls:"t-ga", kind:"adult", keys:["height"], inp:aHt, open:["3. Tube & airway kit","ga","ind"],
     ans:()=>sm(S.sex==="F"?"6.5–7.0":"7.0–7.5",`${f1(r05(4+S.height/10))} cm at mouth corner`)},
   pett:{lab:"Paeds ETT", ic:"paeds", cls:"t-paeds", kind:"paeds", keys:Pk, inp:pAge, open:["1. Tube: size, depth, blade, suction","paeds","ind"],
     ans:()=>{ const e=paedEtt(); return sm(e.useCuff?f1(e.cuffed):e.plainTxt,`${e.useCuff?"cuffed · ":""}${fmt(e.depth)} cm`); }},
@@ -871,19 +872,19 @@ const QT = (() => {
     ans:()=>{ const ml=dz(Math.min(0.1*S.pw,10),"mL",10); return sm(ml,`mL of 1:10 000 (10 mcg/kg)`); }},
   dlt:{lab:"Double-lumen tube", ic:"airway", cls:"t-ga", kind:"adult", keys:["height"], inp:aHt, open:["2. One-lung ventilation","ga","maint"],
     ans:()=>sm(dltSize(),`Fr left · ${sig(12+S.height/10)} cm`)},
-  prop:{lab:"Propofol induction", ic:"airway", cls:"t-ga", kind:"adult", keys:A, inp:aBoth, open:["1. Induction drugs","ga","ind"],
+  prop:{lab:"Propofol induction", ic:"airway", cls:"t-ga", kind:"adult", keys:A, inp:aBoth, open:["1. Induction drugs & relaxants","ga","ind"],
     ans:()=>{ const w=wts().lbw, r=x=>dz(dz(x/10,"mL")*10,"mg"); return sm(`${r(1.5*w)}–${r(2.5*w)}`,`mg · 1.5–2.5 mg/kg LBW`); }},
   sug:{lab:"Sugammadex", ic:"airway", cls:"t-ga", kind:"adult", keys:["aw"], inp:aWt, open:["1. Reversal","ga","post"],
     ans:()=>{ const t=wts().tbw, m=k=>sig(dz(k*t/100,"mL")*100); return sm(m(2),`mg (2/kg) · 4: ${m(4)} · 16: ${m(16)}`); }},
   neo:{lab:"Neostigmine + glyco", ic:"airway", cls:"t-ga", kind:"adult", keys:A, inp:aBoth, open:["1. Reversal","ga","post"],
     ans:()=>{ const neo=Math.min(0.05*wts().ibw,5); return sm(sig(dz(neo/2.5,"mL")*2.5),`mg + glyco ${dz(neo*0.2,"mg")} mg`); }},
-  fent:{lab:"Fentanyl induction", ic:"airway", cls:"t-ga", kind:"adult", keys:A, inp:aBoth, open:["1. Induction drugs","ga","ind"],
+  fent:{lab:"Fentanyl induction", ic:"airway", cls:"t-ga", kind:"adult", keys:A, inp:aBoth, open:["1. Induction drugs & relaxants","ga","ind"],
     ans:()=>{ const w=wts().lbw, r=x=>dz(dz(x/50,"mL")*50,"mcg"); return sm(`${r(w)}–${r(3*w)}`,`mcg · 1–3 mcg/kg LBW`); }},
   bw:{lab:"Body weights", ic:"airway", cls:"t-ga", kind:"adult", keys:A, inp:aBoth, goTab:"ga:ind",
     ans:()=>{ const x=wts(); return sm(sig(x.ibw),`kg IBW · LBW ${sig(x.lbw)} · Adj ${sig(x.adj)} · PBW ${sig(x.ibwRaw)}`); }},
   pwt:{lab:"Paeds weight estimate", ic:"paeds", cls:"t-paeds", kind:"paeds", keys:["pY"], inp:()=>`${S.pY} y${S.pM?` ${S.pM} m`:""}`, goTab:"paeds:pre",
     ans:()=>{ const y=S.pY, mo=AGEM(), e = mo<1?null : y<1?0.5*mo+4 : y<=5?2*y+8 : y<=12?3*y+7 : null; return e==null ? sm("—","no formula for this age") : sm(sig(e),"kg (APLS)"); }},
-  pprop:{lab:"Paeds propofol", ic:"paeds", cls:"t-paeds", kind:"paeds", keys:Pk, inp:pAge, open:["3. Induction drugs","paeds","ind"],
+  pprop:{lab:"Paeds propofol", ic:"paeds", cls:"t-paeds", kind:"paeds", keys:Pk, inp:pAge, open:["3. Induction drugs & relaxants","paeds","ind"],
     ans:()=>{ const neo=AGEM()<1, w=S.pw; return neo ? sm(dz(2*w,"mg"),"mg · neonate 2 mg/kg") : sm(`${dz(4*w,"mg")}–${dz(5*w,"mg")}`,"mg · 4–5 mg/kg healthy"); }},
   pcau:{lab:"Paeds caudal (T10)", ic:"spinal", cls:"t-regional", kind:"paeds", keys:["pw"], inp:()=>`${sig(S.pw)} kg`, open:["3. Caudal","paeds","blocks"],
     ans:()=>{ const w=S.pw, a=Math.min(0.75*w,20), b=Math.min(w,20); return sm(a===b?sig(a):`${sig(a)}–${sig(b)}`,"mL bupi 0.25% (max 20)"); }},
@@ -1459,23 +1460,47 @@ pCards.tiva = () => {
 };
 
 const PIND_CHECKED = true;
+const IR_CHECKED = true;   // checked by author 22 Nov 2026
+const irDraft = () => IR_CHECKED ? "" : `<div class="warn" style="margin-top:0">DRAFT — induction drugs and muscle relaxants combined in one card under class headings (no dose changed). Not yet ticked by you.</div>`;
+/* class headings inside a combined drug card, with a jump row (taps scroll to the heading; no redraw) */
+const IR_SECS = {anti:"Anticholinergic", opioid:"Opioid", hyp:"Hypnotic", relax:"Muscle relaxant", noiv:"No IV access"};
+const irJump = ids => `<div class="jumprow">${ids.map(k => `<button class="chip" data-jump="${k}">${IR_SECS[k]}</button>`).join("")}</div>`;
+const irHead = k => `<h3 class="irh" data-anchor="${k}">${IR_SECS[k]}</h3>`;
+const OLD_LABELS = {"ga|1. Induction drugs":"ga-ind-induction-drugs", "ga|3. Muscle relaxants":"ga-ind-muscle-relaxants", "ga|4. Tube & airway kit":"ga-ind-tube-and-airway-kit",
+  "paeds|3. Induction drugs":"paeds-ind-induction-drugs", "paeds|4. Muscle relaxants":"paeds-ind-muscle-relaxants", "paeds|5. RSI (child)":"paeds-ind-rsi", "paeds|6. Ketamine induction (short cases)":"paeds-ind-ketamine-anaesthesia",
+  "paeds|7. TIVA: model check & propofol targets":"paeds-ind-tiva-model-check", "paeds|8. TIVA: remifentanil":"paeds-ind-remifentanil", "paeds|9. Ventilation settings":"paeds-ind-ventilation",
+  "paeds|10. One-lung ventilation (Storz)":"paeds-ind-one-lung-ventilation-storz", "paeds|11. Lines: double-lumen CVC":"paeds-ind-double-lumen-cvc"};   // pre-v2.70 recent records {g, t}
+const ID_ALIAS = {"ga-ind-muscle-relaxants": ["ga-ind-induction-drugs", "relax"], "paeds-ind-muscle-relaxants": ["paeds-ind-induction-drugs", "relax"]};   // merged cards: old id → [card, section]
 const pindDraft = () => PIND_CHECKED ? "" : `<div class="warn" style="margin-top:0">DRAFT — paeds induction review (Nov 2026): opioids, gas induction, relaxants, RSI, reversal, bolus pressors, and the review fixes (glucose targets, ventilation by age, blood product doses, omeprazole, RCUK 2025 arrest, difficult airway, tonsil bleed, pyloric). Not yet ticked by you.</div>`;
 pCards.drugs = () => {
-  const w = W(), mo = AGEM(), neo = mo < 1, pre = neo && isPreterm();
-  return `<div class="card"><h2>Paeds induction drugs</h2>${pindDraft()}${pbDraft()}${T([
-    (()=>{ const mo=AGEM(), b = mo<1 ? ["neonate",[2,2]] : ["healthy child",[4,5]]; return R(`Propofol (${b[0]})`,`${b[1][0]===b[1][1]?b[1][0]:b[1].join("–")} mg/kg`,`${pk(b[1],"mg")} = ${pk([b[1][0]/10,b[1][1]/10],"mL")}`,"local: healthy 4–5 · ill, liver transplant or neonate 2 mg/kg (titrate) · laryngospasm 1–2","IV"); })(),
-    DR("Ketamine",[1,2],"mg","haemodynamically unstable, asthma",null,"IV"), DR("Ketamine (no IV access)",[4,5],"mg","onset 3–5 min · site IV once settled",500,"IM"),
+  const w = W(), mo = AGEM(), neo = mo < 1, pre = neo && isPreterm(), inf = mo < 12;
+  return `<div class="card"><h2>Paeds induction drugs &amp; relaxants</h2>${pindDraft()}${pbDraft()}${irDraft()}${irJump(["anti","opioid","hyp","relax","noiv"])}
+  ${irHead("anti")}${T([
     R("Atropine (neonate, before laryngoscopy)","20 mcg/kg",pk(20,"mcg",600),"vagal bradycardia at laryngoscopy; neonates and young infants","IV").replace('<tr class="dz"', isNeo() ? '<tr class="dz hl"' : '<tr class="dz"'),
-    R("Thiopentone 2.5% (if stocked)",neo?"3–4 mg/kg (neonate)":"5–7 mg/kg",pk(neo?[3,4]:[5,7],"mg",500),"","IV"),
-    R("Sevoflurane (gas induction)","8% in O₂ ± N₂O","<b>8%</b>, reduce once deep","site IV once asleep; not for a full stomach","inhaled"),
+    DR("Glycopyrrolate","4","mcg",null,200,"IV")])}
+  ${irHead("opioid")}${T([
     R("Fentanyl","1–2 mcg/kg",pk([1,2],"mcg",100),neo?"neonate: start at 0.5 mcg/kg and titrate (pain protocol 0.5–3)":"remifentanil: TIVA card","IV"),
-    R("Morphine",pre?"0.025–0.05 mg/kg (preterm neonate)":"0.05–0.1 mg/kg",pk(pre?[0.025,0.05]:[0.05,0.1],"mg",10),neo?"pain protocol: term 0.05–0.1, preterm 0.025–0.05 over 5 min":"titrate; longer cases","IV"),
-    DR("Suxamethonium (no IV access)","4","mg","onset 2–4 min · give atropine IM with it",150,"IM"), DR("Atropine (no IV access)","0.02","mg","onset 5–15 min",0.6,"IM"),
-    DR("Glycopyrrolate","4","mcg",null,200,"IV"),
-    R("Local anaesthetic (max)","bupivacaine 0.25% 1 mL/kg",pk(1,"mL"),"maximum for infiltration / blocks","infiltration / perineural")])}
-
+    R("Morphine",pre?"0.025–0.05 mg/kg (preterm neonate)":"0.05–0.1 mg/kg",pk(pre?[0.025,0.05]:[0.05,0.1],"mg",10),neo?"pain protocol: term 0.05–0.1, preterm 0.025–0.05 over 5 min":"titrate; longer cases","IV")])}
+  ${irHead("hyp")}${T([
+    (()=>{ const mo=AGEM(), b = mo<1 ? ["neonate",[2,2]] : ["healthy child",[4,5]]; return R(`Propofol (${b[0]})`,`${b[1][0]===b[1][1]?b[1][0]:b[1].join("–")} mg/kg`,`${pk(b[1],"mg")} = ${pk([b[1][0]/10,b[1][1]/10],"mL")}`,"local: healthy 4–5 · ill, liver transplant or neonate 2 mg/kg (titrate) · laryngospasm 1–2","IV"); })(),
+    R("Thiopentone 2.5% (if stocked)",neo?"3–4 mg/kg (neonate)":"5–7 mg/kg",pk(neo?[3,4]:[5,7],"mg",500),"","IV"),
+    DR("Ketamine",[1,2],"mg","haemodynamically unstable, asthma",null,"IV"),
+    R("Sevoflurane (gas induction)","8% in O₂ ± N₂O","<b>8%</b>, reduce once deep","site IV once asleep; not for a full stomach","inhaled")])}
+  ${irHead("relax")}${T([
+    R("Suxamethonium",neo?"3 mg/kg (neonate)":inf?"2 mg/kg (infant)":"1–1.5 mg/kg",pk(neo?[3,3]:inf?[2,2]:[1,1.5],"mg",150),"infants and before a second dose: atropine 20 mcg/kg first","IV"),
+    R("Rocuronium (intubation)","0.6 mg/kg",pk(0.6,"mg"),neo||inf?"infant: slower onset, longer action":"top-up 0.1–0.2 mg/kg, guided by TOF","IV"),
+    R("Rocuronium (RSI)","1.2 mg/kg",pk(1.2,"mg"),"reversible with sugammadex 16 mg/kg","IV"),
+    R("Atracurium","0.5 mg/kg",pk(0.5,"mg"),neo?"local manual; BNFc neonate 0.3–0.5 · top-up 0.1–0.2 mg/kg":"top-up 0.1–0.2 mg/kg (⅓ of intubating dose); Hofmann — liver or kidney failure; histamine release","IV"),
+    R("Cisatracurium",mo<1?"not &lt; 1 month":"0.15 mg/kg",mo<1?"—":pk(0.15,"mg"),"top-up 0.03 mg/kg; no histamine release","IV"),
+    R("Vecuronium","0.1 mg/kg",pk(0.1,"mg"),"top-up 0.02–0.05 mg/kg; prolonged in neonates","IV")])}
+  <p class="sub">Monitor with TOF. <button class="linkbtn" data-id="paeds-post-reversal" data-open="1. Reversal" data-g="paeds" data-tab="post">Reversal: Paeds › Post-op › Reversal (child) ›</button></p>${src("APA / BNFc 2026; product information.")}
+  ${irHead("noiv")}${T([
+    DR("Ketamine (no IV access)",[4,5],"mg","onset 3–5 min · site IV once settled",500,"IM"),
+    DR("Suxamethonium (no IV access)","4","mg","onset 2–4 min · give atropine IM with it",150,"IM"),
+    DR("Atropine (no IV access)","0.02","mg","onset 5–15 min",0.6,"IM")])}
   <p class="sub"><b>No IV access:</b> IM options are ketamine, or suxamethonium + atropine. Then site IV / IO.</p>
-  <p class="sub">Relaxants: Muscle relaxants (child). Full stomach: RSI (child). Remifentanil: TIVA card. Ketamine top-ups and MRI / EUA use: Ketamine anaesthesia card.</p>${psrc()}</div>
+  <p class="sub">Full stomach: RSI (child). Remifentanil: TIVA card. Ketamine top-ups and MRI / EUA use: Ketamine anaesthesia card.</p>
+  <button class="homebtn" data-id="paeds-blocks-la-dose-calculator" data-open="1. LA dose calculator (child)" data-g="paeds" data-tab="blocks">Local anaesthetic maximum → Blocks › LA dose calculator (child) ›</button>${psrc()}</div>
   <div class="card"><h2>Paeds intra-op drugs</h2>${pindDraft()}${neoDraft()}${T([
     R("Tranexamic acid","15 mg/kg over 30 min, then 2–5 mg/kg/h",`${pk(15,"mg",1000)}, then ${pk([2,5],"mg")}/h`,"bolus: &gt; 1 y laparotomy; infusion: craniofacial, scoliosis","IV"),
     R("Dexamethasone (oedema)","0.2 mg/kg (up to 0.6)",`${pk(0.2,"mg")} (up to ${dz(0.6*w,"mg")} mg)`,"watch for tumour lysis syndrome","IV"),
@@ -1623,15 +1648,6 @@ function sbpBlock(){ const w = W(), y = S.pY, mo = AGEM(); let sbp, sbpRule, low
   else { sbp = 90 + 2*y; sbpRule = "median 90 + (age × 2)"; low = 70 + 2*y; }
   return `<h3>Expected systolic BP</h3><div class="row"><div><div class="sub">Expected</div><div class="big">${sbp} mmHg</div><div class="sub">${sbpRule}</div></div>
   ${low?`<div><div class="sub">Hypotension below</div><div class="big">${low} mmHg</div><div class="sub">lower limit 70 + (age × 2)</div></div>`:""}</div>`; }
-pCards.relax = () => { const w = W(), mo = AGEM(), inf = mo < 12, neo = mo < 1;
-  return `<div class="card"><h2>Muscle relaxants (child)</h2>${pindDraft()}${T([
-    R("Suxamethonium",neo?"3 mg/kg (neonate)":inf?"2 mg/kg (infant)":"1–1.5 mg/kg",pk(neo?[3,3]:inf?[2,2]:[1,1.5],"mg",150),"infants and before a second dose: atropine 20 mcg/kg first","IV"),
-    R("Rocuronium (intubation)","0.6 mg/kg",pk(0.6,"mg"),neo||inf?"infant: slower onset, longer action":"top-up 0.1–0.2 mg/kg, guided by TOF","IV"),
-    R("Rocuronium (RSI)","1.2 mg/kg",pk(1.2,"mg"),"reversible with sugammadex 16 mg/kg","IV"),
-    R("Atracurium","0.5 mg/kg",pk(0.5,"mg"),neo?"local manual; BNFc neonate 0.3–0.5 · top-up 0.1–0.2 mg/kg":"top-up 0.1–0.2 mg/kg (⅓ of intubating dose); Hofmann — liver or kidney failure; histamine release","IV"),
-    R("Cisatracurium",mo<1?"not &lt; 1 month":"0.15 mg/kg",mo<1?"—":pk(0.15,"mg"),"top-up 0.03 mg/kg; no histamine release","IV"),
-    R("Vecuronium","0.1 mg/kg",pk(0.1,"mg"),"top-up 0.02–0.05 mg/kg; prolonged in neonates","IV")])}
-  <p class="sub">Monitor with TOF. Reversal: Paeds › Post-op › Reversal (child).</p>${src("APA / BNFc 2026; product information.")}</div>`; };
 pCards.rsi = () => { const w = W(), mo = AGEM(), inf = mo < 12, neo = mo < 1;
   return `<div class="card"><h2>RSI (child)</h2>${pindDraft()}
   <p class="sub">Genuine full stomach: bowel obstruction, trauma, pyloric stenosis after the stomach is emptied (NG aspirated supine, left and right lateral).</p>${T([
@@ -2985,15 +3001,29 @@ function lepBody(){ const txt = lepText();
   ${src("OAA labour epidural information card; NAP3 (RCoA 2009; Cook et al., BJA 2009); Ruppen et al., Anesthesiology 2006; Moen et al., Anesthesiology 2004; Ministry of Health Malaysia anaesthesia consent form.")}`; }
 
 /* INDUCTION */
-gaCards.induction = () => `<div class="card"><h2>1. Induction drugs</h2>${gaDraft()}${GT([
+gaCards.induction = () => `<div class="card"><h2>1. Induction drugs &amp; relaxants</h2>${gaDraft()}${irDraft()}${irJump(["opioid","hyp","relax","noiv"])}
+  ${irHead("opioid")}${GT([
+  GD("Fentanyl",[1,3],"mcg","lbw",50,null,null,"IV")])}
+  ${irHead("hyp")}${GT([
   GD("Propofol 1%",[1.5,2.5],"mg","lbw",10,"Elderly / frail: 1–1.5 mg/kg",null,"IV"),
   GD("Thiopentone 2.5%",[3,5],"mg","lbw",25,null,null,"IV"),
   GD("Ketamine",[1,2],"mg","lbw",50,"Haemodynamically unstable, asthma",null,"IV"),
+  GD("Etomidate",[0.2,0.3],"mg","lbw",2,null,null,"IV")])}
+  <p class="sub">Midazolam co-induction 1–2 mg. Reduce all doses in elderly, shocked or septic patients.</p>
+  ${irHead("relax")}${GT([
+  GD("Suxamethonium",[1,1.5],"mg","tbw",50,null,null,"IV"),
+  GD("Rocuronium (intubation)",0.6,"mg","ibw",10,null,null,"IV"),
+  GD("Rocuronium (RSI)",1.2,"mg","ibw",10,null,null,"IV"),
+  GD("Atracurium",0.5,"mg","ibw",10,"Hofmann — renal/liver failure",null,"IV"),
+  GD("Cisatracurium",0.15,"mg","ibw",2,null,null,"IV"),
+  GD("Vecuronium",0.1,"mg","ibw",1,"10 mg in 10 mL",null,"IV")])}
+  <p class="sub">Rocuronium and the other non-depolarising relaxants: IV only (IM onset slow and unreliable).</p>
+  <p class="sub">Top-ups: about ¼ of the intubating dose, guided by TOF.</p>
+  ${irHead("noiv")}${GT([
   GD("Ketamine (no IV access)",[4,5],"mg","lbw",null,"onset 3–5 min · site IV once settled",500,"IM"),
-  GD("Etomidate",[0.2,0.3],"mg","lbw",2,null,null,"IV"),
-  GD("Fentanyl",[1,3],"mcg","lbw",50,null,null,"IV")])}
-  <p class="sub"><b>No IV access:</b> IM options are ketamine, or suxamethonium + atropine. Then site IV / IO.</p>
-  <p class="sub">Midazolam co-induction 1–2 mg. Reduce all doses in elderly, shocked or septic patients.</p>${src(GSRC)}</div>`;
+  GD("Suxamethonium (no IV access)",[3,4],"mg","tbw",null,"onset 2–4 min · give atropine IM with it",150,"IM"),
+  R("Atropine (no IV access, with IM suxamethonium)","fixed dose","<b>0.6 mg</b>","onset 5–15 min","IM")])}
+  <p class="sub"><b>No IV access:</b> IM options are ketamine, or suxamethonium + atropine. Then site IV / IO.</p>${src(GSRC)}</div>`;
 gaCards.rsi = () => { const W2 = wts();
   return `<div class="card"><h2>2. RSI</h2>${gaDraft()}
   <ol><li>Check: suction on, tipping trolley, bougie, VL, SAD, plan A–D said aloud</li><li>Preoxygenate EtO₂ &gt; 0.9 (± high-flow nasal O₂)</li><li>Cricoid 10 N awake → 30 N after LOC; release if view poor</li><li>Induction agent + relaxant, no bag-mask unless SpO₂ falling (then gentle)</li></ol>
@@ -3002,21 +3032,10 @@ gaCards.rsi = () => { const W2 = wts();
     <div class="result" style="margin:0"><div class="sub">Rocuronium 1.2 mg/kg · IBW ${sig(W2.ibw)} kg</div><div class="big">${sig(dz(1.2*W2.ibw/10,"mL")*10)} mg</div><div class="sub">${dz(1.2*W2.ibw/10,"mL")} mL of 10 mg/mL</div>
       <div class="danger" style="margin-bottom:0"><b>Rescue:</b> sugammadex 16 mg/kg TBW = <b>${sig(dz(16*W2.tbw/100,"mL")*100)} mg</b> (${dz(16*W2.tbw/100,"mL")} mL)</div></div></div>
   <p class="sub">Sux: avoid in hyperkalaemia, burns &gt; 48 h, denervation, MH history.</p>${src(GSRC)}</div>`; };
-gaCards.relax = () => `<div class="card"><h2>3. Muscle relaxants</h2>${gaDraft()}${GT([
-  GD("Suxamethonium",[1,1.5],"mg","tbw",50,null,null,"IV"),
-  GD("Suxamethonium (no IV access)",[3,4],"mg","tbw",null,"onset 2–4 min · give atropine IM with it",150,"IM"),
-  R("Atropine (no IV access, with IM suxamethonium)","fixed dose","<b>0.6 mg</b>","onset 5–15 min","IM"),
-  GD("Rocuronium (intubation)",0.6,"mg","ibw",10,null,null,"IV"),
-  GD("Rocuronium (RSI)",1.2,"mg","ibw",10,null,null,"IV"),
-  GD("Atracurium",0.5,"mg","ibw",10,"Hofmann — renal/liver failure",null,"IV"),
-  GD("Cisatracurium",0.15,"mg","ibw",2,null,null,"IV"),
-  GD("Vecuronium",0.1,"mg","ibw",1,"10 mg in 10 mL",null,"IV")])}
-  <p class="sub">Rocuronium and the other non-depolarising relaxants: IV only (IM onset slow and unreliable).</p>
-  <p class="sub">Top-ups: about ¼ of the intubating dose, guided by TOF.</p>${src(GSRC)}</div>`;
 gaCards.kit = () => { const w = S.aw;
   const lma = w < 30 ? "2.5" : w < 50 ? "3" : w < 70 ? "4" : w <= 100 ? "5" : "5 (or 6 if available)";
   const igel = w < 30 ? "2.5" : w < 50 ? "3" : w < 90 ? "4" : "5";
-  return `<div class="card"><h2>4. Tube &amp; airway kit</h2>${ettCalc(true, true)}
+  return `<div class="card"><h2>3. Tube &amp; airway kit</h2>${ettCalc(true, true)}
   <button class="homebtn" data-open="1. Tube: size, depth, blade, suction" data-g="paeds" data-tab="ind">Child or neonate? → Paediatric › Induction ›</button>
   <h3>Supraglottic airway for ${sig(w)} kg</h3>
   <table><tr><td>LMA Classic / Supreme / ProSeal</td><td class="hl">Size ${lma}</td></tr><tr><td>i-gel</td><td class="hl">Size ${igel}</td></tr></table>
@@ -3100,7 +3119,7 @@ gaCards.vent = () => {
   <li>Recruit once the cause is fixed; fibreoptic scope if still unclear</li></ol>
   <button class="emlink" data-open="Bronchospasm" data-g="emerg" data-tab="adult">⚠ Bronchospasm → Emergencies</button>
   <button class="emlink" data-open="Anaphylaxis" data-g="emerg" data-tab="adult">⚠ Anaphylaxis → Emergencies</button>
-  <button class="homebtn" data-open="9. Ventilation settings" data-g="paeds" data-tab="ind">Child? → Paediatric › Induction › Ventilation ›</button>
+  <button class="homebtn" data-open="8. Ventilation settings" data-g="paeds" data-tab="ind">Child? → Paediatric › Induction › Ventilation ›</button>
   ${src("Young et al. BJA 2019 intra-op lung-protective ventilation consensus; ARDSNet; Brain Trauma Foundation 4th ed.; obstetric GA ventilation studies.")}</div>`;
 };
 // left DLT starting size: Asian / Malaysian adults; confirm with fibreoptic
@@ -4082,6 +4101,11 @@ VGROUPS.find(g => g[0]==="General")[1].push(["Paeds doses vs local manual & pain
   "Neonates: morphine term 0.05–0.1 / preterm 0.025–0.05 mg/kg; fentanyl 1–2 mcg/kg (neonate start 0.5, protocol 0.5–3); atracurium 0.5 mg/kg (BNFc neonate 0.3–0.5 as note); PR paracetamol not < 3 months (manual lists 30 mg/kg loading); no sedative premed for neonate / PMA < 60 wk; ondansetron not < 1 month; neonatal antibiotic intervals (cefotaxime, metronidazole)",
   "Ibuprofen 3–6 months 5 mg/kg 6–8-hourly max 20 mg/kg/day; ketamine induction 1–2 mg/kg; phenylephrine bolus 2–10 mcg/kg (max 100 mcg); hydrocortisone 2–4 mg/kg max 200 mg; chlorphenamine IV 0.2 mg/kg max 10 mg",
   "Added from the manual: phenylephrine and vasopressin infusions, max per syringe, antihypertensives (nitroprusside, esmolol, labetalol, hydralazine), other drugs (3% saline, mannitol, KCl, insulin, adenosine 0.1–0.25 mg/kg max 12 mg), dehydration table, hypoxia crisis, difficult airway / CICV rebuilt from the manual (≤ 4 laryngoscopy, ≤ 3 SAD attempts, wake if SpO₂ > 80%), ASA paediatric examples, BMI-for-age note, LMA sizes (standard, pending page 11)"]]);
+VGROUPS.find(g => g[0]==="General")[1].push(["Induction drugs & relaxants combined", "22 Nov 2026", [
+  "Adult: General › Induction › 1. Induction drugs & relaxants — Opioid · Hypnotic · Muscle relaxant · No IV access (rows moved unchanged)",
+  "Paeds: Paediatric › Induction › 3. Induction drugs & relaxants — Anticholinergic · Opioid · Hypnotic · Muscle relaxant · No IV access (rows moved unchanged)",
+  "Removed from the paeds card: 'Local anaesthetic (max) bupivacaine 0.25% 1 mL/kg' → link to Blocks › LA dose calculator (child), which holds the maximum",
+  "Old 'Muscle relaxants' links, search results and recents open the combined card at the Muscle relaxant heading"]]);
 VGROUPS.find(g => g[0]==="General")[1].push(["Safety audit Nov 2026", "22 Nov 2026", [
   "Age eligibility (no dose shown below): promethazine 2 y, parecoxib 2 y, ibuprofen 3 months, diclofenac 6 months (suppository 1 y), paracetamol suppository 3 months, tramadol 1 y, oxycodone 1 month, ondansetron 1 month, cisatracurium 1 month, metoclopramide 1 y",
   "Metoclopramide (child): 0.2 → 0.1–0.15 mg/kg, max 10 mg, max 0.5 mg/kg/day, not < 1 y (EMA 2013)",
@@ -4159,12 +4183,12 @@ function vTicks(){
 }
 /* ---------- ABOUT ---------- */
 const CHANGES = [
+  ["2.70","Induction drugs and muscle relaxants in one card (adult and paeds) under Anticholinergic · Opioid · Hypnotic · Muscle relaxant · No IV access (checked)"],
   ["2.69","Finding cards: search in every section, recent cards on Home, shortcuts between tabs, emergency groups, Clinical Scenarios groups; no clinical text changed (checked)"],
   ["2.68","Safety audit: age-eligibility checks, metoclopramide, KCl, tramadol, anaphylaxis, calcium, bicarbonate, platelets, ranitidine (checked)"],
   ["2.67","Patient box: three tiles in the monitor font while entering, one-line summary bar once set (shows the case name)"],
   ["2.66","Paeds doses checked against the local manual and pain protocol; new: other drugs, antihypertensives, dehydration, hypoxia, LMA sizes; CICO rebuilt (checked)"],
-  ["2.65","Neonatal age: day of life, gestation and birth weight; fluids, blood volume, SpO₂ and ex-prem calculated from them (checked)"],
-  ["2.64","Neonatal basics folded into the paediatric Tube, Drugs, Fluids, Glucose, Ventilation and Warming cards; duodenal atresia, anorectal and Hirschsprung cards"]];
+  ["2.65","Neonatal age: day of life, gestation and birth weight; fluids, blood volume, SpO₂ and ex-prem calculated from them (checked)"]];
 const SRC_LINKS = [
   ["Emergencies", [["Resuscitation Council UK — ALS / PLS guidelines","https://www.resus.org.uk/library"],["Difficult Airway Society guidelines","https://das.uk.com/guidelines"],["Association of Anaesthetists — guidelines (anaphylaxis, LAST, safety)","https://anaesthetists.org/Home/Resources-publications/Guidelines"],["European Malignant Hyperthermia Group","https://www.emhg.org"],["UK Kidney Association — hyperkalaemia guideline","https://www.ukkidney.org/health-professionals/guidelines"]]],
   ["General", [["ASA standards & practice parameters (fasting, PACU)","https://www.asahq.org/standards-and-practice-parameters"],["Centre for Perioperative Care — diabetes guideline","https://cpoc.org.uk/guidelines-resources-guidelines"],["PROSPECT procedure-specific analgesia (ESRA)","https://esraeurope.org/prospect/"],["ASRA Pain Medicine — guidelines (ketamine, anticoagulation)","https://www.asra.com/guidelines-articles/guidelines"],["Brain Trauma Foundation guidelines","https://braintrauma.org/coma/guidelines"]]],
@@ -4396,8 +4420,8 @@ const GROUPS = [
     see:[["premed-assess-airway-assessment-and-plan","Airway assessment"],["premed-prepare-anticoagulants-and-antiplatelets","Anticoagulants"],["regional-safety-anticoagulants","Neuraxial anticoagulant timing"]],
     cards:[["Anaesthetic plan & consent","1. Anaesthetic plan & consent"],"2. Premed note"], links:[["Failed intubation / CICO","adult","Failed intubation / CICO"]]}], cards:[]},
  {id:"ga", name:"General", sub:"Induction · Intra-op · Post-op", tabKey:"gaTab", tabs:[
-   {id:"ind", label:"Induction", input:()=>gaInputs(), hint:"Drugs → RSI → relaxant → tube & airway kit.",
-    cards:["1. Induction drugs","2. RSI","3. Muscle relaxants","4. Tube & airway kit"], see:[["ga-post-im-doses-no-iv-access-or-ward","No IV access: IM doses"]], seeLabel:"Also",
+   {id:"ind", label:"Induction", input:()=>gaInputs(), hint:"Drugs & relaxants → RSI → tube & airway kit.",
+    cards:["1. Induction drugs & relaxants","2. RSI","3. Tube & airway kit"], see:[["ga-post-im-doses-no-iv-access-or-ward","No IV access: IM doses"]], seeLabel:"Also",
     links:[["Failed intubation / CICO","adult","Failed intubation / CICO"],["Anaphylaxis","adult","Anaphylaxis"],["Bronchospasm","adult","Bronchospasm"]]},
    {id:"maint", label:"Intra-op", input:()=>gaInputs(), hint:"Ventilate → keep them asleep and stable.",
     cards:["1. Ventilation strategies","2. One-lung ventilation","3. TIVA","4. Volatile: MAC by age","5. Intra-op analgesia","6. Vasopressors & inotropes","7. Antibiotic prophylaxis","8. Tranexamic acid"],
@@ -4424,12 +4448,12 @@ const GROUPS = [
     cards:[["Paeds fasting","1. Fasting (child)"],["Paeds premedication","2. Premedication"],["Paeds airway score (PAAS)","3. Airway score (PAAS)"],["OSA screen (STBUR)","4. OSA screen (STBUR)"],["URTI & asthma: go or delay","5. URTI & asthma: go or delay"],
       ["Ex-prem: apnoea risk & admission","6. Ex-prem: apnoea risk & admission"],["Congenital conditions (A–Z)","7. Congenital conditions (A–Z)"],["Dehydration (child)","8. Dehydration"]],
     links:[]},
-   {id:"ind", label:"Induction", input:()=>pInputs(true), hint:"Airway kit → drugs → relaxants → RSI → TIVA → ventilate → lines.",
+   {id:"ind", label:"Induction", input:()=>pInputs(true), hint:"Airway kit → drugs & relaxants → RSI → TIVA → ventilate → lines.",
     cards:["§Airway",["Paeds ETT","1. Tube: size, depth, blade, suction"],["Paeds airway kit: NPA, HMEF, bag","2. Airway kit: NPA, HMEF, bag"],
-      "§Drugs",["Paeds induction drugs","3. Induction drugs"],["Muscle relaxants (child)","4. Muscle relaxants"],["RSI (child)","5. RSI (child)"],["Ketamine anaesthesia","6. Ketamine induction (short cases)"],
-      "§TIVA",["TCI model check","7. TIVA: model check & propofol targets"],["Remifentanil 10 mcg/mL","8. TIVA: remifentanil"],
-      "§Ventilation",["Paeds ventilation","9. Ventilation settings"],["One-lung ventilation (Storz)","10. One-lung ventilation (Storz)"],
-      "§Lines",["Double-lumen CVC","11. Lines: double-lumen CVC"]],
+      "§Drugs",["Paeds induction drugs & relaxants","3. Induction drugs & relaxants"],["RSI (child)","4. RSI (child)"],["Ketamine anaesthesia","5. Ketamine induction (short cases)"],
+      "§TIVA",["TCI model check","6. TIVA: model check & propofol targets"],["Remifentanil 10 mcg/mL","7. TIVA: remifentanil"],
+      "§Ventilation",["Paeds ventilation","8. Ventilation settings"],["One-lung ventilation (Storz)","9. One-lung ventilation (Storz)"],
+      "§Lines",["Double-lumen CVC","10. Lines: double-lumen CVC"]],
     links:[["Laryngospasm","paeds","Laryngospasm"],["Paeds bronchospasm","paeds","Bronchospasm"],["Paeds anaphylaxis","paeds","Anaphylaxis"]]},
    {id:"intra", label:"Intra-op", input:()=>pInputs(), hint:"Keep them stable: fluids → drugs → warmth.", seeLabel:"From Induction",
     see:[["paeds-ind-tiva-model-check","TIVA & propofol targets"],["paeds-ind-remifentanil","Remifentanil"],["paeds-ind-ventilation","Ventilation"],["paeds-ind-one-lung-ventilation-storz","One-lung ventilation"],["paeds-ind-double-lumen-cvc","Central line (CVC)"]],
@@ -4482,6 +4506,7 @@ const GROUPS = [
    {id:"don", label:"Donor", input:()=>donInputs(), hint:"Living donor nephrectomy.",
     cards:["1. Donor pre-op","2. Donor intra-op","3. Donor post-op"], links:[]}], cards:[]}];
 const SEARCH_EXTRA = {   // keyed by stable card id
+  "ga-ind-induction-drugs":"induction relaxant relaxant nmb neuromuscular blocker suxamethonium scoline succinylcholine rocuronium atracurium cisatracurium vecuronium",
   "premed-prepare-anticoagulants-and-antiplatelets":"anticoagulant antiplatelet doac apixaban rivaroxaban edoxaban dabigatran warfarin bridging lmwh aspirin clopidogrel ticagrelor prasugrel crcl creatinine",
   "premed-prepare-diabetes-day-of-surgery-plan":"diabetes insulin glargine detemir degludec premixed basal bolus pump vrii vriii sliding scale sulfonylurea gliclazide sglt2 metformin glucose ketones",
   "premed-prepare-pacemaker-icd":"pacemaker icd cied crt defibrillator magnet diathermy asynchronous voo doo pacing dependent",
@@ -4527,7 +4552,6 @@ const SEARCH_EXTRA = {   // keyed by stable card id
   "paeds-pre-congenital-conditions-a-z":"syndrome congenital pierre robin goldenhar treacher collins mps mucopolysaccharidosis down craniosynostosis beckwith turner klippel charge vacterl digeorge mitochondrial myopathy duchenne myotonic sma epidermolysis osteogenesis",
   "paeds-blocks-neonatal-infant-spinal":"neonatal spinal infant spinal ex-prem hernia subarachnoid",
   "paeds-blocks-block-volumes-paeds":"block volume ilioinguinal penile axillary supraclavicular femoral sciatic tap rectus sheath erector spinae esp quadratus lumborum",
-  "paeds-ind-muscle-relaxants":"paeds child relaxant suxamethonium scoline rocuronium atracurium cisatracurium vecuronium",
   "paeds-ind-rsi":"paeds child rsi rapid sequence full stomach pyloric bowel obstruction",
   "paeds-post-reversal":"paeds child reversal neostigmine glycopyrrolate atropine sugammadex tof train-of-four train of four",
   "paeds-post-ponv-by-risk":"ponv paeds vomiting ondansetron dexamethasone droperidol metoclopramide eberhart",
@@ -4569,7 +4593,6 @@ const SEARCH_EXTRA = {   // keyed by stable card id
   "ga-intra-antibiotic-prophylaxis":"antibiotic prophylaxis cefazolin unasyn ampicillin sulbactam augmentin metronidazole gentamicin clindamycin vancomycin cefuroxime azithromycin endocarditis uro gynae ortho dental hpb colorectal",
   "paeds-intra-other-drugs":"hypertonic saline mannitol potassium kcl insulin adenosine bicarbonate paeds",
   "paeds-intra-antibiotic-prophylaxis":"antibiotic prophylaxis cefazolin unasyn metronidazole gentamicin clindamycin vancomycin paeds endocarditis",
-  "ga-ind-muscle-relaxants":"relaxant nmb neuromuscular blocker suxamethonium scoline succinylcholine rocuronium atracurium cisatracurium vecuronium",
   "ga-ind-tube-and-airway-kit":"ett tube endotracheal chula lma igel i-gel supraglottic laryngoscope video adult",
   "regional-safety-anticoagulants":"anticoagulant antiplatelet clopidogrel enoxaparin clexane heparin warfarin doac rivaroxaban apixaban dabigatran asra platelets",
   "obs-lscs-spinal-dose":"lscs caesarean cesarean c-section sab spinal heavy bupivacaine marcaine dose height obstetric",
@@ -4581,7 +4604,7 @@ const SEARCH_EXTRA = {   // keyed by stable card id
   "emerg-paeds-fallot-spell":"tof tetralogy of fallot tet spell cyanotic hypercyanotic",
   "regional-neuraxial-spinal-non-obstetric":"spinal sab subarachnoid heavy bupivacaine marcaine height dose turp urology hernia perineal saddle lower limb hip knee ortho non-obstetric calculator",
   "paeds-ind-ett":"neonate neonatal newborn airway tube",
-  "paeds-ind-induction-drugs":"neonate neonatal newborn",
+  "paeds-ind-induction-drugs":"neonate neonatal newborn paeds child relaxant suxamethonium scoline rocuronium atracurium cisatracurium vecuronium",
   "paeds-intra-maintenance-4-2-1":"neonate neonatal newborn fluids maintenance",
   "paeds-intra-glucose-neonate-paeds":"neonate neonatal newborn hypoglycaemia dextrose",
   "paeds-ind-ventilation":"neonate neonatal newborn ventilation",
@@ -4637,10 +4660,9 @@ const CARD_IDS = {
   "7. Pacemaker / ICD":"premed-prepare-pacemaker-icd",
   "Anaesthetic plan & consent":"premed-plan-anaesthetic-plan-and-consent",
   "2. Premed note":"premed-plan-premed-note",
-  "1. Induction drugs":"ga-ind-induction-drugs",
+  "1. Induction drugs & relaxants":"ga-ind-induction-drugs",
   "2. RSI":"ga-ind-rsi",
-  "3. Muscle relaxants":"ga-ind-muscle-relaxants",
-  "4. Tube & airway kit":"ga-ind-tube-and-airway-kit",
+  "3. Tube & airway kit":"ga-ind-tube-and-airway-kit",
   "1. Ventilation strategies":"ga-intra-ventilation-strategies",
   "2. One-lung ventilation":"ga-intra-one-lung-ventilation",
   "3. TIVA":"ga-intra-tiva",
@@ -4687,8 +4709,7 @@ const CARD_IDS = {
   "Dehydration (child)":"paeds-pre-dehydration",
   "Paeds ETT":"paeds-ind-ett",
   "Paeds airway kit: NPA, HMEF, bag":"paeds-ind-airway-kit-npa-hmef-bag",
-  "Paeds induction drugs":"paeds-ind-induction-drugs",
-  "Muscle relaxants (child)":"paeds-ind-muscle-relaxants",
+  "Paeds induction drugs & relaxants":"paeds-ind-induction-drugs",
   "RSI (child)":"paeds-ind-rsi",
   "Ketamine anaesthesia":"paeds-ind-ketamine-anaesthesia",
   "TCI model check":"paeds-ind-tiva-model-check",
@@ -4805,7 +4826,7 @@ function navEntries(){ if (NAV_CACHE) return NAV_CACHE; const out = [];
       const [o,l] = Array.isArray(it) ? it : [it,it]; out.push({id: CARD_IDS[o] || null, orig: o, label: l, g: g.id, tab: t.id, cat}); } }
   return (NAV_CACHE = out); }
 const tabOf = (g, t) => { const gg = GROUPS.find(x=>x.id===g); return gg && gg.tabs ? gg.tabs.find(x=>x.id===t) || null : null; };
-function findEntry(id, g, tab){ const es = navEntries().filter(e => e.id===id); return es.find(e => e.g===g && e.tab===tab) || es.find(e => e.g===g) || es[0] || null; }
+function findEntry(id, g, tab){ if (ID_ALIAS[id]) id = ID_ALIAS[id][0]; const es = navEntries().filter(e => e.id===id); return es.find(e => e.g===g && e.tab===tab) || es.find(e => e.g===g) || es[0] || null; }
 const idOf = (g, tab, label) => { const e = navEntries().find(e => e.g===g && (!tab || e.tab===tab) && e.label===label); return e ? e.id : null; };
 const ctxOf = (g, tab) => g==="paeds" || (g==="emerg" && tab==="paeds") ? "child" : g==="obs" ? "obstetric" : g==="tx" ? "kidney" : "adult";
 const CTX_TAG = {child:"Child", adult:"Adult", obstetric:"Obstetric", kidney:"Kidney Tx"};
@@ -4950,7 +4971,7 @@ function runSearch(q){
 /* recently opened cards: stable id + where it was opened. No patient data. Old {g, t} records are still read. */
 const recentRaw = () => { const r = store.get("recent", []); return Array.isArray(r) ? r : []; };
 function remember(g, tab, id){ if (!id) return; const r = recentRaw().filter(x => !(x && x.id===id && x.g===g && x.tab===tab)); r.unshift({id, g, tab}); store.set("recent", r.slice(0,5)); }
-function recentList(){ return recentRaw().map(x => !x ? null : x.id ? findEntry(x.id, x.g, x.tab) : x.t ? navEntries().find(e => e.g===x.g && e.label===x.t) || null : null).filter(Boolean)
+function recentList(){ return recentRaw().map(x => !x ? null : x.id ? findEntry(x.id, x.g, x.tab) : x.t ? navEntries().find(e => e.g===x.g && e.label===x.t) || (OLD_LABELS[x.g+"|"+x.t] ? findEntry(OLD_LABELS[x.g+"|"+x.t], x.g) : null) : null).filter(Boolean)
   .filter((e, i, a) => a.findIndex(y => y.id===e.id && y.g===e.g && y.tab===e.tab)===i).slice(0,5); }
 function recentRow(){ const r = recentList(); if (!r.length) return "";
   return `<div class="recent"><div class="label">Recent</div><div class="rchips">${r.map(e => { const tb = tabOf(e.g, e.tab);
@@ -4981,7 +5002,9 @@ function renderNow(){
   tickerInit();
   restoredAt = performance.now();
   if (isWide() && S.openSet) S.openSet.forEach(t => { const d = app.querySelector(`details[data-t="${CSS.escape(t)}"]`); if (d) d.open = true; });
-  if (S.open){ const d = app.querySelector(`details[data-t="${CSS.escape(S.open)}"]`); if (d){ d.open = true; if (S.scrollTo){ d.scrollIntoView({block:"start"}); } } }
+  if (S.open){ const d = app.querySelector(`details[data-t="${CSS.escape(S.open)}"]`); if (d){ d.open = true; if (S.scrollTo){ d.scrollIntoView({block:"start"}); }
+    if (S.anchor){ const a = d.querySelector(`[data-anchor="${S.anchor}"]`); if (a) a.scrollIntoView({block:"start"}); } } }
+  S.anchor = null;
   if (!S.scrollTo) window.scrollTo(0, y);
   S.scrollTo = false;
   if (S.srchFocus){ S.srchFocus = false; const q = app.querySelector("#q"); if (q) q.focus(); }
@@ -5082,13 +5105,15 @@ document.addEventListener("click", e => {
   if (d.csclear){ delete S.sc.cs; delete S.sc.csc; delete S.sc.pl; delete S.sc.dx; S.csDec = ""; S.csNote = ""; S.csWho = "patient"; S.csLang = "English"; S.csOut = "full"; S.csLen = "brief"; render(); return; }
   if (d.screset){ S.sc[d.screset] = {}; render(); return; }
   if (d.derm){ S.derm = d.derm; if (!d.open){ render(); return; } }
+  if (d.jump){ const a = (b.closest("details") || document).querySelector(`[data-anchor="${d.jump}"]`); if (a){ const slim = document.querySelector(".gside.slim"), off = (slim && !isWide() ? slim.offsetHeight : 0) + 8;
+    window.scrollTo({top: window.scrollY + a.getBoundingClientRect().top - off, behavior: reduceMotion() ? "auto" : "smooth"}); } return; }
   if (d.srch){ S.srch = !S.srch; S.srchFocus = S.srch; render(); if (S.srch) window.scrollTo(0,0); return; }
   if (d.catOpen){ const [gid, tid] = d.catOpen.split(":"), og = GROUPS.find(x=>x.id===gid); S.catOpen = S.catOpen || new Set(); S.catOpen.add(d.catOpen); if (og) S[og.tabKey] = tid; S.open = null; S.srch = false;
     if (location.hash==="#g-"+gid) render(); else location.hash = "#g-"+gid; window.scrollTo(0,0); return; }
   if (d.open || d.id){ let open = d.open, gid = d.g, tab = d.tab;
-    if (d.id){ const en = findEntry(d.id, gid, tab); if (en){ open = en.label; gid = en.g; tab = en.tab; } }
+    if (d.id){ const en = findEntry(d.id, gid, tab); if (en){ open = en.label; gid = en.g; tab = en.tab; } if (ID_ALIAS[d.id]) S.anchor = ID_ALIAS[d.id][1]; }
     const og = GROUPS.find(x=>x.id===gid); if (og && og.tabs){ tab = tab || (og.tabs.find(t=>t.cards.some(c=>(Array.isArray(c)?c[1]:c)===open))||og.tabs[0]).id; S[og.tabKey] = tab; }
-    S.srch = false; S.open = d.calc ? null : open; S.scrollTo = !d.calc; if (!d.calc) remember(gid, tab, d.id || idOf(gid, tab, open));
+    S.srch = false; S.open = d.calc ? null : open; S.scrollTo = !d.calc; if (!d.calc) remember(gid, tab, d.id ? (ID_ALIAS[d.id] ? ID_ALIAS[d.id][0] : d.id) : idOf(gid, tab, open));
     const target = "#g-"+gid; if (location.hash===target) render(); else { location.hash = target; } if (d.calc) window.scrollTo(0,0); return; }
   if (d.lscs){ S.spOp="lscs"; S.open=null; location.hash="#g-spinal"; window.scrollTo(0,0); return; }
   if (d.go){ S.ptEditing = false; S.srch = false; S.open = null; S.openSet = new Set(); S.txck = {}; if ((location.hash||"#home")==="#"+d.go){ render(); window.scrollTo(0,0); } else { S.navTop = true; location.hash = "#"+d.go; } return; }
