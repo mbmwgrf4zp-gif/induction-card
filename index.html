@@ -9,10 +9,10 @@
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data:; connect-src 'self'; manifest-src 'self'; worker-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
 <meta name="referrer" content="no-referrer">
 <meta name="description" content="Offline anaesthesia reference with weight-based doses — emergencies, general, regional, paediatric, obstetric and transplant — adapted to Malaysian practice.">
-<meta name="theme-color" content="#0f766e">
+<meta name="theme-color" content="#0b1517">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Induction">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="icon-180.png">
 <link rel="icon" href="icon-192.png">
@@ -102,6 +102,13 @@ button,input,select,summary,a,label{touch-action:manipulation}
 html,body{margin:0;background:var(--bg);color:var(--ink);
   font:400 var(--fs-base)/1.5 var(--font-sans);-webkit-text-size-adjust:100%}
 body{padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom)}
+/* monitor bezel behind the status bar (installed app): clock and battery stay white on black on every page */
+body::before{content:"";position:fixed;top:0;left:0;right:0;height:env(safe-area-inset-top,0px);background:#0b1517;z-index:40;pointer-events:none}
+/* phone: home monitor runs edge to edge and up under the status bar */
+@media (max-width:699px){
+  main .hero{margin:calc(-1 * env(safe-area-inset-top,0px)) calc(-1 * max(16px,env(safe-area-inset-right,0px))) var(--s3) calc(-1 * max(16px,env(safe-area-inset-left,0px)));border-radius:0 0 var(--r) var(--r)}
+  main .hero .hero-in{padding-top:calc(var(--s4) + env(safe-area-inset-top,0px));padding-left:max(var(--s4),env(safe-area-inset-left,0px));padding-right:max(var(--s4),env(safe-area-inset-right,0px))}
+}
 main{max-width:640px;margin:0 auto;padding-block:0 var(--s5);padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
 button{font:inherit;color:inherit}
 p{margin:var(--s2) 0}
@@ -635,7 +642,7 @@ if (window.top !== window.self && /\.github\.io$/.test(location.hostname)) {
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.54.0";
+const APP_VERSION = "2.55.0";
 const APP_DATE = "21 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
@@ -3774,12 +3781,12 @@ function vTicks(){
 }
 /* ---------- ABOUT ---------- */
 const CHANGES = [
+  ["2.55","Phone: home monitor runs edge to edge and under the status bar; dark status-bar strip on every page"],
   ["2.54","Ticker glides at the capnogram speed; offline status moved to About (footer warns only if the offline copy fails)"],
   ["2.53","Airway assessment rebuilt as a checklist with plan tier and aspiration risk; Optimise or postpone merged into one card (checked)"],
   ["2.52","Consent notes copy as plain text: paragraphs, blank lines and hyphen bullets"],
   ["2.51","NAP3 permanent-harm figures in the detailed spinal / epidural and labour notes (checked)"],
-  ["2.50","Labour epidural note laid out like the GA and spinal notes (checked)"],
-  ["2.49","Consent wording revised: decision switch, discussion ticks, clearer language / interpreter, revised risk lists (checked)"]];
+  ["2.50","Labour epidural note laid out like the GA and spinal notes (checked)"]];
 const SRC_LINKS = [
   ["Emergencies", [["Resuscitation Council UK — ALS / PLS guidelines","https://www.resus.org.uk/library"],["Difficult Airway Society guidelines","https://das.uk.com/guidelines"],["Association of Anaesthetists — guidelines (anaphylaxis, LAST, safety)","https://anaesthetists.org/Home/Resources-publications/Guidelines"],["European Malignant Hyperthermia Group","https://www.emhg.org"],["UK Kidney Association — hyperkalaemia guideline","https://www.ukkidney.org/health-professionals/guidelines"]]],
   ["General", [["ASA standards & practice parameters (fasting, PACU)","https://www.asahq.org/standards-and-practice-parameters"],["Centre for Perioperative Care — diabetes guideline","https://cpoc.org.uk/guidelines-resources-guidelines"],["PROSPECT procedure-specific analgesia (ESRA)","https://esraeurope.org/prospect/"],["ASRA Pain Medicine — guidelines (ketamine, anticoagulation)","https://www.asra.com/guidelines-articles/guidelines"],["Brain Trauma Foundation guidelines","https://braintrauma.org/coma/guidelines"]]],
