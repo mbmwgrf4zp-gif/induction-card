@@ -241,7 +241,7 @@ table.dt tr[data-dr]>td.hl .gml{font-size:1.05rem;font-weight:700;color:inherit}
 .dfor{display:none}
 @media screen and (max-width:699px){
   .dfor{display:block;margin:var(--s2) 2px 0;font-size:var(--fs-xs);font-weight:600;color:var(--muted)}
-  .dfor::before{content:"Doses for " attr(data-w) " kg"}.dfor.gtw::before{content:"Doses · the weight used is under each drug"}.dfor.fixw::before{content:"Fixed doses"}
+  .dfor::before{content:"Doses for " attr(data-w) " kg"}.dfor.gtw::before{content:"Doses · the weight used is under each drug"}.dfor.fixw::before{content:"Fixed doses"}.dfor.eqw::before{content:"Equipment"}
   table.dt,table.dt>tbody{display:block}
   table.dt tr.dth{display:none}
   table.dt tr[data-dr]{display:grid;grid-template-columns:minmax(38%,1fr) minmax(0,max-content);grid-template-areas:"name dose" "rule rule" "note note";column-gap:var(--s3);padding:var(--s3) var(--s1);border-bottom:1px solid var(--line)}
@@ -717,7 +717,7 @@ if (window.top !== window.self && /\.github\.io$/.test(location.hostname)) {
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.79.1";
+const APP_VERSION = "2.80.1";
 const APP_DATE = "22 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
@@ -1041,12 +1041,10 @@ const ettCalc = (adultOnly, noInputs) => {
     inputs += seg("sex",[["F",sxi("F")+" Female"],["M",sxi("M")+" Male"]]) + step("height","Height","cm",130,210,1);
     const h = S.height, depth = r05(4 + h/10);
     const sz = S.sex==="F" ? ["6.0","6.5 – 7.0","7.5"] : ["6.5","7.0 – 7.5","8.0"];
-    out = `<div class="result"><div class="row">
-      <div><div class="sub">Tube ID (mm)</div><div class="big">${sz[1]}</div>${trio(sz[0],sz[1],sz[2])}</div>
-      <div><div class="sub">Oral depth at mouth corner</div><div class="big">${f1(depth)} cm</div>
-        <div class="sub">4 + height/10 = 4 + ${h}/10</div></div></div>
-      <div class="sub" style="margin-top:8px">Western 21/23 rule would give ${S.sex==="F"?"21":"23"} cm (21/23 is measured at the incisors).</div>
-      ${src("Depth: Chula formula (Thai adults; measured at the upper canine ≈ mouth corner). Size: my practice, Malaysian adults.")}</div>`;
+    out = `${f6Draft()}${ET([
+      EQ("Tube ID (mm)", `have ${sz[0]} and ${sz[2]} ready`, sz[1], null),
+      EQ("Oral depth at mouth corner", `4 + height/10 = 4 + ${h}/10`, `${f1(depth)} cm`, `Western 21/23 rule would give ${S.sex==="F"?"21":"23"} cm (21/23 is measured at the incisors).`)])}
+      ${src("Depth: Chula formula (Thai adults; measured at the upper canine ≈ mouth corner). Size: my practice, Malaysian adults.")}`;
   } else {
     inputs += pInputs(true);
     out = ettBlock(paedEtt());
@@ -1408,19 +1406,15 @@ function paedEtt(){
 function ettBlock(e){
   const main = e.useCuff ? e.cuffed : e.plain;
   const mainTxt = e.useCuff ? f1(e.cuffed) : e.plainTxt;
-  return `<div class="result">
-    <div class="sub">${e.useCuff?"Cuffed ID (mm) — weight > 5 kg":"Plain (uncuffed) ID (mm)"}</div>
-    <div class="big">${mainTxt}</div>${trio(f1(main-0.5), mainTxt, f1(main+0.5))}
-    ${e.useCuff?`<div class="sub" style="margin-top:8px">Plain alternative: <b>${e.plainTxt}</b></div>`:""}
-    <div class="row" style="margin-top:10px">
-      <div><div class="sub">Oral depth (anchor)</div><div class="big">${fmt(e.depth)} cm</div><div class="sub">${e.depthRule}</div></div>
-      <div><div class="sub">Nasal</div><div class="big">${fmt(e.depth+2)}–${fmt(e.depth+3)} cm</div><div class="sub">oral + 2–3 cm</div></div>
-    </div>
-    <div class="sub" style="margin-top:6px">Cross-check 3 × ETT = ${fmt(3*main)} cm · Suction catheter 2 × ETT = <b>${fmt(2*main)} Fr</b></div>
-    <div class="sub">Laryngoscope: ${e.w < 5 ? "straight Miller 0 or MAC 1 (&lt; 5 kg)" : "curved blade (&gt; 5 kg)"} · Paeds Glidescope size 2 / 2.5 (ages 8–9)</div>
+  return `${f6Draft()}${ET([
+    EQ(e.useCuff?"Cuffed ID (mm) — weight > 5 kg":"Plain (uncuffed) ID (mm)", `have ${f1(main-0.5)} and ${f1(main+0.5)} ready`, mainTxt, e.useCuff?`Plain alternative: <b>${e.plainTxt}</b>`:null),
+    EQ("Oral depth (anchor)", e.depthRule, `${fmt(e.depth)} cm`, null),
+    EQ("Nasal", "oral + 2–3 cm", `${fmt(e.depth+2)}–${fmt(e.depth+3)} cm`, null),
+    EQ("Suction catheter", "2 × ETT", `${fmt(2*main)} Fr`, `Cross-check 3 × ETT = ${fmt(3*main)} cm`),
+    EQ("Laryngoscope:", "", e.w < 5 ? "straight Miller 0 or MAC 1 (&lt; 5 kg)" : "curved blade (&gt; 5 kg)", "Paeds Glidescope size 2 / 2.5 (ages 8–9)")])}
     ${e.conv?`<div class="warn">Infant cuffed size shown as 0.5 smaller than plain — this is a convention, not from your notes. Check on values sheet.</div>`:""}
     ${e.y>=12?`<div class="warn">Age ≥ 12: consider Adult mode (height-based).</div>`:""}
-    ${src(PSRC+" Size: "+e.sizeRule+".")}</div>`;
+    ${src(PSRC+" Size: "+e.sizeRule+".")}`;
 }
 
 const PAEDS = [
@@ -1439,7 +1433,9 @@ const isNeo = () => AGEM() < 1;
 const neoHl = () => isNeo() ? ' class="hl"' : "";
 pCards.ett = () => { const w = W(), ett = w < 2 ? "2.5" : w < 3.5 ? "3.0" : "3.5";
   return `<div class="card"><h2>Paeds ETT</h2>${ettBlock(paedEtt())}
-  <table><tr${neoHl()}><th>Neonate</th><td>Uncuffed <b>${ett}</b> for ${sig(w)} kg <span class="sub">(&lt; 2 kg 2.5 · 2–3.5 kg 3.0 · &gt; 3.5 kg 3.5; cuffed 3.0 from about 3 kg)</span> · oral depth at lip <b>${sig(6 + w)} cm</b> (6 + weight in kg)</td></tr></table></div>`; };
+  <h3${neoHl()}>Neonate</h3>${ET([
+    trCls(EQ("Uncuffed", `for ${sig(w)} kg`, ett, "(&lt; 2 kg 2.5 · 2–3.5 kg 3.0 · &gt; 3.5 kg 3.5; cuffed 3.0 from about 3 kg)"), isNeo() ? "hl" : ""),
+    trCls(EQ("oral depth at lip", "(6 + weight in kg)", `${sig(6 + w)} cm`, null), isNeo() ? "hl" : "")])}</div>`; };
 pCards.airway = () => {
   const w = W(), e = paedEtt(), ett = e.useCuff ? e.cuffed : e.plain, tv = 7*w;
   const hm = tv < 35 ? 0 : tv <= 90 ? 1 : tv <= 200 ? 2 : 3;
@@ -1447,12 +1443,12 @@ pCards.airway = () => {
   const stz = ett >= 5 ? 2 : ett >= 4 ? 1 : ett >= 3.5 ? 0 : -1;
   const hl = c => c ? ' class="hl"' : "";
   return ettBlock(e) + `
-  <div class="card"><h2>Paeds airway kit: NPA, HMEF, bag</h2><h3>NPA</h3><p>Suggested: <b>${f1(e.plain)}</b> (≈ plain ETT size); length nose tip → tragus.</p>
+  <div class="card"><h2>Paeds airway kit: NPA, HMEF, bag</h2><h3>NPA</h3>${f6Draft()}${ET([EQ("Suggested:", "(≈ plain ETT size); length nose tip → tragus.", f1(e.plain), null)])}
   <p class="sub">Notes: size 2.5–5; if size 2 needed, use a modified ETT; 7.5 kg → 3.5.</p>
   <h3>Micro HMEF</h3><p class="sub">TV 4–7 mL/kg for ${sig(w)} kg = <b>${dz(4*w,"mL")}–${dz(7*w,"mL")} mL</b></p>
   <table><tr><th>Tidal volume</th><th>HMEF</th></tr><tr${hl(hm===0)}><td>10–50 mL</td><td>Blue (ETT 3) / red (ETT 3.5)</td></tr>
   <tr${hl(hm===1)}><td>&gt; 35 mL</td><td>Green</td></tr><tr${hl(hm===2)}><td>&gt; 90 mL (max 250 mL)</td><td>Green</td></tr><tr${hl(hm===3)}><td>&gt; 200 mL</td><td>Yellow</td></tr></table>
-  <h3>Bag</h3><p class="sub">3 × vital capacity (35 mL/kg) = <b>${dz(vc3,"mL")} mL</b> → <b>${bag} mL bag</b></p>
+  <h3>Bag</h3>${ET([EQ("Bag", `3 × vital capacity (35 mL/kg) = ${dz(vc3,"mL")} mL →`, `${bag} mL bag`, null)])}
   <table><tr><th>Bag</th><th>Weight</th></tr><tr${hl(bag===500)}><td>500 mL</td><td>5 kg</td></tr><tr${hl(bag===1000)}><td>1000 mL</td><td>10–20 kg</td></tr><tr${hl(bag===1500)}><td>1500 mL</td><td>&gt; 20 kg</td></tr></table>
   <h3>LMA / i-gel size</h3>${(()=>{ const L=[["1","&lt; 5 kg",0,5],["1.5","5–10 kg",5,10],["2","10–20 kg",10,20],["2.5","20–30 kg",20,30],["3","30–50 kg",30,50],["4","50–70 kg",50,70]];
     return `<table>${L.map(([z,r,a,b])=>`<tr${hl(w>=a&&w<b)}><td>Size ${z}</td><td>${r}</td></tr>`).join("")}</table><p class="sub">Standard manufacturer sizes — the local manual's table is an image; confirm against page 11.</p>`; })()}
@@ -2392,6 +2388,10 @@ const f4Draft = () => F4_CHECKED ? "" : `<div class="warn" style="margin-top:0">
 const F5_CHECKED = true;   // checked by author 23 Nov 2026
 const f5Draft = () => F5_CHECKED ? "" : `<div class="warn" style="margin-top:0">DRAFT — RSI doses moved from boxes into a dose table (Nov 2026): same numbers. Not yet ticked by you.</div>`;
 const trCls = (row, cls) => row.replace('<tr class="dz"', `<tr class="dz ${cls}"`);   // rescue / dimmed rows
+const F6_CHECKED = true;   // checked by author 23 Nov 2026
+const f6Draft = () => F6_CHECKED ? "" : `<div class="warn" style="margin-top:0">DRAFT — equipment sizes moved into rows like the dose tables (Nov 2026): same numbers. Not yet ticked by you.</div>`;
+const ET = rows => `<div class="dfor eqw"></div><div style="overflow-x:auto"><table class="dt"><tr class="dth"><th>Item</th><th>Rule</th><th>Size</th></tr>${rows.join("")}</table></div>`;
+const EQ = (name, rule, val, note) => R(name, rule, val, note, "nd");
 const FT = rows => `${rtDraft()}<div class="dfor fixw"></div><div style="overflow-x:auto"><table class="dt"><tr class="dth"><th>Drug</th><th>When / how</th><th>Dose</th></tr>${rows.join("")}</table></div>`;
 const GT = rows => `${rtDraft()}<div class="dfor gtw"></div><div style="overflow-x:auto"><table class="dt gt"><tr class="dth"><th>Drug</th><th>Rule · weight used</th><th>Dose</th></tr>${rows.join("")}</table></div>`;
 const GSRC = "Standard references: BNF, Association of Anaesthetists / SOBA obesity guidance, Miller.";
@@ -3132,7 +3132,7 @@ gaCards.kit = () => { const w = S.aw;
   return `<div class="card"><h2>3. Tube &amp; airway kit</h2>${ettCalc(true, true)}
   <button class="homebtn" data-open="1. Tube: size, depth, blade, suction" data-g="paeds" data-tab="ind">Child or neonate? → Paediatric › Induction ›</button>
   <h3>Supraglottic airway for ${sig(w)} kg</h3>
-  <table><tr><td>LMA Classic / Supreme / ProSeal</td><td class="hl">Size ${lma}</td></tr><tr><td>i-gel</td><td class="hl">Size ${igel}</td></tr></table>
+  ${ET([EQ("LMA Classic / Supreme / ProSeal", "", `Size ${lma}`, null), EQ("i-gel", "", `Size ${igel}`, null)])}
   <p class="sub">LMA: 3 = 30–50 kg, 4 = 50–70 kg, 5 = 70–100 kg. i-gel: 3 = 30–60 kg, 4 = 50–90 kg, 5 = &gt; 90 kg.</p>
   <h3>Video laryngoscope</h3><ul><li>Macintosh-type blade 3 or 4</li><li>Hyperangulated blade: use a pre-shaped stylet</li></ul>
   ${src("Manufacturer weight bands.")}</div>`; };
@@ -3221,8 +3221,7 @@ function dltSize(){ const h = S.height; return S.sex==="F" ? (h<160 ? 35 : 37) :
 gaCards.olv = () => { const d = dltSize(), dep = 12 + S.height/10;
   return `<div class="card"><h2>2. One-lung ventilation</h2>${ventDraft()}
   <h3>Left double-lumen tube (DLT)</h3>
-  <table><tr><th>Starting size</th><td class="hl">${d} Fr <span class="sub">(${sxi(S.sex)} ${S.height} cm)</span></td></tr>
-  <tr><th>Depth</th><td class="hl">≈ ${sig(dep)} cm at mouth corner <span class="sub">(12 + height/10)</span></td></tr></table>
+  ${f6Draft()}${ET([EQ("Starting size", `(${sxi(S.sex)} ${S.height} cm)`, `${d} Fr`, null), EQ("Depth", "(12 + height/10)", `≈ ${sig(dep)} cm`, "at mouth corner")])}
   <p class="sub">${sxi("F")} &lt; 160 cm 35 Fr, ≥ 160 cm 37 Fr · ${sxi("M")} &lt; 170 cm 37 Fr, ≥ 170 cm 39 Fr (41 rarely needed). Height predicts size poorly in Asian patients: have one size smaller ready, and <b>always confirm with a fibreoptic scope</b>.</p>
   <p class="sub"><b>Right DLT</b> only if the left main bronchus can't be used: left pneumonectomy, tumour or stenosis of the left main bronchus.</p>
   <h3>Bronchial blocker instead</h3><ul><li>Difficult airway, already intubated with a single-lumen tube, or post-op ventilation planned</li>
@@ -3355,8 +3354,7 @@ txCards.rsi = () => { const W2 = wts(), hi = kHigh();
   ${src(GSRC+" Suxamethonium and sugammadex UK product labels.")}</div>`; };
 txCards.tube = () => { const pe = sig(S.height/10);
   return `<div class="card"><h2>Kidney: tube, NG &amp; CVC</h2>${tx2Draft()}${ettCalc(true, true)}
-  <h3>Also</h3><table><tr><th>NG tube</th><td>Size 14–16 Fr after intubation</td></tr>
-  <tr><th>CVC (triple-lumen, R-IJV)</th><td class="hl">≈ ${pe} cm at skin <span class="sub">(Peres: height/10)</span></td></tr></table>
+  <h3>Also</h3>${ET([EQ("NG tube", "after intubation", "Size 14–16 Fr", null), EQ("CVC (triple-lumen, R-IJV)", "(Peres: height/10)", `≈ ${pe} cm at skin`, null)])}
   <p class="sub">Scan the IJV for thrombosis first. Formula tends to over-insert (less accurate in women and BMI &gt; 35): <b>confirm tip on CXR</b>. No double-lumen unless discussed with nephrologist.</p>
   ${src("Chula formula; Peres 1990 + validation studies (Cureus 2022, BJA 2017).")}</div>`; };
 txCards.lines = () => `<div class="card"><h2>Kidney: lines, monitoring &amp; antibiotic</h2>${tx2Draft()}
@@ -4221,6 +4219,9 @@ VGROUPS.find(g => g[0]==="General")[1].push(["Paeds doses vs local manual & pain
   "Neonates: morphine term 0.05–0.1 / preterm 0.025–0.05 mg/kg; fentanyl 1–2 mcg/kg (neonate start 0.5, protocol 0.5–3); atracurium 0.5 mg/kg (BNFc neonate 0.3–0.5 as note); PR paracetamol not < 3 months (manual lists 30 mg/kg loading); no sedative premed for neonate / PMA < 60 wk; ondansetron not < 1 month; neonatal antibiotic intervals (cefotaxime, metronidazole)",
   "Ibuprofen 3–6 months 5 mg/kg 6–8-hourly max 20 mg/kg/day; ketamine induction 1–2 mg/kg; phenylephrine bolus 2–10 mcg/kg (max 100 mcg); hydrocortisone 2–4 mg/kg max 200 mg; chlorphenamine IV 0.2 mg/kg max 10 mg",
   "Added from the manual: phenylephrine and vasopressin infusions, max per syringe, antihypertensives (nitroprusside, esmolol, labetalol, hydralazine), other drugs (3% saline, mannitol, KCl, insulin, adenosine 0.1–0.25 mg/kg max 12 mg), dehydration table, hypoxia crisis, difficult airway / CICV rebuilt from the manual (≤ 4 laryngoscopy, ≤ 3 SAD attempts, wake if SpO₂ > 80%), ASA paediatric examples, BMI-for-age note, LMA sizes (standard, pending page 11)"]]);
+VGROUPS.find(g => g[0]==="General")[1].push(["Equipment sizes in rows", "23 Nov 2026", [
+  "Tube ID and depth, supraglottic sizes, paeds tube / depth / suction / laryngoscope, neonate tube, NPA, bag, DLT size and depth, NG and CVC depth: same numbers, now in rows labelled 'Equipment' (test-checked)",
+  "Size chips replaced by 'have X and Y ready'; lookup tables (HMEF, bag weight bands, LMA by weight, Storz, lung isolation by age) and ventilator settings unchanged"]]);
 VGROUPS.find(g => g[0]==="General")[1].push(["RSI doses as a dose table", "23 Nov 2026", [
   "General › RSI and Kidney Transplant › RSI & relaxant plan: suxamethonium, rocuronium and sugammadex rescue moved from boxes into the dose table (same numbers, test-checked)",
   "Rescue row tinted red; kidney suxamethonium row faded with 'NOT if K⁺ ≥ 5.5 / unknown' when K⁺ is high (as before)",
@@ -4327,12 +4328,13 @@ function vTicks(){
 }
 /* ---------- ABOUT ---------- */
 const CHANGES = [
+  ["2.80","Equipment sizes (tubes, depths, LMA / i-gel, DLT, NPA, bag, NG, CVC) in rows like the dose tables (checked)"],
   ["2.79","One type scale inside cards (body 16, emergency steps 17, headings 15, notes 14); RSI doses as a dose table (checked)"],
   ["2.78","Syringe recipes at normal size, so only the doses you give stand out (checked)"],
   ["2.77","Dose tables, batch 4 — Kidney Transplant: antibiotic, infusions, reperfusion drugs, reversal, analgesia, donor (checked)"],
   ["2.76","Dose tables, batch 3 — Paediatric: remifentanil, hypoglycaemia, penile block, discharge analgesia, MRI sedation (checked)"],
-  ["2.75","Dose tables, batch 2 — Pre-op and Regional: blocks, epidural, adjuncts, steroid cover, hypoglycaemia (checked)"],
-  ["2.74","Dose tables, batch 1 — Obstetric and General: drug lists moved into dose tables, same words and numbers (checked)"]];
+  ["2.75","Dose tables, batch 2 — Pre-op and Regional: blocks, epidural, adjuncts, steroid cover, hypoglycaemia (checked)"]];
+
 
 
 
