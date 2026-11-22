@@ -663,7 +663,7 @@ if (window.top !== window.self && /\.github\.io$/.test(location.hostname)) {
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.67.1";
+const APP_VERSION = "2.67.2";
 const APP_DATE = "21 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
@@ -4223,10 +4223,11 @@ const lmaSize = w => w < 5 ? "1" : w < 10 ? "1.5" : w < 20 ? "2" : w < 30 ? "2.5
 function prPaeds(){
   const w = W(), mo = AGEM(), y = S.pY, neo = mo < 1, lt2 = w < 2, e = paedEtt(), ett = e.useCuff ? e.cuffed : e.plain;
   const m0 = w<=10 ? 4*w : w<=20 ? 40 + 2*(w-10) : 60 + (w-20), maint = Math.min(m0, 100), def = maint*S.fastH;
-  const ebvk = neo?85:mo<12?80:y<12?75:70, ebv = ebvk*w, abl = S.hbNow>S.hbLow ? ebv*(S.hbNow-S.hbLow)/S.hbNow : 0;
+  const pre = neo && isPreterm(), inf = mo < 12;
+  const ebvk = neo?(isPreterm()?95:85):mo<12?77.5:y<=12?72.5:67.5, ebv = ebvk*w, abl = S.hbNow>S.hbLow ? ebv*(S.hbNow-S.hbLow)/S.hbNow : 0;
   const prop = neo ? [2,"2 mg/kg (neonate, titrate)"] : [[4,5],"4–5 mg/kg (healthy)"];
   const paraIV = neo ? [lt2?7.5:10, `${lt2?7.5:10} mg/kg 8-hourly`] : w < 50 ? [15, "15 mg/kg 6-hourly"] : null;
-  const morph = neo ? ["0.05–0.1 mg/kg, ≥ 4 h apart", pq(w,[0.05,0.1],"mg")] : mo < 6 ? ["0.02 mg/kg, max 0.1 mg/kg", pq(w,0.02,"mg")] : w < 50 ? ["0.05 mg/kg each, max 0.2 mg/kg", pq(w,0.05,"mg")] : ["1–2 mg each, max 5–10 mg", "<b>1–2 mg</b>"];
+  const morph = neo ? (pre ? ["preterm 0.025–0.05 mg/kg, ≥ 4 h apart", pq(w,[0.025,0.05],"mg")] : ["term 0.05–0.1 mg/kg, ≥ 4 h apart", pq(w,[0.05,0.1],"mg")]) : mo < 6 ? ["0.02 mg/kg, max 0.1 mg/kg", pq(w,0.02,"mg")] : w < 50 ? ["0.05 mg/kg each, max 0.2 mg/kg", pq(w,0.05,"mg")] : ["1–2 mg each, max 5–10 mg", "<b>1–2 mg</b>"];
   const bmax = pMaxFor("bupi");
   return `<div class="pr-cols">
   <div class="pr-sec"><h3>Airway</h3><table>
@@ -4237,7 +4238,9 @@ function prPaeds(){
     <tr><td>LMA</td><td colspan="2">Size <b>${lmaSize(w)}</b> (by weight)</td></tr></table></div>
   ${prTab("Induction & relaxant", [
     prRow("Propofol 1%", prop[1], pq(w,prop[0],"mg",null,10)),
-    prRow("Fentanyl", neo?"0.5–3 mcg/kg":"1–2 mcg/kg", pq(w,neo?[0.5,3]:[1,2],"mcg")),
+    prRow("Fentanyl", neo?"1–2 mcg/kg (neonate: start 0.5, titrate)":"1–2 mcg/kg", pq(w,[1,2],"mcg",100)),
+    ...(inf ? [prRow("Atropine", "20 mcg/kg before laryngoscopy", pq(w,20,"mcg",600))] : []),
+    prRow("Suxamethonium", neo?"3 mg/kg (neonate)":inf?"2 mg/kg (infant)":"1–1.5 mg/kg", pq(w,neo?3:inf?2:[1,1.5],"mg",150)),
     prRow("Rocuronium", "0.6 mg/kg (RSI 1.2)", `${pq(w,0.6,"mg",null,10)} · RSI ${pq(w,1.2,"mg",null,10)}`),
     prRow("Atracurium", "0.5 mg/kg", pq(w,0.5,"mg",null,10)),
     prRow("Glycopyrrolate", "4 mcg/kg, max 200", pq(w,4,"mcg",200))])}
@@ -4248,13 +4251,16 @@ function prPaeds(){
   ${prTab("Analgesia, PONV, antibiotic", [
     prRow("Paracetamol IV", paraIV ? paraIV[1] : "1 g 6-hourly", paraIV ? pq(w,paraIV[0],"mg",1000) : "<b>1 g</b>"),
     prRow("Morphine IV", morph[0], morph[1]),
-    prRow("Ondansetron", "0.15 mg/kg, max 4", pq(w,0.15,"mg",4)),
+    prRow("Ondansetron", neo?"not &lt; 1 month":"0.15 mg/kg, max 4", neo?"—":pq(w,0.15,"mg",4)),
     prRow("Dexamethasone", "0.15 mg/kg, max 5", pq(w,0.15,"mg",5)),
-    prRow("Cefazolin", "30 mg/kg, max 2 g", pq(w,30,"mg",2000)),
+    prRow("Cefazolin", neo?"30 mg/kg (neonate: longer redose interval)":"30 mg/kg, max 2 g", pq(w,30,"mg",2000)),
     prRow("LA maximum", `bupi ${bmax} mg/kg${mo<4?" (&lt; 4 m)":""}`, `<b>${sig(dz(bmax*w/2.5,"mL")*2.5)} mg</b> = ${dz(bmax*w/2.5,"mL")} mL 0.25%`)])}
   <div class="pr-sec"><h3>Fluids &amp; blood</h3><table>
-    <tr><td>Maintenance</td><td class="pr-rule">4/2/1, max 100</td><td><b>${dz(maint,"mL/h")} mL/h</b></td></tr>
-    <tr><td>Deficit (${S.fastH} h fast)</td><td class="pr-rule">½ hour 1, ¼ hours 2–3</td><td><b>${dz(def,"mL")} mL</b> · h1 ${dz(maint+def/2,"mL/h")} · h2–3 ${dz(maint+def/4,"mL/h")} mL/h</td></tr>
+    ${neo ? (() => { const bw = bwKg(), r = bw < 0.8 ? 0 : bw <= 1 ? 1 : 2, d = S.pD <= 1 ? 0 : S.pD === 2 ? 1 : S.pD <= 4 ? 2 : 3, v = NEO_FL[r][1][d];
+      return `<tr><td>Maintenance (neonate)</td><td class="pr-rule">day ${S.pD}, birth weight ${sig(bw)} kg: ${v[0]===v[1]?v[0]:v[0]+"–"+v[1]} mL/kg/day · D10 in ½ saline</td><td><b>${dz(v[0]*w/24,"mL/h")}${v[1]>v[0]?"–"+dz(v[1]*w/24,"mL/h"):""} mL/h</b></td></tr>
+      <tr><td>Glucose need</td><td class="pr-rule">4–6 mg/kg/min · keep &gt; 2.6 mmol/L</td><td>D10 <b>${dz(2.4*w,"mL/h")}–${dz(3.6*w,"mL/h")} mL/h</b></td></tr>`; })()
+    : `<tr><td>Maintenance</td><td class="pr-rule">4/2/1, max 100</td><td><b>${dz(maint,"mL/h")} mL/h</b></td></tr>
+    <tr><td>Deficit (${S.fastH} h fast)</td><td class="pr-rule">½ hour 1, ¼ hours 2–3</td><td><b>${dz(def,"mL")} mL</b> · h1 ${dz(maint+def/2,"mL/h")} · h2–3 ${dz(maint+def/4,"mL/h")} mL/h</td></tr>`}
     <tr><td>Bolus</td><td class="pr-rule">10 mL/kg, max 500</td><td>${pq(w,10,"mL",500)}</td></tr>
     <tr><td>Blood volume</td><td class="pr-rule">${ebvk} mL/kg</td><td><b>${dz(ebv,"mL")} mL</b></td></tr>
     <tr><td>Allowable loss</td><td class="pr-rule">Hb ${S.hbNow} → ${S.hbLow} g/dL</td><td><b>${dz(abl,"mL")} mL</b></td></tr>
@@ -4262,13 +4268,14 @@ function prPaeds(){
     <tr><td>Glucose low</td><td class="pr-rule">D10 2.5 mL/kg</td><td>${pq(w,2.5,"mL")}</td></tr></table></div>
   <div class="pr-sec pr-emerg"><h3>Emergency</h3><table>
     <tr><td>Arrest adrenaline</td><td class="pr-rule">10 mcg/kg, 1:10 000</td><td>${pq(w,0.1,"mL",10)} = ${dz(Math.min(10*w,1000),"mcg")} mcg</td></tr>
-    <tr><td>Shock · amiodarone</td><td class="pr-rule">4 J/kg · 5 mg/kg</td><td><b>${dz(4*w,"J")} J</b> · ${pq(w,5,"mg",300)}</td></tr>
+    <tr><td>Shock · amiodarone</td><td class="pr-rule">4 J/kg · 5 mg/kg (max 300)</td><td><b>${dz(4*w,"J")} J</b> · ${pq(w,5,"mg",300)}</td></tr>
     <tr><td>Atropine</td><td class="pr-rule">0.02 mg/kg, max 0.6</td><td>${pq(w,0.02,"mg",0.6,0.1)}</td></tr>
-    <tr><td>Laryngospasm</td><td class="pr-rule">propofol 0.5–1 · sux 0.1–0.5 mg/kg</td><td>${pq(w,[0.5,1],"mg")} · ${pq(w,[0.1,0.5],"mg")} + atropine</td></tr>
-    <tr><td>Anaphylaxis</td><td class="pr-rule">IV 1 mcg/kg · IM 10 mcg/kg</td><td>IV ${pq(w,1,"mcg")} · IM ${pq(w,0.01,"mL",0.5)} 1:1000</td></tr>
+    <tr><td>Laryngospasm</td><td class="pr-rule">propofol 1–2 · sux 0.1–0.5 mg/kg</td><td>${pq(w,[1,2],"mg")} · ${pq(w,[0.1,0.5],"mg")} + atropine</td></tr>
+    <tr><td>Anaphylaxis</td><td class="pr-rule">IV 1–2 (severe 4–10) mcg/kg · IM 10 mcg/kg</td><td>IV ${pq(w,[1,2],"mcg")} · IM ${pq(w,0.01,"mL",0.5)} 1:1000</td></tr>
     <tr><td>Intralipid 20%</td><td class="pr-rule">1.5 mL/kg, then 15 mL/kg/h</td><td>${pq(w,1.5,"mL")} · ${dz(15*w,"mL")} mL/h</td></tr>
     <tr><td>Calcium chloride 10%</td><td class="pr-rule">0.2 mL/kg, max 10</td><td>${pq(w,0.2,"mL",10)}</td></tr></table>
-    <div class="pr-small">Arrest doses: RCUK 2021 (2025 update pending).</div></div>
+    <div class="pr-small">Arrest doses: RCUK Paediatric Life Support 2025.</div></div>
+  ${neo || (isPreterm() && pmaWk() < 60) ? `<div class="pr-sec"><h3>Neonate / ex-prem</h3><ul class="pr-ck">${["No sedative premed (apnoea)", "Theatre ≥ 26 °C, warmed fluids, hat, wrap", `Apnoea monitoring after surgery (PMA ${sig(pmaWk())} wk)`, ...(isPreterm() ? ["Preterm SpO₂ target 91–95%"] : [])].map(t=>`<li>${prBox(t)}</li>`).join("")}</ul></div>` : ""}
   </div>`;
 }
 
@@ -4321,7 +4328,7 @@ screens.print = (which) => {
   const now = new Date(), dt = now.toLocaleDateString("en-GB",{day:"numeric",month:"short",year:"numeric"}) + " " + now.toLocaleTimeString("en-GB",{hour:"2-digit",minute:"2-digit"});
   const W2 = wts();
   const pt = which==="paeds"
-    ? `Age <b>${S.pY} y${S.pM?` ${S.pM} m`:""}</b> · Weight <b>${sig(S.pw)} kg</b> ${S.pwEst?"(<b>estimated</b> from age)":"(actual)"}`
+    ? (AGEM() < 1 ? `Neonate: <b>day ${S.pD}</b> · born at <b>${S.gaB} wk</b>${isPreterm()?" (preterm)":""} · PMA <b>${sig(pmaWk())} wk</b> · Weight <b>${sig(S.pw)} kg</b> (birth weight ${sig(bwKg())} kg)` : `Age <b>${S.pY} y${S.pM?` ${S.pM} m`:""}</b> · Weight <b>${sig(S.pw)} kg</b> ${S.pwEst?"(<b>estimated</b> from age)":"(actual)"}${isPreterm() && AGEM() < 14 ? ` · ex-prem ${S.gaB} wk, PMA <b>${sig(pmaWk())} wk</b>` : ""}`)
     : `${S.sex==="F"?"Female":"Male"} · <b>${S.height} cm</b> · dry weight <b>${sig(S.aw)} kg</b>${S.touched.todayWt?` · today ${sig(S.todayWt)} kg`:""}${S.touched.age?` · ${S.age} y`:""} · BMI ${sig(W2.bmi)} · IBW ${sig(W2.ibw)} · LBW ${sig(W2.lbw)} · <b>K⁺ ${S.k}</b> · <b>Hb ${S.hb}</b>${S.touched.hdH?` · last HD ${S.hdH} h ago`:""}`;
   const wtxt = which==="paeds" ? `${sig(S.pw)} kg` : `${sig(S.aw)} kg dry weight`;
   return head("Print plan", back) + `<div class="card prtools"><p>Check the sheet, then print. On iPhone: <b>Print</b> → choose a printer, or pinch out on the preview → Share → <b>Save to Files</b> for a PDF.</p>
