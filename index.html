@@ -636,7 +636,7 @@ if (window.top !== window.self && /\.github\.io$/.test(location.hostname)) {
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.66.1";
+const APP_VERSION = "2.66.2";
 const APP_DATE = "21 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
@@ -4330,7 +4330,6 @@ const GROUPS = [
     cards:[["Anaesthetic plan & consent","1. Anaesthetic plan & consent"],"2. Premed note"], links:[]}], cards:[]},
  {id:"ga", name:"General", sub:"Induction · Intra-op · Post-op", tabKey:"gaTab", tabs:[
    {id:"ind", label:"Induction", input:()=>gaInputs(), hint:"Drugs → RSI → relaxant → tube & airway kit.",
-    top:()=>`<button class="homebtn" data-open="7. IM doses (no IV access, or ward)" data-g="ga" data-tab="post">No IV access: IM doses → General › Post-op ›</button>`, 
     cards:["1. Induction drugs","2. RSI","3. Muscle relaxants","4. Tube & airway kit"],
     links:[["Failed intubation / CICO","adult","Failed intubation / CICO"],["Anaphylaxis","adult","Anaphylaxis"],["Bronchospasm","adult","Bronchospasm"]]},
    {id:"maint", label:"Intra-op", input:()=>gaInputs(), hint:"Ventilate → keep them asleep and stable.",
