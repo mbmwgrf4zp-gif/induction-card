@@ -708,6 +708,24 @@ a{color:var(--accent)}
 .content details.acc b,.content details.acc strong{font-weight:700}
 .content details.acc .mono,.content details.acc .trio span,.content details.acc .abxrow b,.content details.acc .dchip,.content details.acc .linkish,.content details.acc .scopt b{font-family:var(--font-sans)}
 .content details.acc .trio span{font-weight:700}
+
+/* block finder (v2.86) */
+:root{--bf-skin:#d6c5b8;--bf-pick:#f59e0b;--bf-st1:#fbfcfc;--bf-st2:#e3ebee}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bf-skin:#c2b1a5;--bf-st1:#24343a;--bf-st2:#0d1416}}
+:root[data-theme="dark"]{--bf-skin:#c2b1a5;--bf-st1:#24343a;--bf-st2:#0d1416}
+.bfstage{position:relative;width:100%;aspect-ratio:3/4;max-height:62vh;border-radius:var(--r);border:1px solid var(--line);background:radial-gradient(ellipse 80% 70% at 50% 35%,var(--bf-st1),var(--bf-st2));overflow:hidden;touch-action:pan-y;margin:0 0 var(--s2)}
+.bfstage.nogl{aspect-ratio:auto;min-height:44px}.bfcv{display:block;width:100%;height:100%;cursor:grab}
+.bfhint{position:absolute;left:0;right:0;bottom:6px;text-align:center;font-size:13px;color:var(--muted);pointer-events:none}
+.bfpin{position:absolute;transform:translate(10px,-50%);background:var(--card);color:var(--ink);border:1px solid var(--bf-pick);border-radius:999px;padding:2px 10px;font-size:13px;font-weight:700;pointer-events:none;white-space:nowrap}
+.bfpin::before{content:"";position:absolute;left:-12px;top:50%;width:10px;border-top:1.5px solid var(--bf-pick)}
+.bfviews,.bfchips{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 var(--s2)}
+.bfviews button,.bfchips button{flex:1 1 0;min-height:44px;border-radius:var(--r-sm);border:1px solid var(--line);background:var(--card);color:var(--ink);font:600 14px var(--font-sans);cursor:pointer;padding:0 6px}
+.bfchips button{flex:1 1 40%}.bfchips button[aria-pressed="true"]{background:var(--gc);border-color:var(--gc);color:var(--on)}
+.bfpanel{display:grid;gap:8px;margin:var(--s2) 0}.bfside{margin:0;color:var(--danger-ink);font-weight:600;font-size:14px}
+.bfb{border-radius:var(--r-sm);padding:10px 12px;background:var(--bg);display:grid;gap:2px}.bfb.first{background:var(--gc-soft)}
+.bftag{font-size:13px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--gc)}
+.bfo{display:flex;justify-content:space-between;align-items:baseline;gap:8px;background:none;border:0;padding:0;color:var(--ink);font:inherit;text-align:left;cursor:pointer}
+.bfn{font-weight:700;font-size:16px}.bfd{font-weight:700;font-size:20px;white-space:nowrap}.bfw{font-size:14px;color:var(--muted)}.bfw.bfc{color:var(--ink)}
 </style>
 </head>
 <body>
@@ -722,7 +740,7 @@ if (window.top !== window.self && /\.github\.io$/.test(location.hostname)) {
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.85.1";
+const APP_VERSION = "2.86.1";
 const APP_DATE = "22 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
@@ -739,7 +757,7 @@ const store = {
 };
 // Inputs are not remembered between uses (per plan): state lives in memory only.
 const S = { ettMode:"adult", sex:"F", height:158, ageY:4, ageM:0, wt:3.0,
-            touched:{}, sc:{}, fastH:6, leLen:"brief", leNote:"", csDec:"", pnNote:"", pnF:{}, pnLay:"mine", pnMP:"", pnNeck:"", pnPonv:"", pnUrg:"", crea:80, hbNow:12, hbLow:8, hbTarget:10, derm:"", abxSp:"general", spOp:"lscs", spHt:155, morWt:60, pw:10, pY:1, pM:0, pHt:75, pBE:-5, aw:70, emTab:"adult", obTab:"labour", pTab:"pre", gaTab:"ind", pmTab:"assess", raTab:"safety", laA:[], laP:[], cSex:"F", cY:40, cM:0, cH:160, cW:60, cD:7, cGA:40, cBW:3, cNick:"", laD:"bupi", laC:"0.5", laMl:15, laBi:"1", age:45, apfel:0, pump:"pcea_cse", topup:"lig", ventSc:"std", vfio:"", txTab:"pre", txck:{}, gaB:40, chW:6, pD:7, bw:3, dermMode:"block", asa:"", met:"", csWho:"patient", csOut:"full", csLen:"brief", csLang:"English", csNote:"", k:4.5, hb:10, todayWt:70, hdH:12 };
+            touched:{}, sc:{}, fastH:6, leLen:"brief", leNote:"", csDec:"", pnNote:"", pnF:{}, pnLay:"mine", pnMP:"", pnNeck:"", pnPonv:"", pnUrg:"", crea:80, hbNow:12, hbLow:8, hbTarget:10, derm:"", abxSp:"general", spOp:"lscs", spHt:155, morWt:60, pw:10, pY:1, pM:0, pHt:75, pBE:-5, aw:70, emTab:"adult", obTab:"labour", pTab:"pre", gaTab:"ind", pmTab:"assess", raTab:"finder", laA:[], laP:[], cSex:"F", cY:40, cM:0, cH:160, cW:60, cD:7, cGA:40, cBW:3, cNick:"", laD:"bupi", laC:"0.5", laMl:15, laBi:"1", age:45, apfel:0, pump:"pcea_cse", topup:"lig", ventSc:"std", vfio:"", txTab:"pre", txck:{}, gaB:40, chW:6, pD:7, bw:3, dermMode:"block", asa:"", met:"", csWho:"patient", csOut:"full", csLen:"brief", csLang:"English", csNote:"", k:4.5, hb:10, todayWt:70, hdH:12 };
 
 function src(text){ return `<div class="src">Source: ${text}</div>`; }
 function protoSrc(){
@@ -3759,20 +3777,194 @@ raCards.adjuncts = () => { const x = wts();
     R("IT morphine","(e.g. TKR, hip, laparotomy)","100–150 mcg","monitor RR and sedation for 24 h","intrathecal")])}${src("ASRA / NYSORA adjunct reviews.")}</div>`; };
 
 /* UPPER LIMB */
-raCards.isb = () => blk({t:"Interscalene", ind:"Shoulder, proximal humerus, lateral clavicle", pos:"Semi-sitting, head turned away · linear probe transverse at C6 (cricoid)", sono:"C5–C6 roots (\"traffic lights\") between anterior and middle scalene", needle:"22G 50 mm, in-plane lateral → medial", vol:[10,15], caut:"Phrenic palsy ~100% — avoid in severe respiratory disease or contralateral palsy · Horner's, hoarseness · vertebral artery / intrathecal injection"});
-raCards.scb = () => blk({t:"Supraclavicular", ind:"Elbow, forearm, hand (and humerus)", pos:"Supine, head turned away · linear probe coronal-oblique in supraclavicular fossa", sono:"\"Bunch of grapes\" lateral to subclavian artery, above first rib and pleura", needle:"22G 50 mm, in-plane lateral → medial", vol:[20,25], caut:"Pneumothorax · phrenic palsy ~50% · vascular puncture"});
-raCards.axb = () => blk({t:"Axillary", ind:"Elbow, forearm, hand", pos:"Supine, arm abducted 90° · linear probe in axilla across the humerus", sono:"Axillary artery: median superolateral, ulnar medial, radial posterior; musculocutaneous in coracobrachialis", needle:"22G 50 mm, in-plane", vol:[20,25], caut:"Veins compress — intravascular risk; ~5 mL around each nerve + 5 mL musculocutaneous · no phrenic palsy"});
+const BLK_isb = {t:"Interscalene", ind:"Shoulder, proximal humerus, lateral clavicle", pos:"Semi-sitting, head turned away · linear probe transverse at C6 (cricoid)", sono:"C5–C6 roots (\"traffic lights\") between anterior and middle scalene", needle:"22G 50 mm, in-plane lateral → medial", vol:[10,15], caut:"Phrenic palsy ~100% — avoid in severe respiratory disease or contralateral palsy · Horner's, hoarseness · vertebral artery / intrathecal injection"}; raCards.isb = () => blk(BLK_isb);
+const BLK_scb = {t:"Supraclavicular", ind:"Elbow, forearm, hand (and humerus)", pos:"Supine, head turned away · linear probe coronal-oblique in supraclavicular fossa", sono:"\"Bunch of grapes\" lateral to subclavian artery, above first rib and pleura", needle:"22G 50 mm, in-plane lateral → medial", vol:[20,25], caut:"Pneumothorax · phrenic palsy ~50% · vascular puncture"}; raCards.scb = () => blk(BLK_scb);
+const BLK_axb = {t:"Axillary", ind:"Elbow, forearm, hand", pos:"Supine, arm abducted 90° · linear probe in axilla across the humerus", sono:"Axillary artery: median superolateral, ulnar medial, radial posterior; musculocutaneous in coracobrachialis", needle:"22G 50 mm, in-plane", vol:[20,25], caut:"Veins compress — intravascular risk; ~5 mL around each nerve + 5 mL musculocutaneous · no phrenic palsy"}; raCards.axb = () => blk(BLK_axb);
 /* LOWER LIMB */
-raCards.fem = () => blk({t:"Femoral", ind:"Anterior thigh, femur, knee surgery; hip analgesia", pos:"Supine · linear probe at inguinal crease", sono:"Femoral nerve lateral to artery, deep to fascia iliaca (hyperechoic triangle)", needle:"22G 50–80 mm, in-plane lateral → medial", vol:[15,20], caut:"Quadriceps weakness → fall risk", anal:false});
-raCards.fic = () => blk({t:"Fascia iliaca (suprainguinal)", ind:"Hip fracture, hip surgery", pos:"Supine · linear probe sagittal, medial to ASIS (\"bow-tie\": sartorius + internal oblique)", sono:"Inject deep to fascia iliaca, superficial to iliacus; deep circumflex iliac artery as landmark", needle:"22G 80–100 mm, in-plane caudal → cranial", vol:[30,40], anal:true, caut:"Large volume — check LA max in frail elderly · quadriceps weakness"});
-raCards.peng = () => blk({t:"PENG", ind:"Hip fracture / hip surgery analgesia, motor-sparing", pos:"Supine · curvilinear probe transverse-oblique over AIIS – iliopubic eminence", sono:"Psoas tendon on the pubic ramus; femoral artery medial", needle:"22G 80–100 mm, in-plane lateral → medial, deep to psoas tendon", vol:[20,20], anal:true, caut:"Femoral vessels nearby · large volumes may weaken quadriceps"});
-raCards.acb = () => blk({t:"Adductor canal", ind:"Knee surgery (TKR) analgesia; saphenous territory", pos:"Supine, leg externally rotated · linear probe mid-thigh", sono:"Saphenous nerve lateral to femoral artery, deep to sartorius", needle:"22G 80 mm, in-plane", vol:[10,20], anal:true, caut:"Mostly motor-sparing · vascular puncture"});
-raCards.pop = () => blk({t:"Popliteal sciatic", ind:"Foot and ankle surgery, below knee", pos:"Prone, lateral, or supine with leg raised · linear probe at popliteal crease, scan up to bifurcation", sono:"Tibial and common peroneal nerves posterolateral to popliteal artery; inject at the bifurcation inside the paraneural sheath", needle:"22G 80–100 mm, in-plane lateral", vol:[20,30], caut:"Add saphenous block for medial leg · foot drop — fall precautions"});
+const BLK_fem = {t:"Femoral", ind:"Anterior thigh, femur, knee surgery; hip analgesia", pos:"Supine · linear probe at inguinal crease", sono:"Femoral nerve lateral to artery, deep to fascia iliaca (hyperechoic triangle)", needle:"22G 50–80 mm, in-plane lateral → medial", vol:[15,20], caut:"Quadriceps weakness → fall risk", anal:false}; raCards.fem = () => blk(BLK_fem);
+const BLK_fic = {t:"Fascia iliaca (suprainguinal)", ind:"Hip fracture, hip surgery", pos:"Supine · linear probe sagittal, medial to ASIS (\"bow-tie\": sartorius + internal oblique)", sono:"Inject deep to fascia iliaca, superficial to iliacus; deep circumflex iliac artery as landmark", needle:"22G 80–100 mm, in-plane caudal → cranial", vol:[30,40], anal:true, caut:"Large volume — check LA max in frail elderly · quadriceps weakness"}; raCards.fic = () => blk(BLK_fic);
+const BLK_peng = {t:"PENG", ind:"Hip fracture / hip surgery analgesia, motor-sparing", pos:"Supine · curvilinear probe transverse-oblique over AIIS – iliopubic eminence", sono:"Psoas tendon on the pubic ramus; femoral artery medial", needle:"22G 80–100 mm, in-plane lateral → medial, deep to psoas tendon", vol:[20,20], anal:true, caut:"Femoral vessels nearby · large volumes may weaken quadriceps"}; raCards.peng = () => blk(BLK_peng);
+const BLK_acb = {t:"Adductor canal", ind:"Knee surgery (TKR) analgesia; saphenous territory", pos:"Supine, leg externally rotated · linear probe mid-thigh", sono:"Saphenous nerve lateral to femoral artery, deep to sartorius", needle:"22G 80 mm, in-plane", vol:[10,20], anal:true, caut:"Mostly motor-sparing · vascular puncture"}; raCards.acb = () => blk(BLK_acb);
+const BLK_pop = {t:"Popliteal sciatic", ind:"Foot and ankle surgery, below knee", pos:"Prone, lateral, or supine with leg raised · linear probe at popliteal crease, scan up to bifurcation", sono:"Tibial and common peroneal nerves posterolateral to popliteal artery; inject at the bifurcation inside the paraneural sheath", needle:"22G 80–100 mm, in-plane lateral", vol:[20,30], caut:"Add saphenous block for medial leg · foot drop — fall precautions"}; raCards.pop = () => blk(BLK_pop);
 /* TRUNK */
-raCards.esp = () => blk({t:"Erector spinae (ESP)", ind:"Thoracic: rib fractures, thoracotomy, breast · lumbar: spine, hip", pos:"Sitting, lateral or prone · linear probe parasagittal ~3 cm from midline at target level (T5 thoracic)", sono:"Transverse process with erector spinae muscle above", needle:"22G 50–80 mm, in-plane cranial → caudal onto the transverse process", vol:[20,30], bilat:true, anal:true, caut:"Bilateral = large total dose — use the calculator · pneumothorax rare"});
-raCards.rsb = () => blk({t:"Rectus sheath", ind:"Midline laparotomy, umbilical / incisional hernia", pos:"Supine · linear probe transverse, lateral to the umbilicus", sono:"Inject between rectus abdominis and posterior rectus sheath", needle:"22G 50–80 mm, in-plane medial → lateral", vol:[10,15], bilat:true, anal:true, caut:"Inferior epigastric vessels · peritoneal puncture"});
-raCards.tap = () => blk({t:"TAP", ind:"Lower abdominal incisions (Pfannenstiel, LSCS, appendix, hernia) — somatic only", pos:"Supine · linear probe mid-axillary line between costal margin and iliac crest", sono:"External oblique, internal oblique, transversus abdominis — inject between IO and TA", needle:"22G 80–100 mm, in-plane anterior → posterior", vol:[15,20], bilat:true, anal:true, caut:"No visceral analgesia · liver / bowel puncture · bilateral total dose"});
-raCards.sap = () => blk({t:"Serratus anterior", ind:"Breast surgery, rib fractures, thoracotomy, chest drain", pos:"Supine or lateral, arm abducted · linear probe at 4th–5th rib, mid-axillary line", sono:"Latissimus dorsi and serratus anterior over the ribs — inject superficial or deep to serratus", needle:"22G 50–80 mm, in-plane", vol:[20,30], anal:true, caut:"Pneumothorax · thoracodorsal artery, long thoracic nerve"});
+const BLK_esp = {t:"Erector spinae (ESP)", ind:"Thoracic: rib fractures, thoracotomy, breast · lumbar: spine, hip", pos:"Sitting, lateral or prone · linear probe parasagittal ~3 cm from midline at target level (T5 thoracic)", sono:"Transverse process with erector spinae muscle above", needle:"22G 50–80 mm, in-plane cranial → caudal onto the transverse process", vol:[20,30], bilat:true, anal:true, caut:"Bilateral = large total dose — use the calculator · pneumothorax rare"}; raCards.esp = () => blk(BLK_esp);
+const BLK_rsb = {t:"Rectus sheath", ind:"Midline laparotomy, umbilical / incisional hernia", pos:"Supine · linear probe transverse, lateral to the umbilicus", sono:"Inject between rectus abdominis and posterior rectus sheath", needle:"22G 50–80 mm, in-plane medial → lateral", vol:[10,15], bilat:true, anal:true, caut:"Inferior epigastric vessels · peritoneal puncture"}; raCards.rsb = () => blk(BLK_rsb);
+const BLK_tap = {t:"TAP", ind:"Lower abdominal incisions (Pfannenstiel, LSCS, appendix, hernia) — somatic only", pos:"Supine · linear probe mid-axillary line between costal margin and iliac crest", sono:"External oblique, internal oblique, transversus abdominis — inject between IO and TA", needle:"22G 80–100 mm, in-plane anterior → posterior", vol:[15,20], bilat:true, anal:true, caut:"No visceral analgesia · liver / bowel puncture · bilateral total dose"}; raCards.tap = () => blk(BLK_tap);
+const BLK_sap = {t:"Serratus anterior", ind:"Breast surgery, rib fractures, thoracotomy, chest drain", pos:"Supine or lateral, arm abducted · linear probe at 4th–5th rib, mid-axillary line", sono:"Latissimus dorsi and serratus anterior over the ribs — inject superficial or deep to serratus", needle:"22G 50–80 mm, in-plane", vol:[20,30], anal:true, caut:"Pneumothorax · thoracodorsal artery, long thoracic nerve"}; raCards.sap = () => blk(BLK_sap);
+const BLKS = Object.fromEntries([BLK_isb, BLK_scb, BLK_axb, BLK_fem, BLK_fic, BLK_peng, BLK_acb, BLK_pop, BLK_esp, BLK_rsb, BLK_tap, BLK_sap].map(o => [o.t, o]));   // block cards by title (used by the Block finder)
+/* ---------- BLOCK FINDER (v2.86) — 3D figure: tap where you operate, get blocks from the app's own block cards ---------- */
+const FINDER_CHECKED = true;   // checked by author 23 Nov 2026
+const finderDraft = () => FINDER_CHECKED ? "" : `<div class="warn" style="margin-top:0">DRAFT — block finder: which existing block card is suggested for each body region. Wording, volumes and cautions come from the block cards. Not yet ticked by you.</div>`;
+// region → blocks (titles of existing block cards; first = first choice) and the neuraxial line where relevant
+const BF_REG = {
+  shoulder: {t: "Shoulder", blocks: ["Interscalene"], nx: null},
+  arm:      {t: "Elbow / forearm / hand", blocks: ["Supraclavicular", "Axillary"], nx: null},
+  chest:    {t: "Chest wall", blocks: ["Serratus anterior", "Erector spinae (ESP)"], nx: ["Epidural (adult)", "thoracic epidural"]},
+  upabdo:   {t: "Upper abdomen", blocks: ["Rectus sheath", "Erector spinae (ESP)"], nx: ["Epidural (adult)", "thoracic epidural"]},
+  loabdo:   {t: "Lower abdomen / inguinal", blocks: ["TAP", "Rectus sheath"], nx: ["Spinal dose: non-obstetric", "spinal"]},
+  hip:      {t: "Hip", blocks: ["PENG", "Fascia iliaca (suprainguinal)"], nx: ["Spinal dose: non-obstetric", "spinal"]},
+  knee:     {t: "Knee", blocks: ["Adductor canal", "Femoral"], nx: ["Spinal dose: non-obstetric", "spinal"]},
+  foot:     {t: "Foot / ankle", blocks: ["Popliteal sciatic", "Adductor canal"], nx: ["Spinal dose: non-obstetric", "spinal"]}};
+const BF_ORDER = ["shoulder", "arm", "chest", "upabdo", "loabdo", "hip", "knee", "foot"];
+function bfBlockRow(title, first){
+  const o = BLKS[title], id = CARD_IDS[title], e = findEntry(id); if (!o || !e) return "";
+  const conc = o.anal ? 0.25 : 0.5, bi = o.bilat ? 2 : 1, lo = o.vol[0]*conc*10*bi, hi = o.vol[1]*conc*10*bi, pct = hi / laMaxMg("bupi","a") * 100;
+  const rng = (a, b, u) => a === b ? `${a} ${u}` : `${a}–${b} ${u}`;
+  return `<div class="bfb${first ? " first" : ""}">${first ? `<span class="bftag">First choice</span>` : ""}
+    <button class="bfo" data-id="${id}" data-open="${esc(e.label)}" data-g="regional" data-tab="${e.tab}"><span class="bfn">${esc(o.t)} ›</span><span class="bfd">${rng(o.vol[0], o.vol[1], "mL")}${o.bilat ? " per side" : ""}</span></button>
+    <div class="sub bfw">${o.ind}</div>
+    <div class="sub bfw">bupi/levobupi ${conc}% (${o.anal ? "analgesia" : "surgical"}) = ${rng(dz(lo,"mg"), dz(hi,"mg"), "mg")}${o.bilat ? " both sides" : ""} · <span class="${pct > 100 ? "bad" : ""}">${Math.round(pct)}% of max</span></div>
+    <div class="sub bfw bfc">${o.caut}</div>${laAddBtn("a", "bupi", conc, o.vol[1], bi, o.t)}</div>`;
+}
+function bfPanel(){
+  const sel = S.bf && BF_REG[S.bf.reg] ? S.bf : null;
+  if (!sel) return `<p class="sub" style="margin:0">Turn the figure and tap the part you are operating on, or pick a region above.</p>`;
+  const r = BF_REG[sel.reg], side = sel.side ? sel.side + " " : "";
+  const nx = r.nx && findEntry(CARD_IDS[r.nx[0]]);
+  return `<h3 style="margin-top:0">${side}${side ? r.t.toLowerCase() : r.t}</h3>${sel.side ? `<p class="bfside">Mark the ${sel.side.toLowerCase()} side · Stop Before You Block</p>` : ""}
+    ${r.blocks.map((b, i) => bfBlockRow(b, i === 0)).join("")}
+    ${nx ? `<button class="rellink" data-id="${nx.id}" data-open="${esc(nx.label)}" data-g="regional" data-tab="${nx.tab}">Or neuraxial: ${r.nx[1]} → ${esc(bareLabel(nx.label))} ›</button>` : ""}`;
+}
+raCards.finder = () => `<div class="card"><h2>Block finder</h2>${finderDraft()}
+  <div class="bfstage" id="bfstage"><div class="bfhint" id="bfhint">drag to turn · tap a body part</div></div>
+  <div class="bfviews" role="group" aria-label="View"><button data-bfview="0">Front</button><button data-bfview="1.5708">Side</button><button data-bfview="3.1416">Back</button></div>
+  <div class="bfchips">${BF_ORDER.map(k => `<button data-bfreg="${k}" aria-pressed="${!!(S.bf && S.bf.reg === k)}">${BF_REG[k].t}</button>`).join("")}</div>
+  <div class="bfpanel">${bfPanel()}</div>
+  <button class="homebtn" data-id="paeds-blocks-which-block-paeds" data-open="2. Which block" data-g="paeds" data-tab="blocks">Child? → Paediatric › Blocks › Which block ›</button>
+  ${src("Suggestions point to this app's block cards (" + RSRC + "); figure is schematic.")}</div>`;
+
+/* the figure: smooth-blended body parts (signed distance field) drawn in a WebGL shader; one canvas reused across redraws */
+const BF = (() => {
+  const R = {none: 0, chest: 1, upabdo: 2, loabdo: 3, shoulder: 4, arm: 5, hip: 6, knee: 7, foot: 8}, P = [];
+  const E = (reg, s, c, r, k = .06, sub = false) => P.push({t: 0, reg: R[reg], s, c, r, k, sub});
+  const C = (reg, s, a, b, r1, r2, k = .05, sub = false) => P.push({t: 1, reg: R[reg], s, a, b, r1, r2, k, sub});
+  E("none", 0, [0, 1.665, 0], [.08, .104, .092], .03);  E("none", 0, [0, 1.588, .03], [.058, .048, .058], .04);
+  E("none", 0, [0, 1.69, .072], [.068, .022, .03], .03); E("none", 0, [0, 1.645, .094], [.014, .026, .02], .015);
+  C("none", 0, [0, 1.47, -.01], [0, 1.6, 0], .05, .043, .05);
+  E("chest", 0, [0, 1.3, 0], [.165, .19, .108], .08);    E("upabdo", 0, [0, 1.08, .012], [.128, .14, .094], .09);
+  E("loabdo", 0, [0, .93, 0], [.165, .11, .104], .08);
+  [-1, 1].forEach(s => {
+    E("none", s, [s*.082, 1.655, 0], [.016, .03, .022], .02);
+    C("chest", s, [s*.03, 1.49, -.035], [s*.15, 1.45, -.03], .038, .03, .05);  C("chest", s, [s*.02, 1.455, .05], [s*.15, 1.465, .02], .02, .019, .04);
+    E("chest", s, [s*.072, 1.36, .058], [.075, .055, .045], .05);  E("chest", s, [s*.075, 1.33, .1], [.008, .008, .007], .008);   // pectoral, nipple (T4)
+    E("chest", s, [s*.09, 1.33, -.095], [.06, .075, .022], .04);                                                                 // scapula
+    E("upabdo", s, [s*.1, 1.05, .02], [.05, .1, .07], .05);                                                                      // oblique
+    C("loabdo", s, [s*.13, .975, .05], [s*.14, .995, -.04], .012, .01, .05);   // iliac crest (subtle)
+    E("hip", s, [s*.075, .89, -.062], [.085, .09, .075], .06);   E("shoulder", s, [s*.19, 1.42, 0], [.062, .07, .064], .05);
+    C("arm", s, [s*.2, 1.41, -.005], [s*.29, 1.16, -.01], .046, .036, .04);  E("arm", s, [s*.245, 1.29, .018], [.04, .07, .04], .04);
+    C("arm", s, [s*.29, 1.16, -.01], [s*.36, .93, .02], .038, .026, .03);    E("arm", s, [s*.305, 1.1, 0], [.038, .06, .035], .035);
+    E("arm", s, [s*.38, .86, .025], [.024, .06, .038], .025);  C("arm", s, [s*.37, .9, .045], [s*.36, .85, .062], .013, .011, .02);
+    C("hip", s, [s*.09, .9, 0], [s*.12, .5, 0], .085, .055, .07);
+    C("knee", s, [s*.12, .5, 0], [s*.125, .45, .01], .052, .048, .03);  E("knee", s, [s*.123, .49, .048], [.032, .036, .02], .02);   // knee, kneecap
+    C("knee", s, [s*.125, .45, -.005], [s*.13, .1, -.005], .045, .03, .03);  E("knee", s, [s*.125, .34, -.03], [.05, .09, .05], .04);
+    E("foot", s, [s*.13, .075, 0], [.035, .035, .035], .03);  E("foot", s, [s*.155, .08, 0], [.012, .016, .012], .012);  E("foot", s, [s*.105, .085, 0], [.012, .016, .012], .012);
+    E("foot", s, [s*.13, .042, -.02], [.035, .035, .045], .03);  C("foot", s, [s*.13, .035, 0], [s*.135, .028, .125], .035, .026, .03); });
+  E("none", 0, [0, 1.0, .112], [.008, .01, .012], .012, true);      // umbilicus (T10), shallow
+  E("none", 0, [0, 1.475, .07], [.018, .012, .02], .025, true);    // sternal notch, shallow
+  C("none", 0, [0, 1.48, -.122], [0, 1.0, -.116], .008, .008, .03, true);   // spine line, shallow
+  const ANCH = {chest: [.0, 1.3, .1], upabdo: [0, 1.08, .1], loabdo: [0, .95, .1], shoulder: [.21, 1.43, 0], arm: [.31, 1.08, 0], hip: [.11, .8, .06], knee: [.123, .47, .05], foot: [.13, .06, .08]};
+  const ZD = {shoulder: 1.35, arm: 1.5, chest: 1.8, upabdo: 1.8, loabdo: 1.8, hip: 1.7, knee: 1.5, foot: 1.2};
+  const v3 = a => `vec3(${a.map(x => x.toFixed(4)).join(",")})`, f = x => x.toFixed(4);
+  const dist = q => q.t ? `sdRC(p, ${v3(q.a)}, ${v3(q.b)}, ${f(q.r1)}, ${f(q.r2)})` : `sdE(p - ${v3(q.c)}, ${v3(q.r)})`;
+  const isSel = q => `(abs(${q.reg.toFixed(1)} - selR) < 0.5 && (selS == 0.0 || abs(${q.s.toFixed(1)} - selS) < 0.5))`;
+  const U_ = P.filter(q => !q.sub), SUB = P.filter(q => q.sub);
+  const FS = `precision highp float;
+  uniform vec2 res; uniform vec3 ro; uniform vec3 fw; uniform vec3 rt; uniform vec3 up; uniform vec3 Ld; uniform float selR; uniform float selS; uniform vec3 skin; uniform vec3 hi; uniform float pulse; uniform float dark; uniform float hq;
+  float smin(float a, float b, float k){ float h = max(k - abs(a - b), 0.0) / k; return min(a, b) - h*h*k*0.25; }
+  float sdE(vec3 p, vec3 r){ float k0 = length(p/r); float k1 = length(p/(r*r)); return k0*(k0 - 1.0)/k1; }
+  float sdRC(vec3 p, vec3 a, vec3 b, float r1, float r2){ vec3 ba = b - a; float l2 = dot(ba, ba); float rr = r1 - r2; float a2 = l2 - rr*rr; float il2 = 1.0/l2;
+    vec3 pa = p - a; float y = dot(pa, ba); float z = y - l2; vec3 xv = pa*l2 - ba*y; float x2 = dot(xv, xv); float y2 = y*y*l2; float z2 = z*z*l2; float k = sign(rr)*rr*rr*x2;
+    if (sign(z)*a2*z2 > k) return sqrt(x2 + z2)*il2 - r2; if (sign(y)*a2*y2 < k) return sqrt(x2 + y2)*il2 - r1; return (sqrt(x2*a2*il2) + y*rr)*il2 - r1; }
+  vec2 map(vec3 p){ float d; float tot = 1e9; float best = 1e9; float id = 0.0;
+  ${U_.map(q => `d = ${dist(q)}; if (d < best){ best = d; id = ${(q.reg*3 + q.s + 1).toFixed(1)}; } tot = smin(tot, d, ${f(q.k)});`).join("\n  ")}
+  ${SUB.map(q => `tot = -smin(-tot, ${dist(q)}, ${f(q.k)});`).join("\n  ")}
+    return vec2(tot, id); }
+  float edge(vec3 p){ float d; float ds = 1e9; float doo = 1e9;
+  ${U_.map(q => `d = ${dist(q)}; if (${isSel(q)}) ds = min(ds, d); else doo = min(doo, d);`).join("\n  ")}
+    return abs(ds - doo); }
+  vec3 nrm(vec3 p){ vec2 e = vec2(0.0015, -0.0015); return normalize(e.xyy*map(p + e.xyy).x + e.yyx*map(p + e.yyx).x + e.yxy*map(p + e.yxy).x + e.xxx*map(p + e.xxx).x); }
+  float soft(vec3 o, vec3 d){ float r = 1.0; float t = 0.03; for (int i = 0; i < 22; i++){ float h = map(o + d*t).x; r = min(r, 9.0*h/t); t += clamp(h, 0.02, 0.12); if (r < 0.02 || t > 1.4) break; } return clamp(r, 0.0, 1.0); }
+  void main(){
+    vec2 uv = (gl_FragCoord.xy - 0.5*res) / res.y; vec3 rd = normalize(fw*1.62 + uv.x*rt + uv.y*up);
+    float t = 0.4; vec2 h = vec2(1.0, 0.0); bool hit = false;
+    for (int i = 0; i < 96; i++){ h = map(ro + rd*t); if (h.x < 0.0008){ hit = true; break; } t += h.x; if (t > 6.0) break; }
+    if (!hit){ float tg = -ro.y / rd.y; if (tg > 0.0){ vec3 g = ro + rd*tg; float sh = smoothstep(0.34, 0.0, length(g.xz*vec2(1.0, 1.6))); gl_FragColor = vec4(0.0, 0.0, 0.0, 0.18*sh); return; } gl_FragColor = vec4(0.0); return; }
+    vec3 p = ro + rd*t, n = nrm(p);
+    float reg = floor(h.y/3.0 + 0.001), sd = h.y - reg*3.0 - 1.0;
+    bool on = selR > 0.5 && abs(reg - selR) < 0.5 && (selS == 0.0 || abs(sd - selS) < 0.5);
+    vec3 base = on ? hi : mix(skin, hi, reg > 0.5 ? 0.45*pulse : 0.0);
+    float dif = max(dot(n, Ld), 0.0), sh = hq > 0.5 ? mix(0.35, 1.0, soft(p + n*0.004, Ld)) : 1.0;
+    float ao = clamp(0.5 + 12.0*map(p + n*0.03).x, 0.45, 1.0), rim = pow(1.0 - max(dot(n, -rd), 0.0), 3.0);
+    vec3 col = base*(0.4 + 0.62*dif*sh)*ao + (0.12 + 0.22*dark)*rim + 0.08*sh*pow(max(dot(reflect(-Ld, n), -rd), 0.0), 14.0) + skin*0.05*max(n.y, 0.0);
+    if (on) col += hi*0.5*rim + hi*0.06;
+    if (selR > 0.5 && edge(p) < 0.006) col = mix(col, hi*0.55, 0.85);
+    gl_FragColor = vec4(col, 1.0); }`;
+  // JS twin of the distance field, for taps
+  const len = v => Math.hypot(v[0], v[1], v[2]), sub = (a, b) => [a[0]-b[0], a[1]-b[1], a[2]-b[2]], dot = (a, b) => a[0]*b[0] + a[1]*b[1] + a[2]*b[2];
+  const cross = (a, b) => [a[1]*b[2]-a[2]*b[1], a[2]*b[0]-a[0]*b[2], a[0]*b[1]-a[1]*b[0]], nz = a => { const l = len(a); return a.map(x => x/l); };
+  const sdE = (p, r) => { const k0 = len([p[0]/r[0], p[1]/r[1], p[2]/r[2]]), k1 = len([p[0]/(r[0]*r[0]), p[1]/(r[1]*r[1]), p[2]/(r[2]*r[2])]); return k0*(k0 - 1)/k1; };
+  const sdRC = (p, a, b, r1, r2) => { const ba = sub(b, a), l2 = dot(ba, ba), rr = r1 - r2, a2 = l2 - rr*rr, il2 = 1/l2, pa = sub(p, a), y = dot(pa, ba), z = y - l2;
+    const xv = [pa[0]*l2 - ba[0]*y, pa[1]*l2 - ba[1]*y, pa[2]*l2 - ba[2]*y], x2 = dot(xv, xv), y2 = y*y*l2, z2 = z*z*l2, k = Math.sign(rr)*rr*rr*x2;
+    if (Math.sign(z)*a2*z2 > k) return Math.sqrt(x2 + z2)*il2 - r2; if (Math.sign(y)*a2*y2 < k) return Math.sqrt(x2 + y2)*il2 - r1; return (Math.sqrt(x2*a2*il2) + y*rr)*il2 - r1; };
+  const smin = (a, b, k) => { const h = Math.max(k - Math.abs(a - b), 0)/k; return Math.min(a, b) - h*h*k*.25; };
+  const dq = (p, q) => q.t ? sdRC(p, q.a, q.b, q.r1, q.r2) : sdE(sub(p, q.c), q.r);
+  const mapJS = p => { let tot = 1e9, best = 1e9, q0 = null; for (const q of U_){ const d = dq(p, q); if (d < best){ best = d; q0 = q; } tot = smin(tot, d, q.k); } for (const q of SUB) tot = -smin(-tot, dq(p, q), q.k); return [tot, q0]; };
+  // camera: orbit (yaw, limited pitch) around a target; eases towards the selected region
+  const st = {cv: null, gl: null, prog: null, U: null, ok: null, yaw: 0, pitch: 0, T: [0, .9, 0], D: 3.35, goal: null, low: false, queued: false, pulsed: false, pulse: 0, raf: 0};
+  const cam = () => { const cp = Math.cos(st.pitch), ro = [st.T[0] + st.D*Math.sin(st.yaw)*cp, st.T[1] + st.D*Math.sin(st.pitch), st.T[2] + st.D*Math.cos(st.yaw)*cp];
+    const fw = nz(sub(st.T, ro)), rt = nz(cross(fw, [0, 1, 0])), up = cross(rt, fw); return {ro, fw, rt, up}; };
+  function init(){
+    if (st.ok !== null) return st.ok;
+    const cv = document.createElement("canvas"), gl = cv.getContext("webgl", {alpha: true, antialias: false, premultipliedAlpha: false});
+    if (!gl){ st.ok = false; return false; }
+    const sh = (type, srcT) => { const o = gl.createShader(type); gl.shaderSource(o, srcT); gl.compileShader(o); if (!gl.getShaderParameter(o, gl.COMPILE_STATUS)) throw new Error(gl.getShaderInfoLog(o)); return o; };
+    try { const pr = gl.createProgram(); gl.attachShader(pr, sh(gl.VERTEX_SHADER, "attribute vec2 v; void main(){ gl_Position = vec4(v, 0.0, 1.0); }")); gl.attachShader(pr, sh(gl.FRAGMENT_SHADER, FS)); gl.linkProgram(pr);
+      if (!gl.getProgramParameter(pr, gl.LINK_STATUS)) throw new Error("link"); st.prog = pr; } catch (e){ st.ok = false; return false; }
+    gl.useProgram(st.prog); const buf = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, buf); gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1, 3,-1, -1,3]), gl.STATIC_DRAW);
+    const loc = gl.getAttribLocation(st.prog, "v"); gl.enableVertexAttribArray(loc); gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0); gl.enable(gl.BLEND); gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+    st.cv = cv; st.gl = gl; st.U = n => gl.getUniformLocation(st.prog, n); cv.className = "bfcv"; bind(cv); st.ok = true; return true; }
+  const hex = c => { const m = /#?([\da-f]{2})([\da-f]{2})([\da-f]{2})/i.exec(c) || [0, "d6", "c5", "b8"]; return [1, 2, 3].map(i => parseInt(m[i], 16)/255); };
+  const cssv = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+  const isDark = () => document.documentElement.dataset.theme === "dark" || (document.documentElement.dataset.theme !== "light" && matchMedia("(prefers-color-scheme: dark)").matches);
+  function draw(){ st.queued = false; const cv = st.cv, gl = st.gl; if (!cv || !cv.isConnected) return;
+    const dpr = Math.min(devicePixelRatio || 1, 1.5)*(st.low ? .6 : 1), w = Math.round(cv.clientWidth*dpr), h = Math.round(cv.clientHeight*dpr); if (!w || !h) return;
+    if (cv.width !== w || cv.height !== h){ cv.width = w; cv.height = h; } gl.viewport(0, 0, w, h); gl.clearColor(0, 0, 0, 0); gl.clear(gl.COLOR_BUFFER_BIT);
+    const c = cam(), sel = S.bf && R[S.bf.reg] ? S.bf : null, L = nz([-.45*Math.cos(st.yaw) + .7*Math.sin(st.yaw), .65, .45*Math.sin(st.yaw) + .7*Math.cos(st.yaw)]);
+    const U = st.U; gl.uniform2f(U("res"), w, h); gl.uniform3fv(U("ro"), c.ro); gl.uniform3fv(U("fw"), c.fw); gl.uniform3fv(U("rt"), c.rt); gl.uniform3fv(U("up"), c.up); gl.uniform3fv(U("Ld"), L);
+    gl.uniform1f(U("selR"), sel ? R[sel.reg] : 0); gl.uniform1f(U("selS"), sel && sel.side ? (sel.side === "Right" ? -1 : 1) : 0); gl.uniform1f(U("pulse"), st.pulse);
+    gl.uniform1f(U("dark"), isDark() ? 1 : 0); gl.uniform1f(U("hq"), st.low ? 0 : 1); gl.uniform3fv(U("skin"), hex(cssv("--bf-skin"))); gl.uniform3fv(U("hi"), hex(cssv("--bf-pick")));
+    gl.drawArrays(gl.TRIANGLES, 0, 3); pin(c, sel); }
+  const redraw = () => { if (!st.queued){ st.queued = true; requestAnimationFrame(draw); } };
+  function pin(c, sel){ const el = document.getElementById("bfpin"); if (!el) return; if (!sel || !ANCH[sel.reg]){ el.hidden = true; return; }
+    const sx = sel.side === "Right" ? -1 : 1, a0 = ANCH[sel.reg], p = [["chest","upabdo","loabdo"].includes(sel.reg) ? 0 : a0[0]*sx, a0[1], a0[2]], q = sub(p, c.ro);
+    const z = dot(q, c.fw); if (z <= 0){ el.hidden = true; return; } const w = st.cv.clientWidth, h = st.cv.clientHeight;
+    el.style.left = (1.62*dot(q, c.rt)/z*h + .5*w) + "px"; el.style.top = (.5*h - 1.62*dot(q, c.up)/z*h) + "px"; el.textContent = (sel.side ? sel.side + " " : "") + BF_REG[sel.reg].t.split(" / ")[0].toLowerCase(); el.hidden = false; }
+  function ease(){ cancelAnimationFrame(st.raf); const g = st.goal; if (!g) return; const reduce = reduceMotion();
+    const step = () => { let done = true; const k = reduce ? 1 : .18;
+      ["yaw", "D", "pitch"].forEach(n => { if (g[n] === undefined) return; const d = g[n] - st[n]; if (Math.abs(d) > .002){ st[n] += d*k; done = false; } else st[n] = g[n]; });
+      if (g.T) st.T = st.T.map((x, i) => { const d = g.T[i] - x; if (Math.abs(d) > .001){ done = false; return x + d*k; } return g.T[i]; });
+      draw(); if (!done) st.raf = requestAnimationFrame(step); else st.goal = null; }; step(); }
+  function focus(sel){ if (sel && ANCH[sel.reg]){ const sx = sel.side === "Right" ? -1 : 1, a0 = ANCH[sel.reg];
+      st.goal = {T: [["chest","upabdo","loabdo"].includes(sel.reg) ? 0 : a0[0]*sx*.6, a0[1], 0], D: ZD[sel.reg] || 2}; } else st.goal = {T: [0, .9, 0], D: 3.35}; ease(); }
+  function view(yaw){ const base = Math.round(st.yaw/(2*Math.PI))*2*Math.PI; st.goal = {yaw: base + yaw, pitch: 0}; ease(); }
+  function pick(px, py){ const c = cam(), w = st.cv.clientWidth, h = st.cv.clientHeight, ux = (px - .5*w)/h, uy = (.5*h - py)/h;
+    const rd = nz([c.fw[0]*1.62 + ux*c.rt[0] + uy*c.up[0], c.fw[1]*1.62 + ux*c.rt[1] + uy*c.up[1], c.fw[2]*1.62 + ux*c.rt[2] + uy*c.up[2]]); let t = .4;
+    for (let i = 0; i < 140; i++){ const p = [c.ro[0] + rd[0]*t, c.ro[1] + rd[1]*t, c.ro[2] + rd[2]*t], [d, q] = mapJS(p); if (d < .001) return q; t += d; if (t > 6) break; } return null; }
+  function bind(cv){ let down = null;
+    cv.addEventListener("pointerdown", e => { down = {x: e.clientX, y: e.clientY, yaw: st.yaw, pitch: st.pitch, moved: false, tilt: false}; cv.setPointerCapture(e.pointerId); cancelAnimationFrame(st.raf); st.goal = null; });
+    cv.addEventListener("pointermove", e => { if (!down) return; const dx = e.clientX - down.x, dy = e.clientY - down.y;
+      if (!down.moved && Math.hypot(dx, dy) > 6){ down.moved = true; down.tilt = Math.abs(dy) > Math.abs(dx)*.8 && Math.abs(dx) > 4; }
+      if (down.moved){ st.low = true; st.yaw = down.yaw - dx*.012; if (down.tilt) st.pitch = Math.max(-.35, Math.min(.35, down.pitch + dy*.006)); redraw(); } });
+    const end = e => { if (!down) return; const tap = !down.moved; down = null; if (st.low){ st.low = false; redraw(); } if (!tap) return;
+      const r = cv.getBoundingClientRect(), q = pick(e.clientX - r.left, e.clientY - r.top); if (!q || !q.reg) return;
+      const key = Object.keys(R).find(k => R[k] === q.reg); S.bf = {reg: key, side: q.s < 0 ? "Right" : q.s > 0 ? "Left" : ""}; focus(S.bf); render(); };
+    cv.addEventListener("pointerup", end); cv.addEventListener("pointercancel", () => { down = null; st.low = false; redraw(); }); }
+  function mount(){ const stage = document.getElementById("bfstage"); if (!stage) return;
+    if (!init()){ stage.classList.add("nogl"); const h = document.getElementById("bfhint"); if (h) h.textContent = "3D not available on this device — use the region buttons"; return; }
+    if (st.cv.parentNode !== stage) stage.prepend(st.cv); if (!document.getElementById("bfpin")){ const p = document.createElement("div"); p.id = "bfpin"; p.className = "bfpin"; p.hidden = true; stage.appendChild(p); }
+    redraw(); if (!st.pulsed && !reduceMotion()){ st.pulsed = true; const t0 = performance.now(); const pl = () => { const k = (performance.now() - t0)/1400; st.pulse = k < 1 ? Math.sin(k*Math.PI) : 0; draw(); if (k < 1) requestAnimationFrame(pl); }; setTimeout(() => requestAnimationFrame(pl), 300); } }
+  return {mount, focus, view, redraw, pick, cam, st, R};
+})();
 
 /* PAEDS calculator card */
 pCards.lacalc = () => `<div class="card"><h2>Paeds LA dose calculator</h2>${laCalc("p")}${psrc()}</div>`;
@@ -4250,6 +4442,12 @@ VGROUPS.find(g => g[0]==="General")[1].push(["Paeds doses vs local manual & pain
 VGROUPS.find(g => g[0]==="General")[1].push(["Equipment sizes in rows", "23 Nov 2026", [
   "Tube ID and depth, supraglottic sizes, paeds tube / depth / suction / laryngoscope, neonate tube, NPA, bag, DLT size and depth, NG and CVC depth: same numbers, now in rows labelled 'Equipment' (test-checked)",
   "Size chips replaced by 'have X and Y ready'; lookup tables (HMEF, bag weight bands, LMA by weight, Storz, lung isolation by age) and ventilator settings unchanged"]]);
+VGROUPS.find(g => g[0]==="General")[1].push(["Block finder", "23 Nov 2026", [
+  "Regional › Finder (new first tab): 3D figure; tap a region (or a region button) to see suggested blocks from the existing block cards",
+  "Shoulder → interscalene · Elbow/forearm/hand → supraclavicular, axillary · Chest wall → serratus anterior, ESP; or thoracic epidural",
+  "Upper abdomen → rectus sheath, ESP; or thoracic epidural · Lower abdomen/inguinal → TAP, rectus sheath; or spinal",
+  "Hip → PENG, fascia iliaca · Knee → adductor canal, femoral · Foot/ankle → popliteal sciatic, adductor canal (saphenous); each lower-limb region: or spinal",
+  "Indication, volume (bupi/levobupi, % of max for the patient) and cautions are shown exactly as on each block card; adults only (child → Paeds › Which block)"]]);
 VGROUPS.find(g => g[0]==="General")[1].push(["RSI doses as a dose table", "23 Nov 2026", [
   "General › RSI and Kidney Transplant › RSI & relaxant plan: suxamethonium, rocuronium and sugammadex rescue moved from boxes into the dose table (same numbers, test-checked)",
   "Rescue row tinted red; kidney suxamethonium row faded with 'NOT if K⁺ ≥ 5.5 / unknown' when K⁺ is high (as before)",
@@ -4356,12 +4554,13 @@ function vTicks(){
 }
 /* ---------- ABOUT ---------- */
 const CHANGES = [
+  ["2.86","Regional › Finder: turn a 3D figure, tap where you operate, see the suggested blocks from the block cards (checked)"],
   ["2.85","Dermatome figure with a 3D look: shaded limbs and torso, soft shadow (checked)"],
   ["2.84","Dermatomes: the block rises from the feet when you pick an operation or level, recedes when you go lower (off with Reduce Motion) (checked)"],
   ["2.83","Dermatome figure full width; operations in two columns underneath (checked)"],
   ["2.82","Dermatomes: one figure beside the operation list (✓ covered / needs X), back on a toggle, landmarks labelled outside the body (checked)"],
-  ["2.81","Big monitor-font numbers less crowded: wider digit spacing, spaced range dash, more room below (checked)"],
-  ["2.80","Equipment sizes (tubes, depths, LMA / i-gel, DLT, NPA, bag, NG, CVC) in rows like the dose tables (checked)"]];
+  ["2.81","Big monitor-font numbers less crowded: wider digit spacing, spaced range dash, more room below (checked)"]];
+
 
 
 
@@ -4617,7 +4816,9 @@ const GROUPS = [
    {id:"post", label:"Post-op", input:()=>gaInputs(), hint:"Reverse → extubate → prevent PONV → analgesia → discharge → IM doses.",
     cards:["1. Reversal",["Extubation criteria","2. Extubation criteria"],["PONV: Apfel score","3. PONV: Apfel score"],"4. Analgesia ladder & PCA",["Discharge from recovery","5. Discharge from recovery"],["Discharge home (daycare)","6. Discharge home (daycare)"],"7. IM doses (no IV access, or ward)"],
     links:[["Bronchospasm","adult","Bronchospasm"],["Anaphylaxis","adult","Anaphylaxis"]]}], cards:[]},
- {id:"regional", name:"Regional", sub:"Safety · Neuraxial · Upper · Lower · Trunk", tabKey:"raTab", tabs:[
+ {id:"regional", name:"Regional", sub:"Finder · Safety · Neuraxial · Upper · Lower · Trunk", tabKey:"raTab", tabs:[
+   {id:"finder", label:"Finder", input:()=>gaInputs(), autoOpen:true, hint:"Turn the figure and tap where you operate; suggestions come from the block cards.",
+    cards:[["Block finder","1. Block finder"]], links:[["LA toxicity (LAST)","adult","LA toxicity"]]},
    {id:"safety", label:"Safety", input:()=>gaInputs(), hint:"Before every block: dose limits, checklist, anticoagulants.",
     cards:[["LA dose calculator","1. LA dose calculator"],["Stop Before You Block & safe injection","2. Stop Before You Block"],["Neuraxial & deep blocks: anticoagulant timing","3. Anticoagulant timing"]],
     links:[["LA toxicity (LAST)","adult","LA toxicity"]]},
@@ -4694,6 +4895,7 @@ const GROUPS = [
    {id:"don", label:"Donor", input:()=>donInputs(), hint:"Living donor nephrectomy.",
     cards:["1. Donor pre-op","2. Donor intra-op","3. Donor post-op"], links:[]}], cards:[]}];
 const SEARCH_EXTRA = {   // keyed by stable card id
+  "regional-finder-block-finder":"block finder which block body region 3d figure shoulder arm hand chest abdomen inguinal hip knee foot ankle suggest",
   "ga-ind-induction-drugs":"induction relaxant relaxant nmb neuromuscular blocker suxamethonium scoline succinylcholine rocuronium atracurium cisatracurium vecuronium",
   "premed-prepare-anticoagulants-and-antiplatelets":"anticoagulant antiplatelet doac apixaban rivaroxaban edoxaban dabigatran warfarin bridging lmwh aspirin clopidogrel ticagrelor prasugrel crcl creatinine",
   "premed-prepare-diabetes-day-of-surgery-plan":"diabetes insulin glargine detemir degludec premixed basal bolus pump vrii vriii sliding scale sulfonylurea gliclazide sglt2 metformin glucose ketones",
@@ -4989,6 +5191,7 @@ const CARD_IDS = {
   "1. Donor pre-op":"tx-donor-pre-op",
   "2. Donor intra-op":"tx-donor-intra-op",
   "3. Donor post-op":"tx-donor-post-op",
+  "Block finder":"regional-finder-block-finder",
   "Spinal dose: non-obstetric":"regional-neuraxial-spinal-non-obstetric"};
 /* Card registry. Every card is still drawn fresh from its renderer on every render (no cached doses);
    the registry only records which renderer draws which card, so a screen draws the renderers it needs. */
@@ -5110,6 +5313,7 @@ const NEO_JUMPS = [["paeds-ind-ett","Airway & tube"],["paeds-ind-induction-drugs
   ["paeds-ind-ventilation","Ventilation"],["paeds-pre-ex-prem-apnoea-risk-and-admission","Ex-prem & apnoea"]];
 function groupScreen(g){
   const tab0 = g.tabs ? (g.tabs.find(t=>t.id===S[g.tabKey]) || g.tabs[0]) : null;
+  if (tab0 && tab0.autoOpen && S.open == null && !S.autoShut){ const it = tab0.cards.find(c => !isHead(c)); S.open = Array.isArray(it) ? it[1] : it; }
   const m = cardMap((tab0 ? tab0.cards : g.cards).filter(it => !isHead(it)).map(it => Array.isArray(it) ? it[0] : it));
   const entry = (it, tid) => { const [o,l] = Array.isArray(it) ? it : [it,it];
     return m[o] ? accordion(m[o], l, g.id, l!==o ? l : null, tid, CARD_IDS[o]) : `<div class="danger">Missing card: ${esc(o)}</div>`; };
@@ -5219,6 +5423,7 @@ function renderNow(){
   if (!S.scrollTo) window.scrollTo(0, y);
   S.scrollTo = false;
   if (S.srchFocus){ S.srchFocus = false; const q = app.querySelector("#q"); if (q) q.focus(); }
+  if (app.querySelector("#bfstage")) BF.mount();
   if (S.dermAnim){ const a = S.dermAnim; S.dermAnim = null; requestAnimationFrame(() => dermAnimate(a)); }
   if (active){ const el = app.querySelector(`[data-in="${active}"]`); if (el){ el.focus(); const v=el.value; el.value=""; el.value=v; } }
 }
@@ -5272,9 +5477,9 @@ document.addEventListener("toggle", e => {
   S.openSet = S.openSet || new Set();
   if (d.open){ const user = d._userOpen || performance.now() - restoredAt > 80; d._userOpen = false;
     if (user && !reduceMotion()){ d.classList.add("anim"); setTimeout(()=>d.classList.remove("anim"), 260); }
-    S.open = d.dataset.t; S.openSet.add(d.dataset.t); remember(d.dataset.g, d.dataset.tab, d.dataset.id);
+    S.open = d.dataset.t; S.openSet.add(d.dataset.t); remember(d.dataset.g, d.dataset.tab, d.dataset.id); if (d.dataset.id === "regional-finder-block-finder") BF.mount();
     if (!isWide()) document.querySelectorAll("details.acc[open]").forEach(o => { if (o!==d){ if (user && !reduceMotion() && o.dataset.g !== "emerg") collapseAcc(o); else o.open = false; } }); }
-  else { S.openSet.delete(d.dataset.t); if (S.open === d.dataset.t) S.open = null; }
+  else { S.openSet.delete(d.dataset.t); if (S.open === d.dataset.t) S.open = null; if (d.dataset.id === "regional-finder-block-finder") S.autoShut = true; }
 }, true);
 document.addEventListener("toggle", e => { const d = e.target; if (!d.matches || !d.matches("details.catgrp")) return; S.catOpen = S.catOpen || new Set();
   if (d.open) S.catOpen.add(d.dataset.cat); else { S.catOpen.delete(d.dataset.cat); if (d.querySelector("details.acc[open]")) S.open = null; } }, true);
@@ -5316,6 +5521,8 @@ document.addEventListener("click", e => {
   if (d.leclear){ delete S.sc.le; delete S.sc.pl; delete S.sc.dx; S.csDec = ""; S.leNote = ""; S.leLen = "brief"; render(); return; }
   if (d.csclear){ delete S.sc.cs; delete S.sc.csc; delete S.sc.pl; delete S.sc.dx; S.csDec = ""; S.csNote = ""; S.csWho = "patient"; S.csLang = "English"; S.csOut = "full"; S.csLen = "brief"; render(); return; }
   if (d.screset){ S.sc[d.screset] = {}; render(); return; }
+  if (d.bfreg){ S.bf = S.bf && S.bf.reg === d.bfreg && !S.bf.side ? null : {reg: d.bfreg, side: ""}; BF.focus(S.bf); render(); return; }
+  if (d.bfview !== undefined){ BF.view(+d.bfview); return; }
   if (d.dermback){ S.dermBack = !S.dermBack; render(); return; }
   if (d.derm){ S.dermAnim = {prev: dermState().top}; S.derm = d.derm; if (!d.open){ render(); return; } }
   if (d.jump){ const a = (b.closest("details") || document).querySelector(`[data-anchor="${d.jump}"]`); if (a){ const slim = document.querySelector(".gside.slim"), off = (slim && !isWide() ? slim.offsetHeight : 0) + 8;
@@ -5329,7 +5536,7 @@ document.addEventListener("click", e => {
     S.srch = false; S.open = d.calc ? null : open; S.scrollTo = !d.calc; if (!d.calc) remember(gid, tab, d.id ? (ID_ALIAS[d.id] ? ID_ALIAS[d.id][0] : d.id) : idOf(gid, tab, open));
     const target = "#g-"+gid; if (location.hash===target) render(); else { location.hash = target; } if (d.calc) window.scrollTo(0,0); return; }
   if (d.lscs){ S.spOp="lscs"; S.open=null; location.hash="#g-spinal"; window.scrollTo(0,0); return; }
-  if (d.go){ S.ptEditing = false; S.srch = false; S.open = null; S.openSet = new Set(); S.txck = {}; if ((location.hash||"#home")==="#"+d.go){ render(); window.scrollTo(0,0); } else { S.navTop = true; location.hash = "#"+d.go; } return; }
+  if (d.go){ S.ptEditing = false; S.srch = false; S.autoShut = false; S.open = null; S.openSet = new Set(); S.txck = {}; if ((location.hash||"#home")==="#"+d.go){ render(); window.scrollTo(0,0); } else { S.navTop = true; location.hash = "#"+d.go; } return; }
   if (d.savename){ const v = cleanName(S.dname ?? doctorName()); store.set("doctor", v || "Dr X"); S.dname = undefined; location.hash = "#home"; return; }
   if (d.case){ const c = getCases().find(x=>x.id===d.case); if (c){ switchClin(store.get("active",null), c.id); store.set("active", c.id); applyCase(c); } if ((location.hash||"#home")==="#cases") render(); else render(); return; }
   if (d.delcase){ const cs = getCases().filter(x=>x.id!==d.delcase); store.set("cases", cs); if (store.get("active",null)===d.delcase){ CASE_CLIN[d.delcase] = null; switchClin(d.delcase, null); store.set("active", null); } delete CASE_CLIN[d.delcase]; render(); return; }
