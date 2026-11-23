@@ -436,7 +436,11 @@ details.catgrp>summary::-webkit-details-marker{display:none}details.catgrp>summa
 details.endo{margin-top:var(--s3);border:1px solid var(--line);border-radius:var(--r-sm);padding:var(--s2) var(--s3)}
 details.endo summary{cursor:pointer;font-weight:600;font-size:var(--fs-sm)}
 .dwrap{display:grid;grid-template-columns:1fr 1fr;gap:var(--s2);margin:var(--s2) 0}
-.dfig{margin:0;text-align:center}.dfig svg{width:100%;height:auto;max-height:300px}.dfig figcaption{font-size:var(--fs-xs);color:var(--muted)}
+.dwrap2{display:grid;grid-template-columns:minmax(0,52%) minmax(0,1fr);gap:var(--s3);align-items:start;margin:var(--s2) 0}.dfcol{display:grid;justify-items:center;gap:2px}.dback{min-height:36px}
+.dproc{display:grid;gap:4px;min-width:0}.dpr{box-sizing:border-box;display:flex;flex-direction:column;align-items:flex-start;gap:1px;min-width:0;width:100%;min-height:40px;text-align:left;padding:6px 8px;border-radius:8px;border:1px solid var(--line);background:var(--card);color:var(--ink);font:inherit;font-size:var(--fs-sm);line-height:1.25;cursor:pointer}
+.dpr.ok{background:var(--gc-soft);border-color:transparent}.dpr.no{color:var(--muted)}.dpl{font-weight:700;white-space:nowrap}.dpr.ok .dpl{color:var(--gc)}
+.dfig .lml{stroke:var(--muted);stroke-width:.8}
+.dfig{margin:0;text-align:center}.dfig svg{width:100%;height:auto;max-height:340px}.dfig figcaption{font-size:var(--fs-xs);color:var(--muted)}
 .dfig .body{fill:var(--dim)}
 .dfig .edge{fill:none;stroke:var(--muted);stroke-width:1.6;opacity:.6;stroke-linejoin:round}.dfig .body{stroke:none}
 .dfig .band{stroke:none;cursor:pointer;transition:fill .18s ease,opacity .18s ease}
@@ -444,7 +448,7 @@ details.endo summary{cursor:pointer;font-weight:600;font-size:var(--fs-sm)}
 .dfig .r-l{fill:#16a34a}.dfig .r-l.alt{fill:#4ade80}.dfig .r-s{fill:#db2777}.dfig .r-s.alt{fill:#f472b6}
 .dfig .band.off{fill:var(--dim2)}.dfig .band.off.alt{fill:var(--dim)}
 .dfig .topline{stroke:var(--danger-ink);stroke-width:1.6;stroke-dasharray:4 2.5;pointer-events:none}
-.dfig .lmk{font:600 6.4px var(--font-sans);fill:var(--ink);paint-order:stroke;stroke:var(--card);stroke-width:2.4px;stroke-linejoin:round;pointer-events:none}
+.dfig .lmk{font:600 13px var(--font-sans);fill:var(--ink);paint-order:stroke;stroke:var(--card);stroke-width:2.4px;stroke-linejoin:round;pointer-events:none}
 .dfig .kp{fill:var(--danger-ink);stroke:var(--card);stroke-width:1.2;pointer-events:none}
 .dkey{display:flex;flex-wrap:wrap;align-items:center;gap:4px 10px;font-size:var(--fs-xs);color:var(--muted);margin:0 0 var(--s2)}.dkey .k{width:10px;height:10px;border-radius:3px;margin-right:-6px}
 .dkey .r-c{background:#f59e0b}.dkey .r-t{background:#0891b2}.dkey .r-l{background:#16a34a}.dkey .r-s{background:#db2777}
@@ -718,7 +722,7 @@ if (window.top !== window.self && /\.github\.io$/.test(location.hostname)) {
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.81.1";
+const APP_VERSION = "2.82.1";
 const APP_DATE = "22 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
@@ -3933,11 +3937,11 @@ function dermSVG(view){
   // block top line (trunk levels)
   if (st.mode==="block" && st.top && TRUNK[st.top]){ const y = TRUNK[st.top][0]; g += `<line class="topline" x1="56" y1="${y}" x2="144" y2="${y}"/>`; }
   // landmarks (front only)
-  if (view==="F") LANDMARKS.forEach(([l,t,y]) => g += `<text class="lmk" x="103" y="${y+2.2}">${t} ${l}</text>`);
+  if (view==="F") LANDMARKS.forEach(([l,t,y]) => g += `<line class="lml" x1="${y > 160 ? 136 : 142}" y1="${y}" x2="156" y2="${y}"/><text class="lmk" x="158" y="${y+3.6}">${t} ${l}</text>`);
   // key points: only selected (single) or block top
   const dots = view==="F" ? FRONT_DOTS : BACK_DOTS, show = st.mode==="block" ? new Set(st.top?[st.top]:[]) : new Set(st.sel);
   Object.entries(dots).forEach(([l,[x,y]]) => { if (show.has(l)) g += `<circle class="kp on" cx="${x}" cy="${y}" r="3.4"/>` + (/^T([2-9]|1[0-2])$/.test(l) || x===100 ? "" : `<circle class="kp on" cx="${200-x}" cy="${y}" r="3.4"/>`); });
-  return `<figure class="dfig"><svg viewBox="12 0 176 312" role="img" aria-label="${view==="F"?"Front":"Back"} dermatome diagram">${defs}${g}</svg><figcaption>${view==="F"?"Front":"Back"}</figcaption></figure>`;
+  return `<figure class="dfig"><svg viewBox="${view==="F" ? "14 0 240 312" : "12 0 176 312"}" role="img" aria-label="${view==="F"?"Front":"Back"} dermatome diagram">${defs}${g}</svg><figcaption>${view==="F"?"Front":"Back"}</figcaption></figure>`;
 }
 const DERM_SURG = [["LSCS","T4"],["Upper abdominal","T4–T6"],["Lower abdominal / inguinal hernia","T8–T10"],["TURP / vaginal / cervix","T10"],["Testes","T10"],["Hip / knee","T10–L1"],["Foot / ankle","L2"],["Perineal / haemorrhoids (saddle)","S1–S4-5"]];
 function dermCard(){
@@ -3945,20 +3949,19 @@ function dermCard(){
   let info;
   if (!top) info = mode==="block" ? "Tap a level, the body, or an operation to set the block height." : "Tap a level, the body, or an operation to highlight it.";
   else if (mode==="single") info = `<b>${S.derm}</b> — ${sel.map(l=>(sel.length>1?`${l}: `:"")+DERM_INFO[l]).join(" · ")}`;
-  else { const ok = [], no = [];
-    DERM_SURG.forEach(([s,l]) => { const need = dermExpand(l)[0]; (dermIdx(top) <= dermIdx(need) ? ok : no).push([s,need]); });
-    info = `<b>Block to ${top}</b> — ${DERM_INFO[top]}${ok.length?`<div class="dok">Enough for: ${ok.map(([s])=>`${s} ✓`).join(" · ")}</div>`:""}${no.length?`<div class="dno">Not enough for: ${no.map(([s,n])=>`${s} (needs ${n})`).join(" · ")}</div>`:""}`; }
+  else info = `<b>Block to ${top}</b> — ${DERM_INFO[top]}`;
+  // operations beside the figure: ✓ covered by the current block, grey "needs X" if not (v2.82)
+  const ops = `<div class="dproc">${DERM_SURG.map(([s,l]) => { const need = dermExpand(l)[0], ok = top && dermIdx(top) <= dermIdx(need);
+    return `<button class="dpr ${top ? (ok ? "ok" : "no") : ""}" data-derm="${l}"><span>${s}</span><span class="dpl">${top ? (ok ? `✓ ${l}` : `needs ${l}`) : l}</span></button>`; }).join("")}</div>`;
   return `${DERM_CHECKED?"":`<div class="warn" style="margin-top:0">DRAFT — ASIA/ISNCSCI 2019 key points; Miller / OAA. Not yet ticked by you.</div>`}
   ${seg("dermMode",[["block","Block up to"],["single","Single level"]])}
-  <div class="dwrap">${dermSVG("F")}${dermSVG("B")}</div>
-  <div class="dkey"><span class="k r-c"></span>Cervical<span class="k r-t"></span>Thoracic<span class="k r-l"></span>Lumbar<span class="k r-s"></span>Sacral</div>
   <div class="dsel">${info}</div>
+  <div class="dwrap2"><div class="dfcol">${dermSVG(S.dermBack ? "B" : "F")}<button class="linkbtn dback" data-dermback="1">${S.dermBack ? "‹ Front" : "Back ›"}</button></div>
+    ${mode==="block" ? ops : `<div class="sub">Single level: tap another level to compare. Switch to "Block up to" to check operations.</div>`}</div>
   ${mode==="block" ? `<p class="sub" style="margin-top:var(--s2)"><b>Cold</b> is usually lost 1–2 levels higher than <b>pinprick</b>; <b>light touch</b> is lowest. LSCS: aim for touch at T5–T4.</p>` : ""}
   <div class="dchips">${DERM_LEVELS.map(l=>`<button class="dchip r-${dermRegion(l)} ${l===top||(mode==="single"&&sel.includes(l))?"on":mode==="block"&&st.on.has(l)?"in":""}" data-derm="${l}">${l}</button>`).join("")}</div>
   <h3>Landmarks</h3>
   <table>${[["C6","Thumb"],["T4","Nipple"],["T6","Xiphoid"],["T10","Umbilicus"],["L1","Groin / inguinal ligament"],["L3","Knee"],["L5","Dorsum of foot, big toe"],["S1","Lateral foot, heel"],["S4-5","Perianal"]].map(([l,t])=>`<tr class="${l===top?"hl":""}"><td><button class="linkish" data-derm="${l}">${l}</button></td><td>${t}</td></tr>`).join("")}</table>
-  <h3>Block height needed</h3>
-  <table>${DERM_SURG.map(([s,l])=>{ const need = dermExpand(l)[0], ok = mode==="block" && top && dermIdx(top) <= dermIdx(need); return `<tr class="${S.derm===l||(mode==="block"&&top===need)?"hl":""}"><td>${s}${mode==="block"&&top?` <span class="sub">${ok?"✓":"✗"}</span>`:""}</td><td><button class="linkish" data-derm="${l}">${l}</button></td></tr>`; }).join("")}</table>
   <h3>Testing the block</h3>
   <ul><li><b>Cold</b> (ice / ethyl chloride) is lost 1–2 segments higher than <b>pinprick</b>, which is higher than <b>light touch</b></li>
   <li><b>LSCS:</b> aim <b>T4</b> bilaterally; light touch to T5–T4 is the best predictor of a comfortable section</li>
@@ -4329,12 +4332,13 @@ function vTicks(){
 }
 /* ---------- ABOUT ---------- */
 const CHANGES = [
+  ["2.82","Dermatomes: one figure beside the operation list (✓ covered / needs X), back on a toggle, landmarks labelled outside the body (checked)"],
   ["2.81","Big monitor-font numbers less crowded: wider digit spacing, spaced range dash, more room below (checked)"],
   ["2.80","Equipment sizes (tubes, depths, LMA / i-gel, DLT, NPA, bag, NG, CVC) in rows like the dose tables (checked)"],
   ["2.79","One type scale inside cards (body 16, emergency steps 17, headings 15, notes 14); RSI doses as a dose table (checked)"],
   ["2.78","Syringe recipes at normal size, so only the doses you give stand out (checked)"],
-  ["2.77","Dose tables, batch 4 — Kidney Transplant: antibiotic, infusions, reperfusion drugs, reversal, analgesia, donor (checked)"],
-  ["2.76","Dose tables, batch 3 — Paediatric: remifentanil, hypoglycaemia, penile block, discharge analgesia, MRI sedation (checked)"]];
+  ["2.77","Dose tables, batch 4 — Kidney Transplant: antibiotic, infusions, reperfusion drugs, reversal, analgesia, donor (checked)"]];
+
 
 
 
@@ -5284,6 +5288,7 @@ document.addEventListener("click", e => {
   if (d.leclear){ delete S.sc.le; delete S.sc.pl; delete S.sc.dx; S.csDec = ""; S.leNote = ""; S.leLen = "brief"; render(); return; }
   if (d.csclear){ delete S.sc.cs; delete S.sc.csc; delete S.sc.pl; delete S.sc.dx; S.csDec = ""; S.csNote = ""; S.csWho = "patient"; S.csLang = "English"; S.csOut = "full"; S.csLen = "brief"; render(); return; }
   if (d.screset){ S.sc[d.screset] = {}; render(); return; }
+  if (d.dermback){ S.dermBack = !S.dermBack; render(); return; }
   if (d.derm){ S.derm = d.derm; if (!d.open){ render(); return; } }
   if (d.jump){ const a = (b.closest("details") || document).querySelector(`[data-anchor="${d.jump}"]`); if (a){ const slim = document.querySelector(".gside.slim"), off = (slim && !isWide() ? slim.offsetHeight : 0) + 8;
     window.scrollTo({top: window.scrollY + a.getBoundingClientRect().top - off, behavior: reduceMotion() ? "auto" : "smooth"}); } return; }
