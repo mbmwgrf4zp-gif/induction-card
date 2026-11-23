@@ -439,7 +439,7 @@ details.endo summary{cursor:pointer;font-weight:600;font-size:var(--fs-sm)}
 .dwrap2{display:grid;grid-template-columns:minmax(0,1fr);gap:var(--s2);margin:var(--s2) 0}.dfcol .dfig{width:100%;max-width:420px}.dfcol{display:grid;justify-items:center;gap:2px}.dback{min-height:36px}
 .dproc{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;min-width:0}.dpr{box-sizing:border-box;display:flex;flex-direction:column;align-items:flex-start;gap:1px;min-width:0;width:100%;min-height:40px;text-align:left;padding:6px 8px;border-radius:8px;border:1px solid var(--line);background:var(--card);color:var(--ink);font:inherit;font-size:var(--fs-sm);line-height:1.25;cursor:pointer}
 .dpr.ok{background:var(--gc-soft);border-color:transparent}.dpr.no{color:var(--muted)}.dpl{font-weight:700;white-space:nowrap}.dpr.ok .dpl{color:var(--gc)}
-.dfig .lml{stroke:var(--muted);stroke-width:.8}
+.dfig .lml{stroke:var(--muted);stroke-width:.8}.dfig .shade{pointer-events:none;mix-blend-mode:normal}.dfig .shadow{fill:var(--dim2);opacity:.9}
 .dfig{margin:0;text-align:center}.dfig svg{width:100%;height:auto;max-height:460px}.dfig figcaption{font-size:var(--fs-xs);color:var(--muted)}
 .dfig .body{fill:var(--dim)}
 .dfig .edge{fill:none;stroke:var(--muted);stroke-width:1.6;opacity:.6;stroke-linejoin:round}.dfig .body{stroke:none}
@@ -722,7 +722,7 @@ if (window.top !== window.self && /\.github\.io$/.test(location.hostname)) {
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.84.1";
+const APP_VERSION = "2.85.1";
 const APP_DATE = "22 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
@@ -3925,15 +3925,22 @@ function dermSVG(view){
   const defs = `<defs><clipPath id="${id}-torso">${SIL.torso}</clipPath>
     <clipPath id="${id}-arm"><path d="${SIL.arm}"/><path d="${mirPath(SIL.arm)}"/><path d="${SIL.hand}"/><path d="${mirPath(SIL.hand)}"/></clipPath>
     <clipPath id="${id}-leg"><path d="${SIL.leg}"/><path d="${mirPath(SIL.leg)}"/><path d="${SIL.foot}"/><path d="${mirPath(SIL.foot)}"/></clipPath>
-    <clipPath id="${id}-head">${SIL.head}</clipPath></defs>`;
+    <clipPath id="${id}-head">${SIL.head}</clipPath>
+    <linearGradient id="${id}-cyl" x1="0" x2="1" y1="0" y2="0"><stop offset="0" stop-color="#fff" stop-opacity=".42"/><stop offset=".28" stop-color="#fff" stop-opacity=".08"/><stop offset=".6" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".3"/></linearGradient>
+    <radialGradient id="${id}-dome" cx=".35" cy=".3" r=".8"><stop offset="0" stop-color="#fff" stop-opacity=".45"/><stop offset=".55" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".25"/></radialGradient>
+    <filter id="${id}-drop" x="-20%" y="-10%" width="140%" height="130%"><feDropShadow dx="2.5" dy="4" stdDeviation="3" flood-color="#0b1517" flood-opacity=".28"/></filter></defs>`;
   const parts = `${SIL.head}${SIL.neck}${SIL.torso}<path d="${SIL.arm}"/><path d="${mirPath(SIL.arm)}"/><path d="${SIL.hand}"/><path d="${mirPath(SIL.hand)}"/><path d="${SIL.leg}"/><path d="${mirPath(SIL.leg)}"/><path d="${SIL.foot}"/><path d="${mirPath(SIL.foot)}"/>`;
-  let g = `<g class="edge">${parts}</g><g class="body">${parts}</g>`;
+  let g = `<g class="shadow" filter="url(#${id}-drop)">${parts}</g><g class="edge">${parts}</g><g class="body">${parts}</g>`;
   if (view==="B") g += `<rect class="${cls("C2")}" data-dl="C2" x="80" y="28" width="40" height="14" clip-path="url(#${id}-head)"/>`;
   g += `<path class="${cls("C3")}" data-dl="C3" d="M92 34 L108 34 L109 50 L91 50 Z"/>`;
   Object.entries(TRUNK).forEach(([l,[a,b]]) => g += `<rect class="${cls(l)}" data-dl="${l}" x="40" y="${a}" width="120" height="${b-a}" clip-path="url(#${id}-torso)"/>`);
   ARM.forEach(([l,a]) => g += poly(l, a, "arm"));
   (view==="F" ? LEG_F : LEG_B).forEach(([l,a]) => g += poly(l, a, "leg"));
   if (view==="B") g += `<circle class="${cls("S4-5")}" data-dl="S4-5" cx="100" cy="186" r="5"/>`;
+  // 3D look (v2.85): light from the upper left, shade on the right of each part
+  const shadeParts = [SIL.head.replace("<ellipse", `<ellipse fill="url(#${id}-dome)"`), SIL.neck.replace("<path", `<path fill="url(#${id}-cyl)"`), SIL.torso.replace("<path", `<path fill="url(#${id}-cyl)"`),
+    ...[SIL.arm, mirPath(SIL.arm), SIL.hand, mirPath(SIL.hand), SIL.leg, mirPath(SIL.leg), SIL.foot, mirPath(SIL.foot)].map(d => `<path fill="url(#${id}-cyl)" d="${d}"/>`)];
+  g += `<g class="shade">${shadeParts.join("")}</g>`;
   // block top line (trunk levels)
   if (st.mode==="block" && st.top && TRUNK[st.top]){ const y = TRUNK[st.top][0]; g += `<line class="topline" x1="56" y1="${y}" x2="144" y2="${y}"/>`; }
   // landmarks (front only)
@@ -4349,12 +4356,13 @@ function vTicks(){
 }
 /* ---------- ABOUT ---------- */
 const CHANGES = [
+  ["2.85","Dermatome figure with a 3D look: shaded limbs and torso, soft shadow (checked)"],
   ["2.84","Dermatomes: the block rises from the feet when you pick an operation or level, recedes when you go lower (off with Reduce Motion) (checked)"],
   ["2.83","Dermatome figure full width; operations in two columns underneath (checked)"],
   ["2.82","Dermatomes: one figure beside the operation list (✓ covered / needs X), back on a toggle, landmarks labelled outside the body (checked)"],
   ["2.81","Big monitor-font numbers less crowded: wider digit spacing, spaced range dash, more room below (checked)"],
-  ["2.80","Equipment sizes (tubes, depths, LMA / i-gel, DLT, NPA, bag, NG, CVC) in rows like the dose tables (checked)"],
-  ["2.79","One type scale inside cards (body 16, emergency steps 17, headings 15, notes 14); RSI doses as a dose table (checked)"]];
+  ["2.80","Equipment sizes (tubes, depths, LMA / i-gel, DLT, NPA, bag, NG, CVC) in rows like the dose tables (checked)"]];
+
 
 
 
