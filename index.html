@@ -714,7 +714,7 @@ a{color:var(--accent)}
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bf-skin:#c2b1a5;--bf-st1:#24343a;--bf-st2:#0d1416}}
 :root[data-theme="dark"]{--bf-skin:#c2b1a5;--bf-st1:#24343a;--bf-st2:#0d1416}
 .bfstage{position:relative;width:auto;max-width:100%;aspect-ratio:3/4;max-height:62vh;max-height:62svh;border-radius:var(--r);border:1px solid var(--line);background:radial-gradient(ellipse 80% 70% at 50% 35%,var(--bf-st1),var(--bf-st2));overflow:hidden;touch-action:pan-y;margin:0 0 var(--s2)}
-.bfstage.nogl{aspect-ratio:auto;min-height:44px}.bfcv{display:block;width:100%;height:100%;cursor:grab}
+.bfcv{display:block;width:100%;height:100%;cursor:grab}
 .bfhint{position:absolute;left:0;right:0;top:6px;text-align:center;font-size:13px;color:var(--muted);pointer-events:none}
 .bfpin{position:absolute;transform:translate(10px,-50%);background:var(--card);color:var(--ink);border:1px solid var(--bf-pick);border-radius:999px;padding:2px 10px;font-size:13px;font-weight:700;pointer-events:none;white-space:nowrap}
 .bfpin::before{content:"";position:absolute;left:-12px;top:50%;width:10px;border-top:1.5px solid var(--bf-pick)}
@@ -722,6 +722,8 @@ a{color:var(--accent)}
 .bfturn{position:absolute;right:8px;bottom:8px;width:44px;height:44px;border-radius:50%;border:1px solid var(--line);background:var(--card);color:var(--ink);display:grid;place-items:center;padding:0;cursor:pointer;box-shadow:0 1px 3px rgba(0,0,0,.15)}.bfstage.nogl .bfturn{display:none}
 .bfhint{transition:opacity .4s}.bfhint.gone{opacity:0}
 .bflink,.bfkid{display:block;background:none;border:0;padding:6px 0;min-height:44px;font:600 15px var(--font-sans);color:var(--gc);cursor:pointer;text-align:left}
+.bfshowrow{margin-bottom:var(--s2)}.bfshow{display:block;width:100%;box-sizing:border-box;min-height:48px;margin:0;border-radius:var(--r-sm);border:1px solid var(--gc);background:var(--gc-soft);color:var(--ink);font:600 15px var(--font-sans);cursor:pointer}
+.bfrow{display:flex;justify-content:space-between;align-items:center}.bfmute{color:var(--muted);font-weight:400;font-size:14px}.bfnote{margin:0 0 var(--s2)}
 .bfkid{font-weight:400;font-size:14px;color:var(--muted);min-height:40px}
 .bfchips button{flex:1 1 0;min-height:44px;border-radius:var(--r-sm);border:1px solid var(--line);background:var(--card);color:var(--ink);font:600 14px var(--font-sans);cursor:pointer;padding:0 6px}
 .bfchips button{flex:1 1 40%}.bfchips button[aria-pressed="true"]{background:var(--gc);border-color:var(--gc);color:var(--on)}
@@ -744,7 +746,7 @@ if (window.top !== window.self && /\.github\.io$/.test(location.hostname)) {
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.93.1";
+const APP_VERSION = "2.94.1";
 const APP_DATE = "22 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
@@ -3829,17 +3831,23 @@ function bfPanel(){
     ${r.blocks.map((b, i) => bfBlockRow(b, i === 0)).join("")}
     ${nx ? `<button class="rellink" data-id="${nx.id}" data-open="${esc(nx.label)}" data-g="regional" data-tab="${nx.tab}">Or neuraxial: ${r.nx[1]} → ${esc(bareLabel(nx.label))} ›</button>` : ""}`;
 }
-raCards.finder = () => `<div class="card"><h2>Block finder</h2>${finderDraft()}
-  <div class="bfstage${BF.st.nogl ? " nogl" : ""}" id="bfstage"><div class="bfhint${BF.st.touched ? " gone" : ""}" id="bfhint">${BF.st.nogl ? "3D not available on this device — pick a region below" : "Drag to turn · tap to choose"}</div>
+raCards.finder = () => { const can = glAvail() && !BF.st.nogl, on = can && bf3d(), fail = (BF_BOOT || BF.st.failed) && !on;
+  return `<div class="card"><h2>Block finder</h2>${finderDraft()}
+  ${on ? `<div class="bfstage" id="bfstage"><div class="bfhint${BF.st.touched ? " gone" : ""}" id="bfhint">Drag to turn · tap to choose</div>
     <button class="bfturn" data-bfturn="1" aria-label="Turn the figure: front, side, back" title="Turn"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12a8 8 0 1 1-2.3-5.6"/><path d="M20 4v5h-5"/></svg></button></div>
-  <button class="bflink" data-bflist="1" aria-expanded="${!!(S.bfList || BF.st.nogl)}">${S.bfList || BF.st.nogl ? "Hide list" : "List"} ›</button>
-  <div class="bfchips" id="bfchips"${S.bfList || BF.st.nogl ? "" : " hidden"}>${BF_ORDER.map(k => `<button data-bfreg="${k}" aria-pressed="${!!(S.bf && S.bf.reg === k)}">${BF_REG[k].t}</button>`).join("")}</div>
+  <div class="bfrow"><button class="bflink" data-bflist="1" aria-expanded="${!!S.bfList}">${S.bfList ? "Hide list" : "List"} ›</button><button class="bflink bfmute" data-bf3d="off">Hide 3D</button></div>`
+    : `${can ? `<div class="bfshowrow"><button class="bfshow" data-bf3d="on">Show 3D figure</button></div>` : ""}${fail ? `<p class="sub bfnote">3D turned off on this device after a problem.</p>` : ""}`}
+  <div class="bfchips" id="bfchips"${on && !S.bfList ? " hidden" : ""}>${BF_ORDER.map(k => `<button data-bfreg="${k}" aria-pressed="${!!(S.bf && S.bf.reg === k)}">${BF_REG[k].t}</button>`).join("")}</div>
   <div class="bfpanel">${bfPanel()}</div>
   <button class="bfkid" data-id="paeds-blocks-which-block-paeds" data-open="2. Which block" data-g="paeds" data-tab="blocks">Child → Paeds blocks ›</button>
-  ${src("Suggestions point to this app's block cards (" + RSRC + "); figure is schematic.")}</div>`;
+  ${src("Suggestions point to this app's block cards (" + RSRC + "); figure is schematic.")}</div>`; };
 
 /* the figure: smooth-blended body parts (signed distance field) drawn in a WebGL shader; one canvas reused across redraws */
-const FINDER_ON = false;   // Regional › Finder tab hidden for now (crashed Regional on a laptop); code kept for later
+const FINDER_ON = true;   // Regional › Finder: last tab; the list works without 3D, the 3D figure starts only on request
+// 3D is opt-in per device. Crash guard: "bfBoot" is written before the 3D starts and cleared once it has drawn; if it is still there on the next launch the page died mid-start → 3D off on this device
+const BF_BOOT = store.get("bfBoot", false); if (BF_BOOT){ store.set("bf3d", "off"); store.set("bfBoot", false); }
+const bf3d = () => store.get("bf3d", "off") === "on";
+const glAvail = () => !!window.WebGLRenderingContext;
 const BF = (() => {
   const R = {none: 0, chest: 1, upabdo: 2, loabdo: 3, shoulder: 4, arm: 5, hip: 6, knee: 7, foot: 8}, P = [];
   const E = (reg, s, c, r, k = .06, sub = false) => P.push({t: 0, reg: R[reg], s, c, r, k, sub});
@@ -3922,6 +3930,7 @@ const BF = (() => {
   const st = {cv: null, gl: null, prog: null, U: null, ok: null, yaw: 0, pitch: 0, T: [0, .9, 0], D: 3.35, goal: null, low: false, queued: false, pulsed: false, pulse: 0, raf: 0};
   const cam = () => { const cp = Math.cos(st.pitch), ro = [st.T[0] + st.D*Math.sin(st.yaw)*cp, st.T[1] + st.D*Math.sin(st.pitch), st.T[2] + st.D*Math.cos(st.yaw)*cp];
     const fw = nz(sub(st.T, ro)), rt = nz(cross(fw, [0, 1, 0])), up = cross(rt, fw); return {ro, fw, rt, up}; };
+  function giveUp(){ st.ok = false; st.nogl = true; st.failed = true; store.set("bf3d", "off"); store.set("bfBoot", false); if (st.cv) st.cv.remove(); render(); }
   function init(){
     if (st.ok !== null) return st.ok;
     const cv = document.createElement("canvas"), gl = cv.getContext("webgl", {alpha: true, antialias: false, premultipliedAlpha: false});
@@ -3931,7 +3940,7 @@ const BF = (() => {
       if (!gl.getProgramParameter(pr, gl.LINK_STATUS)) throw new Error("link"); st.prog = pr; } catch (e){ st.ok = false; return false; }
     gl.useProgram(st.prog); const buf = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, buf); gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1, 3,-1, -1,3]), gl.STATIC_DRAW);
     const loc = gl.getAttribLocation(st.prog, "v"); gl.enableVertexAttribArray(loc); gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0); gl.enable(gl.BLEND); gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
-    cv.addEventListener("webglcontextlost", e => { e.preventDefault(); st.ok = false; st.nogl = true; cv.remove(); render(); });   // graphics reset → fall back to the region list, never crash
+    cv.addEventListener("webglcontextlost", e => { e.preventDefault(); giveUp(); });   // graphics reset → fall back to the region list, never crash
     st.cv = cv; st.gl = gl; st.U = n => gl.getUniformLocation(st.prog, n); cv.className = "bfcv"; bind(cv); st.ok = true; return true; }
   const hex = c => { const m = /#?([\da-f]{2})([\da-f]{2})([\da-f]{2})/i.exec(c) || [0, "d6", "c5", "b8"]; return [1, 2, 3].map(i => parseInt(m[i], 16)/255); };
   const cssv = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
@@ -3945,9 +3954,9 @@ const BF = (() => {
     const U = st.U; gl.uniform2f(U("res"), w, h); gl.uniform3fv(U("ro"), c.ro); gl.uniform3fv(U("fw"), c.fw); gl.uniform3fv(U("rt"), c.rt); gl.uniform3fv(U("up"), c.up); gl.uniform3fv(U("Ld"), L);
     gl.uniform1f(U("selR"), sel ? R[sel.reg] : 0); gl.uniform1f(U("selS"), sel && sel.side ? (sel.side === "Right" ? -1 : 1) : 0); gl.uniform1f(U("pulse"), st.pulse);
     gl.uniform1f(U("dark"), isDark() ? 1 : 0); gl.uniform1f(U("hq"), st.low || st.q < 1 ? 0 : 1); gl.uniform3fv(U("skin"), hex(cssv("--bf-skin"))); gl.uniform3fv(U("hi"), hex(cssv("--bf-pick")));
-    const timing = (st.frames = (st.frames || 0) + 1) === 2, t0 = timing ? performance.now() : 0;
+    const timing = (st.frames = (st.frames || 0) + 1) === 2, t0 = timing ? performance.now() : 0; if (st.frames === 1) setTimeout(() => store.set("bfBoot", false), 2500);
     gl.drawArrays(gl.TRIANGLES, 0, 3); pin(c, sel);
-    if (timing){ gl.readPixels(0, 0, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array(4)); const dt = performance.now() - t0; st.ms = dt; if (dt > 1000){ st.ok = false; st.nogl = true; cv.remove(); render(); return; } if (dt > 150) st.q = .5; else if (dt > 40) st.q = .7; if (st.q) redraw(); } }
+    if (timing){ gl.readPixels(0, 0, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array(4)); const dt = performance.now() - t0; st.ms = dt; if (dt > 1000){ giveUp(); return; } if (dt > 150) st.q = .5; else if (dt > 40) st.q = .7; if (st.q) redraw(); } }
   const redraw = () => { if (!st.queued){ st.queued = true; requestAnimationFrame(draw); } };
   function pin(c, sel){ const el = document.getElementById("bfpin"); if (!el) return; if (!sel || !ANCH[sel.reg]){ el.hidden = true; return; }
     const sx = sel.side === "Right" ? -1 : 1, a0 = ANCH[sel.reg], p = [["chest","upabdo","loabdo"].includes(sel.reg) ? 0 : a0[0]*sx, a0[1], a0[2]], q = sub(p, c.ro);
@@ -3975,8 +3984,8 @@ const BF = (() => {
       const key = Object.keys(R).find(k => R[k] === q.reg); S.bf = {reg: key, side: q.s < 0 ? "Right" : q.s > 0 ? "Left" : ""}; focus(S.bf); render(); };
     cv.addEventListener("pointerup", end); cv.addEventListener("pointercancel", () => { down = null; st.low = false; redraw(); }); }
   function mount(){ const stage = document.getElementById("bfstage"); if (!stage) return;
-    if (!init()){ stage.classList.add("nogl"); st.nogl = true; const h = document.getElementById("bfhint"); if (h) h.textContent = "3D not available on this device — pick a region below";
-      const l = document.getElementById("bfchips"); if (l) l.hidden = false; const b = document.querySelector("[data-bflist]"); if (b){ b.textContent = "Hide list ›"; b.setAttribute("aria-expanded", "true"); } return; }
+    if (st.ok === null) store.set("bfBoot", true);   // crash guard on: cleared once the figure has drawn
+    if (!init()){ store.set("bfBoot", false); st.nogl = true; render(); return; }
     if (st.cv.parentNode !== stage) stage.prepend(st.cv); if (!document.getElementById("bfpin")){ const p = document.createElement("div"); p.id = "bfpin"; p.className = "bfpin"; p.hidden = true; stage.appendChild(p); }
     redraw(); if (!st.pulsed && !reduceMotion() && !st.q){ st.pulsed = true; const t0 = performance.now(); const pl = () => { const k = (performance.now() - t0)/1400; st.pulse = k < 1 ? Math.sin(k*Math.PI) : 0; draw(); if (k < 1) requestAnimationFrame(pl); }; setTimeout(() => requestAnimationFrame(pl), 300); } }
   return {mount, focus, view, turn, redraw, pick, cam, st, R};
@@ -4570,12 +4579,12 @@ function vTicks(){
 }
 /* ---------- ABOUT ---------- */
 const CHANGES = [
+  ["2.94","Regional › Finder back as the last tab: region list first, 3D figure only when you tap Show 3D figure (remembered per device); a 3D start that crashes turns 3D off on that device (checked)"],
   ["2.93","Regional › Finder tab hidden for now (it crashed Regional on a laptop); Regional opens on Safety; block cards unchanged (checked)"],
   ["2.92","Block finder lighter on laptops: draws only the body parts near each pixel, caps the picture size, lowers quality on slow graphics, and falls back to the region list instead of crashing (checked)"],
   ["2.91","Block finder: figure no longer changes size while scrolling on iPhone, so the page stops shaking (checked)"],
   ["2.90","Block finder tidier: one turn button on the figure, regions behind a List link, shorter names, hint fades after first touch, small child link (checked)"],
-  ["2.89","Block finder: smooth, slightly fuller abdomen — no pinched waist or step under the ribs (checked)"],
-  ["2.88","Block finder: tap outside the body to clear the choice and go back to the full body (checked)"]];
+  ["2.89","Block finder: smooth, slightly fuller abdomen — no pinched waist or step under the ribs (checked)"]];
 
 
 
@@ -4832,9 +4841,7 @@ const GROUPS = [
    {id:"post", label:"Post-op", input:()=>gaInputs(), hint:"Reverse → extubate → prevent PONV → analgesia → discharge → IM doses.",
     cards:["1. Reversal",["Extubation criteria","2. Extubation criteria"],["PONV: Apfel score","3. PONV: Apfel score"],"4. Analgesia ladder & PCA",["Discharge from recovery","5. Discharge from recovery"],["Discharge home (daycare)","6. Discharge home (daycare)"],"7. IM doses (no IV access, or ward)"],
     links:[["Bronchospasm","adult","Bronchospasm"],["Anaphylaxis","adult","Anaphylaxis"]]}], cards:[]},
- {id:"regional", name:"Regional", sub:(FINDER_ON ? "Finder · " : "") + "Safety · Neuraxial · Upper · Lower · Trunk", tabKey:"raTab", tabs:[
-   ...(FINDER_ON ? [{id:"finder", label:"Finder", input:()=>gaInputs(), autoOpen:true, hint:"Turn the figure and tap where you operate; suggestions come from the block cards.",
-    cards:[["Block finder","1. Block finder"]], links:[["LA toxicity (LAST)","adult","LA toxicity"]]}] : []),
+ {id:"regional", name:"Regional", sub:"Safety · Neuraxial · Upper · Lower · Trunk" + (FINDER_ON ? " · Finder" : ""), tabKey:"raTab", tabs:[
    {id:"safety", label:"Safety", input:()=>gaInputs(), hint:"Before every block: dose limits, checklist, anticoagulants.",
     cards:[["LA dose calculator","1. LA dose calculator"],["Stop Before You Block & safe injection","2. Stop Before You Block"],["Neuraxial & deep blocks: anticoagulant timing","3. Anticoagulant timing"]],
     links:[["LA toxicity (LAST)","adult","LA toxicity"]]},
@@ -4847,7 +4854,9 @@ const GROUPS = [
    {id:"lower", see:[["regional-safety-la-dose-calculator","LA dose calculator"],["regional-safety-stop-before-you-block","Stop Before You Block"]], seeLabel:"Safety", label:"Lower", input:()=>gaInputs(), hint:"Hip → foot.", cards:[["Fascia iliaca (suprainguinal)","1. Fascia iliaca"],["PENG","2. PENG"],["Femoral","3. Femoral"],["Adductor canal","4. Adductor canal"],["Popliteal sciatic","5. Popliteal sciatic"]],
     links:[["LA toxicity (LAST)","adult","LA toxicity"]]},
    {id:"trunk", see:[["regional-safety-la-dose-calculator","LA dose calculator"],["regional-safety-stop-before-you-block","Stop Before You Block"]], seeLabel:"Safety", label:"Trunk", input:()=>gaInputs(), hint:"Chest → abdomen. Bilateral blocks: check the calculator.", cards:[["Erector spinae (ESP)","1. Erector spinae (ESP)"],["Serratus anterior","2. Serratus anterior"],["Rectus sheath","3. Rectus sheath"],["TAP","4. TAP"]],
-    links:[["LA toxicity (LAST)","adult","LA toxicity"]]}], cards:[]},
+    links:[["LA toxicity (LAST)","adult","LA toxicity"]]},
+   ...(FINDER_ON ? [{id:"finder", label:"Finder", input:()=>gaInputs(), autoOpen:true, hint:"Pick where you operate; suggestions come from the block cards. 3D figure optional.",
+    cards:[["Block finder","1. Block finder"]], links:[["LA toxicity (LAST)","adult","LA toxicity"]]}] : [])], cards:[]},
  {id:"paeds", name:"Paediatric", sub:"Pre-op · Induction · Intra-op · Blocks · Post-op · Clinical Scenarios", tabKey:"pTab", tabs:[
    {id:"pre", label:"Pre-op", input:()=>pInputs(), hint:"Assess the child: fasting, premed, airway, OSA, URTI, ex-prem, syndromes.",
     cards:[["Paeds fasting","1. Fasting (child)"],["Paeds premedication","2. Premedication"],["Paeds airway score (PAAS)","3. Airway score (PAAS)"],["OSA screen (STBUR)","4. OSA screen (STBUR)"],["URTI & asthma: go or delay","5. URTI & asthma: go or delay"],
@@ -5540,6 +5549,7 @@ document.addEventListener("click", e => {
   if (d.bfreg){ S.bf = S.bf && S.bf.reg === d.bfreg && !S.bf.side ? null : {reg: d.bfreg, side: ""}; BF.focus(S.bf); render(); return; }
   if (d.bfturn){ BF.turn(); return; }
   if (d.bflist){ S.bfList = !S.bfList; render(); return; }
+  if (d.bf3d){ store.set("bf3d", d.bf3d); render(); return; }
   if (d.dermback){ S.dermBack = !S.dermBack; render(); return; }
   if (d.derm){ S.dermAnim = {prev: dermState().top}; S.derm = d.derm; if (!d.open){ render(); return; } }
   if (d.jump){ const a = (b.closest("details") || document).querySelector(`[data-anchor="${d.jump}"]`); if (a){ const slim = document.querySelector(".gside.slim"), off = (slim && !isWide() ? slim.offsetHeight : 0) + 8;
