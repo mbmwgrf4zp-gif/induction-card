@@ -744,7 +744,7 @@ if (window.top !== window.self && /\.github\.io$/.test(location.hostname)) {
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.91.1";
+const APP_VERSION = "2.92.1";
 const APP_DATE = "22 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
@@ -3870,6 +3870,12 @@ const BF = (() => {
   const dist = q => q.t ? `sdRC(p, ${v3(q.a)}, ${v3(q.b)}, ${f(q.r1)}, ${f(q.r2)})` : `sdE(p - ${v3(q.c)}, ${v3(q.r)})`;
   const isSel = q => `(abs(${q.reg.toFixed(1)} - selR) < 0.5 && (selS == 0.0 || abs(${q.s.toFixed(1)} - selS) < 0.5))`;
   const U_ = P.filter(q => !q.sub), SUB = P.filter(q => q.sub);
+  // bounding groups (head, trunk, each arm, each leg): the shader skips a whole group when the point is far from it — much lighter on laptop GPUs
+  const dd = (a, b) => Math.hypot(a[0]-b[0], a[1]-b[1], a[2]-b[2]), pc = q => q.t ? q.a.map((x, i) => (x + q.b[i])/2) : q.c, pr = q => q.t ? dd(q.b, q.a)/2 + Math.max(q.r1, q.r2) : Math.max(...q.r);
+  const grpOf = q => { const c = pc(q), ax = Math.abs(c[0]); return c[1] > 1.53 && ax < .12 ? "head" : ax > .17 && c[1] > .75 ? "arm" + Math.sign(c[0]) : c[1] < .85 ? "leg" + Math.sign(c[0]) : "trunk"; };
+  const GRP = ["trunk", "head", "arm1", "arm-1", "leg1", "leg-1"].map(g => { const qs = U_.filter(q => grpOf(q) === g); if (!qs.length) return null;
+    const c = [0, 1, 2].map(i => qs.reduce((a, q) => a + pc(q)[i], 0)/qs.length), r = Math.max(...qs.map(q => dd(pc(q), c) + pr(q))) + .01; return {qs, c, r}; }).filter(Boolean);
+  const grpCode = (body, skip) => GRP.map(g => `d = length(p - ${v3(g.c)}) - ${f(g.r)}; if (d < 0.15){\n  ${g.qs.map(body).join("\n  ")} }${skip ? ` else ${skip}` : ""}`).join("\n  ");
   const FS = `precision highp float;
   uniform vec2 res; uniform vec3 ro; uniform vec3 fw; uniform vec3 rt; uniform vec3 up; uniform vec3 Ld; uniform float selR; uniform float selS; uniform vec3 skin; uniform vec3 hi; uniform float pulse; uniform float dark; uniform float hq;
   float smin(float a, float b, float k){ float h = max(k - abs(a - b), 0.0) / k; return min(a, b) - h*h*k*0.25; }
@@ -3878,11 +3884,11 @@ const BF = (() => {
     vec3 pa = p - a; float y = dot(pa, ba); float z = y - l2; vec3 xv = pa*l2 - ba*y; float x2 = dot(xv, xv); float y2 = y*y*l2; float z2 = z*z*l2; float k = sign(rr)*rr*rr*x2;
     if (sign(z)*a2*z2 > k) return sqrt(x2 + z2)*il2 - r2; if (sign(y)*a2*y2 < k) return sqrt(x2 + y2)*il2 - r1; return (sqrt(x2*a2*il2) + y*rr)*il2 - r1; }
   vec2 map(vec3 p){ float d; float tot = 1e9; float best = 1e9; float id = 0.0;
-  ${U_.map(q => `d = ${dist(q)}; if (d < best){ best = d; id = ${(q.reg*3 + q.s + 1).toFixed(1)}; } tot = smin(tot, d, ${f(q.k)});`).join("\n  ")}
+  ${grpCode(q => `d = ${dist(q)}; if (d < best){ best = d; id = ${(q.reg*3 + q.s + 1).toFixed(1)}; } tot = smin(tot, d, ${f(q.k)});`, "tot = min(tot, d);")}
   ${SUB.map(q => `tot = -smin(-tot, ${dist(q)}, ${f(q.k)});`).join("\n  ")}
     return vec2(tot, id); }
   float edge(vec3 p){ float d; float ds = 1e9; float doo = 1e9;
-  ${U_.map(q => `d = ${dist(q)}; if (${isSel(q)}) ds = min(ds, d); else doo = min(doo, d);`).join("\n  ")}
+  ${grpCode(q => `d = ${dist(q)}; if (${isSel(q)}) ds = min(ds, d); else doo = min(doo, d);`, "")}
     return abs(ds - doo); }
   vec3 nrm(vec3 p){ vec2 e = vec2(0.0015, -0.0015); return normalize(e.xyy*map(p + e.xyy).x + e.yyx*map(p + e.yyx).x + e.yxy*map(p + e.yxy).x + e.xxx*map(p + e.xxx).x); }
   float soft(vec3 o, vec3 d){ float r = 1.0; float t = 0.03; for (int i = 0; i < 22; i++){ float h = map(o + d*t).x; r = min(r, 9.0*h/t); t += clamp(h, 0.02, 0.12); if (r < 0.02 || t > 1.4) break; } return clamp(r, 0.0, 1.0); }
@@ -3924,18 +3930,23 @@ const BF = (() => {
       if (!gl.getProgramParameter(pr, gl.LINK_STATUS)) throw new Error("link"); st.prog = pr; } catch (e){ st.ok = false; return false; }
     gl.useProgram(st.prog); const buf = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, buf); gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1, 3,-1, -1,3]), gl.STATIC_DRAW);
     const loc = gl.getAttribLocation(st.prog, "v"); gl.enableVertexAttribArray(loc); gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0); gl.enable(gl.BLEND); gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+    cv.addEventListener("webglcontextlost", e => { e.preventDefault(); st.ok = false; st.nogl = true; cv.remove(); render(); });   // graphics reset → fall back to the region list, never crash
     st.cv = cv; st.gl = gl; st.U = n => gl.getUniformLocation(st.prog, n); cv.className = "bfcv"; bind(cv); st.ok = true; return true; }
   const hex = c => { const m = /#?([\da-f]{2})([\da-f]{2})([\da-f]{2})/i.exec(c) || [0, "d6", "c5", "b8"]; return [1, 2, 3].map(i => parseInt(m[i], 16)/255); };
   const cssv = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
   const isDark = () => document.documentElement.dataset.theme === "dark" || (document.documentElement.dataset.theme !== "light" && matchMedia("(prefers-color-scheme: dark)").matches);
   function draw(){ st.queued = false; const cv = st.cv, gl = st.gl; if (!cv || !cv.isConnected) return;
-    const dpr = Math.min(devicePixelRatio || 1, 1.5)*(st.low ? .6 : 1), w = Math.round(cv.clientWidth*dpr), h = Math.round(cv.clientHeight*dpr); if (!w || !h) return;
+    const cw = cv.clientWidth, ch = cv.clientHeight; if (!cw || !ch) return;
+    // pixel budget (~200k) and automatic quality drop on slow GPUs, so a laptop's graphics never stall
+    const dpr = Math.min(devicePixelRatio || 1, 1.5, Math.sqrt(2e5/(cw*ch)))*(st.q || 1)*(st.low ? .6 : 1), w = Math.max(1, Math.round(cw*dpr)), h = Math.max(1, Math.round(ch*dpr));
     if (cv.width !== w || cv.height !== h){ cv.width = w; cv.height = h; } gl.viewport(0, 0, w, h); gl.clearColor(0, 0, 0, 0); gl.clear(gl.COLOR_BUFFER_BIT);
     const c = cam(), sel = S.bf && R[S.bf.reg] ? S.bf : null, L = nz([-.45*Math.cos(st.yaw) + .7*Math.sin(st.yaw), .65, .45*Math.sin(st.yaw) + .7*Math.cos(st.yaw)]);
     const U = st.U; gl.uniform2f(U("res"), w, h); gl.uniform3fv(U("ro"), c.ro); gl.uniform3fv(U("fw"), c.fw); gl.uniform3fv(U("rt"), c.rt); gl.uniform3fv(U("up"), c.up); gl.uniform3fv(U("Ld"), L);
     gl.uniform1f(U("selR"), sel ? R[sel.reg] : 0); gl.uniform1f(U("selS"), sel && sel.side ? (sel.side === "Right" ? -1 : 1) : 0); gl.uniform1f(U("pulse"), st.pulse);
-    gl.uniform1f(U("dark"), isDark() ? 1 : 0); gl.uniform1f(U("hq"), st.low ? 0 : 1); gl.uniform3fv(U("skin"), hex(cssv("--bf-skin"))); gl.uniform3fv(U("hi"), hex(cssv("--bf-pick")));
-    gl.drawArrays(gl.TRIANGLES, 0, 3); pin(c, sel); }
+    gl.uniform1f(U("dark"), isDark() ? 1 : 0); gl.uniform1f(U("hq"), st.low || st.q < 1 ? 0 : 1); gl.uniform3fv(U("skin"), hex(cssv("--bf-skin"))); gl.uniform3fv(U("hi"), hex(cssv("--bf-pick")));
+    const timing = (st.frames = (st.frames || 0) + 1) === 2, t0 = timing ? performance.now() : 0;
+    gl.drawArrays(gl.TRIANGLES, 0, 3); pin(c, sel);
+    if (timing){ gl.readPixels(0, 0, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array(4)); const dt = performance.now() - t0; st.ms = dt; if (dt > 1000){ st.ok = false; st.nogl = true; cv.remove(); render(); return; } if (dt > 150) st.q = .5; else if (dt > 40) st.q = .7; if (st.q) redraw(); } }
   const redraw = () => { if (!st.queued){ st.queued = true; requestAnimationFrame(draw); } };
   function pin(c, sel){ const el = document.getElementById("bfpin"); if (!el) return; if (!sel || !ANCH[sel.reg]){ el.hidden = true; return; }
     const sx = sel.side === "Right" ? -1 : 1, a0 = ANCH[sel.reg], p = [["chest","upabdo","loabdo"].includes(sel.reg) ? 0 : a0[0]*sx, a0[1], a0[2]], q = sub(p, c.ro);
@@ -3966,7 +3977,7 @@ const BF = (() => {
     if (!init()){ stage.classList.add("nogl"); st.nogl = true; const h = document.getElementById("bfhint"); if (h) h.textContent = "3D not available on this device — pick a region below";
       const l = document.getElementById("bfchips"); if (l) l.hidden = false; const b = document.querySelector("[data-bflist]"); if (b){ b.textContent = "Hide list ›"; b.setAttribute("aria-expanded", "true"); } return; }
     if (st.cv.parentNode !== stage) stage.prepend(st.cv); if (!document.getElementById("bfpin")){ const p = document.createElement("div"); p.id = "bfpin"; p.className = "bfpin"; p.hidden = true; stage.appendChild(p); }
-    redraw(); if (!st.pulsed && !reduceMotion()){ st.pulsed = true; const t0 = performance.now(); const pl = () => { const k = (performance.now() - t0)/1400; st.pulse = k < 1 ? Math.sin(k*Math.PI) : 0; draw(); if (k < 1) requestAnimationFrame(pl); }; setTimeout(() => requestAnimationFrame(pl), 300); } }
+    redraw(); if (!st.pulsed && !reduceMotion() && !st.q){ st.pulsed = true; const t0 = performance.now(); const pl = () => { const k = (performance.now() - t0)/1400; st.pulse = k < 1 ? Math.sin(k*Math.PI) : 0; draw(); if (k < 1) requestAnimationFrame(pl); }; setTimeout(() => requestAnimationFrame(pl), 300); } }
   return {mount, focus, view, turn, redraw, pick, cam, st, R};
 })();
 
@@ -4558,12 +4569,12 @@ function vTicks(){
 }
 /* ---------- ABOUT ---------- */
 const CHANGES = [
+  ["2.92","Block finder lighter on laptops: draws only the body parts near each pixel, caps the picture size, lowers quality on slow graphics, and falls back to the region list instead of crashing (checked)"],
   ["2.91","Block finder: figure no longer changes size while scrolling on iPhone, so the page stops shaking (checked)"],
   ["2.90","Block finder tidier: one turn button on the figure, regions behind a List link, shorter names, hint fades after first touch, small child link (checked)"],
   ["2.89","Block finder: smooth, slightly fuller abdomen — no pinched waist or step under the ribs (checked)"],
   ["2.88","Block finder: tap outside the body to clear the choice and go back to the full body (checked)"],
-  ["2.87","Block finder looks more natural: smooth back (no disc), proper head and neck, chest wall colours only the chest, figure fits the card, hint at the top (checked)"],
-  ["2.86","Regional › Finder: turn a 3D figure, tap where you operate, see the suggested blocks from the block cards (checked)"]];
+  ["2.87","Block finder looks more natural: smooth back (no disc), proper head and neck, chest wall colours only the chest, figure fits the card, hint at the top (checked)"]];
 
 
 
