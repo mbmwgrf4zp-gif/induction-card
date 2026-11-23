@@ -713,9 +713,9 @@ a{color:var(--accent)}
 :root{--bf-skin:#d6c5b8;--bf-pick:#f59e0b;--bf-st1:#fbfcfc;--bf-st2:#e3ebee}
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bf-skin:#c2b1a5;--bf-st1:#24343a;--bf-st2:#0d1416}}
 :root[data-theme="dark"]{--bf-skin:#c2b1a5;--bf-st1:#24343a;--bf-st2:#0d1416}
-.bfstage{position:relative;width:100%;aspect-ratio:3/4;max-height:62vh;border-radius:var(--r);border:1px solid var(--line);background:radial-gradient(ellipse 80% 70% at 50% 35%,var(--bf-st1),var(--bf-st2));overflow:hidden;touch-action:pan-y;margin:0 0 var(--s2)}
+.bfstage{position:relative;width:auto;max-width:100%;aspect-ratio:3/4;max-height:62vh;border-radius:var(--r);border:1px solid var(--line);background:radial-gradient(ellipse 80% 70% at 50% 35%,var(--bf-st1),var(--bf-st2));overflow:hidden;touch-action:pan-y;margin:0 0 var(--s2)}
 .bfstage.nogl{aspect-ratio:auto;min-height:44px}.bfcv{display:block;width:100%;height:100%;cursor:grab}
-.bfhint{position:absolute;left:0;right:0;bottom:6px;text-align:center;font-size:13px;color:var(--muted);pointer-events:none}
+.bfhint{position:absolute;left:0;right:0;top:6px;text-align:center;font-size:13px;color:var(--muted);pointer-events:none}
 .bfpin{position:absolute;transform:translate(10px,-50%);background:var(--card);color:var(--ink);border:1px solid var(--bf-pick);border-radius:999px;padding:2px 10px;font-size:13px;font-weight:700;pointer-events:none;white-space:nowrap}
 .bfpin::before{content:"";position:absolute;left:-12px;top:50%;width:10px;border-top:1.5px solid var(--bf-pick)}
 .bfviews,.bfchips{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 var(--s2)}
@@ -740,7 +740,7 @@ if (window.top !== window.self && /\.github\.io$/.test(location.hostname)) {
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.86.1";
+const APP_VERSION = "2.87.1";
 const APP_DATE = "22 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
@@ -3838,17 +3838,16 @@ const BF = (() => {
   const R = {none: 0, chest: 1, upabdo: 2, loabdo: 3, shoulder: 4, arm: 5, hip: 6, knee: 7, foot: 8}, P = [];
   const E = (reg, s, c, r, k = .06, sub = false) => P.push({t: 0, reg: R[reg], s, c, r, k, sub});
   const C = (reg, s, a, b, r1, r2, k = .05, sub = false) => P.push({t: 1, reg: R[reg], s, a, b, r1, r2, k, sub});
-  E("none", 0, [0, 1.665, 0], [.08, .104, .092], .03);  E("none", 0, [0, 1.588, .03], [.058, .048, .058], .04);
-  E("none", 0, [0, 1.69, .072], [.068, .022, .03], .03); E("none", 0, [0, 1.645, .094], [.014, .026, .02], .015);
-  C("none", 0, [0, 1.47, -.01], [0, 1.6, 0], .05, .043, .05);
-  E("chest", 0, [0, 1.3, 0], [.165, .19, .108], .08);    E("upabdo", 0, [0, 1.08, .012], [.128, .14, .094], .09);
+  E("none", 0, [0, 1.645, .004], [.08, .1, .092], .02);  E("none", 0, [0, 1.58, .03], [.056, .045, .055], .035);   // head, jaw
+  E("none", 0, [0, 1.66, .06], [.058, .016, .024], .04); E("none", 0, [0, 1.622, .084], [.01, .02, .014], .02);    // brow, nose
+  C("none", 0, [0, 1.45, -.012], [0, 1.57, -.006], .052, .046, .03);                                                   // neck (shorter, fuller)
+  E("chest", 0, [0, 1.3, .008], [.165, .19, .098], .08);  E("chest", 0, [0, 1.24, -.03], [.15, .19, .058], .06);   // ribcage + flat back    E("upabdo", 0, [0, 1.09, .01], [.148, .16, .096], .1);
   E("loabdo", 0, [0, .93, 0], [.165, .11, .104], .08);
   [-1, 1].forEach(s => {
-    E("none", s, [s*.082, 1.655, 0], [.016, .03, .022], .02);
-    C("chest", s, [s*.03, 1.49, -.035], [s*.15, 1.45, -.03], .038, .03, .05);  C("chest", s, [s*.02, 1.455, .05], [s*.15, 1.465, .02], .02, .019, .04);
+    E("none", s, [s*.077, 1.628, -.006], [.01, .024, .016], .02);   // ear (small)
+    C("none", s, [s*.04, 1.465, -.03], [s*.15, 1.45, -.03], .032, .028, .035);   // trapezius (not chest wall)  C("chest", s, [s*.02, 1.455, .05], [s*.15, 1.465, .02], .02, .019, .04);
     E("chest", s, [s*.072, 1.36, .058], [.075, .055, .045], .05);  E("chest", s, [s*.075, 1.33, .1], [.008, .008, .007], .008);   // pectoral, nipple (T4)
-    E("chest", s, [s*.09, 1.33, -.095], [.06, .075, .022], .04);                                                                 // scapula
-    E("upabdo", s, [s*.1, 1.05, .02], [.05, .1, .07], .05);                                                                      // oblique
+        E("upabdo", s, [s*.1, 1.03, .015], [.045, .085, .065], .06);                                                                      // oblique
     C("loabdo", s, [s*.13, .975, .05], [s*.14, .995, -.04], .012, .01, .05);   // iliac crest (subtle)
     E("hip", s, [s*.075, .89, -.062], [.085, .09, .075], .06);   E("shoulder", s, [s*.19, 1.42, 0], [.062, .07, .064], .05);
     C("arm", s, [s*.2, 1.41, -.005], [s*.29, 1.16, -.01], .046, .036, .04);  E("arm", s, [s*.245, 1.29, .018], [.04, .07, .04], .04);
@@ -3860,8 +3859,6 @@ const BF = (() => {
     E("foot", s, [s*.13, .075, 0], [.035, .035, .035], .03);  E("foot", s, [s*.155, .08, 0], [.012, .016, .012], .012);  E("foot", s, [s*.105, .085, 0], [.012, .016, .012], .012);
     E("foot", s, [s*.13, .042, -.02], [.035, .035, .045], .03);  C("foot", s, [s*.13, .035, 0], [s*.135, .028, .125], .035, .026, .03); });
   E("none", 0, [0, 1.0, .112], [.008, .01, .012], .012, true);      // umbilicus (T10), shallow
-  E("none", 0, [0, 1.475, .07], [.018, .012, .02], .025, true);    // sternal notch, shallow
-  C("none", 0, [0, 1.48, -.122], [0, 1.0, -.116], .008, .008, .03, true);   // spine line, shallow
   const ANCH = {chest: [.0, 1.3, .1], upabdo: [0, 1.08, .1], loabdo: [0, .95, .1], shoulder: [.21, 1.43, 0], arm: [.31, 1.08, 0], hip: [.11, .8, .06], knee: [.123, .47, .05], foot: [.13, .06, .08]};
   const ZD = {shoulder: 1.35, arm: 1.5, chest: 1.8, upabdo: 1.8, loabdo: 1.8, hip: 1.7, knee: 1.5, foot: 1.2};
   const v3 = a => `vec3(${a.map(x => x.toFixed(4)).join(",")})`, f = x => x.toFixed(4);
@@ -4554,12 +4551,12 @@ function vTicks(){
 }
 /* ---------- ABOUT ---------- */
 const CHANGES = [
+  ["2.87","Block finder looks more natural: smooth back (no disc), proper head and neck, chest wall colours only the chest, figure fits the card, hint at the top (checked)"],
   ["2.86","Regional › Finder: turn a 3D figure, tap where you operate, see the suggested blocks from the block cards (checked)"],
   ["2.85","Dermatome figure with a 3D look: shaded limbs and torso, soft shadow (checked)"],
   ["2.84","Dermatomes: the block rises from the feet when you pick an operation or level, recedes when you go lower (off with Reduce Motion) (checked)"],
   ["2.83","Dermatome figure full width; operations in two columns underneath (checked)"],
-  ["2.82","Dermatomes: one figure beside the operation list (✓ covered / needs X), back on a toggle, landmarks labelled outside the body (checked)"],
-  ["2.81","Big monitor-font numbers less crowded: wider digit spacing, spaced range dash, more room below (checked)"]];
+  ["2.82","Dermatomes: one figure beside the operation list (✓ covered / needs X), back on a toggle, landmarks labelled outside the body (checked)"]];
 
 
 
