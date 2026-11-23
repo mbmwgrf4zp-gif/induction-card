@@ -436,11 +436,11 @@ details.catgrp>summary::-webkit-details-marker{display:none}details.catgrp>summa
 details.endo{margin-top:var(--s3);border:1px solid var(--line);border-radius:var(--r-sm);padding:var(--s2) var(--s3)}
 details.endo summary{cursor:pointer;font-weight:600;font-size:var(--fs-sm)}
 .dwrap{display:grid;grid-template-columns:1fr 1fr;gap:var(--s2);margin:var(--s2) 0}
-.dwrap2{display:grid;grid-template-columns:minmax(0,52%) minmax(0,1fr);gap:var(--s3);align-items:start;margin:var(--s2) 0}.dfcol{display:grid;justify-items:center;gap:2px}.dback{min-height:36px}
-.dproc{display:grid;gap:4px;min-width:0}.dpr{box-sizing:border-box;display:flex;flex-direction:column;align-items:flex-start;gap:1px;min-width:0;width:100%;min-height:40px;text-align:left;padding:6px 8px;border-radius:8px;border:1px solid var(--line);background:var(--card);color:var(--ink);font:inherit;font-size:var(--fs-sm);line-height:1.25;cursor:pointer}
+.dwrap2{display:grid;grid-template-columns:minmax(0,1fr);gap:var(--s2);margin:var(--s2) 0}.dfcol .dfig{width:100%;max-width:420px}.dfcol{display:grid;justify-items:center;gap:2px}.dback{min-height:36px}
+.dproc{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;min-width:0}.dpr{box-sizing:border-box;display:flex;flex-direction:column;align-items:flex-start;gap:1px;min-width:0;width:100%;min-height:40px;text-align:left;padding:6px 8px;border-radius:8px;border:1px solid var(--line);background:var(--card);color:var(--ink);font:inherit;font-size:var(--fs-sm);line-height:1.25;cursor:pointer}
 .dpr.ok{background:var(--gc-soft);border-color:transparent}.dpr.no{color:var(--muted)}.dpl{font-weight:700;white-space:nowrap}.dpr.ok .dpl{color:var(--gc)}
 .dfig .lml{stroke:var(--muted);stroke-width:.8}
-.dfig{margin:0;text-align:center}.dfig svg{width:100%;height:auto;max-height:340px}.dfig figcaption{font-size:var(--fs-xs);color:var(--muted)}
+.dfig{margin:0;text-align:center}.dfig svg{width:100%;height:auto;max-height:460px}.dfig figcaption{font-size:var(--fs-xs);color:var(--muted)}
 .dfig .body{fill:var(--dim)}
 .dfig .edge{fill:none;stroke:var(--muted);stroke-width:1.6;opacity:.6;stroke-linejoin:round}.dfig .body{stroke:none}
 .dfig .band{stroke:none;cursor:pointer;transition:fill .18s ease,opacity .18s ease}
@@ -722,7 +722,7 @@ if (window.top !== window.self && /\.github\.io$/.test(location.hostname)) {
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.82.1";
+const APP_VERSION = "2.83.1";
 const APP_DATE = "22 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
@@ -4332,12 +4332,13 @@ function vTicks(){
 }
 /* ---------- ABOUT ---------- */
 const CHANGES = [
+  ["2.83","Dermatome figure full width; operations in two columns underneath (checked)"],
   ["2.82","Dermatomes: one figure beside the operation list (✓ covered / needs X), back on a toggle, landmarks labelled outside the body (checked)"],
   ["2.81","Big monitor-font numbers less crowded: wider digit spacing, spaced range dash, more room below (checked)"],
   ["2.80","Equipment sizes (tubes, depths, LMA / i-gel, DLT, NPA, bag, NG, CVC) in rows like the dose tables (checked)"],
   ["2.79","One type scale inside cards (body 16, emergency steps 17, headings 15, notes 14); RSI doses as a dose table (checked)"],
-  ["2.78","Syringe recipes at normal size, so only the doses you give stand out (checked)"],
-  ["2.77","Dose tables, batch 4 — Kidney Transplant: antibiotic, infusions, reperfusion drugs, reversal, analgesia, donor (checked)"]];
+  ["2.78","Syringe recipes at normal size, so only the doses you give stand out (checked)"]];
+
 
 
 
