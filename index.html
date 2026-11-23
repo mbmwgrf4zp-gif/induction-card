@@ -718,10 +718,14 @@ a{color:var(--accent)}
 .bfhint{position:absolute;left:0;right:0;top:6px;text-align:center;font-size:13px;color:var(--muted);pointer-events:none}
 .bfpin{position:absolute;transform:translate(10px,-50%);background:var(--card);color:var(--ink);border:1px solid var(--bf-pick);border-radius:999px;padding:2px 10px;font-size:13px;font-weight:700;pointer-events:none;white-space:nowrap}
 .bfpin::before{content:"";position:absolute;left:-12px;top:50%;width:10px;border-top:1.5px solid var(--bf-pick)}
-.bfviews,.bfchips{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 var(--s2)}
-.bfviews button,.bfchips button{flex:1 1 0;min-height:44px;border-radius:var(--r-sm);border:1px solid var(--line);background:var(--card);color:var(--ink);font:600 14px var(--font-sans);cursor:pointer;padding:0 6px}
+.bfchips{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 var(--s2)}.bfchips[hidden]{display:none}
+.bfturn{position:absolute;right:8px;bottom:8px;width:44px;height:44px;border-radius:50%;border:1px solid var(--line);background:var(--card);color:var(--ink);display:grid;place-items:center;padding:0;cursor:pointer;box-shadow:0 1px 3px rgba(0,0,0,.15)}.bfstage.nogl .bfturn{display:none}
+.bfhint{transition:opacity .4s}.bfhint.gone{opacity:0}
+.bflink,.bfkid{display:block;background:none;border:0;padding:6px 0;min-height:44px;font:600 15px var(--font-sans);color:var(--gc);cursor:pointer;text-align:left}
+.bfkid{font-weight:400;font-size:14px;color:var(--muted);min-height:40px}
+.bfchips button{flex:1 1 0;min-height:44px;border-radius:var(--r-sm);border:1px solid var(--line);background:var(--card);color:var(--ink);font:600 14px var(--font-sans);cursor:pointer;padding:0 6px}
 .bfchips button{flex:1 1 40%}.bfchips button[aria-pressed="true"]{background:var(--gc);border-color:var(--gc);color:var(--on)}
-.bfpanel{display:grid;gap:8px;margin:var(--s2) 0}.bfside{margin:0;color:var(--danger-ink);font-weight:600;font-size:14px}
+.bfpanel{display:grid;gap:8px;margin:var(--s2) 0}.bfpanel:empty{display:none}.bfside{margin:0;color:var(--danger-ink);font-weight:600;font-size:14px}
 .bfb{border-radius:var(--r-sm);padding:10px 12px;background:var(--bg);display:grid;gap:2px}.bfb.first{background:var(--gc-soft)}
 .bftag{font-size:13px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--gc)}
 .bfo{display:flex;justify-content:space-between;align-items:baseline;gap:8px;background:none;border:0;padding:0;color:var(--ink);font:inherit;text-align:left;cursor:pointer}
@@ -740,7 +744,7 @@ if (window.top !== window.self && /\.github\.io$/.test(location.hostname)) {
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.89.1";
+const APP_VERSION = "2.90.1";
 const APP_DATE = "22 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
@@ -3798,10 +3802,10 @@ const finderDraft = () => FINDER_CHECKED ? "" : `<div class="warn" style="margin
 // region → blocks (titles of existing block cards; first = first choice) and the neuraxial line where relevant
 const BF_REG = {
   shoulder: {t: "Shoulder", blocks: ["Interscalene"], nx: null},
-  arm:      {t: "Elbow / forearm / hand", blocks: ["Supraclavicular", "Axillary"], nx: null},
+  arm:      {t: "Arm / hand", blocks: ["Supraclavicular", "Axillary"], nx: null},
   chest:    {t: "Chest wall", blocks: ["Serratus anterior", "Erector spinae (ESP)"], nx: ["Epidural (adult)", "thoracic epidural"]},
   upabdo:   {t: "Upper abdomen", blocks: ["Rectus sheath", "Erector spinae (ESP)"], nx: ["Epidural (adult)", "thoracic epidural"]},
-  loabdo:   {t: "Lower abdomen / inguinal", blocks: ["TAP", "Rectus sheath"], nx: ["Spinal dose: non-obstetric", "spinal"]},
+  loabdo:   {t: "Lower abdo / groin", blocks: ["TAP", "Rectus sheath"], nx: ["Spinal dose: non-obstetric", "spinal"]},
   hip:      {t: "Hip", blocks: ["PENG", "Fascia iliaca (suprainguinal)"], nx: ["Spinal dose: non-obstetric", "spinal"]},
   knee:     {t: "Knee", blocks: ["Adductor canal", "Femoral"], nx: ["Spinal dose: non-obstetric", "spinal"]},
   foot:     {t: "Foot / ankle", blocks: ["Popliteal sciatic", "Adductor canal"], nx: ["Spinal dose: non-obstetric", "spinal"]}};
@@ -3818,7 +3822,7 @@ function bfBlockRow(title, first){
 }
 function bfPanel(){
   const sel = S.bf && BF_REG[S.bf.reg] ? S.bf : null;
-  if (!sel) return `<p class="sub" style="margin:0">Turn the figure and tap the part you are operating on, or pick a region above.</p>`;
+  if (!sel) return "";
   const r = BF_REG[sel.reg], side = sel.side ? sel.side + " " : "";
   const nx = r.nx && findEntry(CARD_IDS[r.nx[0]]);
   return `<h3 style="margin-top:0">${side}${side ? r.t.toLowerCase() : r.t}</h3>${sel.side ? `<p class="bfside">Mark the ${sel.side.toLowerCase()} side · Stop Before You Block</p>` : ""}
@@ -3826,11 +3830,12 @@ function bfPanel(){
     ${nx ? `<button class="rellink" data-id="${nx.id}" data-open="${esc(nx.label)}" data-g="regional" data-tab="${nx.tab}">Or neuraxial: ${r.nx[1]} → ${esc(bareLabel(nx.label))} ›</button>` : ""}`;
 }
 raCards.finder = () => `<div class="card"><h2>Block finder</h2>${finderDraft()}
-  <div class="bfstage" id="bfstage"><div class="bfhint" id="bfhint">drag to turn · tap a body part · tap outside to zoom out</div></div>
-  <div class="bfviews" role="group" aria-label="View"><button data-bfview="0">Front</button><button data-bfview="1.5708">Side</button><button data-bfview="3.1416">Back</button></div>
-  <div class="bfchips">${BF_ORDER.map(k => `<button data-bfreg="${k}" aria-pressed="${!!(S.bf && S.bf.reg === k)}">${BF_REG[k].t}</button>`).join("")}</div>
+  <div class="bfstage${BF.st.nogl ? " nogl" : ""}" id="bfstage"><div class="bfhint${BF.st.touched ? " gone" : ""}" id="bfhint">${BF.st.nogl ? "3D not available on this device — pick a region below" : "Drag to turn · tap to choose"}</div>
+    <button class="bfturn" data-bfturn="1" aria-label="Turn the figure: front, side, back" title="Turn"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12a8 8 0 1 1-2.3-5.6"/><path d="M20 4v5h-5"/></svg></button></div>
+  <button class="bflink" data-bflist="1" aria-expanded="${!!(S.bfList || BF.st.nogl)}">${S.bfList || BF.st.nogl ? "Hide list" : "List"} ›</button>
+  <div class="bfchips" id="bfchips"${S.bfList || BF.st.nogl ? "" : " hidden"}>${BF_ORDER.map(k => `<button data-bfreg="${k}" aria-pressed="${!!(S.bf && S.bf.reg === k)}">${BF_REG[k].t}</button>`).join("")}</div>
   <div class="bfpanel">${bfPanel()}</div>
-  <button class="homebtn" data-id="paeds-blocks-which-block-paeds" data-open="2. Which block" data-g="paeds" data-tab="blocks">Child? → Paediatric › Blocks › Which block ›</button>
+  <button class="bfkid" data-id="paeds-blocks-which-block-paeds" data-open="2. Which block" data-g="paeds" data-tab="blocks">Child → Paeds blocks ›</button>
   ${src("Suggestions point to this app's block cards (" + RSRC + "); figure is schematic.")}</div>`;
 
 /* the figure: smooth-blended body parts (signed distance field) drawn in a WebGL shader; one canvas reused across redraws */
@@ -3943,12 +3948,13 @@ const BF = (() => {
       draw(); if (!done) st.raf = requestAnimationFrame(step); else st.goal = null; }; step(); }
   function focus(sel){ if (sel && ANCH[sel.reg]){ const sx = sel.side === "Right" ? -1 : 1, a0 = ANCH[sel.reg];
       st.goal = {T: [["chest","upabdo","loabdo"].includes(sel.reg) ? 0 : a0[0]*sx*.6, a0[1], 0], D: ZD[sel.reg] || 2}; } else st.goal = {T: [0, .9, 0], D: 3.35}; ease(); }
+  function turn(){ st.vi = ((st.vi || 0) + 1) % 3; view([0, Math.PI/2, Math.PI][st.vi]); }
   function view(yaw){ const base = Math.round(st.yaw/(2*Math.PI))*2*Math.PI; st.goal = {yaw: base + yaw, pitch: 0}; ease(); }
   function pick(px, py){ const c = cam(), w = st.cv.clientWidth, h = st.cv.clientHeight, ux = (px - .5*w)/h, uy = (.5*h - py)/h;
     const rd = nz([c.fw[0]*1.62 + ux*c.rt[0] + uy*c.up[0], c.fw[1]*1.62 + ux*c.rt[1] + uy*c.up[1], c.fw[2]*1.62 + ux*c.rt[2] + uy*c.up[2]]); let t = .4;
     for (let i = 0; i < 140; i++){ const p = [c.ro[0] + rd[0]*t, c.ro[1] + rd[1]*t, c.ro[2] + rd[2]*t], [d, q] = mapJS(p); if (d < .001) return q; t += d; if (t > 6) break; } return null; }
   function bind(cv){ let down = null;
-    cv.addEventListener("pointerdown", e => { down = {x: e.clientX, y: e.clientY, yaw: st.yaw, pitch: st.pitch, moved: false, tilt: false}; cv.setPointerCapture(e.pointerId); cancelAnimationFrame(st.raf); st.goal = null; });
+    cv.addEventListener("pointerdown", e => { if (!st.touched){ st.touched = true; const h = document.getElementById("bfhint"); if (h) h.classList.add("gone"); } down = {x: e.clientX, y: e.clientY, yaw: st.yaw, pitch: st.pitch, moved: false, tilt: false}; cv.setPointerCapture(e.pointerId); cancelAnimationFrame(st.raf); st.goal = null; });
     cv.addEventListener("pointermove", e => { if (!down) return; const dx = e.clientX - down.x, dy = e.clientY - down.y;
       if (!down.moved && Math.hypot(dx, dy) > 6){ down.moved = true; down.tilt = Math.abs(dy) > Math.abs(dx)*.8 && Math.abs(dx) > 4; }
       if (down.moved){ st.low = true; st.yaw = down.yaw - dx*.012; if (down.tilt) st.pitch = Math.max(-.35, Math.min(.35, down.pitch + dy*.006)); redraw(); } });
@@ -3957,10 +3963,11 @@ const BF = (() => {
       const key = Object.keys(R).find(k => R[k] === q.reg); S.bf = {reg: key, side: q.s < 0 ? "Right" : q.s > 0 ? "Left" : ""}; focus(S.bf); render(); };
     cv.addEventListener("pointerup", end); cv.addEventListener("pointercancel", () => { down = null; st.low = false; redraw(); }); }
   function mount(){ const stage = document.getElementById("bfstage"); if (!stage) return;
-    if (!init()){ stage.classList.add("nogl"); const h = document.getElementById("bfhint"); if (h) h.textContent = "3D not available on this device — use the region buttons"; return; }
+    if (!init()){ stage.classList.add("nogl"); st.nogl = true; const h = document.getElementById("bfhint"); if (h) h.textContent = "3D not available on this device — pick a region below";
+      const l = document.getElementById("bfchips"); if (l) l.hidden = false; const b = document.querySelector("[data-bflist]"); if (b){ b.textContent = "Hide list ›"; b.setAttribute("aria-expanded", "true"); } return; }
     if (st.cv.parentNode !== stage) stage.prepend(st.cv); if (!document.getElementById("bfpin")){ const p = document.createElement("div"); p.id = "bfpin"; p.className = "bfpin"; p.hidden = true; stage.appendChild(p); }
     redraw(); if (!st.pulsed && !reduceMotion()){ st.pulsed = true; const t0 = performance.now(); const pl = () => { const k = (performance.now() - t0)/1400; st.pulse = k < 1 ? Math.sin(k*Math.PI) : 0; draw(); if (k < 1) requestAnimationFrame(pl); }; setTimeout(() => requestAnimationFrame(pl), 300); } }
-  return {mount, focus, view, redraw, pick, cam, st, R};
+  return {mount, focus, view, turn, redraw, pick, cam, st, R};
 })();
 
 /* PAEDS calculator card */
@@ -4551,12 +4558,12 @@ function vTicks(){
 }
 /* ---------- ABOUT ---------- */
 const CHANGES = [
+  ["2.90","Block finder tidier: one turn button on the figure, regions behind a List link, shorter names, hint fades after first touch, small child link (checked)"],
   ["2.89","Block finder: smooth, slightly fuller abdomen — no pinched waist or step under the ribs (checked)"],
   ["2.88","Block finder: tap outside the body to clear the choice and go back to the full body (checked)"],
   ["2.87","Block finder looks more natural: smooth back (no disc), proper head and neck, chest wall colours only the chest, figure fits the card, hint at the top (checked)"],
   ["2.86","Regional › Finder: turn a 3D figure, tap where you operate, see the suggested blocks from the block cards (checked)"],
-  ["2.85","Dermatome figure with a 3D look: shaded limbs and torso, soft shadow (checked)"],
-  ["2.84","Dermatomes: the block rises from the feet when you pick an operation or level, recedes when you go lower (off with Reduce Motion) (checked)"]];
+  ["2.85","Dermatome figure with a 3D look: shaded limbs and torso, soft shadow (checked)"]];
 
 
 
@@ -5519,7 +5526,8 @@ document.addEventListener("click", e => {
   if (d.csclear){ delete S.sc.cs; delete S.sc.csc; delete S.sc.pl; delete S.sc.dx; S.csDec = ""; S.csNote = ""; S.csWho = "patient"; S.csLang = "English"; S.csOut = "full"; S.csLen = "brief"; render(); return; }
   if (d.screset){ S.sc[d.screset] = {}; render(); return; }
   if (d.bfreg){ S.bf = S.bf && S.bf.reg === d.bfreg && !S.bf.side ? null : {reg: d.bfreg, side: ""}; BF.focus(S.bf); render(); return; }
-  if (d.bfview !== undefined){ BF.view(+d.bfview); return; }
+  if (d.bfturn){ BF.turn(); return; }
+  if (d.bflist){ S.bfList = !S.bfList; render(); return; }
   if (d.dermback){ S.dermBack = !S.dermBack; render(); return; }
   if (d.derm){ S.dermAnim = {prev: dermState().top}; S.derm = d.derm; if (!d.open){ render(); return; } }
   if (d.jump){ const a = (b.closest("details") || document).querySelector(`[data-anchor="${d.jump}"]`); if (a){ const slim = document.querySelector(".gside.slim"), off = (slim && !isWide() ? slim.offsetHeight : 0) + 8;
