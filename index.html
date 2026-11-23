@@ -519,6 +519,7 @@ details.endo summary{cursor:pointer;font-weight:600;font-size:var(--fs-sm)}
 @supports (color:color-mix(in srgb,red 50%,transparent)){:root{--tile-grid:color-mix(in srgb,var(--ink) 5.5%,transparent)}}
 .grid2 .sq,.pearl{background-image:linear-gradient(var(--tile-grid) 1px,transparent 1px),linear-gradient(90deg,var(--tile-grid) 1px,transparent 1px);background-size:12px 12px}
 .tile.t-emerg{background-image:linear-gradient(rgba(255,255,255,.09) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.09) 1px,transparent 1px);background-size:12px 12px}
+.quick .lcd .qbf{display:flex;align-items:center;gap:8px}.quick .lcd .qbf small{display:block}.qman{flex:0 0 auto;width:36px;height:76px;fill:rgba(255,255,255,.24)}.qman g.on{filter:drop-shadow(0 0 3px currentColor)}.qman .bk{fill:none;stroke-width:1.4;stroke-dasharray:2 1.5}
 .quick .lcd.qtxt .qans{font-family:var(--font-sans);font-weight:700;font-size:clamp(15px,4.6vw,19px);letter-spacing:0;white-space:normal;line-height:1.15}
 :root[data-lcd="amber"]{--etco2:#fbbf24;--lcdx:#fbbf24}:root[data-lcd="green"]{--etco2:#4ade80;--lcdx:#4ade80}:root[data-lcd="cyan"]{--etco2:#22d3ee;--lcdx:#22d3ee}:root[data-lcd="white"]{--etco2:#f1f5f4;--lcdx:#f1f5f4}:root[data-lcd="red"]{--etco2:#ff7a59;--lcdx:#ff7a59}
 :root[data-lcd]:not([data-lcd="section"]) .quick .qbtn.lcd{--lcd:var(--lcdx)}
@@ -747,7 +748,7 @@ if (window.top !== window.self && /\.github\.io$/.test(location.hostname)) {
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.101.1";
+const APP_VERSION = "2.102.1";
 const APP_DATE = "22 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
@@ -852,7 +853,7 @@ function seg1(root){ (root||document).querySelectorAll('.big,.qans,.clock').forE
 function clockTxt(){ const d = new Date(); return d.toLocaleTimeString("en-GB", {hour:"2-digit", minute:"2-digit", hour12:false}); }
 function dateTxt(){ return new Date().toLocaleDateString("en-GB", {weekday:"long", day:"numeric", month:"long"}); }
 /* ---------- QUICK TILES (user picks 3; numbers reuse the card formulas) ---------- */
-const QDEF = ["lscs","aett","pett"];
+const QDEF = ["lscs","bf","cons"];
 /* ---------- TIPS & TRICKS TICKER ---------- */
 const QUOTES_CHECKED = true;
 // Public-domain translations only, each checked word-for-word against the published text
@@ -979,9 +980,40 @@ const QT = (() => {
     ans:()=>sm("Print","one A4 sheet for this child")},
   prt:{lab:"Print transplant plan", ic:"tx", cls:"t-tx", kind:"adult", txt:true, keys:["aw","height","k","hb"], inp:()=>`${sig(S.aw)} kg dry`, go:"print-tx",
     ans:()=>sm("Print","kidney recipient, one A4 sheet")},
+  bf:{lab:"Block finder", ic:"spinal", cls:"t-regional", kind:"any", txt:true, keys:[], inp:()=>"body map", open:["1. Block finder","regional","finder"],
+    ans:()=>{ const sel = S.bf && BF_REG[S.bf.reg] ? S.bf : null, r = sel && BF_REG[sel.reg], o = r && BLKS[r.blocks[0]];
+      const txt = r ? `${sel.side ? sel.side + " " : ""}${r.t.split(" / ")[0].toLowerCase()}<small>${o ? `${esc(o.t)} · ${o.vol[0]}–${o.vol[1]} mL` : ""}</small>` : `Body map<small>tap to pick a region</small>`;
+      return `<span class="qbf">${bfMini(sel)}<span>${txt}</span></span>`; }},
+  lipid:{lab:"Intralipid (LAST)", ic:"emerg", cls:"t-emerg", kind:"adult", keys:["aw"], inp:aWt, open:["LA toxicity (LAST)","emerg","adult"],
+    ans:()=>sm(dz(1.5*S.aw,"mL"),`mL 20% bolus over 2–3 min · then ${dz(15*S.aw,"mL/h")} mL/h`)},
+  dant:{lab:"Dantrolene (MH)", ic:"emerg", cls:"t-emerg", kind:"adult", keys:["aw"], inp:aWt, open:["Malignant hyperthermia","emerg","adult"],
+    ans:()=>{ const mg = Math.min(2.5*S.aw, 300); return sm(dz(mg,"mg"),`mg · 2.5 mg/kg (max 300) · ${Math.ceil(mg/20)} × 20 mg vials`); }},
+  abx:{lab:"Antibiotic prophylaxis", ic:"airway", cls:"t-ga", kind:"adult", keys:["aw"], inp:aWt, open:["7. Antibiotic prophylaxis","ga","maint"],
+    ans:()=>sm(S.aw>=120?"3 g":"2 g","cefazolin IV · ≤ 60 min before · redose 4 h")},
   lac:{lab:"LA dose calc", ic:"spinal", cls:"t-regional", kind:"any", txt:true, keys:[], inp:()=>"shortcut", open:["1. LA dose calculator","regional","safety"],
     ans:()=>{ const n = (S.laA||[]).length; return n ? sm(`${n} added`,"tap to see the total") : sm("Add","tap to total your blocks"); }}};
 })();
+/* mini mannequin for the Block finder tile: flat picture, the chosen region in its body-map colour (patient's right on the viewer's left) */
+function bfMini(sel){
+  const M = x => (40 - x), poly = (pts, side) => side === "L" ? pts.map(([x, y]) => [M(x), y]) : pts, P = a => a.map(p => p.join(",")).join(" ");
+  const R = {}; const add = (reg, side, el) => (R[reg + (side || "")] = R[reg + (side || "")] || []).push(el);
+  ["R", "L"].forEach(sd => { const m = sd === "L" ? M : (x => x);
+    add("clavicle", sd, `<rect x="${sd === "L" ? 21 : 11}" y="15" width="8" height="1.8" rx=".9"/>`);
+    add("shoulder", sd, `<circle cx="${m(9.5)}" cy="18" r="3.6"/>`);
+    add("arm", sd, `<polygon points="${P(poly([[7,20],[10.5,21],[7.5,34],[4.5,33]], sd))}"/><polygon points="${P(poly([[4.5,33],[7.5,34],[4.6,46],[2,45]], sd))}"/><ellipse cx="${m(2.9)}" cy="49" rx="1.8" ry="3"/>`);
+    add("breast", sd, `<ellipse cx="${m(15.6)}" cy="22.5" rx="3.6" ry="3"/>`);
+    add("hip", sd, `<polygon points="${P(poly([[12.8,42],[19.6,46],[19.4,56],[13.4,56]], sd))}"/>`);
+    add("knee", sd, `<rect x="${sd === "L" ? 20.6 : 13.4}" y="56" width="6" height="8" rx="1"/>`);
+    add("foot", sd, `<polygon points="${P(poly([[13.8,64],[19.4,64],[18.8,78],[14.8,78]], sd))}"/><ellipse cx="${m(16.6)}" cy="80" rx="3.6" ry="1.6"/>`); });
+  add("chest", "", `<rect x="12" y="17" width="16" height="11" rx="2"/>`); add("upabdo", "", `<rect x="12.5" y="28" width="15" height="7"/>`);
+  add("loabdo", "", `<polygon points="12.5,35 27.5,35 27.2,42 20,46 12.8,42"/>`);
+  const on = k => sel && (k === sel.reg + (sel.side === "Right" ? "R" : sel.side === "Left" ? "L" : "") || (!sel.side && k.replace(/[RL]$/, "") === sel.reg));
+  const order = ["chest", "upabdo", "loabdo", "breastR", "breastL", "clavicleR", "clavicleL", "shoulderR", "shoulderL", "armR", "armL", "hipR", "hipL", "kneeR", "kneeL", "footR", "footL"];
+  const col = sel ? BF.regColor(sel.reg) : "";
+  const parts = order.map(k => `<g class="${on(k) ? "on" : ""}"${on(k) ? ` style="fill:${col}"` : ""}>${(R[k] || []).join("")}</g>`).join("");
+  const back = sel && sel.reg === "back" ? `<rect class="bk" x="12.5" y="28" width="15" height="12" rx="1" style="stroke:${col}"/>` : "";
+  return `<svg class="qman" viewBox="0 0 40 84" aria-hidden="true"><circle cx="20" cy="7" r="5"/><rect x="18" y="11.5" width="4" height="4"/>${parts}${back}</svg>`;
+}
 function quickIds(){ const out = [...new Set(qSaved())]; for (const d of QDEF){ if (out.length>=3) break; if (!out.includes(d)) out.push(d); } for (const d of Object.keys(QT)){ if (out.length>=3) break; if (!out.includes(d)) out.push(d); } return out; }
 function quickTile(id){
   const t = QT[id], ac = activeCase(), child = ac && ac.y < 16, male = ac && ac.sex === "M";
@@ -995,7 +1027,9 @@ const qSaved = () => { const q = store.get("quick", null); return (Array.isArray
 screens.quick = () => { const sel = qSaved();
   return head("Quick tiles","home") + `<div class="card"><p>Choose the <b>3</b> tiles shown on the home screen. Tap to add or remove; they appear in the order you pick. Saved on this phone only.</p>
     <p class="sub">Chosen: <b>${sel.map(id=>QT[id].lab).join(" · ") || "none"}</b>${sel.length<3?` — pick ${3-sel.length} more (empty slots show a default)`:""}</p>
-    <div class="txck">${Object.entries(QT).map(([id,t]) => { const n = sel.indexOf(id); return `<button class="txci ${n>=0?"on":""}" data-qpick="${id}" aria-pressed="${n>=0}"><span class="box">${n>=0?n+1:""}</span><span>${t.lab}</span></button>`; }).join("")}</div>
+    ${(() => { const SHORT = ["cons","psum","prp","prt"], grp = (id, t) => t.cls === "t-emerg" ? "Emergency" : SHORT.includes(id) ? "Shortcuts" : ({"t-ga":"Adult","t-obs":"Obstetric","t-regional":"Regional","t-paeds":"Paeds","t-tx":"Transplant"})[t.cls] || "Other";
+      return ["Emergency","Adult","Obstetric","Regional","Paeds","Transplant","Shortcuts","Other"].map(g => { const items = Object.entries(QT).filter(([id, t]) => grp(id, t) === g); if (!items.length) return "";
+        return `<h3>${g}</h3><div class="txck">${items.map(([id,t]) => { const n = sel.indexOf(id); return `<button class="txci ${n>=0?"on":""}" data-qpick="${id}" aria-pressed="${n>=0}"><span class="box">${n>=0?n+1:""}</span><span>${t.lab}</span></button>`; }).join("")}</div>`; }).join(""); })()}
     ${S.qmsg?`<div class="warn">${S.qmsg}</div>`:""}
     <button class="linkbtn" data-qreset="1">Reset to default</button></div>` + disc; };
 /* Home section tiles: monitor channels. Each wave segment is exactly 40 units wide so the sweep loops seamlessly. */
@@ -4643,12 +4677,12 @@ function vTicks(){
 }
 /* ---------- ABOUT ---------- */
 const CHANGES = [
+  ["2.102","Quick tiles: Block finder (mini mannequin), Intralipid, Dantrolene, Antibiotic prophylaxis; picker grouped by section; defaults LSCS spinal, Block finder, Plan & consent (checked)"],
   ["2.101","Accuracy: trunk regions and dermatome bands re-set to landmarks measured on the body (nipple, xiphisternum, umbilicus); lower abdomen ends at the inguinal ligament; groin below it is L1 / hip; new Back / spine region; knee shortened, shin now in Lower leg / foot / ankle (checked)"],
   ["2.100","3D body sharper: full screen resolution, fairer speed check, softened region edges, narrower clavicle strip (checked)"],
   ["2.99","Block finder: pale until you choose; new Clavicle and Breast regions; new block cards Superficial cervical plexus and PECS II (checked)"],
   ["2.98","Block finder as a colour map like the dermatomes: upper limb amber, trunk blue, lower limb green; the chosen region stays coloured, the rest fade; colour dots in the list (checked)"],
-  ["2.97","Dermatomes on the 3D body: with 3D on, the dermatome card colours the levels on the body, the block rises from the feet, tap the body to pick a level (checked)"],
-  ["2.96","Block finder: real 3D body (MakeHuman mannequin, CC0) replaces the blob figure: more human, sharp, and much lighter on graphics; straight region bands on the trunk (checked)"]];
+  ["2.97","Dermatomes on the 3D body: with 3D on, the dermatome card colours the levels on the body, the block rises from the feet, tap the body to pick a level (checked)"]];
 
 
 
@@ -4984,7 +5018,7 @@ const GROUPS = [
    {id:"don", label:"Donor", input:()=>donInputs(), hint:"Living donor nephrectomy.",
     cards:["1. Donor pre-op","2. Donor intra-op","3. Donor post-op"], links:[]}], cards:[]}];
 const SEARCH_EXTRA = {   // keyed by stable card id
-  "regional-finder-block-finder":"block finder which block body region 3d figure shoulder arm hand chest abdomen inguinal hip knee foot ankle suggest",
+  "regional-finder-block-finder":"block finder which block body map mannequin body region 3d figure shoulder arm hand chest abdomen inguinal hip knee foot ankle suggest",
   "ga-ind-induction-drugs":"induction relaxant relaxant nmb neuromuscular blocker suxamethonium scoline succinylcholine rocuronium atracurium cisatracurium vecuronium",
   "premed-prepare-anticoagulants-and-antiplatelets":"anticoagulant antiplatelet doac apixaban rivaroxaban edoxaban dabigatran warfarin bridging lmwh aspirin clopidogrel ticagrelor prasugrel crcl creatinine",
   "premed-prepare-diabetes-day-of-surgery-plan":"diabetes insulin glargine detemir degludec premixed basal bolus pump vrii vriii sliding scale sulfonylurea gliclazide sglt2 metformin glucose ketones",
