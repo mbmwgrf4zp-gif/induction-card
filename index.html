@@ -722,7 +722,7 @@ if (window.top !== window.self && /\.github\.io$/.test(location.hostname)) {
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.83.1";
+const APP_VERSION = "2.84.1";
 const APP_DATE = "22 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
@@ -3972,6 +3972,23 @@ function dermCard(){
   <p class="sub">Schematic diagram: band shapes are simplified; dots are the ASIA key sensory points (patient's right on the left of each figure). Tap the body to pick a level.</p>
   ${src("ASIA/ISNCSCI 2019; Bromage 1965; Miller's Anesthesia; OAA.")}`;
 }
+/* the block spreads: bands colour in one after another from the feet up (≈1 s), or recede from the top (≈0.6 s). Display only. */
+function dermAnimate(a){
+  if (reduceMotion()) return;
+  const st = dermState(), svgs = document.querySelectorAll("details.acc[open] .dfig svg"); if (!st.top || !svgs.length) return;
+  const all = l => Array.from(svgs).flatMap(sv => Array.from(sv.querySelectorAll(`.band[data-dl="${l}"]`)));
+  if (st.mode === "single"){ st.sel.forEach(l => all(l).forEach(el => el.animate([{opacity: 0}, {opacity: 1}], {duration: 300, easing: "ease-out"}))); return; }
+  const ni = dermIdx(st.top), oi = (!a.prev || a.prev === st.top) ? DERM_LEVELS.length : dermIdx(a.prev);
+  if (ni === oi) return;
+  const rising = ni < oi, lv = rising ? DERM_LEVELS.slice(ni, oi).reverse() : DERM_LEVELS.slice(oi, ni), step = (rising ? 1000 : 600) / lv.length;
+  const lines = Array.from(svgs).map(sv => sv.querySelector(".topline")).filter(Boolean), finalY = lines.length ? +lines[0].getAttribute("y1") : null;
+  const setLine = y => lines.forEach(ln => { ln.setAttribute("y1", y); ln.setAttribute("y2", y); ln.style.opacity = 1; });
+  lv.forEach(l => all(l).forEach(el => { el.classList.toggle("on", !rising); el.classList.toggle("off", rising); }));   // start from the previous picture
+  if (rising) lines.forEach(ln => ln.style.opacity = 0); else if (a.prev && TRUNK[a.prev]) setLine(TRUNK[a.prev][0]);
+  lv.forEach((l, i) => setTimeout(() => { all(l).forEach(el => { el.classList.toggle("on", rising); el.classList.toggle("off", !rising); });
+    if (TRUNK[l] && lines.length) setLine(rising ? TRUNK[l][0] : TRUNK[l][1]);
+    if (i === lv.length - 1 && lines.length) setLine(finalY); }, Math.round(step * (i + 1))));
+}
 raCards.derm = () => `<div class="card"><h2>Dermatomes &amp; block height</h2>${dermCard()}</div>`;
 const dermLink = (lvl, label) => `<button class="dermlink" data-derm="${lvl}" data-open="6. Dermatomes &amp; block height" data-g="regional" data-tab="neuraxial">${label||`Aim ${lvl}`} → see dermatomes ›</button>`;
 
@@ -4332,12 +4349,13 @@ function vTicks(){
 }
 /* ---------- ABOUT ---------- */
 const CHANGES = [
+  ["2.84","Dermatomes: the block rises from the feet when you pick an operation or level, recedes when you go lower (off with Reduce Motion) (checked)"],
   ["2.83","Dermatome figure full width; operations in two columns underneath (checked)"],
   ["2.82","Dermatomes: one figure beside the operation list (✓ covered / needs X), back on a toggle, landmarks labelled outside the body (checked)"],
   ["2.81","Big monitor-font numbers less crowded: wider digit spacing, spaced range dash, more room below (checked)"],
   ["2.80","Equipment sizes (tubes, depths, LMA / i-gel, DLT, NPA, bag, NG, CVC) in rows like the dose tables (checked)"],
-  ["2.79","One type scale inside cards (body 16, emergency steps 17, headings 15, notes 14); RSI doses as a dose table (checked)"],
-  ["2.78","Syringe recipes at normal size, so only the doses you give stand out (checked)"]];
+  ["2.79","One type scale inside cards (body 16, emergency steps 17, headings 15, notes 14); RSI doses as a dose table (checked)"]];
+
 
 
 
@@ -5193,6 +5211,7 @@ function renderNow(){
   if (!S.scrollTo) window.scrollTo(0, y);
   S.scrollTo = false;
   if (S.srchFocus){ S.srchFocus = false; const q = app.querySelector("#q"); if (q) q.focus(); }
+  if (S.dermAnim){ const a = S.dermAnim; S.dermAnim = null; requestAnimationFrame(() => dermAnimate(a)); }
   if (active){ const el = app.querySelector(`[data-in="${active}"]`); if (el){ el.focus(); const v=el.value; el.value=""; el.value=v; } }
 }
 /* ---------- MOTION ---------- */
@@ -5251,7 +5270,7 @@ document.addEventListener("toggle", e => {
 }, true);
 document.addEventListener("toggle", e => { const d = e.target; if (!d.matches || !d.matches("details.catgrp")) return; S.catOpen = S.catOpen || new Set();
   if (d.open) S.catOpen.add(d.dataset.cat); else { S.catOpen.delete(d.dataset.cat); if (d.querySelector("details.acc[open]")) S.open = null; } }, true);
-document.addEventListener("click", e => { const t = e.target.closest && e.target.closest("[data-dl]"); if (!t) return; S.derm = t.getAttribute("data-dl"); render(); });
+document.addEventListener("click", e => { const t = e.target.closest && e.target.closest("[data-dl]"); if (!t) return; S.dermAnim = {prev: dermState().top}; S.derm = t.getAttribute("data-dl"); render(); });
 let vtaps = 0, vtimer = null;
 document.addEventListener("click", e => { if (!e.target.closest || !e.target.closest(".vtap")) return; vtaps++; clearTimeout(vtimer); vtimer = setTimeout(()=>vtaps=0, 1500); if (vtaps >= 5){ vtaps = 0; location.hash = "#values"; window.scrollTo(0,0); } });
 document.addEventListener("change", e => { if (e.target.id==="csNote"){ S.csNote = e.target.value.slice(0,300); render(); } if (e.target.id==="leNote"){ S.leNote = e.target.value.slice(0,300); render(); } if (e.target.id==="pnNote"){ S.pnNote = e.target.value.slice(0,300); render(); } if (e.target.dataset && e.target.dataset.pnf){ const f = e.target.dataset.pnf, v = e.target.value.slice(0,300); (S.pnF = S.pnF || {})[f] = v; if (f === "cr"){ const n = parseFloat(v); if (n >= 30 && n <= 1200){ S.crea = n; S.touched.crea = true; } } render(); } });
@@ -5290,7 +5309,7 @@ document.addEventListener("click", e => {
   if (d.csclear){ delete S.sc.cs; delete S.sc.csc; delete S.sc.pl; delete S.sc.dx; S.csDec = ""; S.csNote = ""; S.csWho = "patient"; S.csLang = "English"; S.csOut = "full"; S.csLen = "brief"; render(); return; }
   if (d.screset){ S.sc[d.screset] = {}; render(); return; }
   if (d.dermback){ S.dermBack = !S.dermBack; render(); return; }
-  if (d.derm){ S.derm = d.derm; if (!d.open){ render(); return; } }
+  if (d.derm){ S.dermAnim = {prev: dermState().top}; S.derm = d.derm; if (!d.open){ render(); return; } }
   if (d.jump){ const a = (b.closest("details") || document).querySelector(`[data-anchor="${d.jump}"]`); if (a){ const slim = document.querySelector(".gside.slim"), off = (slim && !isWide() ? slim.offsetHeight : 0) + 8;
     window.scrollTo({top: window.scrollY + a.getBoundingClientRect().top - off, behavior: reduceMotion() ? "auto" : "smooth"}); } return; }
   if (d.srch){ S.srch = !S.srch; S.srchFocus = S.srch; render(); if (S.srch) window.scrollTo(0,0); return; }
