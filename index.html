@@ -210,7 +210,8 @@ header h1{font-size:var(--fs-lg);font-weight:700;margin:0;flex:1;display:flex;al
 
 /* results */
 .result{background:var(--gc-soft);border-radius:var(--r);padding:var(--s4);margin:var(--s3) 0}
-.big{font-family:'DSEG7',var(--font-mono);font-size:calc(var(--big)*.92);font-weight:600;line-height:1.1;font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+.big{font-family:'DSEG7',var(--font-mono);font-size:calc(var(--big)*.92);font-weight:600;line-height:1.15;font-variant-numeric:tabular-nums;letter-spacing:.06em;margin:2px 0 6px}
+.big .rgd{font-family:var(--font-sans);font-weight:500;font-size:.78em;letter-spacing:0;margin:0 .28em 0 .22em;vertical-align:.08em}
 .sub{color:var(--muted);font-size:var(--fs-sm);line-height:1.4}
 .row{display:flex;gap:var(--s4);flex-wrap:wrap}
 .row>div{flex:1 1 140px;min-width:0}
@@ -717,7 +718,7 @@ if (window.top !== window.self && /\.github\.io$/.test(location.hostname)) {
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.80.1";
+const APP_VERSION = "2.81.1";
 const APP_DATE = "22 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
@@ -4328,12 +4329,13 @@ function vTicks(){
 }
 /* ---------- ABOUT ---------- */
 const CHANGES = [
+  ["2.81","Big monitor-font numbers less crowded: wider digit spacing, spaced range dash, more room below (checked)"],
   ["2.80","Equipment sizes (tubes, depths, LMA / i-gel, DLT, NPA, bag, NG, CVC) in rows like the dose tables (checked)"],
   ["2.79","One type scale inside cards (body 16, emergency steps 17, headings 15, notes 14); RSI doses as a dose table (checked)"],
   ["2.78","Syringe recipes at normal size, so only the doses you give stand out (checked)"],
   ["2.77","Dose tables, batch 4 — Kidney Transplant: antibiotic, infusions, reperfusion drugs, reversal, analgesia, donor (checked)"],
-  ["2.76","Dose tables, batch 3 — Paediatric: remifentanil, hypoglycaemia, penile block, discharge analgesia, MRI sedation (checked)"],
-  ["2.75","Dose tables, batch 2 — Pre-op and Regional: blocks, epidural, adjuncts, steroid cover, hypoglycaemia (checked)"]];
+  ["2.76","Dose tables, batch 3 — Paediatric: remifentanil, hypoglycaemia, penile block, discharge analgesia, MRI sedation (checked)"]];
+
 
 
 
@@ -5175,7 +5177,7 @@ function renderNow(){
   const nav = `<nav class="sidenav" aria-label="Sections"><div class="snbrand">${svg("capno")} Induction Card</div>${navItems.map(([hh,l,ic,cls])=>`<button class="snitem sn-${cls} ${h===hh||(hh==="home"&&!h.startsWith("g-")&&h!=="values"&&h!=="about")?"on":""}" data-go="${hh}"><span class="snico">${svg(ic)}</span>${l}</button>`).join("")}
     <div class="snkeys">Keys: <b>/</b> search · <b>Esc</b> back · <b>1–6</b> tabs</div></nav>`;
   app.innerHTML = `<div class="shell">${nav}<div class="content">${html}</div></div>`;
-  app.querySelectorAll('.big').forEach(el => { el.innerHTML = el.innerHTML.replace(/(\d)\s+(mg|mcg|mL\/h|mL|g|kg|mmHg|wk|cm|mmol|units?|J)(?=\s|<|$)/g, '$1<span class="bu"> $2</span>'); });
+  app.querySelectorAll('.big').forEach(el => { el.innerHTML = el.innerHTML.replace(/(\d)\s+(mg|mcg|mL\/h|mL|g|kg|mmHg|wk|cm|mmol|units?|J)(?=\s|<|$)/g, '$1<span class="bu"> $2</span>').replace(/(\d)\s*[–-]\s*(?=\d)/g, '$1<span class="rgd">–</span>'); });
   seg1(app);
   tickerInit();
   restoredAt = performance.now();
