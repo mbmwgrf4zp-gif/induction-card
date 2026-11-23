@@ -744,7 +744,7 @@ if (window.top !== window.self && /\.github\.io$/.test(location.hostname)) {
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.92.1";
+const APP_VERSION = "2.93.1";
 const APP_DATE = "22 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
@@ -761,7 +761,7 @@ const store = {
 };
 // Inputs are not remembered between uses (per plan): state lives in memory only.
 const S = { ettMode:"adult", sex:"F", height:158, ageY:4, ageM:0, wt:3.0,
-            touched:{}, sc:{}, fastH:6, leLen:"brief", leNote:"", csDec:"", pnNote:"", pnF:{}, pnLay:"mine", pnMP:"", pnNeck:"", pnPonv:"", pnUrg:"", crea:80, hbNow:12, hbLow:8, hbTarget:10, derm:"", abxSp:"general", spOp:"lscs", spHt:155, morWt:60, pw:10, pY:1, pM:0, pHt:75, pBE:-5, aw:70, emTab:"adult", obTab:"labour", pTab:"pre", gaTab:"ind", pmTab:"assess", raTab:"finder", laA:[], laP:[], cSex:"F", cY:40, cM:0, cH:160, cW:60, cD:7, cGA:40, cBW:3, cNick:"", laD:"bupi", laC:"0.5", laMl:15, laBi:"1", age:45, apfel:0, pump:"pcea_cse", topup:"lig", ventSc:"std", vfio:"", txTab:"pre", txck:{}, gaB:40, chW:6, pD:7, bw:3, dermMode:"block", asa:"", met:"", csWho:"patient", csOut:"full", csLen:"brief", csLang:"English", csNote:"", k:4.5, hb:10, todayWt:70, hdH:12 };
+            touched:{}, sc:{}, fastH:6, leLen:"brief", leNote:"", csDec:"", pnNote:"", pnF:{}, pnLay:"mine", pnMP:"", pnNeck:"", pnPonv:"", pnUrg:"", crea:80, hbNow:12, hbLow:8, hbTarget:10, derm:"", abxSp:"general", spOp:"lscs", spHt:155, morWt:60, pw:10, pY:1, pM:0, pHt:75, pBE:-5, aw:70, emTab:"adult", obTab:"labour", pTab:"pre", gaTab:"ind", pmTab:"assess", raTab:"safety", laA:[], laP:[], cSex:"F", cY:40, cM:0, cH:160, cW:60, cD:7, cGA:40, cBW:3, cNick:"", laD:"bupi", laC:"0.5", laMl:15, laBi:"1", age:45, apfel:0, pump:"pcea_cse", topup:"lig", ventSc:"std", vfio:"", txTab:"pre", txck:{}, gaB:40, chW:6, pD:7, bw:3, dermMode:"block", asa:"", met:"", csWho:"patient", csOut:"full", csLen:"brief", csLang:"English", csNote:"", k:4.5, hb:10, todayWt:70, hdH:12 };
 
 function src(text){ return `<div class="src">Source: ${text}</div>`; }
 function protoSrc(){
@@ -3839,6 +3839,7 @@ raCards.finder = () => `<div class="card"><h2>Block finder</h2>${finderDraft()}
   ${src("Suggestions point to this app's block cards (" + RSRC + "); figure is schematic.")}</div>`;
 
 /* the figure: smooth-blended body parts (signed distance field) drawn in a WebGL shader; one canvas reused across redraws */
+const FINDER_ON = false;   // Regional › Finder tab hidden for now (crashed Regional on a laptop); code kept for later
 const BF = (() => {
   const R = {none: 0, chest: 1, upabdo: 2, loabdo: 3, shoulder: 4, arm: 5, hip: 6, knee: 7, foot: 8}, P = [];
   const E = (reg, s, c, r, k = .06, sub = false) => P.push({t: 0, reg: R[reg], s, c, r, k, sub});
@@ -4569,12 +4570,12 @@ function vTicks(){
 }
 /* ---------- ABOUT ---------- */
 const CHANGES = [
+  ["2.93","Regional › Finder tab hidden for now (it crashed Regional on a laptop); Regional opens on Safety; block cards unchanged (checked)"],
   ["2.92","Block finder lighter on laptops: draws only the body parts near each pixel, caps the picture size, lowers quality on slow graphics, and falls back to the region list instead of crashing (checked)"],
   ["2.91","Block finder: figure no longer changes size while scrolling on iPhone, so the page stops shaking (checked)"],
   ["2.90","Block finder tidier: one turn button on the figure, regions behind a List link, shorter names, hint fades after first touch, small child link (checked)"],
   ["2.89","Block finder: smooth, slightly fuller abdomen — no pinched waist or step under the ribs (checked)"],
-  ["2.88","Block finder: tap outside the body to clear the choice and go back to the full body (checked)"],
-  ["2.87","Block finder looks more natural: smooth back (no disc), proper head and neck, chest wall colours only the chest, figure fits the card, hint at the top (checked)"]];
+  ["2.88","Block finder: tap outside the body to clear the choice and go back to the full body (checked)"]];
 
 
 
@@ -4831,9 +4832,9 @@ const GROUPS = [
    {id:"post", label:"Post-op", input:()=>gaInputs(), hint:"Reverse → extubate → prevent PONV → analgesia → discharge → IM doses.",
     cards:["1. Reversal",["Extubation criteria","2. Extubation criteria"],["PONV: Apfel score","3. PONV: Apfel score"],"4. Analgesia ladder & PCA",["Discharge from recovery","5. Discharge from recovery"],["Discharge home (daycare)","6. Discharge home (daycare)"],"7. IM doses (no IV access, or ward)"],
     links:[["Bronchospasm","adult","Bronchospasm"],["Anaphylaxis","adult","Anaphylaxis"]]}], cards:[]},
- {id:"regional", name:"Regional", sub:"Finder · Safety · Neuraxial · Upper · Lower · Trunk", tabKey:"raTab", tabs:[
-   {id:"finder", label:"Finder", input:()=>gaInputs(), autoOpen:true, hint:"Turn the figure and tap where you operate; suggestions come from the block cards.",
-    cards:[["Block finder","1. Block finder"]], links:[["LA toxicity (LAST)","adult","LA toxicity"]]},
+ {id:"regional", name:"Regional", sub:(FINDER_ON ? "Finder · " : "") + "Safety · Neuraxial · Upper · Lower · Trunk", tabKey:"raTab", tabs:[
+   ...(FINDER_ON ? [{id:"finder", label:"Finder", input:()=>gaInputs(), autoOpen:true, hint:"Turn the figure and tap where you operate; suggestions come from the block cards.",
+    cards:[["Block finder","1. Block finder"]], links:[["LA toxicity (LAST)","adult","LA toxicity"]]}] : []),
    {id:"safety", label:"Safety", input:()=>gaInputs(), hint:"Before every block: dose limits, checklist, anticoagulants.",
     cards:[["LA dose calculator","1. LA dose calculator"],["Stop Before You Block & safe injection","2. Stop Before You Block"],["Neuraxial & deep blocks: anticoagulant timing","3. Anticoagulant timing"]],
     links:[["LA toxicity (LAST)","adult","LA toxicity"]]},
