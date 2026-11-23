@@ -740,7 +740,7 @@ if (window.top !== window.self && /\.github\.io$/.test(location.hostname)) {
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.87.1";
+const APP_VERSION = "2.88.1";
 const APP_DATE = "22 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
@@ -3826,7 +3826,7 @@ function bfPanel(){
     ${nx ? `<button class="rellink" data-id="${nx.id}" data-open="${esc(nx.label)}" data-g="regional" data-tab="${nx.tab}">Or neuraxial: ${r.nx[1]} → ${esc(bareLabel(nx.label))} ›</button>` : ""}`;
 }
 raCards.finder = () => `<div class="card"><h2>Block finder</h2>${finderDraft()}
-  <div class="bfstage" id="bfstage"><div class="bfhint" id="bfhint">drag to turn · tap a body part</div></div>
+  <div class="bfstage" id="bfstage"><div class="bfhint" id="bfhint">drag to turn · tap a body part · tap outside to zoom out</div></div>
   <div class="bfviews" role="group" aria-label="View"><button data-bfview="0">Front</button><button data-bfview="1.5708">Side</button><button data-bfview="3.1416">Back</button></div>
   <div class="bfchips">${BF_ORDER.map(k => `<button data-bfreg="${k}" aria-pressed="${!!(S.bf && S.bf.reg === k)}">${BF_REG[k].t}</button>`).join("")}</div>
   <div class="bfpanel">${bfPanel()}</div>
@@ -3953,7 +3953,7 @@ const BF = (() => {
       if (!down.moved && Math.hypot(dx, dy) > 6){ down.moved = true; down.tilt = Math.abs(dy) > Math.abs(dx)*.8 && Math.abs(dx) > 4; }
       if (down.moved){ st.low = true; st.yaw = down.yaw - dx*.012; if (down.tilt) st.pitch = Math.max(-.35, Math.min(.35, down.pitch + dy*.006)); redraw(); } });
     const end = e => { if (!down) return; const tap = !down.moved; down = null; if (st.low){ st.low = false; redraw(); } if (!tap) return;
-      const r = cv.getBoundingClientRect(), q = pick(e.clientX - r.left, e.clientY - r.top); if (!q || !q.reg) return;
+      const r = cv.getBoundingClientRect(), q = pick(e.clientX - r.left, e.clientY - r.top); if (!q || !q.reg){ if (S.bf){ S.bf = null; focus(null); render(); } return; }   // tap off the body (or head / neck) → back to full body
       const key = Object.keys(R).find(k => R[k] === q.reg); S.bf = {reg: key, side: q.s < 0 ? "Right" : q.s > 0 ? "Left" : ""}; focus(S.bf); render(); };
     cv.addEventListener("pointerup", end); cv.addEventListener("pointercancel", () => { down = null; st.low = false; redraw(); }); }
   function mount(){ const stage = document.getElementById("bfstage"); if (!stage) return;
@@ -4551,12 +4551,12 @@ function vTicks(){
 }
 /* ---------- ABOUT ---------- */
 const CHANGES = [
+  ["2.88","Block finder: tap outside the body to clear the choice and go back to the full body (checked)"],
   ["2.87","Block finder looks more natural: smooth back (no disc), proper head and neck, chest wall colours only the chest, figure fits the card, hint at the top (checked)"],
   ["2.86","Regional › Finder: turn a 3D figure, tap where you operate, see the suggested blocks from the block cards (checked)"],
   ["2.85","Dermatome figure with a 3D look: shaded limbs and torso, soft shadow (checked)"],
   ["2.84","Dermatomes: the block rises from the feet when you pick an operation or level, recedes when you go lower (off with Reduce Motion) (checked)"],
-  ["2.83","Dermatome figure full width; operations in two columns underneath (checked)"],
-  ["2.82","Dermatomes: one figure beside the operation list (✓ covered / needs X), back on a toggle, landmarks labelled outside the body (checked)"]];
+  ["2.83","Dermatome figure full width; operations in two columns underneath (checked)"]];
 
 
 
