@@ -780,6 +780,7 @@ details.faqg>summary{cursor:pointer;font-weight:700;color:var(--accent);min-heig
 .bfchips button{flex:1 1 40%}.bfchips button[aria-pressed="true"]{background:var(--gc);border-color:var(--gc);color:var(--on)}
 .bfdot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px;vertical-align:0;flex:0 0 auto}
 .bfmore summary{cursor:pointer;font-weight:600;color:var(--gc);min-height:44px;display:flex;align-items:center}.bfmore[open]{display:grid;gap:8px}
+.nhd{margin:var(--s2) 0 0;font-size:13px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
 .nchips{display:flex;flex-wrap:wrap;gap:6px;margin:var(--s2) 0}.nchips button{min-height:40px;padding:0 12px;border-radius:999px;border:1px solid var(--line);background:var(--card);color:var(--ink);font-size:14px;display:inline-flex;align-items:center}.nchips button[aria-pressed="true"]{border-color:var(--gc);background:var(--gc-soft);font-weight:600}
 .npanel{border:1px solid var(--line);border-radius:var(--r-sm);padding:var(--s3);margin:var(--s2) 0}
 .bfpanel{display:grid;gap:8px;margin:var(--s2) 0}.bfpanel:empty{display:none}.bfside{margin:0;color:var(--danger-ink);font-weight:600;font-size:14px}
@@ -801,7 +802,7 @@ if (window.top !== window.self && /\.github\.io$/.test(location.hostname)) {
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.120.1";
+const APP_VERSION = "2.121.1";
 const APP_DATE = "24 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
@@ -4141,7 +4142,7 @@ const BF = (() => {
       gl_Position = vec4(3.24*dot(q, rt)/asp, 3.24*dot(q, up), (z*10.1/9.9 - 2.0/9.9), z); }`;
   const FS = `#extension GL_OES_standard_derivatives : enable
     precision highp float; varying vec3 vn; varying vec3 vp; varying vec3 vs; varying vec3 vc; uniform vec3 ro; uniform vec3 Ld; uniform vec3 skin; uniform vec3 hi; uniform float pulse; uniform float dark; uniform vec3 band;
-    uniform float dm; uniform vec3 dr; uniform float ytop; uniform vec3 red; uniform float yb[11]; uniform float nsel; uniform float nlimb;
+    uniform float dm; uniform vec3 dr; uniform float ytop; uniform vec3 red; uniform float yb[11]; uniform float nsel;
     float terr(vec3 s, float d, vec3 P){ float u = s.x, a = s.y, b = s.z;   // cutaneous nerves, arm and leg (same rules as nerveAt in JS)
       if (u < 0.0) return (P.y > 1.40 && P.y < 1.52 && abs(P.x) > 0.04 && P.z > -0.03) ? 1.0 : 0.0;   // supraclavicular: cut by position, so the edge is straight
       if (u < 1.0){ if (a > 0.25 && u < 0.5) return 2.0; if (b < -0.35 || a >= 0.0) return 3.0; return u < 0.4 ? 9.0 : 5.0; }
@@ -4154,8 +4155,8 @@ const BF = (() => {
       float f = u - 6.0; if (f < 0.14) return a > 0.5 ? 17.0 : 18.0; if (b < -0.3) return 18.0; if (d > 0.5) return 16.0; if (a > 0.6) return 17.0; if (a < -0.55 && f < 0.7) return 13.0; return 15.0; }
     vec3 npal(float t){ if (t < 1.5) return vec3(.56,.47,.78); if (t < 2.5) return vec3(.91,.33,.60); if (t < 3.5) return vec3(.25,.66,.86); if (t < 4.5) return vec3(.98,.78,.20);
       if (t < 5.5) return vec3(.20,.70,.62); if (t < 6.5) return vec3(.50,.78,.31); if (t < 7.5) return vec3(.89,.27,.22); if (t < 8.5) return vec3(.20,.27,.66); if (t < 9.5) return vec3(.66,.55,.45);
-      if (t < 10.5) return vec3(.98,.62,.25); if (t < 11.5) return vec3(.40,.62,.95); if (t < 12.5) return vec3(.62,.40,.80); if (t < 13.5) return vec3(.20,.72,.55); if (t < 14.5) return vec3(.75,.60,.45);
-      if (t < 15.5) return vec3(.98,.80,.25); if (t < 16.5) return vec3(.85,.20,.25); if (t < 17.5) return vec3(.30,.30,.70); if (t < 18.5) return vec3(.90,.45,.65); return vec3(.55,.75,.30); }
+      if (t < 10.5) return vec3(.98,.62,.25); if (t < 11.5) return vec3(.56,.60,.98); if (t < 12.5) return vec3(.55,.25,.55); if (t < 13.5) return vec3(.10,.50,.30); if (t < 14.5) return vec3(.55,.65,.72);
+      if (t < 15.5) return vec3(.80,.58,.12); if (t < 16.5) return vec3(.65,.15,.15); if (t < 17.5) return vec3(.38,.28,.78); if (t < 18.5) return vec3(.98,.70,.80); return vec3(.80,.90,.35); }
     vec3 pal(float i){ float a = mod(i, 2.0); if (i < 6.5) return a > 0.5 ? vec3(.984,.749,.141) : vec3(.961,.620,.043); if (i < 18.5) return a > 0.5 ? vec3(.133,.827,.933) : vec3(.031,.569,.698);
       if (i < 23.5) return a > 0.5 ? vec3(.29,.871,.502) : vec3(.086,.639,.29); return a > 0.5 ? vec3(.957,.447,.714) : vec3(.859,.153,.467); }
     float lev(float y){ if (y > 1.40) return 2.0; for (int k = 0; k < 11; k++){ if (y >= yb[k]) return 8.0 + float(k); } return 19.0; }
@@ -4169,9 +4170,8 @@ const BF = (() => {
         if (vs.z > 0.5 && tOn > 0.5 && edge < 0.003) base = base*0.55; }
       else if (dm < 1.5){ float L = lev(vp.y), cov = (dr.z < 0.5 || (L > dr.x - 0.5 && L < dr.y + 0.5)) ? 1.0 : 0.0; base = mix(vc, mix(skin, pal(L), cov), clamp(vs.z, 0.0, 1.0)); }
       else { float w = max(vc.y, 0.0001), t = vc.y > 0.5 ? terr(vs/w, vc.x/w, vp) : 0.0;   // off-limb corners carry zeros: dividing by the interpolated flag keeps only the limb's own coordinates
-        if ((nlimb < 0.5 && t > 9.5) || (nlimb > 0.5 && t < 9.5)) t = 0.0;   // only the limb in view is coloured
         float pick = nsel > 0.5 && abs(t - nsel) < 0.5 ? 1.0 : 0.0;
-        base = t < 0.5 ? skin : nsel < 0.5 ? mix(skin, npal(t), 0.35) : pick > 0.5 ? npal(t) : mix(skin, npal(t), 0.14);   // pale until a nerve is chosen; then only that one in full colour
+        base = t < 0.5 ? skin : nsel < 0.5 ? mix(skin, npal(t), 0.25) : pick > 0.5 ? npal(t) : mix(skin, npal(t), 0.14);   // pale until a nerve is chosen; then only that one in full colour
         #ifdef GL_OES_standard_derivatives
         if (nsel < 0.5 && fwidth(t) > 0.01) base = base*0.88;   // faint borders while nothing is chosen
         if (nsel > 0.5 && fwidth(pick) > 0.01) base = mix(npal(nsel), vec3(0.1), 0.55);   // solid outline round the chosen territory only
@@ -4246,7 +4246,7 @@ const BF = (() => {
     const timing = (st.frames = (st.frames || 0) + 1) >= 4 && st.frames <= 6, t0 = timing ? performance.now() : 0; if (st.frames === 1) setTimeout(() => store.set("bfBoot", false), 2500);
     gl.useProgram(st.gprog); camU(st.gprog); gl.depthMask(false); const lg = att(st.gprog, "v", st.bG, 2); gl.drawArrays(gl.TRIANGLES, 0, 6); gl.disableVertexAttribArray(lg); gl.depthMask(true);
     const derm = st.mode === "derm", nerve = st.mode === "nerve", skinC = hex(cssv("--bf-skin")), dr = derm ? dermRange() : null; if (derm) dermBuf(dr, skinC); else if (nerve) nerveBuf(); else selBuf(sel, skinC); gl.useProgram(st.prog); const U = camU(st.prog);
-    gl.uniform1f(U("dm"), nerve ? 2 : derm ? 1 : 0); gl.uniform1f(U("nsel"), nerve ? (S.nerve || 0) : 0); gl.uniform1f(U("nlimb"), st.limb === "leg" ? 1 : 0); gl.uniform1fv(U("yb"), DYB); gl.uniform3fv(U("red"), hex(cssv("--danger-ink")));
+    gl.uniform1f(U("dm"), nerve ? 2 : derm ? 1 : 0); gl.uniform1f(U("nsel"), nerve ? (S.nerve || 0) : 0); gl.uniform1fv(U("yb"), DYB); gl.uniform3fv(U("red"), hex(cssv("--danger-ink")));
     if (derm){ gl.uniform3f(U("dr"), dr.lo, dr.hi, dr.any ? 1 : 0); const ti = dr.top ? dermIdx(dr.top) : -1; gl.uniform1f(U("ytop"), ti === 2 ? 1.40 : ti >= 8 && ti <= 18 ? (ti === 8 ? 1.40 : DYB[ti - 9]) : ti === 19 ? .93 : 0); }
     gl.uniform3fv(U("Ld"), L); gl.uniform1f(U("pulse"), st.pulse); gl.uniform1f(U("dark"), isDark() ? 1 : 0); gl.uniform3fv(U("skin"), skinC); gl.uniform3fv(U("hi"), hex(cssv("--bf-pick")));
     gl.uniform3f(U("band"), sel ? (BAND[sel.reg] ? R[sel.reg] : 9) : 0, 0, sel ? 1 : 0);   // x: chosen trunk region (1–3; 9 = a limb region), z: something chosen
@@ -4271,7 +4271,12 @@ const BF = (() => {
   const ZONE = {shoulder: "upper", arm: "upper", clavicle: "upper", chest: "trunk", breast: "trunk", upabdo: "trunk", loabdo: "trunk", back: "trunk", hip: "lower", knee: "lower", foot: "lower", hand: "upper", thigh: "lower"};
   const ZV = {upper: s => ({T: [.28*s, 1.24, 0], D: 1.55}), trunk: () => ({T: [0, 1.16, 0], D: 1.55}), lower: s => ({T: [.12*s, .5, 0], D: 2.05})};
   function zoneTo(z, s){ st.zone = {z, s}; const g = ZV[z](s || 1), asp = st.cv && st.cv.clientHeight ? st.cv.clientWidth/st.cv.clientHeight : .75; g.D *= Math.max(1, .75/asp); st.goal = g; ease(); }   // tall narrow box (wide screens): step back so the hand / foot stays in view
-  function turn(){ if (st.mode === "nerve"){ st.vi = ((st.vi || 0) + 1) % 4; const V = (st.limb === "leg" ? [[0, 0], [Math.PI, 0], [Math.PI/2, 0], [-.2, -1.1]] : [[0, 0], [Math.PI, 0], [-.6, -1.05], [.5, 1.0]])[st.vi], base = Math.round(st.yaw/(2*Math.PI))*2*Math.PI; st.goal = {yaw: base + V[0], pitch: V[1]}; ease(); return; }   // nerve map: front, back, palm (from below), back of the hand (from above)
+  // nerve map zoom: whole body, or one arm / leg (s = side, +1 left, −1 right)
+  function nerveZoom(limb, s){ s = s || 1; st.nzone = limb ? {limb, s} : null; st.vi = 0; const base = Math.round(st.yaw/(2*Math.PI))*2*Math.PI;
+    const g = limb === "arm" ? {T: [.34*s, 1.15, .1], D: 1.45} : limb === "leg" ? {T: [.13*s, .52, .05], D: 2.35} : {T: [0, .9, 0], D: 3.35};
+    const asp = st.cv && st.cv.clientHeight ? st.cv.clientWidth/st.cv.clientHeight : .75; if (limb) g.D *= Math.max(1, .75/asp); g.yaw = base; g.pitch = 0; st.goal = g; ease(); }
+  function turn(){ if (st.mode === "nerve"){ const z = st.nzone && st.nzone.limb, VV = z === "leg" ? [[0, 0], [Math.PI, 0], [Math.PI/2, 0], [-.2, -1.1]] : z === "arm" ? [[0, 0], [Math.PI, 0], [-.6, -1.05], [.5, 1.0]] : [[0, 0], [Math.PI, 0], [Math.PI/2, 0]];
+    st.vi = ((st.vi || 0) + 1) % VV.length; const V = VV[st.vi], base = Math.round(st.yaw/(2*Math.PI))*2*Math.PI; st.goal = {yaw: base + V[0], pitch: V[1]}; ease(); return; }   // nerve map: front, back, palm (from below), back of the hand (from above)
     st.vi = ((st.vi || 0) + 1) % 3; view([0, Math.PI/2, Math.PI][st.vi]); }
   function view(yaw){ const base = Math.round(st.yaw/(2*Math.PI))*2*Math.PI; st.goal = {yaw: base + yaw, pitch: 0}; ease(); }
   // tap → ray through the mesh (nearest triangle hit)
@@ -4286,7 +4291,7 @@ const BF = (() => {
       const t = (e2x*qx + e2y*qy + e2z*qz)*inv; if (t > .01 && t < best){ best = t; hit = (u + v < .5 ? T[i] : u > v ? T[i+1] : T[i+2]); bt = i; bu = u; bv = v; } }
     if (hit < 0) return null;
     if (st.mode === "nerve"){ const g = nDec(m), A = g(T[bt]), B = g(T[bt+1]), C = g(T[bt+2]), w = [1 - bu - bv, bu, bv], x = k => A[k]*w[0] + B[k]*w[1] + C[k]*w[2];
-      const H = [o[0] + d[0]*best, o[1] + d[1]*best, o[2] + d[2]*best]; const fl = x(4); const nv = fl > .5 ? nerveAt(x(0)/fl, x(1)/fl, x(2)/fl, x(3)/fl, H) : 0; return {nerve: nv && (nv >= 10) === (st.limb === "leg") ? nv : 0}; }   // the other limb is plain skin
+      const H = [o[0] + d[0]*best, o[1] + d[1]*best, o[2] + d[2]*best]; const fl = x(4); const nv = fl > .5 ? nerveAt(x(0)/fl, x(1)/fl, x(2)/fl, x(3)/fl, H) : 0; return {nerve: nv, s: H[0] < 0 ? -1 : 1}; }
     if (st.mode === "derm"){ const L = m.dl[hit]; return L === 254 ? {derm: DERM_LEVELS[dLev(o[1] + d[1]*best)]} : L < 28 ? {derm: DERM_LEVELS[L]} : null; }
     const id = m.id[hit], reg = Math.floor(id/3);
     if (reg >= 1 && reg <= 3){ const y = o[1] + d[1]*best, k = Object.keys(BAND).find(b => y >= BAND[b][0] && y < BAND[b][1]); return {reg: R[k], s: 0}; }
@@ -4298,7 +4303,11 @@ const BF = (() => {
       if (down.moved){ st.yaw = down.yaw - dx*.012; if (down.tilt){ const lim = st.mode === "nerve" ? 1.2 : .35; st.pitch = Math.max(-lim, Math.min(lim, down.pitch + dy*.006)); } redraw(); } });
     const end = e => { if (!down) return; const tap = !down.moved; down = null; if (!tap) return;
       const r = cv.getBoundingClientRect(), q = pick(e.clientX - r.left, e.clientY - r.top);
-      if (st.mode === "nerve"){ const nv = q && q.nerve ? q.nerve : 0; S.nerve = nv === S.nerve ? 0 : nv; render(); return; }   // tap the chosen one again to clear
+      if (st.mode === "nerve"){ const nv = q && q.nerve ? q.nerve : 0;
+        if (!q){ if (S.nerve || st.nzone){ S.nerve = 0; nerveZoom(null); render(); } return; }   // off the body → whole body
+        if (!nv) return;
+        if (!st.nzone){ nerveZoom(nv >= 10 ? "leg" : "arm", q.s); render(); return; }   // first tap zooms onto that limb; second tap picks the nerve
+        S.nerve = nv === S.nerve ? 0 : nv; render(); return; }   // tap the chosen one again to clear
       if (st.mode === "derm"){ if (q && q.derm){ S.dermAnim = {prev: dermState().top}; S.derm = q.derm; render(); } return; }
       if (!q || !q.reg){ if (S.bf || st.zone){ S.bf = null; focus(null); render(); } return; }   // tap off the body (or head / neck) → back to full body
       const key = Object.keys(R).find(k => R[k] === q.reg);
@@ -4308,7 +4317,8 @@ const BF = (() => {
   function mount(){ const stage = document.getElementById("bfstage"); if (!stage) return;
     if (st.ok === null) store.set("bfBoot", true);   // crash guard on: cleared once the figure has drawn
     if (!init()){ store.set("bfBoot", false); st.nogl = true; render(); return; }
-    const mode = stage.dataset.mode || "finder", limb = stage.dataset.limb || ""; if (mode !== st.mode || limb !== (st.limb || "")){ st.mode = mode; st.limb = limb; st.vi = 0; st.selKey = null; cancelAnimationFrame(st.raf); st.goal = null; st.T = [0, .9, 0]; st.D = 3.35; st.pitch = 0; st.zone = null; if (mode === "nerve"){ if (limb === "leg"){ st.T = [.13, .52, .05]; st.D = 2.35; } else { st.T = [.34, 1.15, .1]; st.D = 1.45; } st.yaw = 0; } }
+    const mode = stage.dataset.mode || "finder"; if (mode !== st.mode){ st.mode = mode; st.nzone = null; st.vi = 0; st.selKey = null; cancelAnimationFrame(st.raf); st.goal = null; st.T = [0, .9, 0]; st.D = 3.35; st.pitch = 0; st.zone = null; if (mode === "nerve") st.yaw = 0; }
+    if (mode === "nerve" && S.nerveZoomReq){ const r = S.nerveZoomReq; S.nerveZoomReq = null; setTimeout(() => { nerveZoom(r.limb, r.s); render(); }, 0); }   // opened from "See the nerves of this arm / leg"
     if (st.cv.parentNode !== stage) stage.prepend(st.cv); if (!document.getElementById("bfpin")){ const p = document.createElement("div"); p.id = "bfpin"; p.className = "bfpin"; p.hidden = true; stage.appendChild(p); }
     redraw(); if (false){ st.pulsed = true; const t0 = performance.now(); const pl = () => { const k = (performance.now() - t0)/1400; st.pulse = k < 1 ? Math.sin(k*Math.PI) : 0; draw(); if (k < 1) requestAnimationFrame(pl); }; setTimeout(() => requestAnimationFrame(pl), 300); } }
   // the block spreads up from the feet (or recedes) over ≈1 s, like the 2D chart; display only
@@ -4317,7 +4327,7 @@ const BF = (() => {
     const t0 = performance.now(), dur = to < from ? 1000 : 600; cancelAnimationFrame(st.draf);
     const step = () => { const k = Math.min(1, (performance.now() - t0)/dur); st.dlo = from + (to - from)*k; draw(); if (k < 1) st.draf = requestAnimationFrame(step); else { st.dlo = undefined; redraw(); } }; step(); }
   const regColor = k => { const c = RPAL[k]; return c ? "rgb(" + c.map(x => Math.round(x*255)).join(",") + ")" : ""; };
-  return {mount, focus, zoneTo, view, turn, redraw, pick, cam, st, R, dermRise, regColor};
+  return {mount, focus, zoneTo, nerveZoom, view, turn, redraw, pick, cam, st, R, dermRise, regColor};
 })();
 
 /* PAEDS calculator card */
@@ -4530,15 +4540,15 @@ const NERVES = {
   9: {n: "Intercostobrachial nerve", r: "T2", c: "#a88c73", skin: "Upper inner arm and armpit", by: [], note: "<b>Never covered by a brachial plexus block.</b> Add a subcutaneous injection just below the armpit — matters for an upper-arm tourniquet."}};
 Object.assign(NERVES, {   // v2.116 lower limb
   10: {n: "Lateral femoral cutaneous nerve", r: "L2–L3", c: "#fa9e40", skin: "Outer (lateral) thigh down to the knee", by: ["Lateral femoral cutaneous (LFCN)", "Fascia iliaca (suprainguinal)"], note: "Its area varies a lot between people."},
-  11: {n: "Femoral nerve (anterior cutaneous branches)", r: "L2–L4", c: "#669ef2", skin: "Front and inner front of the thigh", by: ["Femoral", "Fascia iliaca (suprainguinal)"], note: ""},
-  12: {n: "Obturator nerve", r: "L2–L4", c: "#9e66cc", skin: "Inner (medial) thigh — small and variable", by: ["Obturator"], note: "Skin area is unreliable: check the block by adductor weakness."},
-  13: {n: "Saphenous nerve (femoral)", r: "L3–L4", c: "#33b88c", skin: "Inner leg from the knee to the arch of the foot, around the medial malleolus", by: ["Adductor canal", "Femoral", "Ankle block"], note: "Add it to a popliteal sciatic block for the inner leg and ankle."},
-  14: {n: "Posterior femoral cutaneous nerve", r: "S1–S3", c: "#bf9973", skin: "Back of the thigh from the buttock to mid-calf", by: [], note: "Leaves the sacral plexus in the buttock — a popliteal sciatic block does not reach it."},
-  15: {n: "Common peroneal nerve (superficial peroneal, lateral sural cutaneous)", r: "L4–S2", c: "#facc40", skin: "Outer and front of the leg; most of the top of the foot", by: ["Popliteal sciatic", "Ankle block"], note: ""},
-  16: {n: "Deep peroneal nerve", r: "L4–L5", c: "#d93340", skin: "First web space, between the big and second toe", by: ["Popliteal sciatic", "Ankle block"], note: "Also the ankle joint."},
-  17: {n: "Sural nerve", r: "S1–S2", c: "#4d4db3", skin: "Back and outer lower leg; outer border of the foot and little toe", by: ["Popliteal sciatic", "Ankle block"], note: ""},
-  18: {n: "Tibial nerve (calcaneal, plantar nerves)", r: "S1–S3", c: "#e673a6", skin: "Heel and sole", by: ["Popliteal sciatic", "Ankle block"], note: "Ankle block: behind the posterior tibial artery at the medial malleolus."},
-  19: {n: "Ilioinguinal / genitofemoral nerves", r: "L1–L2", c: "#8cbf4d", skin: "Upper inner thigh just below the groin", by: ["Ilioinguinal / iliohypogastric"], note: "The ilioinguinal part only."}});
+  11: {n: "Femoral nerve (anterior cutaneous branches)", r: "L2–L4", c: "#8f99fa", skin: "Front and inner front of the thigh", by: ["Femoral", "Fascia iliaca (suprainguinal)"], note: ""},
+  12: {n: "Obturator nerve", r: "L2–L4", c: "#8c408c", skin: "Inner (medial) thigh — small and variable", by: ["Obturator"], note: "Skin area is unreliable: check the block by adductor weakness."},
+  13: {n: "Saphenous nerve (femoral)", r: "L3–L4", c: "#1a804d", skin: "Inner leg from the knee to the arch of the foot, around the medial malleolus", by: ["Adductor canal", "Femoral", "Ankle block"], note: "Add it to a popliteal sciatic block for the inner leg and ankle."},
+  14: {n: "Posterior femoral cutaneous nerve", r: "S1–S3", c: "#8ca6b8", skin: "Back of the thigh from the buttock to mid-calf", by: [], note: "Leaves the sacral plexus in the buttock — a popliteal sciatic block does not reach it."},
+  15: {n: "Common peroneal nerve (superficial peroneal, lateral sural cutaneous)", r: "L4–S2", c: "#cc941f", skin: "Outer and front of the leg; most of the top of the foot", by: ["Popliteal sciatic", "Ankle block"], note: ""},
+  16: {n: "Deep peroneal nerve", r: "L4–L5", c: "#a62626", skin: "First web space, between the big and second toe", by: ["Popliteal sciatic", "Ankle block"], note: "Also the ankle joint."},
+  17: {n: "Sural nerve", r: "S1–S2", c: "#6147c7", skin: "Back and outer lower leg; outer border of the foot and little toe", by: ["Popliteal sciatic", "Ankle block"], note: ""},
+  18: {n: "Tibial nerve (calcaneal, plantar nerves)", r: "S1–S3", c: "#fab3cc", skin: "Heel and sole", by: ["Popliteal sciatic", "Ankle block"], note: "Ankle block: behind the posterior tibial artery at the medial malleolus."},
+  19: {n: "Ilioinguinal / genitofemoral nerves", r: "L1–L2", c: "#cce659", skin: "Upper inner thigh just below the groin", by: ["Ilioinguinal / iliohypogastric"], note: "The ilioinguinal part only."}});
 // NYSORA Functional regional anesthesia anatomy, Tables 5–6 (joints), as written; ids = nerves on the map
 const NJOINTS = [["arm", "Sternoclavicular", "Medial supraclavicular, nerve to subclavius", [1]], ["arm", "Acromioclavicular", "Axillary, lateral pectoral, lateral supraclavicular", [2, 1]],
   ["arm", "Shoulder (glenohumeral)", "Axillary, suprascapular, lateral pectoral", [2]], ["arm", "Elbow (humeroulnar, humeroradial)", "Radial, musculocutaneous, ulnar", [3, 4, 8]],
@@ -4549,18 +4559,18 @@ const NJOINTS = [["arm", "Sternoclavicular", "Medial supraclavicular, nerve to s
   ["leg", "Ankle (tibiotalar, talocalcaneal)", "Tibial, deep peroneal", [18, 16]], ["leg", "Metatarsophalangeal", "Tibial", [18]], ["leg", "Interphalangeal", "Tibial", [18]]];
 const NERVE_ORDER = [1, 2, 3, 4, 5, 9, 6, 7, 8], NERVE_LEG = [19, 10, 11, 12, 14, 13, 15, 17, 16, 18];
 function nerveView(){
-  if (!S.nerveLimb) S.nerveLimb = "arm"; const leg = S.nerveLimb === "leg", list = leg ? NERVE_LEG : NERVE_ORDER; if (S.nerve && !list.includes(S.nerve)) S.nerve = 0;
+  const zl = BF.st.nzone && BF.st.nzone.limb, leg = zl === "leg";
   const on3 = glAvail() && !BF.st.nogl && bf3d(), can = glAvail() && !BF.st.nogl, k = S.nerve || 0, nv = NERVES[k], jn = k ? NJOINTS.filter(r => r[3].includes(k)).map(r => r[1]) : [];
-  return `${NERVE_CHECKED ? "" : `<div class="warn" style="margin-top:0">DRAFT — nerve map (v2.115). Compare with your references before use.</div>`}${leg && !NERVE_CHECKED2 ? `<div class="warn" style="margin-top:0">DRAFT — leg nerve map (v2.116). Compare with your references before use.</div>` : ""}
-  ${seg("nerveLimb", [["arm", "Arm"], ["leg", "Leg"]])}
-  <div class="dsel">${nv ? `<b>${nv.n}</b> (${nv.r}) — ${nv.skin}` : `Tap the ${leg ? "leg" : "arm"} or a nerve below to see which blocks cover it.`}</div>
+  return `${NERVE_CHECKED ? "" : `<div class="warn" style="margin-top:0">DRAFT — nerve map (v2.115). Compare with your references before use.</div>`}${!NERVE_CHECKED2 ? `<div class="warn" style="margin-top:0">DRAFT — leg nerve map (v2.116). Compare with your references before use.</div>` : ""}
+  <div class="dsel">${nv ? `<b>${nv.n}</b> (${nv.r}) — ${nv.skin}` : zl ? `Tap the skin, or a nerve below, to see which blocks cover it.` : "Tap an arm or a leg to zoom in, or pick a nerve below."}</div>
   <div class="bffig"><div class="bfin"><div class="bfleft">
-  ${on3 ? `<div class="bfstage" id="bfstage" data-mode="nerve" data-limb="${S.nerveLimb}"><div class="bfhint${BF.st.touched ? " gone" : ""}" id="bfhint">Drag to turn · tap the skin</div>
-      <button class="bfturn" data-bfturn="1" aria-label="${leg ? "Turn the leg: front, back, side, sole" : "Turn the arm: front, back, palm, back of hand"}" title="Turn"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12a8 8 0 1 1-2.3-5.6"/><path d="M20 4v5h-5"/></svg></button></div>
+  ${on3 ? `<div class="bfstage" id="bfstage" data-mode="nerve"><div class="bfhint${BF.st.touched ? " gone" : ""}" id="bfhint">Drag to turn · tap a limb to zoom in</div>
+      <button class="bfwhole" data-bfwhole="1"${zl || S.nerve ? "" : " hidden"}><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>Whole body</button>
+      <button class="bfturn" data-bfturn="1" aria-label="${leg ? "Turn: front, back, side, sole" : zl ? "Turn: front, back, palm, back of hand" : "Turn: front, back, side"}" title="Turn"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12a8 8 0 1 1-2.3-5.6"/><path d="M20 4v5h-5"/></svg></button></div>
       <div class="bfrow"><span class="sub">3D body · typical territories, schematic</span><button class="bflink bfmute" data-bf3d="off">Hide 3D</button></div>`
     : `<p class="sub">The map needs the 3D body.${can ? ` <button class="linkbtn" data-bf3d="on">Show 3D body ›</button>` : ""}</p>`}
   </div><div class="bfright">
-  <div class="nchips">${list.map(i => `<button data-nerve="${i}" aria-pressed="${k === i}"><span class="bfdot" style="background:${NERVES[i].c}"></span>${NERVES[i].n.replace(/ \(.*\)$/, "")}</button>`).join("")}</div>
+  ${[["Arm", NERVE_ORDER], ["Leg", NERVE_LEG]].map(([h, ids]) => `<h3 class="nhd">${h}</h3><div class="nchips">${ids.map(i => `<button data-nerve="${i}" aria-pressed="${k === i}"><span class="bfdot" style="background:${NERVES[i].c}"></span>${NERVES[i].n.replace(/ \(.*\)$/, "")}</button>`).join("")}</div>`).join("")}
   ${nv ? `<div class="npanel"><h3 style="margin-top:0">${nv.n} <span class="sub">${nv.r}</span></h3><p class="sub" style="margin:0 0 var(--s2)">${nv.skin}</p>
     <p style="margin:0 0 var(--s1)"><b>Covered by</b>${nv.by.length ? "" : ": no brachial plexus block"}</p>${nv.by.map(t => raLink(t)).join("")}${nv.note ? `<p class="sub" style="margin:var(--s2) 0 0">${nv.note}</p>` : ""}${jn.length ? `<p class="sub" style="margin:var(--s2) 0 0"><b>Joints:</b> ${jn.join(" · ")}</p>` : ""}</div>` : ""}
   <button class="rellink" data-seg="bfView" data-val="op">Blocks for an operation site ›</button>
@@ -5047,6 +5057,7 @@ function vTicks(){
 }
 /* ---------- ABOUT ---------- */
 const CHANGES = [
+  ["2.121","Block finder › Nerves: one whole-body view (no Arm / Leg switch) — tap a limb to zoom in, then a nerve; Whole body button; nerve list under Arm and Leg headings; lighter start; leg colours no longer clash with the arm (checked)"],
   ["2.120","About reorganised: story, four features, What's inside in three groups (incl. LA calculator, nerve map, timer), Install, Share, a separate Use with care card, then Details; live facts line; version line at the foot (checked)"],
   ["2.119","Block finder: calmer colours — nerves start pale, the chosen one in full colour with an outline, the rest almost skin; only the limb in view is coloured; tap again to clear; Operation regions fade further once one is chosen (checked)"],
   ["2.118","Nerve map: groin patch (ilioinguinal / genitofemoral) now has a clean edge along the inguinal ligament (checked)"],
@@ -6104,9 +6115,9 @@ document.addEventListener("click", e => {
   if (d.leclear){ delete S.sc.le; delete S.sc.pl; delete S.sc.dx; S.csDec = ""; S.leNote = ""; S.leLen = "brief"; render(); return; }
   if (d.csclear){ delete S.sc.cs; delete S.sc.csc; delete S.sc.pl; delete S.sc.dx; S.csDec = ""; S.csNote = ""; S.csWho = "patient"; S.csLang = "English"; S.csOut = "full"; S.csLen = "brief"; render(); return; }
   if (d.screset){ S.sc[d.screset] = {}; render(); return; }
-  if (d.bfwhole){ S.bf = null; BF.focus(null); render(); return; }
-  if (d.bfnerve){ S.bfView = "nerve"; S.nerveLimb = d.bfnerve; S.nerve = 0; render(); return; }
-  if (d.nerve){ const k = +d.nerve; S.nerve = S.nerve === k ? 0 : k; render(); return; }
+  if (d.bfwhole){ if (S.bfView === "nerve"){ S.nerve = 0; BF.nerveZoom(null); render(); return; } S.bf = null; BF.focus(null); render(); return; }
+  if (d.bfnerve){ S.bfView = "nerve"; S.nerve = 0; S.nerveZoomReq = {limb: d.bfnerve, s: S.bf && S.bf.side === "Right" ? -1 : 1}; render(); return; }
+  if (d.nerve){ const k = +d.nerve; S.nerve = S.nerve === k ? 0 : k; if (S.nerve && BF.st.ok && S.bfView === "nerve"){ const lb = k >= 10 ? "leg" : "arm", z = BF.st.nzone; if (!z || z.limb !== lb) BF.nerveZoom(lb, z ? z.s : 1); } render(); return; }   // a nerve button also zooms onto its limb
   if (d.bfreg){ S.bf = S.bf && S.bf.reg === d.bfreg && !S.bf.side ? null : {reg: d.bfreg, side: ""}; BF.focus(S.bf); render(); return; }
   if (d.bfturn){ BF.turn(); return; }
   if (d.bflist){ S.bfList = !S.bfList; render(); return; }
