@@ -365,10 +365,11 @@ tr.over td{background:var(--danger-bg)}
 @keyframes sweep{from{transform:translateX(0)}to{transform:translateX(-100px)}}
 @media (prefers-reduced-motion: reduce){.capno .trace{animation:none}}
 .hero-top{position:relative;display:flex;align-items:center;justify-content:space-between;gap:var(--s2)}
-.brand{display:flex;align-items:center;gap:6px;font-size:var(--fs-xs);font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--mon-muted)}
+.brand{display:flex;align-items:center;gap:6px;font-size:var(--fs-xs);font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--mon-muted)}.brand{white-space:nowrap;min-width:0}.brand svg{flex:0 0 auto}
 .brand svg{width:18px;height:18px;color:var(--etco2)}
-.hero-r{display:flex;align-items:center;gap:var(--s2);position:relative}
-.tmrbtn{display:grid;justify-items:end;gap:0;background:none;border:0;padding:2px 4px;cursor:pointer;color:var(--etco2);min-height:36px}.tmrbtn small{font:600 9px var(--font-sans);letter-spacing:.08em;white-space:nowrap;color:var(--mon-muted)}.tmrbtn .clock{font-size:15px;display:inline-block;width:4.8em;overflow:hidden;white-space:nowrap;text-align:right;font-variant-numeric:tabular-nums}.tmrbtn{width:5.6em;flex:0 0 auto}.tmrbtn.alert .clock{color:var(--danger-ink,#ff9b93)}
+.hero-r{display:flex;align-items:center;gap:var(--s2);position:relative}.tvdoc{font-size:11px;color:var(--mon-muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.tmrbtn{display:grid;justify-items:end;gap:0;background:none;border:0;padding:2px 4px;cursor:pointer;color:var(--etco2);min-height:36px}.tmrbtn small{font:600 10px var(--font-sans);letter-spacing:.08em;white-space:nowrap;color:var(--mon-muted)}.hero-mid{position:relative;display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:start;gap:var(--s2)}.hgreet{min-width:0}.nobr{white-space:nowrap}.hgreet .hello{overflow-wrap:anywhere}.hero-mid .tmrbtn{margin-top:var(--s3);min-height:44px}
+.tmrbtn .clock{font-size:22px;display:inline-block;width:4.8em;overflow:hidden;white-space:nowrap;text-align:right;font-variant-numeric:tabular-nums}.tmrbtn{flex:0 0 auto}.tmrbtn.alert .clock{color:var(--danger-ink,#ff9b93)}
 
 .tmrpill{display:flex;align-items:center;gap:10px;width:100%;min-height:40px;margin:var(--s3) 0;padding:6px 14px;border-radius:var(--r);border:1px solid #1f2c2e;background:var(--mon-bg);color:var(--mon-ink);font:500 13px var(--font-sans);cursor:pointer;text-align:left}
 .tpi{white-space:nowrap;flex:1;min-width:0;display:flex;align-items:center;gap:8px;font-size:14px}.tdot{width:8px;height:8px;border-radius:50%;background:#6b7a7c;flex:0 0 auto}.tdot.on{background:#4ade80;box-shadow:0 0 6px #4ade80}.tpt{margin-left:auto;display:inline-block;width:5em;text-align:right;white-space:nowrap;font-size:17px;font-variant-numeric:tabular-nums}.tpi b.due{width:auto}.tval.due{width:auto}.tmrpill svg{width:16px;height:16px;color:var(--etco2)}.tmrpill b{font-family:'DSEG7',var(--font-mono);font-weight:400;color:var(--etco2)}.tmrpill.alert{border-color:var(--danger-ink)}
@@ -378,9 +379,9 @@ tr.over td{background:var(--danger-bg)}
 .tbtns{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:6px}.tb{min-height:40px;padding:0 12px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--ink);font:600 14px var(--font-sans);cursor:pointer}.tb.pri{background:var(--accent);border-color:var(--accent);color:var(--on,#fff)}.tb.warn{border-color:var(--danger-ink);color:var(--danger-ink)}
 .trem{grid-column:1/-1;font-size:14px;color:var(--muted)}.trem select,.twake select{font:inherit;min-height:36px;border-radius:8px;border:1px solid var(--line);background:var(--card);color:var(--ink)}
 .twake{display:flex;align-items:center;gap:8px;font-size:14px;min-height:40px}.twake input{width:20px;height:20px}
-.cbub{position:absolute;top:calc(100% + 10px);right:-6px;z-index:3;white-space:nowrap;padding:6px 10px;border-radius:10px;border:1px solid rgba(250,204,21,.45);background:rgba(10,18,20,.88);color:var(--etco2);font:600 13px var(--font-sans);cursor:pointer;animation:cbubIn .5s ease both}
-.cbub::before{content:"";position:absolute;top:-6px;right:70px;width:10px;height:10px;background:inherit;border-left:1px solid rgba(250,204,21,.45);border-top:1px solid rgba(250,204,21,.45);transform:rotate(45deg)}
-@keyframes cbubIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}@media (prefers-reduced-motion: reduce){.cbub{animation:none}}
+.cbub{position:absolute;top:50%;right:calc(100% + 10px);transform:translateY(-50%);z-index:3;white-space:nowrap;padding:6px 10px;border-radius:10px;border:1px solid rgba(250,204,21,.45);background:rgba(10,18,20,.88);color:var(--etco2);font:600 13px var(--font-sans);cursor:pointer;animation:cbubIn .5s ease both}
+.cbub::before{content:"";position:absolute;top:50%;right:-6px;width:10px;height:10px;margin-top:-5px;background:inherit;border-right:1px solid rgba(250,204,21,.45);border-top:1px solid rgba(250,204,21,.45);transform:rotate(45deg)}
+@keyframes cbubIn{from{opacity:0;transform:translate(-4px,-50%)}to{opacity:1;transform:translateY(-50%)}}@media (prefers-reduced-motion: reduce){.cbub{animation:none}}
 .clock{font-family:'DSEG7',var(--font-mono);letter-spacing:.02em;font-size:var(--fs-sm);color:var(--etco2);font-weight:600}
 .herobtn{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.14);color:var(--mon-ink);height:36px;min-width:36px;width:36px;padding:0;display:inline-grid;place-items:center;line-height:1}.herobtn svg{display:block}
 .hello{position:relative;font-size:var(--fs-xl);font-weight:600;line-height:1.2;margin:var(--s3) 0 2px}
@@ -793,7 +794,7 @@ if (window.top !== window.self && /\.github\.io$/.test(location.hostname)) {
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.109.1";
+const APP_VERSION = "2.110.1";
 const APP_DATE = "24 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
@@ -904,7 +905,7 @@ function tmrState(){ let t = store.get("timers", null); if (!t || typeof t !== "
   TMR_KEYS.forEach(([k]) => { t[k] = t[k] || {}; }); return t; }
 const tmrSave = t => { t.saved = Date.now(); store.set("timers", t); };
 const tmrEl = x => (x.acc || 0) + (x.run ? Date.now() - x.start : 0);
-const tmrOn = x => !!(x.run || x.acc);
+const tmrOn = x => !!(x && (x.run || x.acc));
 const tmrShow = k => (store.get("timerShow", {})[k]) !== false;
 const abxTotal = () => (+store.get("abxMin", 240) || 240) * 60000;
 function fmtE(ms, long){ const s = Math.max(0, Math.floor(ms/1000)), h = Math.floor(s/3600), m = Math.floor(s%3600/60), sec = s%60, p = n => String(n).padStart(2, "0");
@@ -913,7 +914,7 @@ function tmrText(k, t){ const x = t[k];
   if (k === "abx"){ if (!tmrOn(x)) return fmtE(abxTotal(), true); const left = abxTotal() - tmrEl(x); return left > 0 ? fmtE(left, true) : "DUE"; }
   return fmtE(tmrEl(x), k === "an"); }
 function tmrAlert(k, t){ const x = t[k]; if (k === "nm") return !!(tmrOn(x) && x.remind && tmrEl(x) >= x.remind*60000); if (k === "abx") return tmrOn(x) && abxTotal() - tmrEl(x) <= 0; return false; }
-function tmrMain(t){ const k = ["an","nm","abx"].find(k => tmrShow(k) && tmrOn(t[k])); return k ? {k, lab: k === "an" ? "ANAESTHESIA" : k === "nm" ? "RELAX" : "ABX", txt: tmrText(k, t)} : {k: null, lab: "TIMER", txt: "00:00"}; }
+function tmrMain(t){ const k = TMR_KEYS.map(x => x[0]).find(k => tmrShow(k) && t[k] && tmrOn(t[k])); return k ? {k, lab: k === "an" ? "ANAESTHESIA" : k === "nm" ? "RELAX" : "ABX", txt: tmrText(k, t)} : {k: null, lab: "TIMER", txt: "00:00"}; }
 function tmrPillTxt(t){ return TMR_KEYS.filter(([k]) => tmrShow(k) && tmrOn(t[k])).map(([k, l]) => `<span class="tpi"><span class="tdot ${t[k].run ? "on" : ""}"></span>${l} timer${t[k].run ? "" : " · Paused"}</span><b class="tpt" data-tt="${k}">${tmrText(k, t)}</b>`).join(""); }
 function tmrPanel(){ if (!S.tmrOpen) return ""; const t = tmrState();
   const btn = (k, act, lab, cls = "") => `<button class="tb ${cls}" data-tmr="${act}:${k}">${lab}</button>`;
@@ -1175,9 +1176,9 @@ screens.home = () => {
   return `<section class="hero"><div class="hero-in">
     <svg class="capno" viewBox="0 0 400 48" preserveAspectRatio="none" aria-hidden="true"><g class="trace"><path d="${CAPNO}"/></g></svg>
     <div class="hero-top"><span class="brand">${svg("capno")} Induction Card</span>
-      <span class="hero-r">${(() => { const m = tmrMain(tmrState()); return `<button class="tmrbtn" data-tmr="toggle" aria-label="Timers" aria-expanded="${!!S.tmrOpen}"><small id="tmrl">${m.lab}</small><span id="tmrv" class="clock">${m.txt}</span></button>`; })()}<button class="iconbtn herobtn gearbtn" data-go="settings" aria-label="Customise">${svg("sliders")}</button>${custBubble()}<button class="iconbtn themebtn herobtn" data-theme-toggle aria-label="Theme: ${th}">${thLabel}</button></span></div>
-    <h1 class="hello">${greet()},<br>${esc(doctorName())} <button class="namebtn" data-go="settings" aria-label="Change display name">✎</button></h1>
-    <div class="date">${dateTxt()}</div></div>
+      <span class="hero-r"><button class="iconbtn herobtn gearbtn" data-go="settings" aria-label="Customise">${svg("sliders")}</button>${custBubble()}<button class="iconbtn themebtn herobtn" data-theme-toggle aria-label="Theme: ${th}">${thLabel}</button></span></div>
+    <div class="hero-mid"><div class="hgreet"><h1 class="hello">${greet()},<br>${(() => { const w = esc(doctorName()).split(" "), last = w.pop(); return `${w.join(" ")}${w.length ? " " : ""}<span class="nobr">${last}&nbsp;<button class="namebtn" data-go="settings" aria-label="Change display name">✎</button></span>`; })()}</h1>${!customName() && tvDoc()[1] ? `<div class="tvdoc"><i>${esc(tvDoc()[1])}</i></div>` : ""}
+    <div class="date">${dateTxt()}</div></div>${(() => { const m = tmrMain(tmrState()); return `<button class="tmrbtn" data-tmr="toggle" aria-label="Anaesthesia timer" aria-expanded="${!!S.tmrOpen}"><small id="tmrl">${m.lab}</small><span id="tmrv" class="clock">${m.txt}</span></button>`; })()}</div></div>
     ${ticker()}
   </section>${tmrPanel()}
   <div class="searchbox">${svg("search")}<input id="q" class="search" type="search" placeholder="Search caudal, remi, LSCS…" autocomplete="off" aria-label="Search cards"></div><div id="results"></div>
@@ -4226,7 +4227,14 @@ pCards.abx = () => `<div class="card"><h2>Paeds antibiotic prophylaxis</h2>${abx
 
 /* ---------- DISPLAY NAME (phone only) ---------- */
 const cleanName = v => String(v||"").replace(/[<>&"'`]/g,"").trim().slice(0,24);
-const doctorName = () => cleanName(store.get("doctor", "Dr X")) || "Dr X";
+// Default greeting (v2.110): until you set your own name, a TV anaesthetist each day (same all day; order reshuffled weekly). Names only.
+const TV_DOCS = [["Dr Arase Monji","Iryu: Team Medical Dragon"],["Dr Jōnouchi Hiromi","Doctor-X"],["Dr Fuyuki Jirō","TOKYO MER"],["Dr Cha Yo-han","Doctor John"],["Dr Kang Shi-young","Doctor John"],["Dr Nam Do-il","Dr. Romantic"],["Dr Ben Warren","Grey’s Anatomy"],["Dr X",""]];
+const customName = () => { const v = cleanName(store.get("doctor", "")); return v && v !== "Dr X" ? v : ""; };
+function tvDoc(){ const d = new Date(), day = Math.floor((d - d.getTimezoneOffset()*6e4) / 864e5), n = TV_DOCS.length, wk = Math.floor(day / n);   // one shuffle per cycle: each name once every n days
+  const a = TV_DOCS.slice(); let x = (wk * 9301 + 31) % 233280;   // one shuffle per cycle
+  for (let i = a.length - 1; i > 0; i--){ x = (x * 9301 + 49297) % 233280; const j = Math.floor(x / 233280 * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; }
+  return a[((day % n) + n) % n]; }
+const doctorName = () => customName() || tvDoc()[0];
 const LCDS = [["section","By section",""],["amber","Amber","#fbbf24"],["green","Green","#4ade80"],["cyan","Cyan","#22d3ee"],["white","White","#f1f5f4"],["red","Red-orange","#ff7a59"]];
 const lcdNow = () => { const v = store.get("lcd","section"); return LCDS.some(x=>x[0]===v) ? v : "section"; };
 function applyLcd(){ const v = lcdNow(); if (v==="section") document.documentElement.removeAttribute("data-lcd"); else document.documentElement.setAttribute("data-lcd", v); }
@@ -4241,11 +4249,11 @@ screens.settings = () => { store.set("hintCust", true); const th = store.get("th
   <div class="card"><h2>Display colour</h2><p class="cnow">Now: <b>${(LCDS.find(x=>x[0]===lcdNow())||[0,lcdNow()])[1]}</b></p><p class="sub">Colour of the glowing numbers on the quick tiles, the header clock and the trace. Saved on this phone only.</p>
   <div class="lcdpick">${LCDS.map(([k,l,c]) => `<button class="lcdsw ${lcdNow()===k?"on":""}" data-lcdpick="${k}" aria-pressed="${lcdNow()===k}"><span class="sw" style="${c?`background:${c}`:"background:conic-gradient(#f472b6,#fbbf24,#4ade80,#22d3ee,#f472b6)"}"></span>${l}</button>`).join("")}</div>
   <div class="lcddemo"><span class="clock">12:34</span><span class="qans">6.5–7.0</span></div></div>
-  <div class="card"><h2>Display name</h2><p class="cnow">Now: <b>${esc(doctorName())}</b></p>
+  <div class="card"><h2>Display name</h2><p class="cnow">Now: <b>${customName() ? esc(customName()) : `rotating TV anaesthetists (today: ${esc(tvDoc()[0])})`}</b></p>
   <label class="sub" for="dname">Name shown in the greeting (max 24 characters)</label>
-  <input id="dname" class="search" style="padding-left:12px" maxlength="24" autocomplete="off" value="${esc(S.dname ?? doctorName())}">
+  <input id="dname" class="search" style="padding-left:12px" maxlength="24" autocomplete="off" value="${esc(S.dname ?? customName())}" placeholder="Your name, e.g. Dr Tan">
   <p class="sub">Saved on this phone only.</p>
-  <button class="homebtn primary" data-savename="1">Save name</button></div>
+  <button class="homebtn primary" data-savename="1">Save name</button>${customName() ? ` <button class="homebtn" data-namerot="1">Back to rotating names</button>` : `<p class="sub">Leave empty to keep a different TV anaesthetist each day.</p>`}</div>
   <div class="card"><h2>Tips and tricks</h2><p class="cnow">Now: <b>${showQuotes() ? "tips and quotes" : "tips only"}</b></p><p class="sub">The moving line on the home screen. Press and hold to pause; tap a tip to open its card.</p>
   ${seg("quotesSet",[["on","Show quotes"],["off","Tips only"]])}</div>
   <div class="card"><h2>3D figures</h2><p class="cnow">Now: <b>${!can3 ? "not available on this device" : bf3d() ? "on" : "off"}</b></p><p class="sub">The 3D body in the Block finder and the Dermatomes card. Off shows the region list and the 2D chart.</p>
@@ -4783,12 +4791,12 @@ function vTicks(){
 }
 /* ---------- ABOUT ---------- */
 const CHANGES = [
+  ["2.110","Default greeting: a TV anaesthetist each day, full names (Arase Monji, Jōnouchi Hiromi, Fuyuki Jirō, Cha Yo-han, Kang Shi-young, Nam Do-il, Ben Warren, Dr X) until you set your own name; anaesthesia timer moved beside the greeting, larger (checked)"],
   ["2.109","Timer bar: \u201cAnaesthesia timer\u201d spelled out, time on the right, green dot while running / Paused, proper spacing (checked)"],
   ["2.108","Anaesthesia timer instead of the clock: tap to start at induction; shows on every screen while running; optional keep-screen-on (checked)"],
   ["2.107","Customise button now a sliders icon; the tip card is replaced by a small bubble under the button (shown on up to 3 days); plain theme symbols on iPhone (checked)"],
   ["2.106","Customise on the home screen (tiles, style, light/dark, colour, name, tips, 3D, reset all); FAQ in About, also found by search (checked)"],
-  ["2.105","About redesigned: monitor-style banner, why this exists, three selling-point tiles, install for iPhone and Android (with Install app button where offered), colour grid of features, details folded (checked)"],
-  ["2.104","About updated: selling points first, What\u2019s inside (links), Getting started, 3D note, privacy list, full change history, MakeHuman credit"]];
+  ["2.105","About redesigned: monitor-style banner, why this exists, three selling-point tiles, install for iPhone and Android (with Install app button where offered), colour grid of features, details folded (checked)"]];
 
 
 
@@ -5842,7 +5850,8 @@ document.addEventListener("click", e => {
     const target = "#g-"+gid; if (location.hash===target) render(); else { location.hash = target; } if (d.calc) window.scrollTo(0,0); return; }
   if (d.lscs){ S.spOp="lscs"; S.open=null; location.hash="#g-spinal"; window.scrollTo(0,0); return; }
   if (d.go){ S.ret = null; S.ptEditing = false; S.srch = false; S.autoShut = false; S.open = null; S.openSet = new Set(); S.txck = {}; if ((location.hash||"#home")==="#"+d.go){ render(); window.scrollTo(0,0); } else { S.navTop = true; location.hash = "#"+d.go; } return; }
-  if (d.savename){ const v = cleanName(S.dname ?? doctorName()); store.set("doctor", v || "Dr X"); S.dname = undefined; location.hash = "#home"; return; }
+  if (d.savename){ const v = cleanName(S.dname ?? customName()); if (v) store.set("doctor", v); else { try { localStorage.removeItem("ic.doctor"); } catch (e) {} } S.dname = undefined; location.hash = "#home"; return; }
+  if (d.namerot){ try { localStorage.removeItem("ic.doctor"); } catch (e) {} S.dname = undefined; render(); return; }
   if (d.case){ const c = getCases().find(x=>x.id===d.case); if (c){ switchClin(store.get("active",null), c.id); store.set("active", c.id); applyCase(c); } if ((location.hash||"#home")==="#cases") render(); else render(); return; }
   if (d.delcase){ const cs = getCases().filter(x=>x.id!==d.delcase); store.set("cases", cs); if (store.get("active",null)===d.delcase){ CASE_CLIN[d.delcase] = null; switchClin(d.delcase, null); store.set("active", null); } delete CASE_CLIN[d.delcase]; render(); return; }
   if (d.savecase){ const cs = getCases(); if (cs.length >= CASE_MAX) return;
