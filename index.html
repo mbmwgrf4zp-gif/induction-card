@@ -368,10 +368,10 @@ tr.over td{background:var(--danger-bg)}
 .brand{display:flex;align-items:center;gap:6px;font-size:var(--fs-xs);font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--mon-muted)}
 .brand svg{width:18px;height:18px;color:var(--etco2)}
 .hero-r{display:flex;align-items:center;gap:var(--s2);position:relative}
-.tmrbtn{display:grid;justify-items:end;gap:0;background:none;border:0;padding:2px 4px;cursor:pointer;color:var(--etco2);min-height:36px}.tmrbtn small{font:600 9px var(--font-sans);letter-spacing:.12em;color:var(--mon-muted)}.tmrbtn .clock{font-size:15px;display:inline-block;width:4.8em;overflow:hidden;white-space:nowrap;text-align:right;font-variant-numeric:tabular-nums}.tmrbtn{width:5.6em;flex:0 0 auto}.tmrbtn.alert .clock{color:var(--danger-ink,#ff9b93)}
+.tmrbtn{display:grid;justify-items:end;gap:0;background:none;border:0;padding:2px 4px;cursor:pointer;color:var(--etco2);min-height:36px}.tmrbtn small{font:600 9px var(--font-sans);letter-spacing:.08em;white-space:nowrap;color:var(--mon-muted)}.tmrbtn .clock{font-size:15px;display:inline-block;width:4.8em;overflow:hidden;white-space:nowrap;text-align:right;font-variant-numeric:tabular-nums}.tmrbtn{width:5.6em;flex:0 0 auto}.tmrbtn.alert .clock{color:var(--danger-ink,#ff9b93)}
 
-.tmrpill{display:flex;flex-wrap:wrap;align-items:center;gap:4px 14px;width:100%;margin:var(--s2) 0 0;padding:8px 12px;border-radius:12px;border:1px solid #1f2c2e;background:var(--mon-bg);color:var(--mon-ink);font:500 13px var(--font-sans);cursor:pointer;text-align:left}
-.tpi{white-space:nowrap}.tpi b{display:inline-block;width:4.8em;white-space:nowrap;font-variant-numeric:tabular-nums}.tpi b.due{width:auto}.tval.due{width:auto}.tmrpill svg{width:16px;height:16px;color:var(--etco2)}.tmrpill b{font-family:'DSEG7',var(--font-mono);font-weight:400;color:var(--etco2)}.tmrpill.alert{border-color:var(--danger-ink)}
+.tmrpill{display:flex;align-items:center;gap:10px;width:100%;min-height:40px;margin:var(--s3) 0;padding:6px 14px;border-radius:var(--r);border:1px solid #1f2c2e;background:var(--mon-bg);color:var(--mon-ink);font:500 13px var(--font-sans);cursor:pointer;text-align:left}
+.tpi{white-space:nowrap;flex:1;min-width:0;display:flex;align-items:center;gap:8px;font-size:14px}.tdot{width:8px;height:8px;border-radius:50%;background:#6b7a7c;flex:0 0 auto}.tdot.on{background:#4ade80;box-shadow:0 0 6px #4ade80}.tpt{margin-left:auto;display:inline-block;width:5em;text-align:right;white-space:nowrap;font-size:17px;font-variant-numeric:tabular-nums}.tpi b.due{width:auto}.tval.due{width:auto}.tmrpill svg{width:16px;height:16px;color:var(--etco2)}.tmrpill b{font-family:'DSEG7',var(--font-mono);font-weight:400;color:var(--etco2)}.tmrpill.alert{border-color:var(--danger-ink)}
 .tmrpanel{margin:var(--s2) 0;padding:12px;border-radius:var(--r);background:var(--card);border:1px solid var(--line);display:grid;gap:10px}
 .trow{display:grid;grid-template-columns:1fr auto;gap:6px 10px;align-items:center;padding-bottom:10px;border-bottom:1px solid var(--line)}.trow.alert{background:var(--danger-bg);border-radius:10px;padding:8px;border-color:transparent}
 .tlab b{display:block;font-size:16px}.tlab small{color:var(--muted);font-size:13px}.tval{font-family:'DSEG7',var(--font-mono);font-size:24px;color:var(--accent);width:4.8em;overflow:hidden;white-space:nowrap;text-align:right;font-variant-numeric:tabular-nums}.trow.alert .tval{color:var(--danger-ink)}.tval.due,.tmrpill b.due{font-family:var(--font-sans);font-weight:700;font-size:16px}.tmrpill b.due{font-size:13px;color:#ff9b93}
@@ -793,7 +793,7 @@ if (window.top !== window.self && /\.github\.io$/.test(location.hostname)) {
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.108.1";
+const APP_VERSION = "2.109.1";
 const APP_DATE = "24 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
@@ -913,8 +913,8 @@ function tmrText(k, t){ const x = t[k];
   if (k === "abx"){ if (!tmrOn(x)) return fmtE(abxTotal(), true); const left = abxTotal() - tmrEl(x); return left > 0 ? fmtE(left, true) : "DUE"; }
   return fmtE(tmrEl(x), k === "an"); }
 function tmrAlert(k, t){ const x = t[k]; if (k === "nm") return !!(tmrOn(x) && x.remind && tmrEl(x) >= x.remind*60000); if (k === "abx") return tmrOn(x) && abxTotal() - tmrEl(x) <= 0; return false; }
-function tmrMain(t){ const k = ["an","nm","abx"].find(k => tmrShow(k) && tmrOn(t[k])); return k ? {k, lab: k === "an" ? "ANAES" : k === "nm" ? "RELAX" : "ABX", txt: tmrText(k, t)} : {k: null, lab: "TIMER", txt: "00:00"}; }
-function tmrPillTxt(t){ return TMR_KEYS.filter(([k]) => tmrShow(k) && tmrOn(t[k])).map(([k, l]) => `<span class="tpi">${({an:"Anaes", nm:"Relax", abx:"Abx"})[k]} <b class="${tmrText(k, t) === "DUE" ? "due" : ""}" data-tt="${k}">${tmrText(k, t) === "DUE" ? "redose due" : tmrText(k, t)}</b></span>`).join(""); }
+function tmrMain(t){ const k = ["an","nm","abx"].find(k => tmrShow(k) && tmrOn(t[k])); return k ? {k, lab: k === "an" ? "ANAESTHESIA" : k === "nm" ? "RELAX" : "ABX", txt: tmrText(k, t)} : {k: null, lab: "TIMER", txt: "00:00"}; }
+function tmrPillTxt(t){ return TMR_KEYS.filter(([k]) => tmrShow(k) && tmrOn(t[k])).map(([k, l]) => `<span class="tpi"><span class="tdot ${t[k].run ? "on" : ""}"></span>${l} timer${t[k].run ? "" : " · Paused"}</span><b class="tpt" data-tt="${k}">${tmrText(k, t)}</b>`).join(""); }
 function tmrPanel(){ if (!S.tmrOpen) return ""; const t = tmrState();
   const btn = (k, act, lab, cls = "") => `<button class="tb ${cls}" data-tmr="${act}:${k}">${lab}</button>`;
   const row = ([k, lab]) => { if (!tmrShow(k)) return ""; const x = t[k], on = tmrOn(x), arm = S.tmrArm === k;
@@ -4783,12 +4783,12 @@ function vTicks(){
 }
 /* ---------- ABOUT ---------- */
 const CHANGES = [
+  ["2.109","Timer bar: \u201cAnaesthesia timer\u201d spelled out, time on the right, green dot while running / Paused, proper spacing (checked)"],
   ["2.108","Anaesthesia timer instead of the clock: tap to start at induction; shows on every screen while running; optional keep-screen-on (checked)"],
   ["2.107","Customise button now a sliders icon; the tip card is replaced by a small bubble under the button (shown on up to 3 days); plain theme symbols on iPhone (checked)"],
   ["2.106","Customise on the home screen (tiles, style, light/dark, colour, name, tips, 3D, reset all); FAQ in About, also found by search (checked)"],
   ["2.105","About redesigned: monitor-style banner, why this exists, three selling-point tiles, install for iPhone and Android (with Install app button where offered), colour grid of features, details folded (checked)"],
-  ["2.104","About updated: selling points first, What\u2019s inside (links), Getting started, 3D note, privacy list, full change history, MakeHuman credit"],
-  ["2.103","Sharing says what the app does: new share message, link preview picture and text, About card lists the three selling points with Copy message (checked)"]];
+  ["2.104","About updated: selling points first, What\u2019s inside (links), Getting started, 3D note, privacy list, full change history, MakeHuman credit"]];
 
 
 
