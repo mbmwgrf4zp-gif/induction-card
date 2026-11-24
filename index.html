@@ -607,6 +607,7 @@ a{color:var(--accent)}
 .cschip.on{background:var(--cs);border-color:var(--cs);color:var(--mon-bg)}
 .cschip.add{color:var(--cs);border-color:var(--cs);background:none}
 .cschip.ghost{background:none;border-color:transparent;color:var(--mon-muted)}
+.alinks{display:grid;gap:6px}.allch summary{cursor:pointer;color:var(--gc,var(--accent));font-weight:600;min-height:44px;display:flex;align-items:center}
 .shareusp{margin:0 0 var(--s3);padding-left:1.2em;display:grid;gap:4px}
 .sharebox{display:flex;gap:var(--s4);align-items:center;flex-wrap:wrap}.sharebox>div{flex:1;min-width:160px}.sharebox p{margin-top:0}
 .qr{width:150px;height:150px;flex:0 0 150px;border-radius:10px;border:1px solid var(--line);background:#fff}
@@ -759,7 +760,7 @@ if (window.top !== window.self && /\.github\.io$/.test(location.hostname)) {
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.103.1";
+const APP_VERSION = "2.104.1";
 const APP_DATE = "22 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
@@ -4688,12 +4689,12 @@ function vTicks(){
 }
 /* ---------- ABOUT ---------- */
 const CHANGES = [
+  ["2.104","About updated: selling points first, What\u2019s inside (links), Getting started, 3D note, privacy list, full change history, MakeHuman credit"],
   ["2.103","Sharing says what the app does: new share message, link preview picture and text, About card lists the three selling points with Copy message (checked)"],
   ["2.102","Quick tiles: Block finder (mini mannequin), Intralipid, Dantrolene, Antibiotic prophylaxis; picker grouped by section; defaults LSCS spinal, Block finder, Plan & consent (checked)"],
   ["2.101","Accuracy: trunk regions and dermatome bands re-set to landmarks measured on the body (nipple, xiphisternum, umbilicus); lower abdomen ends at the inguinal ligament; groin below it is L1 / hip; new Back / spine region; knee shortened, shin now in Lower leg / foot / ankle (checked)"],
   ["2.100","3D body sharper: full screen resolution, fairer speed check, softened region edges, narrower clavicle strip (checked)"],
-  ["2.99","Block finder: pale until you choose; new Clavicle and Breast regions; new block cards Superficial cervical plexus and PECS II (checked)"],
-  ["2.98","Block finder as a colour map like the dermatomes: upper limb amber, trunk blue, lower limb green; the chosen region stays coloured, the rest fade; colour dots in the list (checked)"]];
+  ["2.99","Block finder: pale until you choose; new Clavicle and Breast regions; new block cards Superficial cervical plexus and PECS II (checked)"]];
 
 
 
@@ -4734,24 +4735,45 @@ const shareCard = () => `<div class="card" id="share"><h2>Share this app</h2>
   <p class="sub mono shareurl">${APP_URL.replace("https://","").replace(/\/$/,"")}</p>${S.copied ? `<div class="result ok" style="margin:0">Link copied ✓</div>` : ""}</div></div>
   <p class="sub">On iPhone: open the link in Safari → Share → <b>Add to Home Screen</b>. Works offline after the first open.</p></div>`;
 ICONS.share = '<path d="M12 3v12"/><path d="m7.5 7.5 4.5-4.5 4.5 4.5"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/>';
-screens.about = () => head("About","home") + shareCard() + `
+// released versions (from the deploy history), shown under "Show all" in About
+const CHANGES_ALL = [["2.103.1", "Share message with selling points, link preview picture and tags"], ["2.102.1", "New quick tiles (Block finder mannequin, Intralipid, Dantrolene, Antibiotics), grouped picker, new defaults"], ["2.101.1", "3D body landmarks, back / spine region, lower leg"], ["2.100.1", "Sharper 3D body, softened region edges"], ["2.99.1", "Clavicle and breast in the Block finder; superficial cervical plexus and PECS II cards"], ["2.98.1", "Block finder as a colour map"], ["2.97.1", "Dermatomes on the 3D body"], ["2.96.1", "Block finder real 3D body (MakeHuman CC0)"], ["2.95.1", "Back returns to the card you came from; block finder help and links"], ["2.94.1", "Block finder back as last Regional tab, 3D optional with crash guard"], ["2.93.1", "Hide Block finder tab for now (Regional crashed on a laptop)"], ["2.92.1", "Block finder lighter on laptops, no crash"], ["2.91.1", "Block finder no longer shakes while scrolling"], ["2.90.1", "Block finder tidier layout"], ["2.89.1", "Block finder smoother abdomen"], ["2.88.1", "Block finder tap outside to zoom out"], ["2.87.1", "Block finder figure looks more natural"], ["2.86.1", "Regional › Finder, 3D block finder"], ["2.85.1", "Dermatome figure 3D look"], ["2.84.1", "Dermatome block rises from the feet"], ["2.83.1", "Full-width dermatome figure"], ["2.82.1", "Dermatome card redesign"], ["2.81.1", "Big monitor-font numbers less crowded"], ["2.80.1", "Equipment sizes in rows"], ["2.79.1", "One type scale inside cards; RSI dose table"], ["2.78.1", "Syringe recipes at normal size"], ["2.77.1", "Dose tables batch 4 (Kidney Transplant) signed off"], ["2.76.1", "Dose tables batch 3 (Paediatric) signed off"], ["2.75.1", "Dose tables batch 2 (Pre-op, Regional) signed off"], ["2.74.1", "Dose tables batch 1 (Obstetric, General) signed off"], ["2.73.1", "Every dose the same large size"], ["2.72.1", "Large, unbroken doses everywhere"], ["2.71.1", "Large, unbroken doses"], ["2.70.1", "Induction drugs & relaxants in one card"], ["2.69.1", "Card organisation, navigation and search"], ["2.68.1", "Safety audit signed off"], ["2.67.2", "Neonatal print plan"], ["2.67.1", "Icon-only sex switch; patient heading style"], ["2.67.0", "Compact patient tiles and summary bar"], ["2.66.3", "Remove IM doses buttons from Emergencies"], ["2.66.2", "Remove IM doses link from General induction"], ["2.66.1", "Paeds doses checked"], ["2.65.1", "Neonatal age inputs checked"], ["2.64.0", "Neonatal content integrated into paeds cards"], ["2.63.2", "Neonatal cards checked"], ["2.62.1", "Paeds induction review checked"], ["2.60.1", "IM midazolam premed checked"], ["2.60.0", "Cards reorganised"], ["2.58.3", "IM ketamine in induction drug tables"], ["2.58.2", "IM doses checked"], ["2.57.2", "Consistent route labels"], ["2.57.1", "Routes and uterotonics checked"], ["2.56.0", "Home monitor back to the rounded card"], ["2.55.0", "Full-width home monitor on phones"], ["2.54.0", "Ticker at capnogram speed; offline status in About"], ["2.53.1", "Airway checklist and Optimise or postpone checked"], ["2.52.0", "Consent notes as plain text"], ["2.51.1", "NAP3 figures checked"], ["2.50.1", "Labour epidural note layout checked"], ["2.49.1", "Consent wording revision checked"], ["2.48.0", "Premed reorganised; plan inside consent"], ["2.47.1", "Fix offline cache name"], ["2.47.0", "Safety release (case isolation, LAST QRH 2023 draft, sample totals hidden, offline status)"], ["2.46.4", "Premed expansion signed off"], ["2.45.0", "Premed section"], ["2.44.1", "Wide tile spacing"], ["2.44.0", "Four more home tile styles"], ["2.43.0", "Home tiles style setting"], ["2.42.0", "Monitor-channel home tiles"], ["2.41.1", "Consent note signed off"], ["2.40.3", "Changelog fixed"], ["2.40.2", "Anti-clickjacking guard"], ["2.40.1", "Align section tiles"], ["2.40.0", "One Consent note card with labour epidural switch"], ["2.39.3", "Link labour consent from General consent"], ["2.39.2", "Clearer epidural procedure line"], ["2.39.1", "Transfusion and labour epidural consent signed off"], ["2.37.3", "Show PBW"], ["2.37.2", "Android grid fallback"], ["2.37.1", "Quieter footer"], ["2.37.0", "Share this app (QR code and share button)"], ["2.36.2", "Today's list strip"], ["2.36.1", "Echo report card signed off"], ["2.35.3", "Ticker without label"], ["2.35.2", "Ticker moved into the header"], ["2.35.1", "Ticker quotes signed off"], ["2.35.0", "Tips and tricks ticker (quotes draft)"], ["2.34.1", "Print plan sheets signed off"]];
+const ABOUT_LINKS = [["Emergencies (crisis cards)",'data-go="g-emerg"'],["Block finder (3D body map)",'data-open="1. Block finder" data-g="regional" data-tab="finder"'],["Dermatomes & block height (3D)",'data-open="6. Dermatomes & block height" data-g="regional" data-tab="neuraxial"'],
+  ["Plan & consent builder",'data-open="1. Anaesthetic plan &amp; consent" data-g="premed" data-tab="consent"'],["Quick tiles",'data-go="quick"'],["Today's list (anonymous cases, deleted after 36 h)",'data-go="cases"'],
+  ["Print plans: paeds",'data-go="print-paeds"'],["Print plans: kidney transplant",'data-go="print-tx"'],["Values sheet (your review ticks)",'data-go="values"']];
+screens.about = () => head("About","home") + `
   <div class="card"><h2>What this is</h2>
-  <p>A personal memory aid for anaesthesia, built and reviewed by an individual anaesthetist. <b>Not endorsed by any hospital or the Ministry of Health.</b> It does not replace clinical judgement, local protocols or a second check of every dose.</p></div>
-  <div class="card"><h2>How doses are worked out</h2><ul>
+  <ul class="shareusp"><li><b>Enter height &amp; weight once</b> — every dose, tube size and block volume is worked out for the patient (IBW / LBW / adjusted weight built in)</li>
+    <li><b>Works offline</b> in theatre; no login, nothing leaves the phone</li>
+    <li><b>All in one</b>: adult, paeds, obstetric, regional with 3D block finder, kidney transplant — adapted to Malaysian practice</li></ul>
+  <p>A personal memory aid for anaesthesia, built and reviewed by an individual anaesthetist. <b>Not endorsed by any hospital or the Ministry of Health.</b> It does not replace clinical judgement, local protocols or a second check of every dose.</p>
+  <p class="sub">Found an error? Screenshot the card and tell whoever shared the app with you.</p></div>
+  <div class="card"><h2>What's inside</h2><div class="alinks">${ABOUT_LINKS.map(([t, a]) => `<button class="rellink" ${a}>${t} ›</button>`).join("")}</div>
+  <p class="sub">Search: tap the magnifier in any section (or press / on a keyboard).</p></div>
+  <div class="card"><h2>Getting started</h2><ol>
+  <li>On iPhone: Safari → Share → <b>Add to Home Screen</b>. It then works offline.</li>
+  <li>Enter the patient once (sex, height, weight, age) at the top of a section; every card uses it.</li>
+  <li>Pick your three <b>Quick tiles</b> for the home screen.</li>
+  <li>Use <b>search</b> to jump to any card.</li>
+  <li>When the <b>Update</b> bar appears, tap it to load the new version.</li></ol></div>` + shareCard() + `
+  <div class="card"><h2>How it works</h2><ul>
   <li>Doses come from the weight you enter, using the weight each drug is dosed on: <b>TBW</b> (actual), <b>IBW</b> (ideal, Devine), <b>LBW</b> (lean, Janmahasatian) or <b>AdjBW</b> (IBW + 0.4 × excess). Each row says which one it used.</li>
   <li><b>PBW</b> (predicted body weight, ARDSNet): male 50, female 45.5 + 0.91 × (height − 152.4). Same formula as IBW but never capped at actual weight; used for tidal volume.</li>
   <li>Doses are rounded to amounts you can draw up: volume first where the strength is known (0.1 mL steps under 10 mL), and never above a stated maximum.</li>
   <li>Maximum doses (adult caps, paediatric caps, local anaesthetic limits) are applied automatically and labelled.</li>
-  <li>Values marked "sample" are placeholders until you enter the patient.</li></ul></div>
+  <li>Values marked "sample" are placeholders until you enter the patient.</li>
+  <li>The <b>3D body</b>, block-finder regions and dermatome map are schematic: landmarks are measured on the model (nipple, xiphisternum, umbilicus, inguinal ligament) and real anatomy varies. 3D starts only when you ask; <b>Hide 3D</b> brings back the list or 2D chart.</li></ul></div>
   <div class="card"><h2>Sources</h2><p class="sub">Every card shows its own source line. Main public guidelines:</p>
   ${SRC_LINKS.map(([g,ls])=>`<h3>${g}</h3><ul class="srcl">${ls.map(([t,u])=>`<li><a href="${u}" target="_blank" rel="noopener noreferrer">${t} ↗</a></li>`).join("")}</ul>`).join("")}
   <h3>Local and personal sources</h3><ul>${LOCAL_SRC.map(t=>`<li>${t}</li>`).join("")}</ul>
-  <p class="sub">Local documents are summarised, not reproduced, and are not linked. Sources reviewed Nov 2026; next review Nov 2027.</p></div>
+  <p class="sub">Local documents are summarised, not reproduced, and are not linked. Sources reviewed Nov 2026; next review Nov 2027.</p>
+  <p class="sub">The <b>Superficial cervical plexus</b> and <b>PECS II</b> cards (Nov 2026) were checked against published abstracts only, not the NYSORA pages — see each card's source line.</p></div>
   <div class="card"><h2>Version</h2><p><span class="mono">v${APP_VERSION}</span> · built ${APP_DATE} · values and sources reviewed Nov 2026, next review Nov 2027.</p>
   <p>Offline copy: ${OFFLINE === "ready" ? `<b>ready</b> (v${APP_VERSION}) — works in flight mode` : OFFLINE === "fail" ? `<b>unavailable</b> <button class="flink" data-offretry="1">Retry</button>` : OFFLINE === "na" ? "not available in this browser view" : "saving…"}</p></div>
-  <div class="card"><h2>Privacy</h2><ul><li>Nothing you enter leaves this phone. No accounts, no tracking, no analytics.</li><li>Anonymous cases (sex, age, height, weight) are kept on this phone only and deleted after 36 hours.</li><li>Works offline once opened.</li></ul></div>
-  <div class="card"><h2>What changed recently</h2><table>${CHANGES.map(([v,t])=>`<tr><td class="mono">${v}</td><td>${t}</td></tr>`).join("")}</table></div>
-  <div class="card"><h2>Licences</h2><p class="sub">IBM Plex Sans / Mono and DSEG7 (keshikan) fonts — SIL Open Font License 1.1.</p></div>` + disc;
+  <div class="card"><h2>Privacy</h2><ul><li>Nothing you enter leaves this phone. No accounts, no tracking, no analytics.</li><li>Anonymous cases (sex, age, height, weight) are kept on this phone only and deleted after 36 hours.</li>
+  <li>Also kept on this phone only: your quick-tile choice, the 3D on/off choice, theme and display settings, and your Values-sheet ticks. Nothing else is stored.</li><li>Works offline once opened.</li></ul></div>
+  <div class="card"><h2>What changed recently</h2><table>${CHANGES.map(([v,t])=>`<tr><td class="mono">${v}</td><td>${t}</td></tr>`).join("")}</table>
+  <details class="allch"><summary>Show all ›</summary><table>${CHANGES_ALL.map(([v,t])=>`<tr><td class="mono">${v}</td><td>${esc(t)}</td></tr>`).join("")}</table></details></div>
+  <div class="card"><h2>Licences</h2><p class="sub">IBM Plex Sans / Mono and DSEG7 (keshikan) fonts — SIL Open Font License 1.1.</p><p class="sub">3D body: MakeHuman base mesh and male targets — CC0 1.0 (makehumancommunity.org).</p></div>` + disc;
 screens.values = () => {
   const ticks = vTicks(), q = (S.vq||"").trim().toLowerCase();
   let all = 0, done = 0;
