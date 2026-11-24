@@ -760,8 +760,11 @@ details.faqg>summary{cursor:pointer;font-weight:700;color:var(--accent);min-heig
 :root{--bf-skin:#d6c5b8;--bf-pick:#f59e0b;--bf-st1:#fbfcfc;--bf-st2:#e3ebee}
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bf-skin:#c2b1a5;--bf-st1:#24343a;--bf-st2:#0d1416}}
 :root[data-theme="dark"]{--bf-skin:#c2b1a5;--bf-st1:#24343a;--bf-st2:#0d1416}
-.bfstage{position:relative;width:auto;max-width:100%;aspect-ratio:3/4;max-height:62vh;max-height:62svh;border-radius:var(--r);border:1px solid var(--line);background:radial-gradient(ellipse 80% 70% at 50% 35%,var(--bf-st1),var(--bf-st2));overflow:hidden;touch-action:pan-y;margin:0 0 var(--s2)}
+.bffig{container-type:inline-size}
+.bfstage{position:relative;width:calc(100% + 2*var(--s4));max-width:none;margin-left:calc(-1*var(--s4))!important;margin-right:calc(-1*var(--s4))!important;aspect-ratio:3/4;max-height:70vh;max-height:70svh;border-radius:0;border:1px solid var(--line);border-left:0;border-right:0;background:radial-gradient(ellipse 80% 70% at 50% 35%,var(--bf-st1),var(--bf-st2));overflow:hidden;touch-action:pan-y;margin:0 0 var(--s2)}
 .bfcv{display:block;width:100%;height:100%;cursor:grab}
+.bfwhole{position:absolute;left:8px;bottom:8px;min-height:44px;padding:0 14px;border-radius:999px;border:1px solid var(--line);background:var(--card);color:var(--ink);font-weight:600;font-size:14px;display:inline-flex;align-items:center;gap:6px}.bfwhole[hidden]{display:none}
+@container (min-width:560px){.bfin{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:var(--s4);align-items:start}.bfin .bfstage{width:auto;margin-left:0!important;margin-right:0!important;aspect-ratio:auto;height:76vh;height:76svh;max-height:none;border-radius:var(--r);border:1px solid var(--line)}.bfin .bfright{position:sticky;top:var(--s3)}}
 .bfhint{position:absolute;left:0;right:0;top:6px;text-align:center;font-size:13px;color:var(--muted);pointer-events:none}
 .bfpin{position:absolute;transform:translate(10px,-50%);background:var(--card);color:var(--ink);border:1px solid var(--bf-pick);border-radius:999px;padding:2px 10px;font-size:13px;font-weight:700;pointer-events:none;white-space:nowrap}
 .bfpin::before{content:"";position:absolute;left:-12px;top:50%;width:10px;border-top:1.5px solid var(--bf-pick)}
@@ -794,7 +797,7 @@ if (window.top !== window.self && /\.github\.io$/.test(location.hostname)) {
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.111.1";
+const APP_VERSION = "2.112.1";
 const APP_DATE = "24 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
@@ -4016,6 +4019,7 @@ function bfBlockRow(title, first){
 }
 function bfPanel(){
   const sel = S.bf && BF_REG[S.bf.reg] ? S.bf : null;
+  if (!sel && BF.st.zone && bf3d()) return `<p class="sub bfempty">Now tap the exact spot on the ${BF.st.zone.z === "upper" ? "arm" : BF.st.zone.z === "lower" ? "leg" : "trunk"} — or Whole body to go back.</p>`;
   if (!sel) return `<p class="sub bfempty">${bf3d() && glAvail() && !BF.st.nogl ? "Tap" : "Pick"} where you operate — the suggested blocks appear here.</p>`;
   const r = BF_REG[sel.reg], side = sel.side ? sel.side + " " : "";
   const nx = r.nx && findEntry(CARD_IDS[r.nx[0]]);
@@ -4025,13 +4029,16 @@ function bfPanel(){
 }
 raCards.finder = () => { const can = glAvail() && !BF.st.nogl, on = can && bf3d(), fail = (BF_BOOT || BF.st.failed) && !on;
   return `<div class="card"><h2>Block finder</h2>${finderDraft()}
-  ${on ? `<div class="bfstage" id="bfstage"><div class="bfhint${BF.st.touched ? " gone" : ""}" id="bfhint">Drag to turn · tap to choose</div>
+  <div class="bffig"><div class="bfin"><div class="bfleft">
+  ${on ? `<div class="bfstage" id="bfstage"><div class="bfhint${BF.st.touched ? " gone" : ""}" id="bfhint">Drag to turn · tap the body to zoom in</div>
+    <button class="bfwhole" data-bfwhole="1"${BF.st.zone || S.bf ? "" : " hidden"}><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>Whole body</button>
     <button class="bfturn" data-bfturn="1" aria-label="Turn the figure: front, side, back" title="Turn"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12a8 8 0 1 1-2.3-5.6"/><path d="M20 4v5h-5"/></svg></button></div>
   <div class="bfrow"><button class="bflink" data-bflist="1" aria-expanded="${!!S.bfList}">${S.bfList ? "Hide list" : "Pick from a list"} ›</button><button class="bflink bfmute" data-bf3d="off">Hide 3D</button></div>`
     : `${can ? `<div class="bfshowrow"><button class="bfshow" data-bf3d="on">Show 3D figure</button></div>` : ""}${fail ? `<p class="sub bfnote">3D turned off on this device after a problem.</p>` : ""}`}
+  </div><div class="bfright">
   <div class="bfchips" id="bfchips"${on && !S.bfList ? " hidden" : ""}>${BF_ORDER.map(k => `<button data-bfreg="${k}" aria-pressed="${!!(S.bf && S.bf.reg === k)}"><span class="bfdot" style="background:${BF.regColor(k)}"></span>${BF_REG[k].t}</button>`).join("")}</div>
   <div class="bfpanel">${bfPanel()}</div>
-  <button class="bfkid" data-id="paeds-blocks-which-block-paeds" data-open="2. Which block" data-g="paeds" data-tab="blocks">Child → Paeds blocks ›</button>
+  <button class="bfkid" data-id="paeds-blocks-which-block-paeds" data-open="2. Which block" data-g="paeds" data-tab="blocks">Child → Paeds blocks ›</button></div></div></div>
   ${src("Suggestions point to this app's block cards (" + RSRC + "); 3D body: MakeHuman base mesh (CC0), schematic.")}</div>`; };
 
 /* the figure: smooth-blended body parts (signed distance field) drawn in a WebGL shader; one canvas reused across redraws */
@@ -4164,7 +4171,10 @@ const BF = (() => {
       draw(); if (!done) st.raf = requestAnimationFrame(step); else st.goal = null; }; step(); }
   function focus(sel){ if (sel && ANCH[sel.reg]){ const sx = sel.side === "Right" ? -1 : 1, a0 = ANCH[sel.reg];
       st.goal = {T: [["chest","upabdo","loabdo","back"].includes(sel.reg) ? 0 : a0[0]*sx*.6, a0[1], 0], D: ZD[sel.reg] || 2};
-      if (sel.reg === "back"){ const c = Math.cos(st.yaw); if (c > -0.5) st.goal.yaw = Math.round(st.yaw/(2*Math.PI))*2*Math.PI + Math.PI; } /* turn round to show the back */ } else st.goal = {T: [0, .9, 0], D: 3.35}; ease(); }
+      if (sel.reg === "back"){ const c = Math.cos(st.yaw); if (c > -0.5) st.goal.yaw = Math.round(st.yaw/(2*Math.PI))*2*Math.PI + Math.PI; } /* turn round to show the back */ } else { st.goal = {T: [0, .9, 0], D: 3.35}; st.zone = null; } ease(); }
+  const ZONE = {shoulder: "upper", arm: "upper", clavicle: "upper", chest: "trunk", breast: "trunk", upabdo: "trunk", loabdo: "trunk", back: "trunk", hip: "lower", knee: "lower", foot: "lower"};
+  const ZV = {upper: s => ({T: [.28*s, 1.24, 0], D: 1.55}), trunk: () => ({T: [0, 1.16, 0], D: 1.55}), lower: s => ({T: [.12*s, .5, 0], D: 2.05})};
+  function zoneTo(z, s){ st.zone = {z, s}; const g = ZV[z](s || 1), asp = st.cv && st.cv.clientHeight ? st.cv.clientWidth/st.cv.clientHeight : .75; g.D *= Math.max(1, .75/asp); st.goal = g; ease(); }   // tall narrow box (wide screens): step back so the hand / foot stays in view
   function turn(){ st.vi = ((st.vi || 0) + 1) % 3; view([0, Math.PI/2, Math.PI][st.vi]); }
   function view(yaw){ const base = Math.round(st.yaw/(2*Math.PI))*2*Math.PI; st.goal = {yaw: base + yaw, pitch: 0}; ease(); }
   // tap → ray through the mesh (nearest triangle hit)
@@ -4189,13 +4199,15 @@ const BF = (() => {
     const end = e => { if (!down) return; const tap = !down.moved; down = null; if (!tap) return;
       const r = cv.getBoundingClientRect(), q = pick(e.clientX - r.left, e.clientY - r.top);
       if (st.mode === "derm"){ if (q && q.derm){ S.dermAnim = {prev: dermState().top}; S.derm = q.derm; render(); } return; }
-      if (!q || !q.reg){ if (S.bf){ S.bf = null; focus(null); render(); } return; }   // tap off the body (or head / neck) → back to full body
-      const key = Object.keys(R).find(k => R[k] === q.reg); S.bf = {reg: key, side: q.s < 0 ? "Right" : q.s > 0 ? "Left" : ""}; focus(S.bf); render(); };
+      if (!q || !q.reg){ if (S.bf || st.zone){ S.bf = null; focus(null); render(); } return; }   // tap off the body (or head / neck) → back to full body
+      const key = Object.keys(R).find(k => R[k] === q.reg);
+      if (!S.bf && !st.zone && ZONE[key]){ zoneTo(ZONE[key], q.s < 0 ? -1 : 1); render(); return; }   // first tap on the whole body → zoom to that area; second tap chooses
+      S.bf = {reg: key, side: q.s < 0 ? "Right" : q.s > 0 ? "Left" : ""}; focus(S.bf); render(); };
     cv.addEventListener("pointerup", end); cv.addEventListener("pointercancel", () => { down = null; redraw(); }); }
   function mount(){ const stage = document.getElementById("bfstage"); if (!stage) return;
     if (st.ok === null) store.set("bfBoot", true);   // crash guard on: cleared once the figure has drawn
     if (!init()){ store.set("bfBoot", false); st.nogl = true; render(); return; }
-    const mode = stage.dataset.mode || "finder"; if (mode !== st.mode){ st.mode = mode; st.selKey = null; cancelAnimationFrame(st.raf); st.goal = null; st.T = [0, .9, 0]; st.D = 3.35; st.pitch = 0; }
+    const mode = stage.dataset.mode || "finder"; if (mode !== st.mode){ st.mode = mode; st.selKey = null; cancelAnimationFrame(st.raf); st.goal = null; st.T = [0, .9, 0]; st.D = 3.35; st.pitch = 0; st.zone = null; }
     if (st.cv.parentNode !== stage) stage.prepend(st.cv); if (!document.getElementById("bfpin")){ const p = document.createElement("div"); p.id = "bfpin"; p.className = "bfpin"; p.hidden = true; stage.appendChild(p); }
     redraw(); if (false){ st.pulsed = true; const t0 = performance.now(); const pl = () => { const k = (performance.now() - t0)/1400; st.pulse = k < 1 ? Math.sin(k*Math.PI) : 0; draw(); if (k < 1) requestAnimationFrame(pl); }; setTimeout(() => requestAnimationFrame(pl), 300); } }
   // the block spreads up from the feet (or recedes) over ≈1 s, like the 2D chart; display only
@@ -4204,7 +4216,7 @@ const BF = (() => {
     const t0 = performance.now(), dur = to < from ? 1000 : 600; cancelAnimationFrame(st.draf);
     const step = () => { const k = Math.min(1, (performance.now() - t0)/dur); st.dlo = from + (to - from)*k; draw(); if (k < 1) st.draf = requestAnimationFrame(step); else { st.dlo = undefined; redraw(); } }; step(); }
   const regColor = k => { const c = RPAL[k]; return c ? "rgb(" + c.map(x => Math.round(x*255)).join(",") + ")" : ""; };
-  return {mount, focus, view, turn, redraw, pick, cam, st, R, dermRise, regColor};
+  return {mount, focus, zoneTo, view, turn, redraw, pick, cam, st, R, dermRise, regColor};
 })();
 
 /* PAEDS calculator card */
@@ -4845,6 +4857,7 @@ function vTicks(){
 }
 /* ---------- ABOUT ---------- */
 const CHANGES = [
+  ["2.112","Block finder: bigger figure (edge to edge on phones, beside the list on wide screens); first tap zooms to the arm, trunk or leg, second tap chooses; Whole body button (checked)"],
   ["2.111","Six new block cards (infraclavicular, paravertebral, QL, ilioinguinal/iliohypogastric, iPACK, ankle) from NYSORA; Block finder uses them; LA running total on every block card, skin-infiltration button, combined-dosing note (checked)"],
   ["2.110","Default greeting: a TV anaesthetist each day, full names (Arase Monji, Jōnouchi Hiromi, Fuyuki Jirō, Cha Yo-han, Kang Shi-young, Nam Do-il, Ben Warren, Dr X) until you set your own name; anaesthesia timer moved beside the greeting, larger (checked)"],
   ["2.109","Timer bar: \u201cAnaesthesia timer\u201d spelled out, time on the right, green dot while running / Paused, proper spacing (checked)"],
@@ -5877,6 +5890,7 @@ document.addEventListener("click", e => {
   if (d.leclear){ delete S.sc.le; delete S.sc.pl; delete S.sc.dx; S.csDec = ""; S.leNote = ""; S.leLen = "brief"; render(); return; }
   if (d.csclear){ delete S.sc.cs; delete S.sc.csc; delete S.sc.pl; delete S.sc.dx; S.csDec = ""; S.csNote = ""; S.csWho = "patient"; S.csLang = "English"; S.csOut = "full"; S.csLen = "brief"; render(); return; }
   if (d.screset){ S.sc[d.screset] = {}; render(); return; }
+  if (d.bfwhole){ S.bf = null; BF.focus(null); render(); return; }
   if (d.bfreg){ S.bf = S.bf && S.bf.reg === d.bfreg && !S.bf.side ? null : {reg: d.bfreg, side: ""}; BF.focus(S.bf); render(); return; }
   if (d.bfturn){ BF.turn(); return; }
   if (d.bflist){ S.bfList = !S.bfList; render(); return; }
