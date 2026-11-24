@@ -367,9 +367,22 @@ tr.over td{background:var(--danger-bg)}
 .hero-top{position:relative;display:flex;align-items:center;justify-content:space-between;gap:var(--s2)}
 .brand{display:flex;align-items:center;gap:6px;font-size:var(--fs-xs);font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--mon-muted)}
 .brand svg{width:18px;height:18px;color:var(--etco2)}
-.hero-r{display:flex;align-items:center;gap:var(--s2)}
+.hero-r{display:flex;align-items:center;gap:var(--s2);position:relative}
+.tmrbtn{display:grid;justify-items:end;gap:0;background:none;border:0;padding:2px 4px;cursor:pointer;color:var(--etco2);min-height:36px}.tmrbtn small{font:600 9px var(--font-sans);letter-spacing:.12em;color:var(--mon-muted)}.tmrbtn .clock{font-size:15px;display:inline-block;width:4.8em;overflow:hidden;white-space:nowrap;text-align:right;font-variant-numeric:tabular-nums}.tmrbtn{width:5.6em;flex:0 0 auto}.tmrbtn.alert .clock{color:var(--danger-ink,#ff9b93)}
+
+.tmrpill{display:flex;flex-wrap:wrap;align-items:center;gap:4px 14px;width:100%;margin:var(--s2) 0 0;padding:8px 12px;border-radius:12px;border:1px solid #1f2c2e;background:var(--mon-bg);color:var(--mon-ink);font:500 13px var(--font-sans);cursor:pointer;text-align:left}
+.tpi{white-space:nowrap}.tpi b{display:inline-block;width:4.8em;white-space:nowrap;font-variant-numeric:tabular-nums}.tpi b.due{width:auto}.tval.due{width:auto}.tmrpill svg{width:16px;height:16px;color:var(--etco2)}.tmrpill b{font-family:'DSEG7',var(--font-mono);font-weight:400;color:var(--etco2)}.tmrpill.alert{border-color:var(--danger-ink)}
+.tmrpanel{margin:var(--s2) 0;padding:12px;border-radius:var(--r);background:var(--card);border:1px solid var(--line);display:grid;gap:10px}
+.trow{display:grid;grid-template-columns:1fr auto;gap:6px 10px;align-items:center;padding-bottom:10px;border-bottom:1px solid var(--line)}.trow.alert{background:var(--danger-bg);border-radius:10px;padding:8px;border-color:transparent}
+.tlab b{display:block;font-size:16px}.tlab small{color:var(--muted);font-size:13px}.tval{font-family:'DSEG7',var(--font-mono);font-size:24px;color:var(--accent);width:4.8em;overflow:hidden;white-space:nowrap;text-align:right;font-variant-numeric:tabular-nums}.trow.alert .tval{color:var(--danger-ink)}.tval.due,.tmrpill b.due{font-family:var(--font-sans);font-weight:700;font-size:16px}.tmrpill b.due{font-size:13px;color:#ff9b93}
+.tbtns{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:6px}.tb{min-height:40px;padding:0 12px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--ink);font:600 14px var(--font-sans);cursor:pointer}.tb.pri{background:var(--accent);border-color:var(--accent);color:var(--on,#fff)}.tb.warn{border-color:var(--danger-ink);color:var(--danger-ink)}
+.trem{grid-column:1/-1;font-size:14px;color:var(--muted)}.trem select,.twake select{font:inherit;min-height:36px;border-radius:8px;border:1px solid var(--line);background:var(--card);color:var(--ink)}
+.twake{display:flex;align-items:center;gap:8px;font-size:14px;min-height:40px}.twake input{width:20px;height:20px}
+.cbub{position:absolute;top:calc(100% + 10px);right:-6px;z-index:3;white-space:nowrap;padding:6px 10px;border-radius:10px;border:1px solid rgba(250,204,21,.45);background:rgba(10,18,20,.88);color:var(--etco2);font:600 13px var(--font-sans);cursor:pointer;animation:cbubIn .5s ease both}
+.cbub::before{content:"";position:absolute;top:-6px;right:70px;width:10px;height:10px;background:inherit;border-left:1px solid rgba(250,204,21,.45);border-top:1px solid rgba(250,204,21,.45);transform:rotate(45deg)}
+@keyframes cbubIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}@media (prefers-reduced-motion: reduce){.cbub{animation:none}}
 .clock{font-family:'DSEG7',var(--font-mono);letter-spacing:.02em;font-size:var(--fs-sm);color:var(--etco2);font-weight:600}
-.herobtn{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.14);color:var(--mon-ink);height:36px;min-width:36px;width:36px}
+.herobtn{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.14);color:var(--mon-ink);height:36px;min-width:36px;width:36px;padding:0;display:inline-grid;place-items:center;line-height:1}.herobtn svg{display:block}
 .hello{position:relative;font-size:var(--fs-xl);font-weight:600;line-height:1.2;margin:var(--s3) 0 2px}
 .date{position:relative;font-size:var(--fs-sm);color:var(--mon-muted);margin-bottom:40px}
 /* live quick tiles */
@@ -625,8 +638,7 @@ a{color:var(--accent)}
 details.adt>summary{cursor:pointer;font-weight:700;font-size:17px;min-height:44px;display:flex;align-items:center;list-style:none}details.adt>summary::after{content:"›";margin-left:auto;color:var(--muted);transition:transform .2s}details.adt[open]>summary::after{transform:rotate(90deg)}
 .alinks{display:grid;gap:6px}
 .cnow{margin:-4px 0 var(--s2);font-size:14px;color:var(--muted)}.cpick>summary{cursor:pointer;color:var(--accent);font-weight:600;min-height:44px;display:flex;align-items:center}
-.gearbtn svg{width:20px;height:20px}.custhint{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:var(--s2) 0;padding:8px 12px;border-radius:12px;background:var(--accent-soft);font-size:14px}
-.homebtn.danger{background:var(--danger-bg);border-color:var(--danger-ink);color:var(--danger-ink)}
+.gearbtn svg{width:22px;height:22px}.gearbtn{--knob:#1b2427}.agi .ahi{--knob:var(--card)}.homebtn.danger{background:var(--danger-bg);border-color:var(--danger-ink);color:var(--danger-ink)}
 details.faqi{border-top:1px solid var(--line)}details.faqi>summary{cursor:pointer;font-weight:600;min-height:44px;display:flex;align-items:center;padding:6px 0}details.faqi p{margin:0 0 10px;color:var(--ink)}
 details.faqg>summary{cursor:pointer;font-weight:700;color:var(--accent);min-height:44px;display:flex;align-items:center;gap:6px}details.faqg{border-top:1px solid var(--line)}details.faqg[open]{padding-bottom:6px}.allch summary{cursor:pointer;color:var(--gc,var(--accent));font-weight:600;min-height:44px;display:flex;align-items:center}
 .shareusp{margin:0 0 var(--s3);padding-left:1.2em;display:grid;gap:4px}
@@ -781,7 +793,7 @@ if (window.top !== window.self && /\.github\.io$/.test(location.hostname)) {
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.106.1";
+const APP_VERSION = "2.108.1";
 const APP_DATE = "24 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
@@ -797,6 +809,7 @@ const store = {
   set(k,v){ try{ localStorage.setItem("ic."+k, JSON.stringify(v)); }catch(e){} }
 };
 // Inputs are not remembered between uses (per plan): state lives in memory only.
+window.addEventListener("hashchange", () => { if (typeof S !== "undefined"){ S.tmrOpen = false; S.tmrArm = null; } });
 const S = { ettMode:"adult", sex:"F", height:158, ageY:4, ageM:0, wt:3.0,
             touched:{}, sc:{}, fastH:6, leLen:"brief", leNote:"", csDec:"", pnNote:"", pnF:{}, pnLay:"mine", pnMP:"", pnNeck:"", pnPonv:"", pnUrg:"", crea:80, hbNow:12, hbLow:8, hbTarget:10, derm:"", abxSp:"general", spOp:"lscs", spHt:155, morWt:60, pw:10, pY:1, pM:0, pHt:75, pBE:-5, aw:70, emTab:"adult", obTab:"labour", pTab:"pre", gaTab:"ind", pmTab:"assess", raTab:"safety", laA:[], laP:[], cSex:"F", cY:40, cM:0, cH:160, cW:60, cD:7, cGA:40, cBW:3, cNick:"", laD:"bupi", laC:"0.5", laMl:15, laBi:"1", age:45, apfel:0, pump:"pcea_cse", topup:"lig", ventSc:"std", vfio:"", txTab:"pre", txck:{}, gaB:40, chW:6, pD:7, bw:3, dermMode:"block", asa:"", met:"", csWho:"patient", csOut:"full", csLen:"brief", csLang:"English", csNote:"", k:4.5, hb:10, todayWt:70, hdH:12 };
 
@@ -852,9 +865,9 @@ const sxi = f => SXI[f==="F"?"F":"M"];
 const svg = k => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS[k]}</svg>`;
 function head(title, back, icon){
   const th = store.get("theme","auto");
-  const thLabel = th==="auto" ? "◐" : th==="dark" ? "☾" : "☀";
+  const thLabel = th==="auto" ? "◐\uFE0E" : th==="dark" ? "☾\uFE0E" : "☀\uFE0E";
   return `<header>${S.ret && back === "home" ? `<button class="iconbtn" data-ret="1" aria-label="Back to the card you came from">‹ Back</button>` : back?`<button class="iconbtn" data-go="${back}" aria-label="Back">‹ Back</button>`:""}
-    <h1>${icon?`<span class="hico">${svg(icon)}</span>`:""}<span>${title}</span></h1>${GROUPS.some(x=>x.id===icon) ? `<button class="iconbtn srchbtn" data-srch="1" aria-label="Search all cards" aria-pressed="${!!S.srch}">${svg("search")}</button>` : ""}<button class="iconbtn themebtn" data-theme-toggle aria-label="Theme: ${th}" title="Theme: ${th}">${thLabel}</button></header>` + (VALUES_CHECKED ? "" : banner());
+    <h1>${icon?`<span class="hico">${svg(icon)}</span>`:""}<span>${title}</span></h1>${GROUPS.some(x=>x.id===icon) ? `<button class="iconbtn srchbtn" data-srch="1" aria-label="Search all cards" aria-pressed="${!!S.srch}">${svg("search")}</button>` : ""}<button class="iconbtn themebtn" data-theme-toggle aria-label="Theme: ${th}" title="Theme: ${th}">${thLabel}</button></header>` + tmrPill() + (VALUES_CHECKED ? "" : banner());
 }
 
 const screens = {};
@@ -883,6 +896,51 @@ function seg1(root){ (root||document).querySelectorAll('.big,.qans,.clock').forE
   const w = document.createTreeWalker(el, NodeFilter.SHOW_TEXT), ns = []; while (w.nextNode()) ns.push(w.currentNode);
   ns.forEach(n => { if (!/1/.test(n.data) || (n.parentElement && n.parentElement.closest('.bu,small,.seg1'))) return;
     const t = document.createElement('span'); t.innerHTML = esc(n.data).replace(/1/g, '<span class="seg1">1</span>'); n.replaceWith(...t.childNodes); }); }); }
+
+/* ---------- TIMER (v2.108): anaesthesia time ----------
+   Stored as start timestamps on this phone (correct after locking the phone or closing the app); cleared after 24 h. No patient data. */
+const TMR_KEYS = [["an","Anaesthesia"]];   // relaxant and antibiotic timers left out for now (kept simple)
+function tmrState(){ let t = store.get("timers", null); if (!t || typeof t !== "object" || Date.now() - (t.saved || 0) > 864e5) t = {an:{}, nm:{}, abx:{}, saved: Date.now()};
+  TMR_KEYS.forEach(([k]) => { t[k] = t[k] || {}; }); return t; }
+const tmrSave = t => { t.saved = Date.now(); store.set("timers", t); };
+const tmrEl = x => (x.acc || 0) + (x.run ? Date.now() - x.start : 0);
+const tmrOn = x => !!(x.run || x.acc);
+const tmrShow = k => (store.get("timerShow", {})[k]) !== false;
+const abxTotal = () => (+store.get("abxMin", 240) || 240) * 60000;
+function fmtE(ms, long){ const s = Math.max(0, Math.floor(ms/1000)), h = Math.floor(s/3600), m = Math.floor(s%3600/60), sec = s%60, p = n => String(n).padStart(2, "0");
+  return h || long ? `${h}:${p(m)}${long ? ":" + p(sec) : ""}` : `${p(m)}:${p(sec)}`; }
+function tmrText(k, t){ const x = t[k];
+  if (k === "abx"){ if (!tmrOn(x)) return fmtE(abxTotal(), true); const left = abxTotal() - tmrEl(x); return left > 0 ? fmtE(left, true) : "DUE"; }
+  return fmtE(tmrEl(x), k === "an"); }
+function tmrAlert(k, t){ const x = t[k]; if (k === "nm") return !!(tmrOn(x) && x.remind && tmrEl(x) >= x.remind*60000); if (k === "abx") return tmrOn(x) && abxTotal() - tmrEl(x) <= 0; return false; }
+function tmrMain(t){ const k = ["an","nm","abx"].find(k => tmrShow(k) && tmrOn(t[k])); return k ? {k, lab: k === "an" ? "ANAES" : k === "nm" ? "RELAX" : "ABX", txt: tmrText(k, t)} : {k: null, lab: "TIMER", txt: "00:00"}; }
+function tmrPillTxt(t){ return TMR_KEYS.filter(([k]) => tmrShow(k) && tmrOn(t[k])).map(([k, l]) => `<span class="tpi">${({an:"Anaes", nm:"Relax", abx:"Abx"})[k]} <b class="${tmrText(k, t) === "DUE" ? "due" : ""}" data-tt="${k}">${tmrText(k, t) === "DUE" ? "redose due" : tmrText(k, t)}</b></span>`).join(""); }
+function tmrPanel(){ if (!S.tmrOpen) return ""; const t = tmrState();
+  const btn = (k, act, lab, cls = "") => `<button class="tb ${cls}" data-tmr="${act}:${k}">${lab}</button>`;
+  const row = ([k, lab]) => { if (!tmrShow(k)) return ""; const x = t[k], on = tmrOn(x), arm = S.tmrArm === k;
+    const sub = k === "an" ? "since induction" : k === "nm" ? (x.n ? `${x.n === 1 ? "1st" : x.n === 2 ? "2nd" : x.n === 3 ? "3rd" : x.n + "th"} dose · since last dose` : "since last dose") : `redose every ${Math.round(abxTotal()/60000/6)/10} h · counting down`;
+    return `<div class="trow ${tmrAlert(k, t) ? "alert" : ""}" data-trow="${k}"><div class="tlab"><b>${lab}</b><small>${sub}</small></div><div class="tval ${tmrText(k, t) === "DUE" ? "due" : ""}" data-tt="${k}">${tmrText(k, t) === "DUE" ? "redose due" : tmrText(k, t)}</div>
+      <div class="tbtns">${k === "nm" ? btn(k, "dose", on ? "Dose given" : "Start (1st dose)", "pri") + (on ? btn(k, x.run ? "pause" : "start", x.run ? "Pause" : "Resume") : "")
+        : btn(k, x.run ? "pause" : "start", x.run ? "Pause" : on ? "Resume" : "Start", x.run ? "" : "pri")}
+        ${on ? (arm ? btn(k, "reset2", "Tap again to reset", "warn") : btn(k, "reset", "Reset")) : ""}</div>
+      ${k === "nm" ? `<div class="trem">Remind me at <select data-tmrremind="1" aria-label="Relaxant reminder">${[0,15,20,25,30,40,45,60].map(m => `<option value="${m}" ${(+x.remind || 0) === m ? "selected" : ""}>${m ? m + " min" : "off"}</option>`).join("")}</select></div>` : ""}</div>`; };
+  return `<div class="tmrpanel" id="tmrpanel">${TMR_KEYS.map(row).join("")}
+    <label class="twake"><input type="checkbox" data-tmrwake="1" ${store.get("wake", false) ? "checked" : ""}> Keep screen on while a timer runs</label>
+    <p class="sub">Counts up from when you press Start. Stays correct if you lock the phone or close the app; cleared after 24 h.</p></div>`; }
+function tmrPill(){ const t = tmrState(), txt = tmrPillTxt(t); if (!txt) return S.tmrOpen ? tmrPanel() : "";
+  const al = TMR_KEYS.some(([k]) => tmrShow(k) && tmrAlert(k, t));
+  return `<button class="tmrpill ${al ? "alert" : ""}" data-tmr="toggle">${svg("capno")} ${txt}</button>${tmrPanel()}`; }
+let WAKE = null;
+async function tmrWake(){ const t = tmrState(), want = store.get("wake", false) && TMR_KEYS.some(([k]) => t[k].run) && !document.hidden;
+  try { if (want && !WAKE && navigator.wakeLock){ WAKE = await navigator.wakeLock.request("screen"); WAKE.addEventListener("release", () => { WAKE = null; }); } else if (!want && WAKE){ await WAKE.release(); WAKE = null; } } catch (e) { WAKE = null; } }
+document.addEventListener("visibilitychange", tmrWake);
+const TMR_BUZZ = {};
+setInterval(() => { const t = tmrState(); document.querySelectorAll("[data-tt]").forEach(el => { const k = el.dataset.tt, v = tmrText(k, t); el.textContent = v === "DUE" ? "redose due" : v; el.classList.toggle("due", v === "DUE"); });
+  const m = tmrMain(t), mv = document.getElementById("tmrv"), ml = document.getElementById("tmrl"); if (mv){ mv.textContent = m.txt; } if (ml) ml.textContent = m.lab;
+  TMR_KEYS.forEach(([k]) => { const a = !!(tmrShow(k) && tmrAlert(k, t));   // !! — toggle(x, undefined) would flip the class every second document.querySelectorAll(`[data-trow="${k}"]`).forEach(r => r.classList.toggle("alert", a));
+    if (a && !TMR_BUZZ[k]){ TMR_BUZZ[k] = true; try { navigator.vibrate && navigator.vibrate([200, 100, 200]); } catch (e) {} } if (!a) TMR_BUZZ[k] = false; });
+  const any = TMR_KEYS.some(([k]) => !!(tmrShow(k) && tmrAlert(k, t))); document.querySelectorAll(".tmrpill,.tmrbtn").forEach(el => el.classList.toggle("alert", any)); }, 1000);
+
 function clockTxt(){ const d = new Date(); return d.toLocaleTimeString("en-GB", {hour:"2-digit", minute:"2-digit", hour12:false}); }
 function dateTxt(){ return new Date().toLocaleDateString("en-GB", {weekday:"long", day:"numeric", month:"long"}); }
 /* ---------- QUICK TILES (user picks 3; numbers reuse the card formulas) ---------- */
@@ -1047,6 +1105,10 @@ function bfMini(sel){
   const back = sel && sel.reg === "back" ? `<rect class="bk" x="12.5" y="28" width="15" height="12" rx="1" style="stroke:${col}"/>` : "";
   return `<svg class="qman" viewBox="0 0 40 84" aria-hidden="true"><circle cx="20" cy="7" r="5"/><rect x="18" y="11.5" width="4" height="4"/>${parts}${back}</svg>`;
 }
+/* one-time pointer to Customise: a small bubble under the button, shown on up to 3 different days, gone once Customise has been opened */
+function custBubble(){ if (store.get("hintCust", false)) return ""; const today = new Date().toDateString(), days = store.get("hintDays", []);
+  const d = Array.isArray(days) ? days : []; if (!d.includes(today)){ if (d.length >= 3){ store.set("hintCust", true); return ""; } d.push(today); store.set("hintDays", d); }
+  return `<button class="cbub" data-go="settings">Customise tiles &amp; look</button>`; }
 function quickIds(){ const out = [...new Set(qSaved())]; for (const d of QDEF){ if (out.length>=3) break; if (!out.includes(d)) out.push(d); } for (const d of Object.keys(QT)){ if (out.length>=3) break; if (!out.includes(d)) out.push(d); } return out; }
 function quickTile(id){
   const t = QT[id], ac = activeCase(), child = ac && ac.y < 16, male = ac && ac.sex === "M";
@@ -1107,17 +1169,17 @@ function secTile(g, style, tag){ style = style || tileStyle(); tag = tag || "but
   if (style === "chart") return `<${tag} class="sq chart t-${g.id}"${act}><span class="chd"><span>08:00</span><span>08:15</span><span>08:30</span></span>${chartMarks(g.id)}${t}</${tag}>`;
   return `<${tag} class="sq t-${g.id}"${act}><span class="qi">${svg(g.id)}</span>${t}</${tag}>`; }
 screens.home = () => {
-  const th = store.get("theme","auto"), thLabel = th==="auto" ? "◐" : th==="dark" ? "☾" : "☀";
+  const th = store.get("theme","auto"), thLabel = th==="auto" ? "◐\uFE0E" : th==="dark" ? "☾\uFE0E" : "☀\uFE0E";
   const secs = ["premed","ga","regional","paeds","obs","tx"].map(id=>GROUPS.find(g=>g.id===id));
   const short = {premed:"Pre-op", ga:"General", regional:"Regional", paeds:"Paediatric", obs:"Obstetric", tx:"Kidney Transplant"};
   return `<section class="hero"><div class="hero-in">
     <svg class="capno" viewBox="0 0 400 48" preserveAspectRatio="none" aria-hidden="true"><g class="trace"><path d="${CAPNO}"/></g></svg>
     <div class="hero-top"><span class="brand">${svg("capno")} Induction Card</span>
-      <span class="hero-r"><span id="clock" class="clock">${clockTxt()}</span><button class="iconbtn herobtn gearbtn" data-go="settings" aria-label="Customise">${svg("gear")}</button><button class="iconbtn themebtn herobtn" data-theme-toggle aria-label="Theme: ${th}">${thLabel}</button></span></div>
+      <span class="hero-r">${(() => { const m = tmrMain(tmrState()); return `<button class="tmrbtn" data-tmr="toggle" aria-label="Timers" aria-expanded="${!!S.tmrOpen}"><small id="tmrl">${m.lab}</small><span id="tmrv" class="clock">${m.txt}</span></button>`; })()}<button class="iconbtn herobtn gearbtn" data-go="settings" aria-label="Customise">${svg("sliders")}</button>${custBubble()}<button class="iconbtn themebtn herobtn" data-theme-toggle aria-label="Theme: ${th}">${thLabel}</button></span></div>
     <h1 class="hello">${greet()},<br>${esc(doctorName())} <button class="namebtn" data-go="settings" aria-label="Change display name">✎</button></h1>
     <div class="date">${dateTxt()}</div></div>
     ${ticker()}
-  </section>${store.get("hintCust", false) ? "" : `<div class="custhint"><span>Tip: tap <b>⚙</b> to choose your quick tiles and look.</span><button class="linkbtn" data-hintx="1" aria-label="Dismiss tip">✕</button></div>`}
+  </section>${tmrPanel()}
   <div class="searchbox">${svg("search")}<input id="q" class="search" type="search" placeholder="Search caudal, remi, LSCS…" autocomplete="off" aria-label="Search cards"></div><div id="results"></div>
   ${recentRow()}
   ${caseStrip()}
@@ -1128,7 +1190,7 @@ screens.home = () => {
   <div class="nolabel"></div>
   <div class="grid2 ts-${tileStyle()}">${secs.map(g=>secTile(g)).join("")}</div>` + discFull();
 };
-setInterval(() => { const c = document.getElementById("clock"); if (c){ c.textContent = clockTxt(); seg1(c.parentElement); } }, 30000);
+
 
 /* ---------- ETT ---------- */
 const ettCalc = (adultOnly, noInputs) => {
@@ -4721,12 +4783,12 @@ function vTicks(){
 }
 /* ---------- ABOUT ---------- */
 const CHANGES = [
-  ["2.106","⚙ Customise on the home screen (tiles, style, light/dark, colour, name, tips, 3D, reset all); FAQ in About, also found by search (checked)"],
+  ["2.108","Anaesthesia timer instead of the clock: tap to start at induction; shows on every screen while running; optional keep-screen-on (checked)"],
+  ["2.107","Customise button now a sliders icon; the tip card is replaced by a small bubble under the button (shown on up to 3 days); plain theme symbols on iPhone (checked)"],
+  ["2.106","Customise on the home screen (tiles, style, light/dark, colour, name, tips, 3D, reset all); FAQ in About, also found by search (checked)"],
   ["2.105","About redesigned: monitor-style banner, why this exists, three selling-point tiles, install for iPhone and Android (with Install app button where offered), colour grid of features, details folded (checked)"],
   ["2.104","About updated: selling points first, What\u2019s inside (links), Getting started, 3D note, privacy list, full change history, MakeHuman credit"],
-  ["2.103","Sharing says what the app does: new share message, link preview picture and text, About card lists the three selling points with Copy message (checked)"],
-  ["2.102","Quick tiles: Block finder (mini mannequin), Intralipid, Dantrolene, Antibiotic prophylaxis; picker grouped by section; defaults LSCS spinal, Block finder, Plan & consent (checked)"],
-  ["2.101","Accuracy: trunk regions and dermatome bands re-set to landmarks measured on the body (nipple, xiphisternum, umbilicus); lower abdomen ends at the inguinal ligament; groin below it is L1 / hip; new Back / spine region; knee shortened, shin now in Lower leg / foot / ankle (checked)"]];
+  ["2.103","Sharing says what the app does: new share message, link preview picture and text, About card lists the three selling points with Copy message (checked)"]];
 
 
 
@@ -4763,15 +4825,15 @@ const shareCard = () => `<div class="card" id="share"><h2>Share this app</h2>
   <button class="homebtn" data-copy="${esc(SHARE_MSG)}">Copy message</button>
   <p class="sub mono shareurl">${APP_URL.replace("https://","").replace(/\/$/,"")}</p>${S.copied ? `<div class="result ok" style="margin:0">Link copied ✓</div>` : ""}</div></div>
   <p class="sub">How to install: see <b>Install</b> above.</p></div>`;
-ICONS.gear = '<circle cx="12" cy="12" r="3.2"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/>';
+ICONS.sliders = '<path d="M6 4v16M12 4v16M18 4v16"/><circle cx="6" cy="9" r="2.2" fill="var(--knob,#0f1719)"/><circle cx="12" cy="15" r="2.2" fill="var(--knob,#0f1719)"/><circle cx="18" cy="7" r="2.2" fill="var(--knob,#0f1719)"/>';
 ICONS.share = '<path d="M12 3v12"/><path d="m7.5 7.5 4.5-4.5 4.5 4.5"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/>';
 // released versions (from the deploy history), shown under "Show all" in About
 const CHANGES_ALL = [["2.103.1", "Share message with selling points, link preview picture and tags"], ["2.102.1", "New quick tiles (Block finder mannequin, Intralipid, Dantrolene, Antibiotics), grouped picker, new defaults"], ["2.101.1", "3D body landmarks, back / spine region, lower leg"], ["2.100.1", "Sharper 3D body, softened region edges"], ["2.99.1", "Clavicle and breast in the Block finder; superficial cervical plexus and PECS II cards"], ["2.98.1", "Block finder as a colour map"], ["2.97.1", "Dermatomes on the 3D body"], ["2.96.1", "Block finder real 3D body (MakeHuman CC0)"], ["2.95.1", "Back returns to the card you came from; block finder help and links"], ["2.94.1", "Block finder back as last Regional tab, 3D optional with crash guard"], ["2.93.1", "Hide Block finder tab for now (Regional crashed on a laptop)"], ["2.92.1", "Block finder lighter on laptops, no crash"], ["2.91.1", "Block finder no longer shakes while scrolling"], ["2.90.1", "Block finder tidier layout"], ["2.89.1", "Block finder smoother abdomen"], ["2.88.1", "Block finder tap outside to zoom out"], ["2.87.1", "Block finder figure looks more natural"], ["2.86.1", "Regional › Finder, 3D block finder"], ["2.85.1", "Dermatome figure 3D look"], ["2.84.1", "Dermatome block rises from the feet"], ["2.83.1", "Full-width dermatome figure"], ["2.82.1", "Dermatome card redesign"], ["2.81.1", "Big monitor-font numbers less crowded"], ["2.80.1", "Equipment sizes in rows"], ["2.79.1", "One type scale inside cards; RSI dose table"], ["2.78.1", "Syringe recipes at normal size"], ["2.77.1", "Dose tables batch 4 (Kidney Transplant) signed off"], ["2.76.1", "Dose tables batch 3 (Paediatric) signed off"], ["2.75.1", "Dose tables batch 2 (Pre-op, Regional) signed off"], ["2.74.1", "Dose tables batch 1 (Obstetric, General) signed off"], ["2.73.1", "Every dose the same large size"], ["2.72.1", "Large, unbroken doses everywhere"], ["2.71.1", "Large, unbroken doses"], ["2.70.1", "Induction drugs & relaxants in one card"], ["2.69.1", "Card organisation, navigation and search"], ["2.68.1", "Safety audit signed off"], ["2.67.2", "Neonatal print plan"], ["2.67.1", "Icon-only sex switch; patient heading style"], ["2.67.0", "Compact patient tiles and summary bar"], ["2.66.3", "Remove IM doses buttons from Emergencies"], ["2.66.2", "Remove IM doses link from General induction"], ["2.66.1", "Paeds doses checked"], ["2.65.1", "Neonatal age inputs checked"], ["2.64.0", "Neonatal content integrated into paeds cards"], ["2.63.2", "Neonatal cards checked"], ["2.62.1", "Paeds induction review checked"], ["2.60.1", "IM midazolam premed checked"], ["2.60.0", "Cards reorganised"], ["2.58.3", "IM ketamine in induction drug tables"], ["2.58.2", "IM doses checked"], ["2.57.2", "Consistent route labels"], ["2.57.1", "Routes and uterotonics checked"], ["2.56.0", "Home monitor back to the rounded card"], ["2.55.0", "Full-width home monitor on phones"], ["2.54.0", "Ticker at capnogram speed; offline status in About"], ["2.53.1", "Airway checklist and Optimise or postpone checked"], ["2.52.0", "Consent notes as plain text"], ["2.51.1", "NAP3 figures checked"], ["2.50.1", "Labour epidural note layout checked"], ["2.49.1", "Consent wording revision checked"], ["2.48.0", "Premed reorganised; plan inside consent"], ["2.47.1", "Fix offline cache name"], ["2.47.0", "Safety release (case isolation, LAST QRH 2023 draft, sample totals hidden, offline status)"], ["2.46.4", "Premed expansion signed off"], ["2.45.0", "Premed section"], ["2.44.1", "Wide tile spacing"], ["2.44.0", "Four more home tile styles"], ["2.43.0", "Home tiles style setting"], ["2.42.0", "Monitor-channel home tiles"], ["2.41.1", "Consent note signed off"], ["2.40.3", "Changelog fixed"], ["2.40.2", "Anti-clickjacking guard"], ["2.40.1", "Align section tiles"], ["2.40.0", "One Consent note card with labour epidural switch"], ["2.39.3", "Link labour consent from General consent"], ["2.39.2", "Clearer epidural procedure line"], ["2.39.1", "Transfusion and labour epidural consent signed off"], ["2.37.3", "Show PBW"], ["2.37.2", "Android grid fallback"], ["2.37.1", "Quieter footer"], ["2.37.0", "Share this app (QR code and share button)"], ["2.36.2", "Today's list strip"], ["2.36.1", "Echo report card signed off"], ["2.35.3", "Ticker without label"], ["2.35.2", "Ticker moved into the header"], ["2.35.1", "Ticker quotes signed off"], ["2.35.0", "Tips and tricks ticker (quotes draft)"], ["2.34.1", "Print plan sheets signed off"]];
 const ABOUT_LINKS = [["Emergencies","crisis cards","emerg","emerg",'data-go="g-emerg"'],["Block finder","3D body map","spinal","spinal",'data-open="1. Block finder" data-g="regional" data-tab="finder"'],["Dermatomes","block height, 3D","spinal","spinal",'data-open="6. Dermatomes & block height" data-g="regional" data-tab="neuraxial"'],
   ["Plan & consent","note builder","values","premed",'data-open="1. Anaesthetic plan &amp; consent" data-g="premed" data-tab="consent"'],["Quick tiles","home screen","capno","airway",'data-go="quick"'],["Today's list","anonymous cases, 36 h","list","values",'data-go="cases"'],
-  ["Print: paeds","one A4 plan","paeds","paeds",'data-go="print-paeds"'],["Print: transplant","kidney recipient","tx","tx",'data-go="print-tx"'],["Values sheet","your review ticks","values","values",'data-go="values"'],["Customise","tiles, colours, 3D","gear","airway",'data-go="settings"']];
+  ["Print: paeds","one A4 plan","paeds","paeds",'data-go="print-paeds"'],["Print: transplant","kidney recipient","tx","tx",'data-go="print-tx"'],["Values sheet","your review ticks","values","values",'data-go="values"'],["Customise","tiles, colours, 3D","sliders","airway",'data-go="settings"']];
 // FAQ (v2.106): [group, [[question, answer html, optional link attrs]]]
-const FAQ = [["Getting started", [["Is it free? Do I need an account?", "Free. No login, no ads."], ["Is it official or endorsed?", "No. It is a personal memory aid, not endorsed by any hospital or the Ministry of Health. Clinical judgement and local protocols come first."], ["Is it only for Malaysia?", "It is adapted to Malaysian practice and local protocols. Elsewhere, check your own guidelines first."], ["Is it for ICU or ED use?", "It is built for perioperative anaesthesia: theatre, recovery and labour ward. ICU infusions and protocols may differ."], ["Does it work on an iPad or laptop?", "Yes. On wide screens several cards can be open side by side. Keys: <b>/</b> search, <b>Esc</b> back, <b>1–6</b> switch tabs."], ["How do I search well?", "Short words and abbreviations work: <i>sux</i>, <i>lipid</i>, <i>LSCS</i>, <i>MH</i>, <i>caudal</i>."], ["What is the Values sheet?", "Your own checklist for reviewing the numbers. Ticks stay on this phone; a line whose wording changes comes back unticked.", "data-go=\"values\""]]], ["Doses & safety", [["Where do the numbers come from?", "Each card shows its source line; the full list is in Details › Sources. Reviewed Nov 2026; next review Nov 2027."], ["Why does it say “sample”?", "Placeholder values until you enter the patient. Quick tiles and emergency doses stay blank until a real weight is entered."], ["Which weight does it use?", "It depends on the drug: total (TBW), ideal (IBW), lean (LBW) or adjusted (AdjBW) body weight. Each dose row says which. See Details › How it works."], ["Why is the dose different from my own calculation?", "It is rounded to an amount you can draw up from the stated strength (0.1 mL steps under 10 mL), and never above a stated maximum; maximum caps are applied automatically."], ["Which drug strengths does it assume?", "Each row states the strength, for example ephedrine 6 mg/mL. Check against the ampoule in your hand — local dilutions vary."], ["Can I change a dose or add my hospital’s protocol?", "No. Values are fixed so everyone sees the same checked numbers. Send corrections to whoever shared the app with you."], ["What if I don’t know the child’s weight?", "In any Paediatric section the patient box shows an APLS estimate from the age, with a <b>Use</b> button. Replace it with a measured weight as soon as you can."], ["Can I use it for children and pregnant patients?", "Yes — the Paediatric (including neonatal) and Obstetric sections. Adult tiles say so when a child case is active."], ["Why do some tiles say “child case” or “male case”?", "When a case is active, tiles that do not fit it (for example LSCS spinal for a male case) show why instead of a number."], ["I found an error. What should I do?", "Screenshot the card and tell whoever shared the app with you."]]], ["Your data", [["Is patient data stored or sent anywhere?", "Nothing leaves the phone. Anonymous cases are deleted after 36 h. See Details › Privacy."], ["Does it remember my patient after I close it?", "No — inputs reset. Save anonymous cases (sex, age, height, weight) in Today’s list for 36 h.", "data-go=\"cases\""], ["How much space or data does it use?", "About 1 MB. It downloads updates only when you open it with signal."]]], ["Install & updates", [["How do I install it on iPhone or Android?", "See <b>Install</b> above."], ["Does it work without signal?", "Yes, after you have opened it once with signal. The Version card shows “Offline copy: ready”."], ["How do I get updates?", "Open the app with signal. When the <b>Update</b> bar appears, tap it."]]], ["Customising", [["How do I change the home screen, tiles or colours?", "Tap <b>⚙</b> on the home screen: quick tiles, tile style, light/dark, colours, name, tips and 3D.", "data-go=\"settings\""], ["The 3D body won’t show or turned itself off.", "Some devices cannot run 3D, and after a problem the app switches back to the list or 2D chart. Tap <b>Show 3D</b> to try again, or turn it on in ⚙ Customise."]]]];
+const FAQ = [["Getting started", [["Is it free? Do I need an account?", "Free. No login, no ads."], ["Is it official or endorsed?", "No. It is a personal memory aid, not endorsed by any hospital or the Ministry of Health. Clinical judgement and local protocols come first."], ["Is it only for Malaysia?", "It is adapted to Malaysian practice and local protocols. Elsewhere, check your own guidelines first."], ["Is it for ICU or ED use?", "It is built for perioperative anaesthesia: theatre, recovery and labour ward. ICU infusions and protocols may differ."], ["Does it work on an iPad or laptop?", "Yes. On wide screens several cards can be open side by side. Keys: <b>/</b> search, <b>Esc</b> back, <b>1–6</b> switch tabs."], ["How do I search well?", "Short words and abbreviations work: <i>sux</i>, <i>lipid</i>, <i>LSCS</i>, <i>MH</i>, <i>caudal</i>."], ["What is the Values sheet?", "Your own checklist for reviewing the numbers. Ticks stay on this phone; a line whose wording changes comes back unticked.", "data-go=\"values\""]]], ["Doses & safety", [["Where do the numbers come from?", "Each card shows its source line; the full list is in Details › Sources. Reviewed Nov 2026; next review Nov 2027."], ["Why does it say “sample”?", "Placeholder values until you enter the patient. Quick tiles and emergency doses stay blank until a real weight is entered."], ["Which weight does it use?", "It depends on the drug: total (TBW), ideal (IBW), lean (LBW) or adjusted (AdjBW) body weight. Each dose row says which. See Details › How it works."], ["Why is the dose different from my own calculation?", "It is rounded to an amount you can draw up from the stated strength (0.1 mL steps under 10 mL), and never above a stated maximum; maximum caps are applied automatically."], ["Which drug strengths does it assume?", "Each row states the strength, for example ephedrine 6 mg/mL. Check against the ampoule in your hand — local dilutions vary."], ["Can I change a dose or add my hospital’s protocol?", "No. Values are fixed so everyone sees the same checked numbers. Send corrections to whoever shared the app with you."], ["What if I don’t know the child’s weight?", "In any Paediatric section the patient box shows an APLS estimate from the age, with a <b>Use</b> button. Replace it with a measured weight as soon as you can."], ["Can I use it for children and pregnant patients?", "Yes — the Paediatric (including neonatal) and Obstetric sections. Adult tiles say so when a child case is active."], ["Why do some tiles say “child case” or “male case”?", "When a case is active, tiles that do not fit it (for example LSCS spinal for a male case) show why instead of a number."], ["I found an error. What should I do?", "Screenshot the card and tell whoever shared the app with you."]]], ["Your data", [["Is patient data stored or sent anywhere?", "Nothing leaves the phone. Anonymous cases are deleted after 36 h. See Details › Privacy."], ["Does it remember my patient after I close it?", "No — inputs reset. Save anonymous cases (sex, age, height, weight) in Today’s list for 36 h.", "data-go=\"cases\""], ["How much space or data does it use?", "About 1 MB. It downloads updates only when you open it with signal."]]], ["Install & updates", [["How do I install it on iPhone or Android?", "See <b>Install</b> above."], ["Does it work without signal?", "Yes, after you have opened it once with signal. The Version card shows “Offline copy: ready”."], ["How do I get updates?", "Open the app with signal. When the <b>Update</b> bar appears, tap it."]]], ["Customising", [["Can it time the anaesthesia?", "Yes. Tap the timer at the top of the home screen and press <b>Start</b> at induction. While it runs, it shows at the top of every screen; it stays correct if you lock the phone."], ["How do I change the home screen, tiles or colours?", "Tap the <b>sliders button</b> (top right of the home screen): quick tiles, tile style, light/dark, colours, name, tips and 3D.", "data-go=\"settings\""], ["The 3D body won’t show or turned itself off.", "Some devices cannot run 3D, and after a problem the app switches back to the list or 2D chart. Tap <b>Show 3D</b> to try again, or turn it on in Customise."]]]];
 const FAQ_FLAT = FAQ.flatMap(([g, qs]) => qs.map(q => ({g, q: q[0], a: q[1], go: q[2]})));
 function faqCard(){ let n = -1; const open = S.faqOpen;
   return `<details class="card adt" id="faq" ${open != null ? "open" : ""}><summary>FAQ</summary>${FAQ.map(([g, qs]) => { const first = n + 1; const items = qs.map(q => { n++; return `<details class="faqi" id="faq-${n}" ${open === n ? "open" : ""}><summary>${q[0]}</summary><p>${q[1]}${q[2] ? ` <button class="linkish" ${q[2]}>More ›</button>` : ""}</p></details>`; }).join("");
@@ -5690,6 +5752,12 @@ document.addEventListener("click", e => {
   e.preventDefault(); if (d._anim) return;
   if (d.open) collapseAcc(d); else expandAcc(d);
 }, true);
+document.addEventListener("change", e => { const el = e.target; if (!el.dataset) return;
+  if (el.dataset.tmrremind){ const t = tmrState(); t.nm.remind = +el.value || 0; tmrSave(t); render(); }
+  if (el.dataset.tmrwake){ store.set("wake", el.checked); tmrWake(); }
+  if (el.dataset.tmrshow){ const v = store.get("timerShow", {}); v[el.dataset.tmrshow] = el.checked; store.set("timerShow", v); render(); }
+  if (el.dataset.abxmin){ store.set("abxMin", +el.value); render(); } });
+document.addEventListener("click", e => { if (!S.tmrOpen) return; const t = e.target; if (t.closest && (t.closest("#tmrpanel") || t.closest("[data-tmr]"))) return; S.tmrOpen = false; S.tmrArm = null; render(); }, true);
 document.addEventListener("toggle", e => { const v = e.target; if (v.matches && v.matches("details.vg") && !(S.vq||"").trim()){ S.vOpen = S.vOpen||[]; const g = v.dataset.vg; S.vOpen = v.open ? [...new Set([...S.vOpen,g])] : S.vOpen.filter(x=>x!==g); } }, true);
 document.addEventListener("toggle", e => {
   const d = e.target; if (!d.matches || !d.matches("details.acc")) return;
@@ -5743,10 +5811,15 @@ document.addEventListener("click", e => {
   if (d.bfreg){ S.bf = S.bf && S.bf.reg === d.bfreg && !S.bf.side ? null : {reg: d.bfreg, side: ""}; BF.focus(S.bf); render(); return; }
   if (d.bfturn){ BF.turn(); return; }
   if (d.bflist){ S.bfList = !S.bfList; render(); return; }
-  if (d.hintx){ store.set("hintCust", true); render(); return; }
+  if (d.tmr){ const [act, k] = d.tmr.split(":"), t = tmrState(), x = k && t[k], now = Date.now();
+    if (act === "toggle"){ S.tmrOpen = !S.tmrOpen; S.tmrArm = null; render(); return; }
+    if (act === "start"){ x.start = now; x.run = true; } else if (act === "pause"){ x.acc = tmrEl(x); x.run = false; }
+    else if (act === "dose"){ x.n = (x.n || 0) + 1; x.acc = 0; x.start = now; x.run = true; }
+    else if (act === "reset"){ S.tmrArm = k; render(); return; } else if (act === "reset2"){ t[k] = k === "nm" ? {remind: x.remind} : {}; }
+    S.tmrArm = null; tmrSave(t); tmrWake(); render(); return; }
   if (d.themeset){ store.set("theme", d.themeset); applyTheme(); render(); return; }
   if (d.resetall){ if (d.resetall === "1"){ S.resetArm = true; render(); return; } if (d.resetall === "0"){ S.resetArm = false; render(); return; }
-    ["quick","tiles","lcd","theme","quotes","bf3d","doctor"].forEach(k => { try { localStorage.removeItem("ic." + k); } catch (e) {} }); S.resetArm = false; S.quotesSet = undefined; applyTheme(); applyLcd(); render(); return; }
+    ["quick","tiles","lcd","theme","quotes","bf3d","doctor","timerShow","abxMin","wake"].forEach(k => { try { localStorage.removeItem("ic." + k); } catch (e) {} }); S.resetArm = false; S.quotesSet = undefined; applyTheme(); applyLcd(); render(); return; }
   if (d.faq !== undefined){ S.faqOpen = +d.faq; if (location.hash === "#about") render(); else location.hash = "#about"; return; }
   if (d.insttab){ S.instTab = d.insttab; render(); return; }
   if (d.install){ if (BIP){ BIP.prompt(); BIP.userChoice.finally(() => { BIP = null; render(); }); } return; }
