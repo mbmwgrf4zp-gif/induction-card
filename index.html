@@ -794,7 +794,7 @@ if (window.top !== window.self && /\.github\.io$/.test(location.hostname)) {
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.110.1";
+const APP_VERSION = "2.111.1";
 const APP_DATE = "24 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
@@ -3829,6 +3829,11 @@ function laAddBtn(lt, d, conc, ml, sides, label){
   const spec = esc(JSON.stringify({d, c:String(conc), ml:+sig(ml), bi:sides, l:label}));
   return `<button class="addla" data-addla="${spec}" data-lt="${lt}">+ Add ${dz(ml,"mL")} mL ${conc}%${sides===2?" × 2 sides":""} to LA calculator</button>`;
 }
+// running total shown on every block card once something is in the calculator (v2.111)
+function laSoFar(lt){ const list = S[laKey(lt)] || []; if (!list.length) return "";
+  let total = 0; const parts = list.map(it => { const mg = it.ml * it.bi * (+it.c) * 10; total += mg / laMaxMg(it.d, lt) * 100; return `${LAD[it.d].n.split(" ")[0].toLowerCase()} ${dz(mg,"mg")} mg`; });
+  const state = total > 100 ? "danger" : total > 80 ? "warn" : "result";
+  return `<div class="${state} lasofar" style="margin-top:var(--s2)">LA so far: ${parts.join(" + ")} = <b>${Math.round(total)}% of max</b> <button class="linkish" data-open="1. LA dose calculator" data-g="regional" data-tab="safety">Open calculator ›</button></div>`; }
 function laCalc(lt){
   const list = S[laKey(lt)] || [], D = LAD[S.laD] || LAD.bupi;
   if (!D.concs.includes(S.laC)) S.laC = D.concs[D.concs.length > 2 ? 1 : 0];
@@ -3842,18 +3847,19 @@ function laCalc(lt){
     <div class="sub">Add a block</div>${seg("laD",Object.entries(LAD).map(([k,v])=>[k,v.n]))}${seg("laC",D.concs.map(c=>[c,c+"%"]))}
     ${step("laMl","Volume","mL",1,60,1)}${seg("laBi",[["1","One side"],["2","Both sides"]])}
     <button class="homebtn" data-addla="form" data-lt="${lt}">+ Add ${S.laMl} mL ${D.n} ${S.laC}%${S.laBi==="2"?" × 2":""}</button>
+    ${lt === "a" ? `<button class="addla" data-addla="${esc(JSON.stringify({d:"lido", c:"1", ml:5, bi:1, l:"Skin infiltration"}))}" data-lt="a">+ Lignocaine 1% skin infiltration, 5 mL</button>` : ""}
     ${list.length ? `<div style="overflow-x:auto"><table><tr><th>Block</th><th>Dose</th><th>% max</th><th></th></tr>${rows}</table></div>` : `<p class="sub">No blocks added yet. Use the form above or the "+ Add" button on any block card.</p>`}
     <div class="meter ${state}"><span style="width:${Math.min(total,100)}%"></span></div>
     <div class="${state==="over"?"danger":state==="near"?"warn":"result"}" style="margin-top:var(--s2)"><b>Total: ${Math.round(total)}% of maximum</b>${state==="over"?" — ABOVE MAXIMUM. Reduce volume or concentration.":state==="near"?" — close to maximum.":""}</div>
     ${list.length?`<button class="linkbtn" data-clrla="${lt}">Clear list</button>`:""}
-    <p class="sub">Different drugs combine as % of each one's own maximum. Doses apply to one sitting.</p>`;
+    <p class="sub">Different drugs combine as % of each one's own maximum. Doses apply to one sitting: doses given over the same few hours count together, whatever the order (for example lignocaine first, ropivacaine or levobupivacaine later): LA toxicity is additive.</p>`;
 }
 
 /* block card builder */
 function blk(o){
   const x = wts(), conc = o.anal ? 0.25 : 0.5, bi = o.bilat ? 2 : 1;
   const mgLo = o.vol[0]*conc*10*bi, mgHi = o.vol[1]*conc*10*bi, pct = mgHi / laMaxMg("bupi","a") * 100;
-  return `<div class="card"><h2>${o.t}</h2>${raDraft()}${o.draft && !BLK2_CHECKED ? `<div class="warn" style="margin-top:0">DRAFT — new card (v2.99). Check every line against your local practice / NYSORA before use.</div>` : ""}
+  return `<div class="card"><h2>${o.t}</h2>${raDraft()}${(o.draft === 3 ? !BLK3_CHECKED : o.draft && !BLK2_CHECKED) ? `<div class="warn" style="margin-top:0">DRAFT — new card (${o.draft === 3 ? "v2.111" : "v2.99"}). Check every line against your local practice / NYSORA before use.</div>` : ""}
   <table class="blk"><tr><th>Indication</th><td>${o.ind}</td></tr>
   <tr><th>Position &amp; probe</th><td>${o.pos}</td></tr>
   <tr><th>Sonoanatomy</th><td>${o.sono}</td></tr>
@@ -3861,7 +3867,7 @@ function blk(o){
   <tr><th>Cautions</th><td>${o.caut}</td></tr></table>
   <h3>Drug &amp; volume</h3>${f2Draft()}${FT([
     R(`bupi/levobupi ${conc}%`,`(${o.anal?"analgesia":"surgical"})`,`${o.vol[0]}–${o.vol[1]} mL${o.bilat?" per side":""}`,`= ${dz(mgLo,"mg")}–${dz(mgHi,"mg")} mg${o.bilat?" both sides":""} · <span class="${pct>100?"bad":""}">${Math.round(pct)}% of max</span>`,"perineural")])}
-  ${laAddBtn("a","bupi",conc,o.vol[1],bi,o.t)}${src(o.src || RSRC)}</div>`;
+  ${laAddBtn("a","bupi",conc,o.vol[1],bi,o.t)}${laSoFar("a")}${src(o.src || RSRC)}</div>`;
 }
 const raCards = {};
 raCards.spinalNonObs = () => `<div class="card"><h2>Spinal dose: non-obstetric</h2><div class="spcalc">${nonObsCalc()}</div></div>`;   // the calculator, listed as a card (v2.69)
@@ -3941,23 +3947,62 @@ const BLK_pecs = {t:"PECS II", draft:true, ind:"Breast surgery: mastectomy, wide
   needle:"22G 50–80 mm, in-plane", vol:[20,30], anal:true, caut:"Usual split ≈ 10 mL (PECS I plane) + 20 mL (under pectoralis minor) · pneumothorax · thoracoacromial artery · medial breast (anterior cutaneous branches) not reliably covered",
   src:"Blanco 2012, Rev Esp Anestesiol Reanim (PMID 22939099): nerves blocked and indications. StatPearls 2023 (PMID 31613471): planes; PECS II non-inferior to paravertebral for breast cancer surgery. 30 mL total used in RCTs (e.g. PMID 42491688). 10 + 20 mL split as originally described — not read from the full text here."};
 raCards.scp = () => blk(BLK_scp); raCards.pecs = () => blk(BLK_pecs);
-const BLKS = Object.fromEntries([BLK_isb, BLK_scb, BLK_axb, BLK_fem, BLK_fic, BLK_peng, BLK_acb, BLK_pop, BLK_esp, BLK_rsb, BLK_tap, BLK_sap, BLK_scp, BLK_pecs].map(o => [o.t, o]));   // block cards by title (used by the Block finder)
+// v2.111 (DRAFT until ticked): six more block cards, each checked against the NYSORA technique page named in its source line.
+const BLK3_CHECKED = true;   // checked by author 24 Nov 2026
+const BLK_icb = {t:"Infraclavicular", draft:3, ind:"Arm, elbow, forearm and hand surgery",
+  pos:"Supine, head turned away, arm abducted 90° with elbow flexed · linear probe parasagittal, just medial to the coracoid process, below the clavicle",
+  sono:"Axillary artery 3–5 cm deep, under pectoralis major and minor; cords around it below the pectoralis minor fascia · aim for a U-shaped spread around the artery (cephalad, caudad, posterior)",
+  needle:"21–22G 8–10 cm, in-plane from the cephalad end of the probe, aiming at the posterior aspect of the axillary artery", vol:[20,30],
+  caut:"Deep, steep needle path; pleura can be close (scan medial → lateral and keep it out of the path) · aspirate every 5 mL; do not inject against high pressure (> 15 psi) · medial upper arm (T2) may need separate infiltration",
+  src:"NYSORA (nysora.com, read 24 Nov 2026): Ultrasound-guided infraclavicular brachial plexus block."};
+const BLK_tpvb = {t:"Thoracic paravertebral", draft:3, ind:"Unilateral chest and abdominal surgery: breast, thoracotomy, rib fractures",
+  pos:"Sitting (preferred), lateral or prone · linear probe transverse, lateral to the spinous process (or paramedian sagittal, 2–3 cm from the midline) at the target level",
+  sono:"Transverse process (acoustic shadow), superior costotransverse ligament, paravertebral space above the pleura · local anaesthetic widens the space and pushes the pleura forward",
+  needle:"22G Tuohy or block needle; in-plane lateral → medial (intercostal approach) or out-of-plane · never more than 1.5 cm beyond the transverse process; do not direct medially", vol:[20,25],
+  caut:"Vascular puncture (~4%), hypotension (~5%), pleural puncture (~1%), pneumothorax (~0.5%) · epidural or intrathecal spread, more likely if directed medially or > 25 mL · vascular space: fast absorption",
+  src:"NYSORA (nysora.com, read 24 Nov 2026): Thoracic and lumbar paravertebral block; Ultrasound-guided thoracic paravertebral block. Single injection 20–25 mL in aliquots; multiple injections 4–5 mL per level."};
+const BLK_ql = {t:"Quadratus lumborum (QL)", draft:3, ind:"Abdominal surgery — QL1: below the umbilicus; QL2 / transmuscular: above and below (incisions up to T6)",
+  pos:"Lateral decubitus preferred · curved probe (2–5 MHz) transverse on the flank, between the costal margin and the iliac crest",
+  sono:"Transmuscular: 'shamrock' at L4 (transverse process, erector spinae, QL, psoas) — inject between QL and psoas · QL1: just deep to the transversus aponeurosis at the lateral border of QL · QL2: behind QL",
+  needle:"In-plane; transmuscular from the posterior end of the probe, through QL", vol:[15,20], bilat:true, anal:true,
+  caut:"Large-volume block in a well-vascularised area — calculate the dose, especially bilateral · kidney, liver or spleen can be punctured · transmuscular: possible lumbar plexus spread and leg weakness",
+  src:"NYSORA (nysora.com, read 24 Nov 2026): Ultrasound-guided TAP and QL blocks. NYSORA: plane blocks need large volumes (at least 15 mL each); 20 mL per side used in a 2025 trial."};
+const BLK_ii = {t:"Ilioinguinal / iliohypogastric", draft:3, ind:"Inguinal hernia repair, orchidopexy and other groin surgery (inguinal crease, upper medial thigh, anterior scrotum / labia)",
+  pos:"Supine · linear probe just medial to the ASIS, on the line from the ASIS to the umbilicus",
+  sono:"Three muscle layers; nerves as hypoechoic ovals between internal oblique and transversus abdominis (deep circumflex iliac artery nearby on Doppler)",
+  needle:"21–22G 50–100 mm, in-plane medial → lateral (out-of-plane may suit obese patients); 1–2 mL to confirm the plane", vol:[10,10], bilat:true, anal:true,
+  caut:"Peritoneum lies just deep to transversus abdominis — keep the tip in view; if unsure, small 0.5–1 mL boluses as you advance · child: 0.15 mL/kg per side",
+  src:"NYSORA (nysora.com, read 24 Nov 2026): Truncal and cutaneous blocks, part 2 (iliohypogastric and ilioinguinal). Adult 10 mL per side."};
+const BLK_ipack = {t:"iPACK", draft:3, ind:"Posterior knee pain after knee surgery (TKA, ACL) — added to an adductor canal or femoral block; motor-sparing",
+  pos:"Linear probe transverse over the medial knee, 2–3 cm above the patella; slide to see the distal femur and the popliteal artery",
+  sono:"Space between the popliteal artery and the back of the femur / knee capsule",
+  needle:"In-plane from the anteromedial knee toward the space between the popliteal artery and the femur", vol:[15,20], anal:true,
+  caut:"Popliteal artery and vein next to the target · stays away from the sciatic branches on purpose (motor-sparing)",
+  src:"NYSORA (nysora.com, read 24 Nov 2026): New addition — iPACK block; Tips for the iPACK block."};
+const BLK_ankle = {t:"Ankle block", draft:3, ind:"Distal foot and toe surgery",
+  pos:"Supine with a footrest under the calf; rotate the leg as needed · linear probe at each nerve",
+  sono:"Tibial: behind the posterior tibial artery at the medial malleolus · deep peroneal: lateral to the anterior tibial artery at the extensor retinaculum · superficial peroneal: 5–10 cm above and in front of the lateral malleolus · sural: beside the small saphenous vein · saphenous: beside the great saphenous vein, 10–15 cm above the medial malleolus",
+  needle:"22–25G 1.5-inch needle with extension tubing", vol:[15,25],
+  caut:"Five separate nerves, 3–5 mL each · the superficial nerves are small and not always visible: use the veins and grooves as landmarks",
+  src:"NYSORA (nysora.com, read 24 Nov 2026): Ultrasound-guided ankle block. 3–5 mL per nerve."};
+raCards.icb = () => blk(BLK_icb); raCards.tpvb = () => blk(BLK_tpvb); raCards.ql = () => blk(BLK_ql); raCards.ii = () => blk(BLK_ii); raCards.ipack = () => blk(BLK_ipack); raCards.ankle = () => blk(BLK_ankle);
+const BLKS = Object.fromEntries([BLK_isb, BLK_scb, BLK_axb, BLK_fem, BLK_fic, BLK_peng, BLK_acb, BLK_pop, BLK_esp, BLK_rsb, BLK_tap, BLK_sap, BLK_scp, BLK_pecs, BLK_icb, BLK_tpvb, BLK_ql, BLK_ii, BLK_ipack, BLK_ankle].map(o => [o.t, o]));   // block cards by title (used by the Block finder)
 /* ---------- BLOCK FINDER (v2.86) — 3D figure: tap where you operate, get blocks from the app's own block cards ---------- */
 const FINDER_CHECKED = true;   // checked by author 23 Nov 2026
 const finderDraft = () => FINDER_CHECKED ? "" : `<div class="warn" style="margin-top:0">DRAFT — block finder: which existing block card is suggested for each body region. Wording, volumes and cautions come from the block cards. Not yet ticked by you.</div>`;
 // region → blocks (titles of existing block cards; first = first choice) and the neuraxial line where relevant
 const BF_REG = {
   shoulder: {t: "Shoulder", blocks: ["Interscalene"], nx: null},
-  arm:      {t: "Arm / hand", blocks: ["Supraclavicular", "Axillary"], nx: null},
+  arm:      {t: "Arm / hand", blocks: ["Supraclavicular", "Infraclavicular", "Axillary"], nx: null},
   clavicle: {t: "Clavicle", blocks: ["Interscalene", "Superficial cervical plexus"], note: "Use both: interscalene for the bone, superficial cervical plexus for the skin (supraclavicular nerves).", nx: null},
-  breast:   {t: "Breast", blocks: ["PECS II", "Serratus anterior", "Erector spinae (ESP)"], note: "Or thoracic paravertebral (no card yet).", nx: null},
+  breast:   {t: "Breast", blocks: ["PECS II", "Thoracic paravertebral", "Serratus anterior", "Erector spinae (ESP)"], nx: null},
   chest:    {t: "Chest wall", blocks: ["Serratus anterior", "Erector spinae (ESP)"], nx: ["Epidural (adult)", "thoracic epidural"]},
-  upabdo:   {t: "Upper abdomen", blocks: ["Rectus sheath", "Erector spinae (ESP)"], nx: ["Epidural (adult)", "thoracic epidural"]},
-  loabdo:   {t: "Lower abdo / groin", blocks: ["TAP", "Rectus sheath"], nx: ["Spinal dose: non-obstetric", "spinal"]},
-  hip:      {t: "Hip", blocks: ["PENG", "Fascia iliaca (suprainguinal)"], nx: ["Spinal dose: non-obstetric", "spinal"]},
-  knee:     {t: "Knee", blocks: ["Adductor canal", "Femoral"], nx: ["Spinal dose: non-obstetric", "spinal"]},
+  upabdo:   {t: "Upper abdomen", blocks: ["Rectus sheath", "Erector spinae (ESP)", "Quadratus lumborum (QL)"], nx: ["Epidural (adult)", "thoracic epidural"]},
+  loabdo:   {t: "Lower abdo / groin", blocks: ["TAP", "Ilioinguinal / iliohypogastric", "Quadratus lumborum (QL)", "Rectus sheath"], nx: ["Spinal dose: non-obstetric", "spinal"]},
+  hip:      {t: "Hip", blocks: ["PENG", "Fascia iliaca (suprainguinal)", "Quadratus lumborum (QL)"], nx: ["Spinal dose: non-obstetric", "spinal"]},
+  knee:     {t: "Knee", blocks: ["Adductor canal", "iPACK", "Femoral"], nx: ["Spinal dose: non-obstetric", "spinal"]},
   back:     {t: "Back / spine", blocks: ["Erector spinae (ESP)"], note: "Or epidural (Neuraxial › Epidural).", nx: ["Spinal dose: non-obstetric", "spinal"]},
-  foot:     {t: "Lower leg / foot / ankle", blocks: ["Popliteal sciatic", "Adductor canal"], nx: ["Spinal dose: non-obstetric", "spinal"]}};
+  foot:     {t: "Lower leg / foot / ankle", blocks: ["Popliteal sciatic", "Ankle block", "Adductor canal"], nx: ["Spinal dose: non-obstetric", "spinal"]}};
 const BF_ORDER = ["shoulder", "clavicle", "arm", "breast", "chest", "upabdo", "loabdo", "back", "hip", "knee", "foot"];
 function bfBlockRow(title, first){
   const o = BLKS[title], id = CARD_IDS[title], e = findEntry(id); if (!o || !e) return "";
@@ -4661,6 +4706,15 @@ VGROUPS.find(g => g[0]==="General")[1].push(["Paeds doses vs local manual & pain
 VGROUPS.find(g => g[0]==="General")[1].push(["Equipment sizes in rows", "23 Nov 2026", [
   "Tube ID and depth, supraglottic sizes, paeds tube / depth / suction / laryngoscope, neonate tube, NPA, bag, DLT size and depth, NG and CVC depth: same numbers, now in rows labelled 'Equipment' (test-checked)",
   "Size chips replaced by 'have X and Y ready'; lookup tables (HMEF, bag weight bands, LMA by weight, Storz, lung isolation by age) and ventilator settings unchanged"]]);
+VGROUPS.find(g => g[0]==="General")[1].push(["Six new block cards & combined LA (v2.111)", "24 Nov 2026", [
+  "Infraclavicular: parasagittal medial to the coracoid; U-shaped spread around the axillary artery; 21–22G 8–10 cm in-plane from cephalad; 20–30 mL; pleura close",
+  "Thoracic paravertebral: sitting; transverse or paramedian sagittal; ≤ 1.5 cm past the transverse process, not medial; 20–25 mL single (4–5 mL per level); pneumothorax ~0.5%, epidural / intrathecal spread",
+  "Quadratus lumborum: lateral decubitus, curved probe; transmuscular (QL–psoas at L4), QL1, QL2; 15–20 mL per side 0.25%; kidney / liver / spleen; leg weakness possible",
+  "Ilioinguinal / iliohypogastric: medial to ASIS on ASIS–umbilicus line; between IO and TA; 10 mL per side adult, 0.15 mL/kg child",
+  "iPACK: medial knee 2–3 cm above patella; between popliteal artery and femur; 15–20 mL 0.25%; with adductor canal / femoral",
+  "Ankle block: five nerves, 3–5 mL each (15–25 mL)",
+  "Block finder: arm + infraclavicular; breast + paravertebral; upper abdomen + QL; lower abdomen + ilioinguinal/iliohypogastric, QL; hip + QL; knee + iPACK; lower leg/foot + ankle block",
+  "LA calculator: running total on every block card; one-tap lignocaine 1% skin infiltration 5 mL; 'doses over the same few hours count together, whatever the order; toxicity is additive'"]]);
 VGROUPS.find(g => g[0]==="General")[1].push(["3D body accuracy (v2.101)", "23 Nov 2026", [
   "Landmarks measured on the model: nipple 1.28 m, umbilicus 1.09 m, sternal notch ≈ 1.44 m, groin crease ≈ 0.84 m; xiphisternum taken as ≈ 1.22 m",
   "Block finder: chest wall / breast above the xiphisternum; upper abdomen xiphisternum → umbilicus; lower abdomen umbilicus → inguinal ligament (line from pubic tubercle to ASIS); front of the thigh below it = hip",
@@ -4791,12 +4845,12 @@ function vTicks(){
 }
 /* ---------- ABOUT ---------- */
 const CHANGES = [
+  ["2.111","Six new block cards (infraclavicular, paravertebral, QL, ilioinguinal/iliohypogastric, iPACK, ankle) from NYSORA; Block finder uses them; LA running total on every block card, skin-infiltration button, combined-dosing note (checked)"],
   ["2.110","Default greeting: a TV anaesthetist each day, full names (Arase Monji, Jōnouchi Hiromi, Fuyuki Jirō, Cha Yo-han, Kang Shi-young, Nam Do-il, Ben Warren, Dr X) until you set your own name; anaesthesia timer moved beside the greeting, larger (checked)"],
   ["2.109","Timer bar: \u201cAnaesthesia timer\u201d spelled out, time on the right, green dot while running / Paused, proper spacing (checked)"],
   ["2.108","Anaesthesia timer instead of the clock: tap to start at induction; shows on every screen while running; optional keep-screen-on (checked)"],
   ["2.107","Customise button now a sliders icon; the tip card is replaced by a small bubble under the button (shown on up to 3 days); plain theme symbols on iPhone (checked)"],
-  ["2.106","Customise on the home screen (tiles, style, light/dark, colour, name, tips, 3D, reset all); FAQ in About, also found by search (checked)"],
-  ["2.105","About redesigned: monitor-style banner, why this exists, three selling-point tiles, install for iPhone and Android (with Install app button where offered), colour grid of features, details folded (checked)"]];
+  ["2.106","Customise on the home screen (tiles, style, light/dark, colour, name, tips, 3D, reset all); FAQ in About, also found by search (checked)"]];
 
 
 
@@ -4841,7 +4895,7 @@ const ABOUT_LINKS = [["Emergencies","crisis cards","emerg","emerg",'data-go="g-e
   ["Plan & consent","note builder","values","premed",'data-open="1. Anaesthetic plan &amp; consent" data-g="premed" data-tab="consent"'],["Quick tiles","home screen","capno","airway",'data-go="quick"'],["Today's list","anonymous cases, 36 h","list","values",'data-go="cases"'],
   ["Print: paeds","one A4 plan","paeds","paeds",'data-go="print-paeds"'],["Print: transplant","kidney recipient","tx","tx",'data-go="print-tx"'],["Values sheet","your review ticks","values","values",'data-go="values"'],["Customise","tiles, colours, 3D","sliders","airway",'data-go="settings"']];
 // FAQ (v2.106): [group, [[question, answer html, optional link attrs]]]
-const FAQ = [["Getting started", [["Is it free? Do I need an account?", "Free. No login, no ads."], ["Is it official or endorsed?", "No. It is a personal memory aid, not endorsed by any hospital or the Ministry of Health. Clinical judgement and local protocols come first."], ["Is it only for Malaysia?", "It is adapted to Malaysian practice and local protocols. Elsewhere, check your own guidelines first."], ["Is it for ICU or ED use?", "It is built for perioperative anaesthesia: theatre, recovery and labour ward. ICU infusions and protocols may differ."], ["Does it work on an iPad or laptop?", "Yes. On wide screens several cards can be open side by side. Keys: <b>/</b> search, <b>Esc</b> back, <b>1–6</b> switch tabs."], ["How do I search well?", "Short words and abbreviations work: <i>sux</i>, <i>lipid</i>, <i>LSCS</i>, <i>MH</i>, <i>caudal</i>."], ["What is the Values sheet?", "Your own checklist for reviewing the numbers. Ticks stay on this phone; a line whose wording changes comes back unticked.", "data-go=\"values\""]]], ["Doses & safety", [["Where do the numbers come from?", "Each card shows its source line; the full list is in Details › Sources. Reviewed Nov 2026; next review Nov 2027."], ["Why does it say “sample”?", "Placeholder values until you enter the patient. Quick tiles and emergency doses stay blank until a real weight is entered."], ["Which weight does it use?", "It depends on the drug: total (TBW), ideal (IBW), lean (LBW) or adjusted (AdjBW) body weight. Each dose row says which. See Details › How it works."], ["Why is the dose different from my own calculation?", "It is rounded to an amount you can draw up from the stated strength (0.1 mL steps under 10 mL), and never above a stated maximum; maximum caps are applied automatically."], ["Which drug strengths does it assume?", "Each row states the strength, for example ephedrine 6 mg/mL. Check against the ampoule in your hand — local dilutions vary."], ["Can I change a dose or add my hospital’s protocol?", "No. Values are fixed so everyone sees the same checked numbers. Send corrections to whoever shared the app with you."], ["What if I don’t know the child’s weight?", "In any Paediatric section the patient box shows an APLS estimate from the age, with a <b>Use</b> button. Replace it with a measured weight as soon as you can."], ["Can I use it for children and pregnant patients?", "Yes — the Paediatric (including neonatal) and Obstetric sections. Adult tiles say so when a child case is active."], ["Why do some tiles say “child case” or “male case”?", "When a case is active, tiles that do not fit it (for example LSCS spinal for a male case) show why instead of a number."], ["I found an error. What should I do?", "Screenshot the card and tell whoever shared the app with you."]]], ["Your data", [["Is patient data stored or sent anywhere?", "Nothing leaves the phone. Anonymous cases are deleted after 36 h. See Details › Privacy."], ["Does it remember my patient after I close it?", "No — inputs reset. Save anonymous cases (sex, age, height, weight) in Today’s list for 36 h.", "data-go=\"cases\""], ["How much space or data does it use?", "About 1 MB. It downloads updates only when you open it with signal."]]], ["Install & updates", [["How do I install it on iPhone or Android?", "See <b>Install</b> above."], ["Does it work without signal?", "Yes, after you have opened it once with signal. The Version card shows “Offline copy: ready”."], ["How do I get updates?", "Open the app with signal. When the <b>Update</b> bar appears, tap it."]]], ["Customising", [["Can it time the anaesthesia?", "Yes. Tap the timer at the top of the home screen and press <b>Start</b> at induction. While it runs, it shows at the top of every screen; it stays correct if you lock the phone."], ["How do I change the home screen, tiles or colours?", "Tap the <b>sliders button</b> (top right of the home screen): quick tiles, tile style, light/dark, colours, name, tips and 3D.", "data-go=\"settings\""], ["The 3D body won’t show or turned itself off.", "Some devices cannot run 3D, and after a problem the app switches back to the list or 2D chart. Tap <b>Show 3D</b> to try again, or turn it on in Customise."]]]];
+const FAQ = [["Getting started", [["Is it free? Do I need an account?", "Free. No login, no ads."], ["Is it official or endorsed?", "No. It is a personal memory aid, not endorsed by any hospital or the Ministry of Health. Clinical judgement and local protocols come first."], ["Is it only for Malaysia?", "It is adapted to Malaysian practice and local protocols. Elsewhere, check your own guidelines first."], ["Is it for ICU or ED use?", "It is built for perioperative anaesthesia: theatre, recovery and labour ward. ICU infusions and protocols may differ."], ["Does it work on an iPad or laptop?", "Yes. On wide screens several cards can be open side by side. Keys: <b>/</b> search, <b>Esc</b> back, <b>1–6</b> switch tabs."], ["How do I search well?", "Short words and abbreviations work: <i>sux</i>, <i>lipid</i>, <i>LSCS</i>, <i>MH</i>, <i>caudal</i>."], ["What is the Values sheet?", "Your own checklist for reviewing the numbers. Ticks stay on this phone; a line whose wording changes comes back unticked.", "data-go=\"values\""]]], ["Doses & safety", [["How do I combine local anaesthetics (e.g. lignocaine then ropivacaine)?", "Regional › Safety › <b>LA dose calculator</b>: add each drug and volume (block cards have a one-tap <b>+ Add</b>; skin infiltration has its own button). It adds each drug as % of its own maximum and shows the total; doses over the same few hours count together. Once anything is added, every block card shows the running total.", 'data-open="1. LA dose calculator" data-g="regional" data-tab="safety"'], ["Where do the numbers come from?", "Each card shows its source line; the full list is in Details › Sources. Reviewed Nov 2026; next review Nov 2027."], ["Why does it say “sample”?", "Placeholder values until you enter the patient. Quick tiles and emergency doses stay blank until a real weight is entered."], ["Which weight does it use?", "It depends on the drug: total (TBW), ideal (IBW), lean (LBW) or adjusted (AdjBW) body weight. Each dose row says which. See Details › How it works."], ["Why is the dose different from my own calculation?", "It is rounded to an amount you can draw up from the stated strength (0.1 mL steps under 10 mL), and never above a stated maximum; maximum caps are applied automatically."], ["Which drug strengths does it assume?", "Each row states the strength, for example ephedrine 6 mg/mL. Check against the ampoule in your hand — local dilutions vary."], ["Can I change a dose or add my hospital’s protocol?", "No. Values are fixed so everyone sees the same checked numbers. Send corrections to whoever shared the app with you."], ["What if I don’t know the child’s weight?", "In any Paediatric section the patient box shows an APLS estimate from the age, with a <b>Use</b> button. Replace it with a measured weight as soon as you can."], ["Can I use it for children and pregnant patients?", "Yes — the Paediatric (including neonatal) and Obstetric sections. Adult tiles say so when a child case is active."], ["Why do some tiles say “child case” or “male case”?", "When a case is active, tiles that do not fit it (for example LSCS spinal for a male case) show why instead of a number."], ["I found an error. What should I do?", "Screenshot the card and tell whoever shared the app with you."]]], ["Your data", [["Is patient data stored or sent anywhere?", "Nothing leaves the phone. Anonymous cases are deleted after 36 h. See Details › Privacy."], ["Does it remember my patient after I close it?", "No — inputs reset. Save anonymous cases (sex, age, height, weight) in Today’s list for 36 h.", "data-go=\"cases\""], ["How much space or data does it use?", "About 1 MB. It downloads updates only when you open it with signal."]]], ["Install & updates", [["How do I install it on iPhone or Android?", "See <b>Install</b> above."], ["Does it work without signal?", "Yes, after you have opened it once with signal. The Version card shows “Offline copy: ready”."], ["How do I get updates?", "Open the app with signal. When the <b>Update</b> bar appears, tap it."]]], ["Customising", [["Can it time the anaesthesia?", "Yes. Tap the timer at the top of the home screen and press <b>Start</b> at induction. While it runs, it shows at the top of every screen; it stays correct if you lock the phone."], ["How do I change the home screen, tiles or colours?", "Tap the <b>sliders button</b> (top right of the home screen): quick tiles, tile style, light/dark, colours, name, tips and 3D.", "data-go=\"settings\""], ["The 3D body won’t show or turned itself off.", "Some devices cannot run 3D, and after a problem the app switches back to the list or 2D chart. Tap <b>Show 3D</b> to try again, or turn it on in Customise."]]]];
 const FAQ_FLAT = FAQ.flatMap(([g, qs]) => qs.map(q => ({g, q: q[0], a: q[1], go: q[2]})));
 function faqCard(){ let n = -1; const open = S.faqOpen;
   return `<details class="card adt" id="faq" ${open != null ? "open" : ""}><summary>FAQ</summary>${FAQ.map(([g, qs]) => { const first = n + 1; const items = qs.map(q => { n++; return `<details class="faqi" id="faq-${n}" ${open === n ? "open" : ""}><summary>${q[0]}</summary><p>${q[1]}${q[2] ? ` <button class="linkish" ${q[2]}>More ›</button>` : ""}</p></details>`; }).join("");
@@ -5109,11 +5163,11 @@ const GROUPS = [
     see:[["regional-safety-la-dose-calculator","LA dose calculator"],["regional-safety-stop-before-you-block","Stop Before You Block"],["regional-safety-anticoagulants","Anticoagulant timing"]], seeLabel:"Safety",
     cards:[["Spinal dose: non-obstetric","0. Spinal dose (non-obstetric)"],["Epidural (adult)","1. Epidural"],["CSE (combined spinal–epidural)","2. CSE"],["Adjuncts","3. Adjuncts"],["Failed or patchy block","4. Failed or patchy block"],["Post-dural puncture headache","5. Post-dural puncture headache"],["Dermatomes & block height","6. Dermatomes & block height"]],
     links:[["High / total spinal","adult","High / total spinal"],["Hypotension after spinal","adult","Hypotension"],["LA toxicity (LAST)","adult","LA toxicity"]]},
-   {id:"upper", see:[["regional-safety-la-dose-calculator","LA dose calculator"],["regional-safety-stop-before-you-block","Stop Before You Block"]], seeLabel:"Safety", label:"Upper", input:()=>gaInputs(), hint:"Shoulder → hand.", cards:[["Interscalene","1. Interscalene"],["Supraclavicular","2. Supraclavicular"],["Axillary","3. Axillary"],["Superficial cervical plexus","4. Superficial cervical plexus"]],
+   {id:"upper", see:[["regional-safety-la-dose-calculator","LA dose calculator"],["regional-safety-stop-before-you-block","Stop Before You Block"]], seeLabel:"Safety", label:"Upper", input:()=>gaInputs(), hint:"Shoulder → hand.", cards:[["Interscalene","1. Interscalene"],["Supraclavicular","2. Supraclavicular"],["Axillary","3. Axillary"],["Superficial cervical plexus","4. Superficial cervical plexus"],["Infraclavicular","5. Infraclavicular"]],
     links:[["LA toxicity (LAST)","adult","LA toxicity"]]},
-   {id:"lower", see:[["regional-safety-la-dose-calculator","LA dose calculator"],["regional-safety-stop-before-you-block","Stop Before You Block"]], seeLabel:"Safety", label:"Lower", input:()=>gaInputs(), hint:"Hip → foot.", cards:[["Fascia iliaca (suprainguinal)","1. Fascia iliaca"],["PENG","2. PENG"],["Femoral","3. Femoral"],["Adductor canal","4. Adductor canal"],["Popliteal sciatic","5. Popliteal sciatic"]],
+   {id:"lower", see:[["regional-safety-la-dose-calculator","LA dose calculator"],["regional-safety-stop-before-you-block","Stop Before You Block"]], seeLabel:"Safety", label:"Lower", input:()=>gaInputs(), hint:"Hip → foot.", cards:[["Fascia iliaca (suprainguinal)","1. Fascia iliaca"],["PENG","2. PENG"],["Femoral","3. Femoral"],["Adductor canal","4. Adductor canal"],["Popliteal sciatic","5. Popliteal sciatic"],["iPACK","6. iPACK"],["Ankle block","7. Ankle block"]],
     links:[["LA toxicity (LAST)","adult","LA toxicity"]]},
-   {id:"trunk", see:[["regional-safety-la-dose-calculator","LA dose calculator"],["regional-safety-stop-before-you-block","Stop Before You Block"]], seeLabel:"Safety", label:"Trunk", input:()=>gaInputs(), hint:"Chest → abdomen. Bilateral blocks: check the calculator.", cards:[["Erector spinae (ESP)","1. Erector spinae (ESP)"],["Serratus anterior","2. Serratus anterior"],["Rectus sheath","3. Rectus sheath"],["TAP","4. TAP"],["PECS II","5. PECS II"]],
+   {id:"trunk", see:[["regional-safety-la-dose-calculator","LA dose calculator"],["regional-safety-stop-before-you-block","Stop Before You Block"]], seeLabel:"Safety", label:"Trunk", input:()=>gaInputs(), hint:"Chest → abdomen. Bilateral blocks: check the calculator.", cards:[["Erector spinae (ESP)","1. Erector spinae (ESP)"],["Serratus anterior","2. Serratus anterior"],["Rectus sheath","3. Rectus sheath"],["TAP","4. TAP"],["PECS II","5. PECS II"],["Thoracic paravertebral","6. Thoracic paravertebral"],["Quadratus lumborum (QL)","7. Quadratus lumborum (QL)"],["Ilioinguinal / iliohypogastric","8. Ilioinguinal / iliohypogastric"]],
     links:[["LA toxicity (LAST)","adult","LA toxicity"]]},
    ...(FINDER_ON ? [{id:"finder", label:"Finder", input:()=>gaInputs(), autoOpen:true, noHint:true,
     cards:[["Block finder","1. Block finder"]], links:[["LA toxicity (LAST)","adult","LA toxicity"]]}] : [])], cards:[]},
@@ -5180,6 +5234,13 @@ const GROUPS = [
    {id:"don", label:"Donor", input:()=>donInputs(), hint:"Living donor nephrectomy.",
     cards:["1. Donor pre-op","2. Donor intra-op","3. Donor post-op"], links:[]}], cards:[]}];
 const SEARCH_EXTRA = {   // keyed by stable card id
+  "regional-safety-la-dose-calculator":"combined total la mixture lignocaine plus ropivacaine levobupivacaine bupivacaine toxicity additive skin infiltration",
+  "regional-upper-infraclavicular":"icb infraclavicular brachial plexus cords coracoid elbow forearm hand",
+  "regional-trunk-thoracic-paravertebral":"tpvb pvb paravertebral breast thoracotomy rib fractures",
+  "regional-trunk-quadratus-lumborum":"ql qlb quadratus lumborum transmuscular shamrock abdominal",
+  "regional-trunk-ilioinguinal-iliohypogastric":"ii ih ilioinguinal iliohypogastric inguinal hernia orchidopexy groin",
+  "regional-lower-ipack":"ipack posterior knee popliteal capsule tka acl",
+  "regional-lower-ankle-block":"ankle block tibial sural saphenous deep superficial peroneal foot toe",
   "regional-finder-block-finder":"block finder which block body map mannequin body region 3d figure shoulder arm hand chest abdomen inguinal hip knee foot ankle suggest",
   "ga-ind-induction-drugs":"induction relaxant relaxant nmb neuromuscular blocker suxamethonium scoline succinylcholine rocuronium atracurium cisatracurium vecuronium",
   "premed-prepare-anticoagulants-and-antiplatelets":"anticoagulant antiplatelet doac apixaban rivaroxaban edoxaban dabigatran warfarin bridging lmwh aspirin clopidogrel ticagrelor prasugrel crcl creatinine",
@@ -5372,7 +5433,7 @@ const CARD_IDS = {
   "Popliteal sciatic":"regional-lower-popliteal-sciatic",
   "Erector spinae (ESP)":"regional-trunk-erector-spinae-esp",
   "Serratus anterior":"regional-trunk-serratus-anterior",
-  "Rectus sheath":"regional-trunk-rectus-sheath",
+  "Rectus sheath":"regional-trunk-rectus-sheath", "Infraclavicular":"regional-upper-infraclavicular", "Thoracic paravertebral":"regional-trunk-thoracic-paravertebral", "Quadratus lumborum (QL)":"regional-trunk-quadratus-lumborum", "Ilioinguinal / iliohypogastric":"regional-trunk-ilioinguinal-iliohypogastric", "iPACK":"regional-lower-ipack", "Ankle block":"regional-lower-ankle-block",
   "TAP":"regional-trunk-tap",
   "Paeds fasting":"paeds-pre-fasting",
   "Paeds premedication":"paeds-pre-premedication",
