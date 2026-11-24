@@ -623,7 +623,12 @@ a{color:var(--accent)}
 .isteps{margin:0 0 var(--s2);padding-left:1.3em;display:grid;gap:4px}.isteps svg{width:16px;height:16px;vertical-align:-3px}
 .adet{font-size:13px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin:var(--s4) 2px var(--s1)}
 details.adt>summary{cursor:pointer;font-weight:700;font-size:17px;min-height:44px;display:flex;align-items:center;list-style:none}details.adt>summary::after{content:"›";margin-left:auto;color:var(--muted);transition:transform .2s}details.adt[open]>summary::after{transform:rotate(90deg)}
-.alinks{display:grid;gap:6px}.allch summary{cursor:pointer;color:var(--gc,var(--accent));font-weight:600;min-height:44px;display:flex;align-items:center}
+.alinks{display:grid;gap:6px}
+.cnow{margin:-4px 0 var(--s2);font-size:14px;color:var(--muted)}.cpick>summary{cursor:pointer;color:var(--accent);font-weight:600;min-height:44px;display:flex;align-items:center}
+.gearbtn svg{width:20px;height:20px}.custhint{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:var(--s2) 0;padding:8px 12px;border-radius:12px;background:var(--accent-soft);font-size:14px}
+.homebtn.danger{background:var(--danger-bg);border-color:var(--danger-ink);color:var(--danger-ink)}
+details.faqi{border-top:1px solid var(--line)}details.faqi>summary{cursor:pointer;font-weight:600;min-height:44px;display:flex;align-items:center;padding:6px 0}details.faqi p{margin:0 0 10px;color:var(--ink)}
+details.faqg>summary{cursor:pointer;font-weight:700;color:var(--accent);min-height:44px;display:flex;align-items:center;gap:6px}details.faqg{border-top:1px solid var(--line)}details.faqg[open]{padding-bottom:6px}.allch summary{cursor:pointer;color:var(--gc,var(--accent));font-weight:600;min-height:44px;display:flex;align-items:center}
 .shareusp{margin:0 0 var(--s3);padding-left:1.2em;display:grid;gap:4px}
 .sharebox{display:flex;gap:var(--s4);align-items:center;flex-wrap:wrap}.sharebox>div{flex:1;min-width:160px}.sharebox p{margin-top:0}
 .qr{width:150px;height:150px;flex:0 0 150px;border-radius:10px;border:1px solid var(--line);background:#fff}
@@ -776,7 +781,7 @@ if (window.top !== window.self && /\.github\.io$/.test(location.hostname)) {
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.105.1";
+const APP_VERSION = "2.106.1";
 const APP_DATE = "24 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
@@ -1052,14 +1057,15 @@ function quickTile(id){
   return `<button class="qbtn lcd ${t.cls}${smp?" smp":""}${t.txt?" qtxt":""}" ${go}><span class="qlab"><span class="qi qmini">${svg(t.ic)}</span>${t.lab}</span><span class="qans">${blocked?na(blocked):smp?`—<small>enter ${[...new Set(t.keys.filter(isSample).map(k=>need[k]||k))].join(" & ")}</small>`:t.ans()}</span><span class="qin">${t.inp()}${smp?' <span class="stag">sample</span>':""}</span></button>`;
 }
 const qSaved = () => { const q = store.get("quick", null); return (Array.isArray(q) ? q : QDEF).filter(id => QT[id]).slice(0,3); };
-screens.quick = () => { const sel = qSaved();
-  return head("Quick tiles","home") + `<div class="card"><p>Choose the <b>3</b> tiles shown on the home screen. Tap to add or remove; they appear in the order you pick. Saved on this phone only.</p>
+function quickPicker(){ const sel = qSaved();
+  return `<p>Choose the <b>3</b> tiles shown on the home screen. Tap to add or remove; they appear in the order you pick. Saved on this phone only.</p>
     <p class="sub">Chosen: <b>${sel.map(id=>QT[id].lab).join(" · ") || "none"}</b>${sel.length<3?` — pick ${3-sel.length} more (empty slots show a default)`:""}</p>
     ${(() => { const SHORT = ["cons","psum","prp","prt"], grp = (id, t) => t.cls === "t-emerg" ? "Emergency" : SHORT.includes(id) ? "Shortcuts" : ({"t-ga":"Adult","t-obs":"Obstetric","t-regional":"Regional","t-paeds":"Paeds","t-tx":"Transplant"})[t.cls] || "Other";
       return ["Emergency","Adult","Obstetric","Regional","Paeds","Transplant","Shortcuts","Other"].map(g => { const items = Object.entries(QT).filter(([id, t]) => grp(id, t) === g); if (!items.length) return "";
         return `<h3>${g}</h3><div class="txck">${items.map(([id,t]) => { const n = sel.indexOf(id); return `<button class="txci ${n>=0?"on":""}" data-qpick="${id}" aria-pressed="${n>=0}"><span class="box">${n>=0?n+1:""}</span><span>${t.lab}</span></button>`; }).join("")}</div>`; }).join(""); })()}
     ${S.qmsg?`<div class="warn">${S.qmsg}</div>`:""}
-    <button class="linkbtn" data-qreset="1">Reset to default</button></div>` + disc; };
+    <button class="linkbtn" data-qreset="1">Reset tiles to default</button>`; }
+screens.quick = () => head("Quick tiles","settings") + `<div class="card">${quickPicker()}</div>` + disc;
 /* Home section tiles: monitor channels. Each wave segment is exactly 40 units wide so the sweep loops seamlessly. */
 const MON_CH = {premed:"PRE", ga:"GA", regional:"RA", paeds:"PAED", obs:"OBS", tx:"TX"};
 const MON_SEG = {premed:[24,"q4-16 9-14q3 1 4 4q2-3 5-2q5 6 9 12h13"], ga:[26,"h6l2-18c5 0 9-1 13-2l3 20h16"], regional:[15,"q5-12 10 0t10 0t10 0t10 0"], paeds:[20,"h8l2-3 2 3h5l2-14 2 22 2-8h6l2-2 2 2h7"], obs:[15,"q3-4 6-1t6 1t6-1t6 2t6-2t6 1t4 0"]};
@@ -1107,11 +1113,11 @@ screens.home = () => {
   return `<section class="hero"><div class="hero-in">
     <svg class="capno" viewBox="0 0 400 48" preserveAspectRatio="none" aria-hidden="true"><g class="trace"><path d="${CAPNO}"/></g></svg>
     <div class="hero-top"><span class="brand">${svg("capno")} Induction Card</span>
-      <span class="hero-r"><span id="clock" class="clock">${clockTxt()}</span><button class="iconbtn themebtn herobtn" data-theme-toggle aria-label="Theme: ${th}">${thLabel}</button></span></div>
+      <span class="hero-r"><span id="clock" class="clock">${clockTxt()}</span><button class="iconbtn herobtn gearbtn" data-go="settings" aria-label="Customise">${svg("gear")}</button><button class="iconbtn themebtn herobtn" data-theme-toggle aria-label="Theme: ${th}">${thLabel}</button></span></div>
     <h1 class="hello">${greet()},<br>${esc(doctorName())} <button class="namebtn" data-go="settings" aria-label="Change display name">✎</button></h1>
     <div class="date">${dateTxt()}</div></div>
     ${ticker()}
-  </section>
+  </section>${store.get("hintCust", false) ? "" : `<div class="custhint"><span>Tip: tap <b>⚙</b> to choose your quick tiles and look.</span><button class="linkbtn" data-hintx="1" aria-label="Dismiss tip">✕</button></div>`}
   <div class="searchbox">${svg("search")}<input id="q" class="search" type="search" placeholder="Search caudal, remi, LSCS…" autocomplete="off" aria-label="Search cards"></div><div id="results"></div>
   ${recentRow()}
   ${caseStrip()}
@@ -4162,18 +4168,28 @@ const doctorName = () => cleanName(store.get("doctor", "Dr X")) || "Dr X";
 const LCDS = [["section","By section",""],["amber","Amber","#fbbf24"],["green","Green","#4ade80"],["cyan","Cyan","#22d3ee"],["white","White","#f1f5f4"],["red","Red-orange","#ff7a59"]];
 const lcdNow = () => { const v = store.get("lcd","section"); return LCDS.some(x=>x[0]===v) ? v : "section"; };
 function applyLcd(){ const v = lcdNow(); if (v==="section") document.documentElement.removeAttribute("data-lcd"); else document.documentElement.setAttribute("data-lcd", v); }
-screens.settings = () => (showQuotes(), "") + head("Settings","home") + `<div class="card"><h2>Display name</h2>
+screens.settings = () => { store.set("hintCust", true); const th = store.get("theme","auto"), can3 = glAvail() && !BF.st.nogl;
+  return (showQuotes(), "") + head("Customise","home") + `<p class="sub" style="margin:var(--s2) 2px">Everything here is saved on this phone only.</p>
+  <div class="card"><h2>Quick tiles</h2><p class="cnow">Now: <b>${qSaved().map(id=>QT[id].lab).join(" · ")}</b></p>
+    <details class="cpick" ${S.qOpen ? "open" : ""}><summary>Choose tiles ›</summary>${quickPicker()}</details></div>
+  <div class="card"><h2>Home tile style</h2><p class="cnow">Now: <b>${(TILE_STYLES.find(x=>x[0]===tileStyle())||[0,tileStyle()])[1]}</b></p><p class="sub">Style of the five section tiles on the home screen. Saved on this phone only.</p>
+  <div class="tilepick">${TILE_STYLES.map(([k,l]) => `<button class="tpk ${tileStyle()===k?"on":""}" data-tilestyle="${k}" aria-pressed="${tileStyle()===k}"><span class="tpv">${secTile(GROUPS.find(x=>x.id==="ga"), k, "span")}</span><span class="tpl">${l}</span></button>`).join("")}</div></div>
+  <div class="card"><h2>Light or dark</h2><p class="cnow">Now: <b>${th === "auto" ? "Auto (follows the phone)" : th === "dark" ? "Dark" : "Light"}</b></p>
+    <div class="seg">${[["auto","Auto"],["light","Light"],["dark","Dark"]].map(([k,l]) => `<button data-themeset="${k}" aria-pressed="${th===k}">${l}</button>`).join("")}</div></div>
+  <div class="card"><h2>Display colour</h2><p class="cnow">Now: <b>${(LCDS.find(x=>x[0]===lcdNow())||[0,lcdNow()])[1]}</b></p><p class="sub">Colour of the glowing numbers on the quick tiles, the header clock and the trace. Saved on this phone only.</p>
+  <div class="lcdpick">${LCDS.map(([k,l,c]) => `<button class="lcdsw ${lcdNow()===k?"on":""}" data-lcdpick="${k}" aria-pressed="${lcdNow()===k}"><span class="sw" style="${c?`background:${c}`:"background:conic-gradient(#f472b6,#fbbf24,#4ade80,#22d3ee,#f472b6)"}"></span>${l}</button>`).join("")}</div>
+  <div class="lcddemo"><span class="clock">12:34</span><span class="qans">6.5–7.0</span></div></div>
+  <div class="card"><h2>Display name</h2><p class="cnow">Now: <b>${esc(doctorName())}</b></p>
   <label class="sub" for="dname">Name shown in the greeting (max 24 characters)</label>
   <input id="dname" class="search" style="padding-left:12px" maxlength="24" autocomplete="off" value="${esc(S.dname ?? doctorName())}">
   <p class="sub">Saved on this phone only.</p>
   <button class="homebtn primary" data-savename="1">Save name</button></div>
-  <div class="card"><h2>Display colour</h2><p class="sub">Colour of the glowing numbers on the quick tiles, the header clock and the trace. Saved on this phone only.</p>
-  <div class="lcdpick">${LCDS.map(([k,l,c]) => `<button class="lcdsw ${lcdNow()===k?"on":""}" data-lcdpick="${k}" aria-pressed="${lcdNow()===k}"><span class="sw" style="${c?`background:${c}`:"background:conic-gradient(#f472b6,#fbbf24,#4ade80,#22d3ee,#f472b6)"}"></span>${l}</button>`).join("")}</div>
-  <div class="lcddemo"><span class="clock">12:34</span><span class="qans">6.5–7.0</span></div></div>
-  <div class="card"><h2>Home tiles</h2><p class="sub">Style of the five section tiles on the home screen. Saved on this phone only.</p>
-  <div class="tilepick">${TILE_STYLES.map(([k,l]) => `<button class="tpk ${tileStyle()===k?"on":""}" data-tilestyle="${k}" aria-pressed="${tileStyle()===k}"><span class="tpv">${secTile(GROUPS.find(x=>x.id==="ga"), k, "span")}</span><span class="tpl">${l}</span></button>`).join("")}</div></div>
-  <div class="card"><h2>Tips and tricks</h2><p class="sub">The moving line on the home screen. Press and hold to pause; tap a tip to open its card.</p>
-  ${seg("quotesSet",[["on","Show quotes"],["off","Tips only"]])}</div>` + disc;
+  <div class="card"><h2>Tips and tricks</h2><p class="cnow">Now: <b>${showQuotes() ? "tips and quotes" : "tips only"}</b></p><p class="sub">The moving line on the home screen. Press and hold to pause; tap a tip to open its card.</p>
+  ${seg("quotesSet",[["on","Show quotes"],["off","Tips only"]])}</div>
+  <div class="card"><h2>3D figures</h2><p class="cnow">Now: <b>${!can3 ? "not available on this device" : bf3d() ? "on" : "off"}</b></p><p class="sub">The 3D body in the Block finder and the Dermatomes card. Off shows the region list and the 2D chart.</p>
+    ${can3 ? `<div class="seg"><button data-bf3d="on" aria-pressed="${bf3d()}">On</button><button data-bf3d="off" aria-pressed="${!bf3d()}">Off</button></div>` : ""}</div>
+  <div class="card"><h2>Reset all</h2><p class="sub">Back to default: quick tiles, tile style, light/dark, colour, name, tips and 3D. Your cases and Values-sheet ticks are kept.</p>
+    ${S.resetArm ? `<button class="homebtn danger" data-resetall="2">Tap again to reset everything</button> <button class="linkbtn" data-resetall="0">Cancel</button>` : `<button class="homebtn" data-resetall="1">Reset all to default</button>`}</div>` + disc; };
 
 /* ---------- DERMATOMES (schematic) — DRAFT: ASIA/ISNCSCI 2019 key sensory points ---------- */
 const DERM_CHECKED = true;
@@ -4705,12 +4721,12 @@ function vTicks(){
 }
 /* ---------- ABOUT ---------- */
 const CHANGES = [
+  ["2.106","⚙ Customise on the home screen (tiles, style, light/dark, colour, name, tips, 3D, reset all); FAQ in About, also found by search (checked)"],
   ["2.105","About redesigned: monitor-style banner, why this exists, three selling-point tiles, install for iPhone and Android (with Install app button where offered), colour grid of features, details folded (checked)"],
   ["2.104","About updated: selling points first, What\u2019s inside (links), Getting started, 3D note, privacy list, full change history, MakeHuman credit"],
   ["2.103","Sharing says what the app does: new share message, link preview picture and text, About card lists the three selling points with Copy message (checked)"],
   ["2.102","Quick tiles: Block finder (mini mannequin), Intralipid, Dantrolene, Antibiotic prophylaxis; picker grouped by section; defaults LSCS spinal, Block finder, Plan & consent (checked)"],
-  ["2.101","Accuracy: trunk regions and dermatome bands re-set to landmarks measured on the body (nipple, xiphisternum, umbilicus); lower abdomen ends at the inguinal ligament; groin below it is L1 / hip; new Back / spine region; knee shortened, shin now in Lower leg / foot / ankle (checked)"],
-  ["2.100","3D body sharper: full screen resolution, fairer speed check, softened region edges, narrower clavicle strip (checked)"]];
+  ["2.101","Accuracy: trunk regions and dermatome bands re-set to landmarks measured on the body (nipple, xiphisternum, umbilicus); lower abdomen ends at the inguinal ligament; groin below it is L1 / hip; new Back / spine region; knee shortened, shin now in Lower leg / foot / ankle (checked)"]];
 
 
 
@@ -4747,12 +4763,19 @@ const shareCard = () => `<div class="card" id="share"><h2>Share this app</h2>
   <button class="homebtn" data-copy="${esc(SHARE_MSG)}">Copy message</button>
   <p class="sub mono shareurl">${APP_URL.replace("https://","").replace(/\/$/,"")}</p>${S.copied ? `<div class="result ok" style="margin:0">Link copied ✓</div>` : ""}</div></div>
   <p class="sub">How to install: see <b>Install</b> above.</p></div>`;
+ICONS.gear = '<circle cx="12" cy="12" r="3.2"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/>';
 ICONS.share = '<path d="M12 3v12"/><path d="m7.5 7.5 4.5-4.5 4.5 4.5"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/>';
 // released versions (from the deploy history), shown under "Show all" in About
 const CHANGES_ALL = [["2.103.1", "Share message with selling points, link preview picture and tags"], ["2.102.1", "New quick tiles (Block finder mannequin, Intralipid, Dantrolene, Antibiotics), grouped picker, new defaults"], ["2.101.1", "3D body landmarks, back / spine region, lower leg"], ["2.100.1", "Sharper 3D body, softened region edges"], ["2.99.1", "Clavicle and breast in the Block finder; superficial cervical plexus and PECS II cards"], ["2.98.1", "Block finder as a colour map"], ["2.97.1", "Dermatomes on the 3D body"], ["2.96.1", "Block finder real 3D body (MakeHuman CC0)"], ["2.95.1", "Back returns to the card you came from; block finder help and links"], ["2.94.1", "Block finder back as last Regional tab, 3D optional with crash guard"], ["2.93.1", "Hide Block finder tab for now (Regional crashed on a laptop)"], ["2.92.1", "Block finder lighter on laptops, no crash"], ["2.91.1", "Block finder no longer shakes while scrolling"], ["2.90.1", "Block finder tidier layout"], ["2.89.1", "Block finder smoother abdomen"], ["2.88.1", "Block finder tap outside to zoom out"], ["2.87.1", "Block finder figure looks more natural"], ["2.86.1", "Regional › Finder, 3D block finder"], ["2.85.1", "Dermatome figure 3D look"], ["2.84.1", "Dermatome block rises from the feet"], ["2.83.1", "Full-width dermatome figure"], ["2.82.1", "Dermatome card redesign"], ["2.81.1", "Big monitor-font numbers less crowded"], ["2.80.1", "Equipment sizes in rows"], ["2.79.1", "One type scale inside cards; RSI dose table"], ["2.78.1", "Syringe recipes at normal size"], ["2.77.1", "Dose tables batch 4 (Kidney Transplant) signed off"], ["2.76.1", "Dose tables batch 3 (Paediatric) signed off"], ["2.75.1", "Dose tables batch 2 (Pre-op, Regional) signed off"], ["2.74.1", "Dose tables batch 1 (Obstetric, General) signed off"], ["2.73.1", "Every dose the same large size"], ["2.72.1", "Large, unbroken doses everywhere"], ["2.71.1", "Large, unbroken doses"], ["2.70.1", "Induction drugs & relaxants in one card"], ["2.69.1", "Card organisation, navigation and search"], ["2.68.1", "Safety audit signed off"], ["2.67.2", "Neonatal print plan"], ["2.67.1", "Icon-only sex switch; patient heading style"], ["2.67.0", "Compact patient tiles and summary bar"], ["2.66.3", "Remove IM doses buttons from Emergencies"], ["2.66.2", "Remove IM doses link from General induction"], ["2.66.1", "Paeds doses checked"], ["2.65.1", "Neonatal age inputs checked"], ["2.64.0", "Neonatal content integrated into paeds cards"], ["2.63.2", "Neonatal cards checked"], ["2.62.1", "Paeds induction review checked"], ["2.60.1", "IM midazolam premed checked"], ["2.60.0", "Cards reorganised"], ["2.58.3", "IM ketamine in induction drug tables"], ["2.58.2", "IM doses checked"], ["2.57.2", "Consistent route labels"], ["2.57.1", "Routes and uterotonics checked"], ["2.56.0", "Home monitor back to the rounded card"], ["2.55.0", "Full-width home monitor on phones"], ["2.54.0", "Ticker at capnogram speed; offline status in About"], ["2.53.1", "Airway checklist and Optimise or postpone checked"], ["2.52.0", "Consent notes as plain text"], ["2.51.1", "NAP3 figures checked"], ["2.50.1", "Labour epidural note layout checked"], ["2.49.1", "Consent wording revision checked"], ["2.48.0", "Premed reorganised; plan inside consent"], ["2.47.1", "Fix offline cache name"], ["2.47.0", "Safety release (case isolation, LAST QRH 2023 draft, sample totals hidden, offline status)"], ["2.46.4", "Premed expansion signed off"], ["2.45.0", "Premed section"], ["2.44.1", "Wide tile spacing"], ["2.44.0", "Four more home tile styles"], ["2.43.0", "Home tiles style setting"], ["2.42.0", "Monitor-channel home tiles"], ["2.41.1", "Consent note signed off"], ["2.40.3", "Changelog fixed"], ["2.40.2", "Anti-clickjacking guard"], ["2.40.1", "Align section tiles"], ["2.40.0", "One Consent note card with labour epidural switch"], ["2.39.3", "Link labour consent from General consent"], ["2.39.2", "Clearer epidural procedure line"], ["2.39.1", "Transfusion and labour epidural consent signed off"], ["2.37.3", "Show PBW"], ["2.37.2", "Android grid fallback"], ["2.37.1", "Quieter footer"], ["2.37.0", "Share this app (QR code and share button)"], ["2.36.2", "Today's list strip"], ["2.36.1", "Echo report card signed off"], ["2.35.3", "Ticker without label"], ["2.35.2", "Ticker moved into the header"], ["2.35.1", "Ticker quotes signed off"], ["2.35.0", "Tips and tricks ticker (quotes draft)"], ["2.34.1", "Print plan sheets signed off"]];
 const ABOUT_LINKS = [["Emergencies","crisis cards","emerg","emerg",'data-go="g-emerg"'],["Block finder","3D body map","spinal","spinal",'data-open="1. Block finder" data-g="regional" data-tab="finder"'],["Dermatomes","block height, 3D","spinal","spinal",'data-open="6. Dermatomes & block height" data-g="regional" data-tab="neuraxial"'],
   ["Plan & consent","note builder","values","premed",'data-open="1. Anaesthetic plan &amp; consent" data-g="premed" data-tab="consent"'],["Quick tiles","home screen","capno","airway",'data-go="quick"'],["Today's list","anonymous cases, 36 h","list","values",'data-go="cases"'],
-  ["Print: paeds","one A4 plan","paeds","paeds",'data-go="print-paeds"'],["Print: transplant","kidney recipient","tx","tx",'data-go="print-tx"'],["Values sheet","your review ticks","values","values",'data-go="values"']];
+  ["Print: paeds","one A4 plan","paeds","paeds",'data-go="print-paeds"'],["Print: transplant","kidney recipient","tx","tx",'data-go="print-tx"'],["Values sheet","your review ticks","values","values",'data-go="values"'],["Customise","tiles, colours, 3D","gear","airway",'data-go="settings"']];
+// FAQ (v2.106): [group, [[question, answer html, optional link attrs]]]
+const FAQ = [["Getting started", [["Is it free? Do I need an account?", "Free. No login, no ads."], ["Is it official or endorsed?", "No. It is a personal memory aid, not endorsed by any hospital or the Ministry of Health. Clinical judgement and local protocols come first."], ["Is it only for Malaysia?", "It is adapted to Malaysian practice and local protocols. Elsewhere, check your own guidelines first."], ["Is it for ICU or ED use?", "It is built for perioperative anaesthesia: theatre, recovery and labour ward. ICU infusions and protocols may differ."], ["Does it work on an iPad or laptop?", "Yes. On wide screens several cards can be open side by side. Keys: <b>/</b> search, <b>Esc</b> back, <b>1–6</b> switch tabs."], ["How do I search well?", "Short words and abbreviations work: <i>sux</i>, <i>lipid</i>, <i>LSCS</i>, <i>MH</i>, <i>caudal</i>."], ["What is the Values sheet?", "Your own checklist for reviewing the numbers. Ticks stay on this phone; a line whose wording changes comes back unticked.", "data-go=\"values\""]]], ["Doses & safety", [["Where do the numbers come from?", "Each card shows its source line; the full list is in Details › Sources. Reviewed Nov 2026; next review Nov 2027."], ["Why does it say “sample”?", "Placeholder values until you enter the patient. Quick tiles and emergency doses stay blank until a real weight is entered."], ["Which weight does it use?", "It depends on the drug: total (TBW), ideal (IBW), lean (LBW) or adjusted (AdjBW) body weight. Each dose row says which. See Details › How it works."], ["Why is the dose different from my own calculation?", "It is rounded to an amount you can draw up from the stated strength (0.1 mL steps under 10 mL), and never above a stated maximum; maximum caps are applied automatically."], ["Which drug strengths does it assume?", "Each row states the strength, for example ephedrine 6 mg/mL. Check against the ampoule in your hand — local dilutions vary."], ["Can I change a dose or add my hospital’s protocol?", "No. Values are fixed so everyone sees the same checked numbers. Send corrections to whoever shared the app with you."], ["What if I don’t know the child’s weight?", "In any Paediatric section the patient box shows an APLS estimate from the age, with a <b>Use</b> button. Replace it with a measured weight as soon as you can."], ["Can I use it for children and pregnant patients?", "Yes — the Paediatric (including neonatal) and Obstetric sections. Adult tiles say so when a child case is active."], ["Why do some tiles say “child case” or “male case”?", "When a case is active, tiles that do not fit it (for example LSCS spinal for a male case) show why instead of a number."], ["I found an error. What should I do?", "Screenshot the card and tell whoever shared the app with you."]]], ["Your data", [["Is patient data stored or sent anywhere?", "Nothing leaves the phone. Anonymous cases are deleted after 36 h. See Details › Privacy."], ["Does it remember my patient after I close it?", "No — inputs reset. Save anonymous cases (sex, age, height, weight) in Today’s list for 36 h.", "data-go=\"cases\""], ["How much space or data does it use?", "About 1 MB. It downloads updates only when you open it with signal."]]], ["Install & updates", [["How do I install it on iPhone or Android?", "See <b>Install</b> above."], ["Does it work without signal?", "Yes, after you have opened it once with signal. The Version card shows “Offline copy: ready”."], ["How do I get updates?", "Open the app with signal. When the <b>Update</b> bar appears, tap it."]]], ["Customising", [["How do I change the home screen, tiles or colours?", "Tap <b>⚙</b> on the home screen: quick tiles, tile style, light/dark, colours, name, tips and 3D.", "data-go=\"settings\""], ["The 3D body won’t show or turned itself off.", "Some devices cannot run 3D, and after a problem the app switches back to the list or 2D chart. Tap <b>Show 3D</b> to try again, or turn it on in ⚙ Customise."]]]];
+const FAQ_FLAT = FAQ.flatMap(([g, qs]) => qs.map(q => ({g, q: q[0], a: q[1], go: q[2]})));
+function faqCard(){ let n = -1; const open = S.faqOpen;
+  return `<details class="card adt" id="faq" ${open != null ? "open" : ""}><summary>FAQ</summary>${FAQ.map(([g, qs]) => { const first = n + 1; const items = qs.map(q => { n++; return `<details class="faqi" id="faq-${n}" ${open === n ? "open" : ""}><summary>${q[0]}</summary><p>${q[1]}${q[2] ? ` <button class="linkish" ${q[2]}>More ›</button>` : ""}</p></details>`; }).join("");
+    return `<details class="faqg" ${open != null && open >= first && open <= n ? "open" : ""}><summary>${g} <span class="sub">(${qs.length})</span></summary>${items}</details>`; }).join("")}</details>`; }
 // install help: which tab to show first, and Chrome's own install prompt where the browser offers one
 const IS_ANDROID = /Android/i.test(navigator.userAgent), IS_IOS = /iPhone|iPad|iPod/i.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
 const IS_INSTALLED = () => matchMedia("(display-mode: standalone)").matches || navigator.standalone === true;
@@ -4783,6 +4806,7 @@ screens.about = () => head("About","home") + `
   ${installCard()}${shareCard()}
   <div class="card acard"><h2>What's inside</h2><div class="agrid">${ABOUT_LINKS.map(([t, sub, ic, g, a]) => `<button class="agi" style="--t:var(--g-${g});--t-soft:var(--g-${g}-soft)" ${a}><span class="ahi">${svg(ic)}</span><span><b>${t}</b><small>${sub}</small></span></button>`).join("")}</div></div>
   <h2 class="adet">Details</h2>
+  ${faqCard()}
   <details class="card adt"><summary>How it works</summary><ul>
   <li>Doses come from the weight you enter, using the weight each drug is dosed on: <b>TBW</b> (actual), <b>IBW</b> (ideal, Devine), <b>LBW</b> (lean, Janmahasatian) or <b>AdjBW</b> (IBW + 0.4 × excess). Each row says which one it used.</li>
   <li><b>PBW</b> (predicted body weight, ARDSNet): male 50, female 45.5 + 0.91 × (height − 152.4). Same formula as IBW but never capped at actual weight; used for tidal volume.</li>
@@ -5570,9 +5594,12 @@ function runSearch(q){
   if (!q.trim()){ el.innerHTML = ""; return; }
   const h = (location.hash||"").slice(1), gid = h.startsWith("g-") ? h.slice(2) : null, og = gid && GROUPS.find(x=>x.id===gid);
   const hits = searchHits(q, og && og.tabs ? [gid, S[og.tabKey] || og.tabs[0].id] : null);
-  el.innerHTML = hits.length ? hits.map(e => { const g = GROUPS.find(x=>x.id===e.g), tb = tabOf(e.g, e.tab);
+  const words = q.trim().toLowerCase().split(/\s+/).filter(Boolean), tests = words.map(wordTest);
+  const fq = FAQ_FLAT.map((f, i) => ({f, i})).filter(({f}) => tests.every(t => t(f.q.toLowerCase() + " " + f.a.replace(/<[^>]+>/g, "").toLowerCase()))).slice(0, 3);
+  const fqHtml = fq.map(({f, i}) => `<button class="hit" data-faq="${i}">${esc(f.q)}<small><span class="ctag">FAQ</span>About › FAQ</small></button>`).join("");
+  el.innerHTML = (hits.length || fq.length) ? hits.map(e => { const g = GROUPS.find(x=>x.id===e.g), tb = tabOf(e.g, e.tab);
       return `<button class="hit" data-id="${e.id}" data-open="${esc(e.t)}" data-g="${e.g}" data-tab="${e.tab}">${esc(e.t)}<small><span class="ctag ctag-${e.ctx}">${CTX_TAG[e.ctx]}</span>${esc(g.name+(tb?" › "+tb.label:""))}</small></button>`; }).join("")
-    : `<div class="sub" style="padding:6px">No card matches "${esc(q.trim())}".</div>`;
+    + fqHtml : `<div class="sub" style="padding:6px">No card matches "${esc(q.trim())}".</div>`;
 }
 /* recently opened cards: stable id + where it was opened. No patient data. Old {g, t} records are still read. */
 const recentRaw = () => { const r = store.get("recent", []); return Array.isArray(r) ? r : []; };
@@ -5615,6 +5642,7 @@ function renderNow(){
   S.scrollTo = false;
   if (S.srchFocus){ S.srchFocus = false; const q = app.querySelector("#q"); if (q) q.focus(); }
   if (app.querySelector("#bfstage")) BF.mount();
+  if (S.faqOpen != null && location.hash === "#about"){ const el = document.getElementById("faq-" + S.faqOpen); if (el) requestAnimationFrame(() => el.scrollIntoView({block: "center"})); S.faqOpen = null; }
   if (S.dermAnim){ const a = S.dermAnim; S.dermAnim = null; requestAnimationFrame(() => { dermAnimate(a); BF.dermRise(a.prev); }); }
   if (active){ const el = app.querySelector(`[data-in="${active}"]`); if (el){ el.focus(); const v=el.value; el.value=""; el.value=v; } }
 }
@@ -5715,6 +5743,11 @@ document.addEventListener("click", e => {
   if (d.bfreg){ S.bf = S.bf && S.bf.reg === d.bfreg && !S.bf.side ? null : {reg: d.bfreg, side: ""}; BF.focus(S.bf); render(); return; }
   if (d.bfturn){ BF.turn(); return; }
   if (d.bflist){ S.bfList = !S.bfList; render(); return; }
+  if (d.hintx){ store.set("hintCust", true); render(); return; }
+  if (d.themeset){ store.set("theme", d.themeset); applyTheme(); render(); return; }
+  if (d.resetall){ if (d.resetall === "1"){ S.resetArm = true; render(); return; } if (d.resetall === "0"){ S.resetArm = false; render(); return; }
+    ["quick","tiles","lcd","theme","quotes","bf3d","doctor"].forEach(k => { try { localStorage.removeItem("ic." + k); } catch (e) {} }); S.resetArm = false; S.quotesSet = undefined; applyTheme(); applyLcd(); render(); return; }
+  if (d.faq !== undefined){ S.faqOpen = +d.faq; if (location.hash === "#about") render(); else location.hash = "#about"; return; }
   if (d.insttab){ S.instTab = d.insttab; render(); return; }
   if (d.install){ if (BIP){ BIP.prompt(); BIP.userChoice.finally(() => { BIP = null; render(); }); } return; }
   if (d.bf3d){ store.set("bf3d", d.bf3d); render(); return; }
@@ -5754,7 +5787,7 @@ document.addEventListener("click", e => {
   if (d.goTab){ const [gid,tid] = d.goTab.split(":"); const og = GROUPS.find(x=>x.id===gid); if (og) S[og.tabKey]=tid; S.open=null; const tg="#g-"+gid; if (location.hash===tg) render(); else location.hash=tg; window.scrollTo(0,0); return; }
   if (d.setw){ S.pw = parseFloat(d.setw); S.touched.pw = true; S.pwEst = true; render(); return; }
   if (d.print){ try { window.print(); } catch (err) {} return; }
-  if (d.qpick){ let c = qSaved(); S.qmsg = ""; if (c.includes(d.qpick)) c = c.filter(x=>x!==d.qpick); else if (c.length >= 3) S.qmsg = "Three are already chosen — remove one first."; else c = [...c, d.qpick]; store.set("quick", c); render(); return; }
+  if (d.qpick){ S.qOpen = true; let c = qSaved(); S.qmsg = ""; if (c.includes(d.qpick)) c = c.filter(x=>x!==d.qpick); else if (c.length >= 3) S.qmsg = "Three are already chosen — remove one first."; else c = [...c, d.qpick]; store.set("quick", c); render(); return; }
   if (d.qreset){ store.set("quick", null); S.qmsg = ""; render(); return; }
   if (d.tilestyle){ store.set("tiles", d.tilestyle); render(); return; }
   if (d.lcdpick){ store.set("lcd", d.lcdpick); applyLcd(); render(); return; }
