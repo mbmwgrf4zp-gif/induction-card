@@ -1,7 +1,7 @@
 {
   "name": "Induction Card",
   "short_name": "Induction",
-  "description": "Offline anaesthesia reference with weight-based doses — emergencies, general, regional, paediatric, obstetric and transplant — adapted to Malaysian practice.",
+  "description": "Enter height & weight once — every dose, tube and block volume worked out. Adult, paeds, obstetric, regional & transplant. Works offline. Free.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
