@@ -808,7 +808,7 @@ details.bfb[open]>summary{margin-bottom:4px}details.bfb .bfo{margin-top:4px}deta
 @media (min-width:560px){.nagsum{max-width:260px}}
 .bfpanel{display:grid;gap:8px;margin:var(--s2) 0}.bfpanel:empty{display:none}.bfside{margin:0;color:var(--danger-ink);font-weight:600;font-size:14px}
 .bfb{border-radius:var(--r-sm);padding:10px 12px;background:var(--bg);display:grid;gap:2px}.bfb.first{background:var(--gc-soft)}
-.bftag{font-size:13px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--gc)}.bfrole{display:block;font-size:13px;font-weight:700;color:var(--muted)}.bfrole.rs{color:var(--gc)}.bfrole.rx{color:var(--warn-ink)}
+.bftag{font-size:13px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--gc)}.bfopl{margin:var(--s2) 0;padding:var(--s2) var(--s3);border-left:4px solid var(--gc);background:var(--card);border-radius:var(--r-sm)}.bfrole{display:block;font-size:13px;font-weight:700;color:var(--muted)}.bfrole.rs{color:var(--gc)}.bfrole.rx{color:var(--warn-ink)}
 .bfo{display:flex;justify-content:space-between;align-items:baseline;gap:8px;background:none;border:0;padding:0;color:var(--ink);font:inherit;text-align:left;cursor:pointer}
 .bfn{font-weight:700;font-size:16px;color:var(--gc);text-decoration:underline;text-decoration-thickness:1.5px;text-underline-offset:3px}.bfempty{margin:0;font-size:15px}.bfd{font-weight:700;font-size:20px;white-space:nowrap}.bfw{font-size:14px;color:var(--muted)}.bfw.bfc{color:var(--ink)}
 </style>
@@ -825,7 +825,7 @@ if (window.top !== window.self && /\.github\.io$/.test(location.hostname)) {
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.142.1";
+const APP_VERSION = "2.144.1";
 const APP_DATE = "25 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
@@ -909,16 +909,16 @@ const DOCTOR = "Dr X";
 const PEARLS = [
   ["Exactly 150 cm → 1.8 mL heavy bupivacaine for LSCS.","A1. Spinal: dose by height","obs","lscs"],
   ["IT morphine is 1 mg/mL diluted: 0.1 mL = 0.1 mg. Never straight from the 10 mg/mL ampoule.","A2. Spinal: IT morphine & fentanyl","obs","lscs"],
-  ["Sugammadex 16 mg/kg (total weight) for immediate reversal after RSI rocuronium.","2. RSI","ga","ind"],
-  ["Rocuronium is dosed on ideal weight; suxamethonium on total weight.","1. Induction drugs & relaxants","ga","ind"],
-  ["Chula formula: oral ETT depth = 4 + height/10 cm.","3. Tube & airway kit","ga","ind"],
+  ["Sugammadex 16 mg/kg (total weight) for immediate reversal after RSI rocuronium.","3. RSI","ga","ind"],
+  ["Rocuronium is dosed on ideal weight; suxamethonium on total weight.","2. Induction drugs & relaxants","ga","ind"],
+  ["Chula formula: oral ETT depth = 4 + height/10 cm.","1. Tube & airway kit","ga","ind"],
   ["Paeds ETT anchor: term 9 cm, 1 year 12 cm, then age/2 + 12.","1. Tube: size, depth, blade, suction","paeds","ind"],
   ["Caudal: more than 1.2 mL/kg of 0.25% bupivacaine = toxicity.","3. Caudal","paeds","blocks"],
   ["Neonatal epidural: never exceed 0.2 mg/kg/h of local anaesthetic.","4. Lumbar / thoracic epidural","paeds","blocks"],
   ["LAST: Intralipid 20% 1.5 mL/kg over 2–3 min, then 15 mL/kg/h. In arrest: adrenaline ≤ 1 mcg/kg, no vasopressin.","LA toxicity (LAST)","emerg","adult"],
   ["It is easier to manage hypotension than an inadequate block.","A1. Spinal: dose by height","obs","lscs"],
   ["4/2/1: a 10 kg child needs 40 mL/h maintenance.","1. Fluids: maintenance & insensible loss","paeds","intra"],
-  ["Apfel 2 risk factors = 39% PONV risk → give 2 agents.","3. PONV: Apfel score","ga","post"],
+  ["Apfel 2 risk factors = 39% PONV risk → give 2 agents.","3. PONV: Apfel score","ga","maint"],
   ["SGLT2 inhibitors: stop 3 days before surgery (ertugliflozin 4).","1. Regular drugs: stop or continue","premed","prepare"],
   ["Laryngospasm: suxamethonium 0.1–0.5 mg/kg IV with atropine 0.02 mg/kg.","Laryngospasm","emerg","paeds"]];
 const CAPNO = (() => { let d = "M0 40"; for (let i=0;i<6;i++){ const x=i*100; d += ` L${x+18} 40 L${x+23} 13 Q${x+40} 10 ${x+58} 8 L${x+63} 40 L${x+100} 40`; } return d; })();
@@ -1052,13 +1052,13 @@ const QT = (() => {
   return {
   lscs:{lab:"LSCS spinal", ic:"obs", cls:"t-obs", kind:"obs", keys:["spHt"], inp:()=>`${Math.round(S.spHt)} cm`, open:["A1. Spinal: dose by height","obs","lscs"],
     ans:()=>{ const h=Math.round(S.spHt), row=LSCS.find(r=>h<=r[0]); return sm(row[1]===row[2]?fmt(row[1]):fmt(row[1])+"–"+fmt(row[2]),"mL heavy bupi"); }},
-  aett:{lab:"Adult ETT", ic:"airway", cls:"t-ga", kind:"adult", keys:["height"], inp:aHt, open:["3. Tube & airway kit","ga","ind"],
+  aett:{lab:"Adult ETT", ic:"airway", cls:"t-ga", kind:"adult", keys:["height"], inp:aHt, open:["1. Tube & airway kit","ga","ind"],
     ans:()=>sm(S.sex==="F"?"6.5–7.0":"7.0–7.5",`${f1(r05(4+S.height/10))} cm at mouth corner`)},
   pett:{lab:"Paeds ETT", ic:"paeds", cls:"t-paeds", kind:"paeds", keys:Pk, inp:pAge, open:["1. Tube: size, depth, blade, suction","paeds","ind"],
     ans:()=>{ const e=paedEtt(); return sm(e.useCuff?f1(e.cuffed):e.plainTxt,`${e.useCuff?"cuffed · ":""}${fmt(e.depth)} cm`); }},
-  rsi:{lab:"RSI drugs", ic:"airway", cls:"t-ga", kind:"adult", keys:A, inp:aBoth, open:["2. RSI","ga","ind"],
+  rsi:{lab:"RSI drugs", ic:"airway", cls:"t-ga", kind:"adult", keys:A, inp:aBoth, open:["3. RSI","ga","ind"],
     ans:()=>{ const W2=wts(); return sm(sig(dz(1.5*W2.tbw/50,"mL")*50),`mg sux · roc ${sig(dz(1.2*W2.ibw/10,"mL")*10)} mg`); }},
-  tv:{lab:"Tidal volume", ic:"airway", cls:"t-ga", kind:"adult", keys:["height"], inp:aHt, open:["1. Ventilation strategies","ga","maint"],
+  tv:{lab:"Tidal volume", ic:"airway", cls:"t-ga", kind:"adult", keys:["height"], inp:aHt, open:["4. Ventilation strategies","ga","maint"],
     ans:()=>sm(mlr(6,8).replace(" mL",""),`mL · 6–8 mL/kg PBW`)},
   lamax:{lab:"LA maximum", ic:"spinal", cls:"t-regional", kind:"adult", keys:A, inp:aBoth, open:["1. LA dose calculator","regional","safety"],
     ans:()=>{ const mg=laMaxMg("bupi","a"); return sm(sig(mg),`mg bupi = ${sig(mg/2.5)} mL 0.25%`); }},
@@ -1068,15 +1068,15 @@ const QT = (() => {
     ans:()=>{ const w=S.pw, m0=w<=10?4*w:w<=20?40+2*(w-10):60+(w-20); return sm(dz(Math.min(m0,100),"mL/h"),"mL/h maintenance"); }},
   padr:{lab:"Paeds arrest adrenaline", ic:"emerg", cls:"t-emerg", kind:"paeds", keys:["pw"], inp:()=>`${sig(S.pw)} kg`, open:["Paeds cardiac arrest","emerg","paeds"],
     ans:()=>{ const ml=dz(Math.min(0.1*S.pw,10),"mL",10); return sm(ml,`mL of 1:10 000 (10 mcg/kg)`); }},
-  dlt:{lab:"Double-lumen tube", ic:"airway", cls:"t-ga", kind:"adult", keys:["height"], inp:aHt, open:["2. One-lung ventilation","ga","maint"],
+  dlt:{lab:"Double-lumen tube", ic:"airway", cls:"t-ga", kind:"adult", keys:["height"], inp:aHt, open:["9. One-lung ventilation","ga","maint"],
     ans:()=>sm(dltSize(),`Fr left · ${sig(12+S.height/10)} cm`)},
-  prop:{lab:"Propofol induction", ic:"airway", cls:"t-ga", kind:"adult", keys:A, inp:aBoth, open:["1. Induction drugs & relaxants","ga","ind"],
+  prop:{lab:"Propofol induction", ic:"airway", cls:"t-ga", kind:"adult", keys:A, inp:aBoth, open:["2. Induction drugs & relaxants","ga","ind"],
     ans:()=>{ const w=wts().lbw, r=x=>dz(dz(x/10,"mL")*10,"mg"); return sm(`${r(1.5*w)}–${r(2.5*w)}`,`mg · 1.5–2.5 mg/kg LBW`); }},
   sug:{lab:"Sugammadex", ic:"airway", cls:"t-ga", kind:"adult", keys:["aw"], inp:aWt, open:["1. Reversal","ga","post"],
     ans:()=>{ const t=wts().tbw, m=k=>sig(dz(k*t/100,"mL")*100); return sm(m(2),`mg (2/kg) · 4: ${m(4)} · 16: ${m(16)}`); }},
   neo:{lab:"Neostigmine + glyco", ic:"airway", cls:"t-ga", kind:"adult", keys:A, inp:aBoth, open:["1. Reversal","ga","post"],
     ans:()=>{ const neo=Math.min(0.05*wts().ibw,5); return sm(sig(dz(neo/2.5,"mL")*2.5),`mg + glyco ${dz(neo*0.2,"mg")} mg`); }},
-  fent:{lab:"Fentanyl induction", ic:"airway", cls:"t-ga", kind:"adult", keys:A, inp:aBoth, open:["1. Induction drugs & relaxants","ga","ind"],
+  fent:{lab:"Fentanyl induction", ic:"airway", cls:"t-ga", kind:"adult", keys:A, inp:aBoth, open:["2. Induction drugs & relaxants","ga","ind"],
     ans:()=>{ const w=wts().lbw, r=x=>dz(dz(x/50,"mL")*50,"mcg"); return sm(`${r(w)}–${r(3*w)}`,`mcg · 1–3 mcg/kg LBW`); }},
   bw:{lab:"Body weights", ic:"airway", cls:"t-ga", kind:"adult", keys:A, inp:aBoth, goTab:"ga:ind",
     ans:()=>{ const x=wts(); return sm(sig(x.ibw),`kg IBW · LBW ${sig(x.lbw)} · Adj ${sig(x.adj)} · PBW ${sig(x.ibwRaw)}`); }},
@@ -1111,7 +1111,7 @@ const QT = (() => {
     ans:()=>sm(dz(1.5*S.aw,"mL"),`mL 20% bolus over 2–3 min · then ${dz(15*S.aw,"mL/h")} mL/h`)},
   dant:{lab:"Dantrolene (MH)", ic:"emerg", cls:"t-emerg", kind:"adult", keys:["aw"], inp:aWt, open:["Malignant hyperthermia","emerg","adult"],
     ans:()=>{ const mg = Math.min(2.5*S.aw, 300); return sm(dz(mg,"mg"),`mg · 2.5 mg/kg (max 300) · ${Math.ceil(mg/20)} × 20 mg vials`); }},
-  abx:{lab:"Antibiotic prophylaxis", ic:"airway", cls:"t-ga", kind:"adult", keys:["aw"], inp:aWt, open:["7. Antibiotic prophylaxis","ga","maint"],
+  abx:{lab:"Antibiotic prophylaxis", ic:"airway", cls:"t-ga", kind:"adult", keys:["aw"], inp:aWt, open:["1. Antibiotic prophylaxis","ga","maint"],
     ans:()=>sm("2 g", S.aw>=120 ? "cefazolin IV (NAG 2024; ASHP 3 g ≥ 120 kg) · 60 min before · redose 4 h" : "cefazolin IV (NAG 2024) · 60 min before · redose 4 h")},
   lac:{lab:"LA dose calc", ic:"spinal", cls:"t-regional", kind:"any", txt:true, keys:[], inp:()=>"shortcut", open:["1. LA dose calculator","regional","safety"],
     ans:()=>{ const n = (S.laA||[]).length; return n ? sm(`${n} added`,"tap to see the total") : sm("Add","tap to total your blocks"); }}};
@@ -1728,7 +1728,8 @@ const irDraft = () => IR_CHECKED ? "" : `<div class="warn" style="margin-top:0">
 const IR_SECS = {anti:"Anticholinergic", opioid:"Opioid", hyp:"Hypnotic", relax:"Muscle relaxant", noiv:"No IV access"};
 const irJump = ids => `<div class="jumprow">${ids.map(k => `<button class="chip" data-jump="${k}">${IR_SECS[k]}</button>`).join("")}</div>`;
 const irHead = k => `<h3 class="irh" data-anchor="${k}">${IR_SECS[k]}</h3>`;
-const OLD_LABELS = {"ga|1. Induction drugs":"ga-ind-induction-drugs", "ga|3. Muscle relaxants":"ga-ind-muscle-relaxants", "ga|4. Tube & airway kit":"ga-ind-tube-and-airway-kit",
+const OLD_LABELS = {"ga|3. Tube & airway kit":"ga-ind-tube-and-airway-kit", "ga|1. Induction drugs & relaxants":"ga-ind-induction-drugs", "ga|2. RSI":"ga-ind-rsi", "ga|7. Antibiotic prophylaxis":"ga-intra-antibiotic-prophylaxis", "ga|8. Tranexamic acid":"ga-intra-tranexamic-acid", "ga|1. Ventilation strategies":"ga-intra-ventilation-strategies", "ga|3. TIVA":"ga-intra-tiva", "ga|4. Volatile: MAC by age":"ga-intra-volatile-mac-by-age", "ga|5. Intra-op analgesia":"ga-intra-analgesia", "ga|6. Vasopressors & inotropes":"ga-intra-vasopressors-and-inotropes", "ga|2. One-lung ventilation":"ga-intra-one-lung-ventilation", "ga|4. Analgesia ladder & PCA":"ga-post-analgesia-ladder-and-pca", "ga|7. IM doses (no IV access, or ward)":"ga-post-im-doses-no-iv-access-or-ward",   // v2.144 General reorder
+  "ga|1. Induction drugs":"ga-ind-induction-drugs", "ga|3. Muscle relaxants":"ga-ind-muscle-relaxants", "ga|4. Tube & airway kit":"ga-ind-tube-and-airway-kit",
   "paeds|3. Induction drugs":"paeds-ind-induction-drugs", "paeds|4. Muscle relaxants":"paeds-ind-muscle-relaxants", "paeds|5. RSI (child)":"paeds-ind-rsi", "paeds|6. Ketamine induction (short cases)":"paeds-ind-ketamine-anaesthesia",
   "paeds|7. TIVA: model check & propofol targets":"paeds-ind-tiva-model-check", "paeds|8. TIVA: remifentanil":"paeds-ind-remifentanil", "paeds|9. Ventilation settings":"paeds-ind-ventilation",
   "paeds|10. One-lung ventilation (Storz)":"paeds-ind-one-lung-ventilation-storz", "paeds|11. Lines: double-lumen CVC":"paeds-ind-double-lumen-cvc"};   // pre-v2.70 recent records {g, t}
@@ -2670,7 +2671,7 @@ gaCards.optpost = () => `<div class="card"><h2>10. Optimise or postpone</h2>${aw
   <tr><td><b>Thyroid disease</b></td><td>Clinically and biochemically euthyroid before elective surgery</td></tr>
   <tr><td><b>Smoking / alcohol</b></td><td>Stop smoking ≥ 4 weeks before if possible (any time helps); screen for alcohol dependence</td></tr></table>
   <button class="homebtn" data-open="2. Echo report: what matters" data-g="premed" data-tab="assess">Valve lesions and EF → Echo report ›</button>
-  <button class="homebtn" data-open="3. PONV: Apfel score" data-g="ga" data-tab="post">PONV risk (Apfel) → General › Post-op ›</button>
+  <button class="homebtn" data-open="3. PONV: Apfel score" data-g="ga" data-tab="maint">PONV risk (Apfel) → General › Intra-op ›</button>
   ${src("Association of Anaesthetists / BHS peri-operative BP guideline (2016, updated 2026); CPOC diabetes 2021; ESC 2022 / ACC-AHA 2024 non-cardiac surgery; International consensus on peri-operative anaemia 2017; WHO anaemia thresholds; BHRS / Association CIED guidance.")}</div>`;
 
 /* Prepare 6 — anticoagulants & antiplatelets */
@@ -2864,7 +2865,7 @@ const IM_CHECKED = true, IMM_CHECKED = true;
 const IMMID = IMM_CHECKED ? "onset 10–15 min · uncooperative patient" : "DRAFT · onset 10–15 min · uncooperative patient";
 const imDraft = () => IM_CHECKED ? "" : `<div class="warn" style="margin-top:0">DRAFT — IM doses (BNF / BNFc, RCUK anaphylaxis 2021, APLS, MOH). Not yet ticked by you.</div>`;
 const FX = (name, dose, note, rt) => R(name, "fixed dose", `<b>${dose}</b>`, note, rt);
-gaCards.imAdult = () => `<div class="card"><h2>7. IM doses (no IV access, or ward)</h2>${imDraft()}
+gaCards.imAdult = () => `<div class="card"><h2>6. IM doses (no IV access, or ward)</h2>${imDraft()}
   <p class="sub">Adult. Deep IM into the anterolateral thigh or gluteal muscle. Absorption is slower and less predictable in shock — get IV / IO access as soon as possible.</p>
   <h3>Rescue</h3>${GT([
     FX("Adrenaline 1:1000 (anaphylaxis)","500 mcg = 0.5 mL","onset: peak about 5–10 min · anterolateral thigh; repeat after 5 min if no better","IM"),
@@ -3016,7 +3017,7 @@ gaCards.stopbang = () => { const x = wts(), n = sbScore(), auto = (on, t) => `<d
   ${fin ? `<div class="${lvl[0]}" style="margin-top:var(--s2)"><div class="big">${n} / 8</div><b>${lvl[1]}.</b> ${lvl[2]}</div>`
     : `<div class="result" style="margin-top:var(--s2)"><div class="big">${n} / 8</div>Score so far — answer every question for the risk.</div>`}${reset("sb")}
   <p class="sub">Screening, not a diagnosis. 0–2 low · 3–4 intermediate · 5–8 high. Also high if ≥ 2 STOP items plus male, BMI &gt; 35 or neck &gt; 40 cm.</p>
-  ${n>=5?`<button class="homebtn" data-open="5. Intra-op analgesia" data-g="ga" data-tab="maint">Opioid-sparing plan → Intra-op analgesia ›</button>`:""}
+  ${n>=5?`<button class="homebtn" data-open="7. Intra-op analgesia" data-g="ga" data-tab="maint">Opioid-sparing plan → Intra-op analgesia ›</button>`:""}
   ${src("Chung et al. STOP-BANG (Anesthesiology 2008; BJA 2012); SASM guidance.")}</div>`; };
 const ARI = () => [
   ["spo2","Pre-op SpO₂ on air",[["≥ 96%",0],["91–95%",8],["≤ 90%",24]]],
@@ -3034,7 +3035,7 @@ gaCards.ariscat = () => { const rows = ARI(), t = chosenPts("ari", rows) + ariAg
   ${choose("ari", rows)}
   <div class="${done?lvl[0]:"result"}"><div class="big">${t}</div>${done?`<b>${lvl[1]}</b> of post-op pulmonary complications ${lvl[2]}`:"Score so far — tap every row."}</div>${reset("ari")}
   <p class="sub">&lt; 26 low · 26–44 intermediate · ≥ 45 high. Not validated for cardiac or thoracic surgery.</p>
-  ${done&&t>=26?`<ul><li>Lung-protective ventilation, short-acting relaxant fully reversed, regional technique where possible</li><li>Treat infection first if elective; stop smoking; chest physiotherapy / incentive spirometry; early mobilisation</li></ul><button class="homebtn" data-open="1. Ventilation strategies" data-g="ga" data-tab="maint">Ventilation strategies → Intra-op ›</button>`:""}
+  ${done&&t>=26?`<ul><li>Lung-protective ventilation, short-acting relaxant fully reversed, regional technique where possible</li><li>Treat infection first if elective; stop smoking; chest physiotherapy / incentive spirometry; early mobilisation</li></ul><button class="homebtn" data-open="4. Ventilation strategies" data-g="ga" data-tab="maint">Ventilation strategies → Intra-op ›</button>`:""}
   ${src("Canet et al. Anesthesiology 2010 (ARISCAT); PERISCOPE validation 2014.")}</div>`; };
 const CFS = [["1","Very fit","Robust, active, exercises regularly"],["2","Fit","No active disease; exercises occasionally"],["3","Managing well","Medical problems controlled; not regularly active beyond walking"],
   ["4","Very mild frailty","Not dependent, but symptoms limit activity; 'slowed up'"],["5","Mild frailty","Needs help with finances, transport, heavy housework, medications"],["6","Moderate frailty","Needs help with all outside activities and housekeeping; help with bathing"],
@@ -3082,7 +3083,7 @@ gaCards.echo = () => `<div class="card"><h2>Echo report: what matters</h2>${echo
     `Fluid overload or RV failure: cautious fluids. Not valid on positive-pressure ventilation.`)}
   </table></div>
   <p class="sub">Severe lesion → arterial line before induction; cardiac-output monitor or TOE if available for major surgery. Valve severity is graded on several measures together — read the report's conclusion.</p>
-  <button class="homebtn" data-open="6. Vasopressors & inotropes" data-g="ga" data-tab="maint">Pressor and inotrope doses → General › Intra-op ›</button>
+  <button class="homebtn" data-open="8. Vasopressors & inotropes" data-g="ga" data-tab="maint">Pressor and inotrope doses → General › Intra-op ›</button>
   ${src("ASE/EACVI chamber quantification 2015 and diastolic function 2016; ASE valvular regurgitation 2017; ACC/AHA valvular heart disease 2020; ESC/ERS pulmonary hypertension 2022; ESC 2022 / ACC-AHA 2024 perioperative guidelines; BJA Education reviews.")}</div>`;
 // v2.127: answers for this patient from NICE NG45 (adults); the full table stays below
 const TESTS_CHECKED = true;   // checked by author 25 Nov 2026;
@@ -3333,7 +3334,7 @@ function lepBody(){ const txt = lepText();
   ${src("OAA labour epidural information card; NAP3 (RCoA 2009; Cook et al., BJA 2009); Ruppen et al., Anesthesiology 2006; Moen et al., Anesthesiology 2004; Ministry of Health Malaysia anaesthesia consent form.")}`; }
 
 /* INDUCTION */
-gaCards.induction = () => `<div class="card"><h2>1. Induction drugs &amp; relaxants</h2>${gaDraft()}${irDraft()}${irJump(["opioid","hyp","relax","noiv"])}
+gaCards.induction = () => `<div class="card"><h2>2. Induction drugs &amp; relaxants</h2>${gaDraft()}${irDraft()}${irJump(["opioid","hyp","relax","noiv"])}
   ${irHead("opioid")}${GT([
   GD("Fentanyl",[1,3],"mcg","lbw",50,null,null,"IV")])}
   ${irHead("hyp")}${GT([
@@ -3357,7 +3358,7 @@ gaCards.induction = () => `<div class="card"><h2>1. Induction drugs &amp; relaxa
   R("Atropine (no IV access, with IM suxamethonium)","fixed dose","<b>0.6 mg</b>","onset 5–15 min","IM")])}
   <p class="sub"><b>No IV access:</b> IM options are ketamine, or suxamethonium + atropine. Then site IV / IO.</p>${src(GSRC)}</div>`;
 gaCards.rsi = () => { const W2 = wts();
-  return `<div class="card"><h2>2. RSI</h2>${gaDraft()}
+  return `<div class="card"><h2>3. RSI</h2>${gaDraft()}
   <ol><li>Check: suction on, tipping trolley, bougie, VL, SAD, plan A–D said aloud</li><li>Preoxygenate EtO₂ &gt; 0.9 (± high-flow nasal O₂)</li><li>Cricoid 10 N awake → 30 N after LOC; release if view poor</li><li>Induction agent + relaxant, no bag-mask unless SpO₂ falling (then gentle)</li></ol>
   ${f5Draft()}${GT([
     R("Suxamethonium",`1.5 mg/kg · TBW ${sig(W2.tbw)} kg`,`${sig(dz(1.5*W2.tbw/50,"mL")*50)} mg`,`${dz(1.5*W2.tbw/50,"mL")} mL of 50 mg/mL`,"IV"),
@@ -3367,7 +3368,7 @@ gaCards.rsi = () => { const W2 = wts();
 gaCards.kit = () => { const w = S.aw;
   const lma = w < 30 ? "2.5" : w < 50 ? "3" : w < 70 ? "4" : w <= 100 ? "5" : "5 (or 6 if available)";
   const igel = w < 30 ? "2.5" : w < 50 ? "3" : w < 90 ? "4" : "5";
-  return `<div class="card"><h2>3. Tube &amp; airway kit</h2>${ettCalc(true, true)}
+  return `<div class="card"><h2>1. Tube &amp; airway kit</h2>${ettCalc(true, true)}
   <button class="homebtn" data-open="1. Tube: size, depth, blade, suction" data-g="paeds" data-tab="ind">Child or neonate? → Paediatric › Induction ›</button>
   <h3>Supraglottic airway for ${sig(w)} kg</h3>
   ${ET([EQ("LMA Classic / Supreme / ProSeal", "", `Size ${lma}`, null), EQ("i-gel", "", `Size ${igel}`, null)])}
@@ -3425,10 +3426,10 @@ gaCards.vent = () => {
   if (!VENT_SC[S.ventSc]) S.ventSc = "std";
   const sc = VENT_SC[S.ventSc];
   const body = sc.olv
-    ? `<button class="homebtn primary" data-open="2. One-lung ventilation" data-g="ga" data-tab="maint">Open 2. One-lung ventilation ›</button>`
+    ? `<button class="homebtn primary" data-open="9. One-lung ventilation" data-g="ga" data-tab="maint">Open 9. One-lung ventilation ›</button>`
     : ventSettings(sc) + `<ul>${sc.li.map(t=>`<li>${t}</li>`).join("")}</ul>` + (S.ventSc==="ards" ? `<h3>PEEP by FiO₂ (ARDSNet lower-PEEP table)</h3><p class="sub">Tap the FiO₂ you are on.</p>
       <table><tr><th>FiO₂</th><th>PEEP cmH₂O</th></tr>${ARDS_TBL.map(([f,p])=>`<tr class="${S.vfio===f?"hl":""}"><td><button class="linkish" data-seg="vfio" data-val="${f}">${f}</button></td><td>${p}</td></tr>`).join("")}</table>` : "");
-  return `<div class="card"><h2>1. Ventilation strategies</h2>${ventDraft()}
+  return `<div class="card"><h2>4. Ventilation strategies</h2>${ventDraft()}
   <p class="sub">Predicted body weight from sex + height: <b>PBW ${sig(pbw())} kg</b>. Tidal volume always from height, never actual weight.</p>
   ${seg("ventSc", Object.entries(VENT_SC).map(([k,v])=>[k,v.n]))}
   ${body}
@@ -3452,12 +3453,12 @@ gaCards.vent = () => {
   <button class="emlink" data-open="Bronchospasm" data-g="emerg" data-tab="adult">⚠ Bronchospasm → Emergencies</button>
   <button class="emlink" data-open="Anaphylaxis" data-g="emerg" data-tab="adult">⚠ Anaphylaxis → Emergencies</button>
   <button class="homebtn" data-open="8. Ventilation settings" data-g="paeds" data-tab="ind">Child? → Paediatric › Induction › Ventilation ›</button>
-  ${src("Young et al. BJA 2019 intra-op lung-protective ventilation consensus; ARDSNet; Brain Trauma Foundation 4th ed.; obstetric GA ventilation studies.")}</div>`;
+  ${src("Young et al. BJA 2019 intra-op lung-protective ventilation consensus; ARDSNet; Brain Trauma Foundation 4th ed.; obstetric GA ventilation studies.")}<button class="rellink navonly" data-id="ga-intra-one-lung-ventilation" data-open="9. One-lung ventilation" data-g="ga" data-tab="maint">One-lung ventilation ›</button></div>`;
 };
 // left DLT starting size: Asian / Malaysian adults; confirm with fibreoptic
 function dltSize(){ const h = S.height; return S.sex==="F" ? (h<160 ? 35 : 37) : (h<170 ? 37 : 39); }
 gaCards.olv = () => { const d = dltSize(), dep = 12 + S.height/10;
-  return `<div class="card"><h2>2. One-lung ventilation</h2>${ventDraft()}
+  return `<div class="card"><h2>9. One-lung ventilation</h2>${ventDraft()}
   <h3>Left double-lumen tube (DLT)</h3>
   ${f6Draft()}${ET([EQ("Starting size", `(${sxi(S.sex)} ${S.height} cm)`, `${d} Fr`, null), EQ("Depth", "(12 + height/10)", `≈ ${sig(dep)} cm`, "at mouth corner")])}
   <p class="sub">${sxi("F")} &lt; 160 cm 35 Fr, ≥ 160 cm 37 Fr · ${sxi("M")} &lt; 170 cm 37 Fr, ≥ 170 cm 39 Fr (41 rarely needed). Height predicts size poorly in Asian patients: have one size smaller ready, and <b>always confirm with a fibreoptic scope</b>.</p>
@@ -3609,7 +3610,7 @@ txCards.maint = () => { const a = S.age, f = Math.pow(10, -0.00269*(a-40)), r = 
   <tr><td>Isoflurane</td><td class="hl">${r(1.17)}%</td><td></td></tr><tr><td>Desflurane</td><td class="hl">${r(6.6)}%</td><td></td></tr></table>
   <h3>or TIVA</h3><p>Propofol TCI (Marsh / Schnider) — targets as General › Intra-op › TIVA. Use processed EEG.</p>
   <ul><li>Fentanyl infusion (see Syringes) ± small morphine</li><li>Good relaxation throughout the vascular anastomosis</li><li>Supine, Gibson incision; warm (forced air, fluid warmer)</li></ul>
-  <button class="homebtn" data-open="3. TIVA" data-g="ga" data-tab="maint">TIVA targets → General › Intra-op ›</button>
+  <button class="homebtn" data-open="5. TIVA" data-g="ga" data-tab="maint">TIVA targets → General › Intra-op ›</button>
   ${src("Mapleson 1996; "+TXP+".")}</div>`; };
 txCards.syr = () => { const w = txW(), W2 = wts(), nor = (lo,hi) => `${dz(lo*w*60/80,"mL/h")}–${dz(hi*w*60/80,"mL/h")} mL/h`;
   return `<div class="card"><h2>Kidney: syringes &amp; infusions</h2>${tx2Draft()}
@@ -3623,7 +3624,7 @@ txCards.bp = () => `<div class="card"><h2>Kidney: BP target &amp; pressors</h2>$
   <table><tr><th>Target</th><td>Patient's own baseline (often 140–150 / 80–90); highest need at <b>reperfusion</b></td></tr>
   <tr><th>First choice</th><td><b>Noradrenaline</b> (bolus or infusion) after depth and volume are optimised</td></tr>
   <tr><th>Why</th><td>Cold, ischaemic, vasospastic graft needs high perfusion pressure; a hypertensive donor's kidney expects a higher MAP</td></tr></table>
-  <button class="homebtn" data-open="6. Vasopressors & inotropes" data-g="ga" data-tab="maint">Pressor doses → General › Intra-op ›</button>
+  <button class="homebtn" data-open="8. Vasopressors & inotropes" data-g="ga" data-tab="maint">Pressor doses → General › Intra-op ›</button>
   ${src(TXP+"; Mayhew BJA Education 2016.")}</div>`;
 txCards.fluid = () => { const w = txW(), hi = kHigh();
   return `<div class="card"><h2>Kidney: fluids &amp; blood</h2>${tx2Draft()}
@@ -3710,7 +3711,7 @@ function donInputs(){ return ptiles([ptile("aw","Donor weight","kg",30,200,1)]);
 
 /* MAINTENANCE */
 gaCards.tiva = () => { const W2 = wts(), w = W2.lbw;
-  return `<div class="card"><h2>3. TIVA</h2>${gaDraft()}
+  return `<div class="card"><h2>5. TIVA</h2>${gaDraft()}
   <table><tr><th>Propofol — Marsh</th><td>Plasma target: induction <b>4–6 mcg/mL</b>, maintenance <b>3–6</b>. Obese: enter <b>AdjBW ${sig(W2.adj)} kg</b>.</td></tr>
   <tr><th>Propofol — Schnider</th><td>Effect-site target: induction <b>3–5 mcg/mL</b> (step up slowly), maintenance <b>2.5–5</b>. Needs age, height, weight, sex.</td></tr>
   <tr><th>Remifentanil — Minto</th><td>Effect-site target: intubation <b>4–6 ng/mL</b>, maintenance <b>2–8</b>.</td></tr></table>
@@ -3720,7 +3721,7 @@ gaCards.tiva = () => { const W2 = wts(), w = W2.lbw;
   ${src("Association of Anaesthetists / SIVA TIVA guidance.")}</div>`; };
 gaCards.mac = () => { const a = S.age, f = Math.pow(10, -0.00269*(a-40));
   const r = (m40) => sig(m40*f);
-  return `<div class="card"><h2>4. Volatile: MAC by age</h2><p class="sub">Age ${a} y (set in the patient box)</p>${gaDraft()}
+  return `<div class="card"><h2>6. Volatile: MAC by age</h2><p class="sub">Age ${a} y (set in the patient box)</p>${gaDraft()}
   <table><tr><th>Agent</th><th>MAC at 40 y</th><th>MAC at ${a} y</th></tr>
   <tr><td>Sevoflurane</td><td>2.1%</td><td class="hl">${r(2.1)}%</td></tr>
   <tr><td>Isoflurane</td><td>1.17%</td><td class="hl">${r(1.17)}%</td></tr>
@@ -3743,7 +3744,7 @@ gaCards.opioid = () => {
     liver && "<b>Liver:</b> paracetamol max 2–3 g/day; lignocaine infusion reduced or avoided; titrate opioids slowly",
     osa && "<b>OSA:</b> opioid-sparing plan advised (switch above); monitored bed if opioids needed",
     tol && "<b>Opioid-tolerant:</b> continue usual opioid (or equivalent); add ketamine; expect higher needs"].filter(Boolean);
-  return `<div class="card"><h2>5. Intra-op analgesia</h2>${ioaDraft()}
+  return `<div class="card"><h2>7. Intra-op analgesia</h2>${ioaDraft()}
   <div class="txck">${t("ofa","<b>Opioid-sparing / opioid-free plan</b> (OSA, obese, PONV-prone, opioid-intolerant)")}</div>
   <h3>Patient factors</h3><div class="txck">${IOA_MOD.map(([k,l])=>t(k,l)).join("")}</div>
   ${mods.length ? `<div class="warn">${mods.join("<br>")}</div>` : `<p class="sub">Elderly (≥ 65) and obese (BMI ≥ 30) are set from the patient box.</p>`}
@@ -3788,10 +3789,10 @@ gaCards.opioid = () => {
   <button class="homebtn" data-open="1. LA dose calculator" data-g="regional" data-tab="safety">LA dose calculator → Regional ›</button>
   <h3>5. Before waking</h3><ul><li>Long-acting opioid given if remifentanil was used</li><li>Infusions stopped (ketamine 30–60 min before; lignocaine at end unless continued on ward under protocol)</li>
   <li>Write PACU analgesia + PCA orders; PONV prophylaxis given</li></ul>
-  <button class="homebtn" data-open="4. Analgesia ladder & PCA" data-g="ga" data-tab="post">Post-op ladder & PCA → General › Post-op ›</button>
+  <button class="homebtn" data-open="3. Analgesia ladder & PCA" data-g="ga" data-tab="post">Post-op ladder & PCA → General › Post-op ›</button>
   ${src("Foo et al. Anaesthesia 2021 (IV lidocaine consensus); ASRA/AAPM/ASA ketamine guideline 2018; PROSPECT (ESRA) procedure recommendations; dexmedetomidine and magnesium trials; product labels.")}</div>`; };
 gaCards.pressors = () => { const w = S.aw, rate = (lo,hi,conc) => `${dz(lo*w*60/conc,"mL/h")}–${dz(hi*w*60/conc,"mL/h")} mL/h`;
-  return `<div class="card"><h2>6. Vasopressors &amp; inotropes</h2>${gaDraft()}
+  return `<div class="card"><h2>8. Vasopressors &amp; inotropes</h2>${gaDraft()}
   <div class="dfor" data-w="${sig(w)}"></div><div style="overflow-x:auto"><table class="dt"><tr class="dth"><th>Drug · mix</th><th>Dose</th><th>For ${sig(w)} kg</th></tr>
   <tr data-dr="1"><td><span class="dn">Ephedrine</span><div class="sub dnote">30 mg in 5 mL = 6 mg/mL</div></td><td>3–6 mg bolus</td><td class="hl">0.5–1 mL</td></tr>
   <tr data-dr="1"><td><span class="dn">Phenylephrine</span><div class="sub dnote">10 mg in 100 mL = 100 mcg/mL</div></td><td>50–100 mcg bolus; infusion 25–100 mcg/min</td><td class="hl">0.5–1 mL; 15–60 mL/h</td></tr>
@@ -3800,7 +3801,7 @@ gaCards.pressors = () => { const w = S.aw, rate = (lo,hi,conc) => `${dz(lo*w*60/
   <tr data-dr="1"><td><span class="dn">Dobutamine</span><div class="sub dnote">250 mg in 50 mL = 5 mg/mL</div></td><td>2–20 mcg/kg/min</td><td class="hl">${rate(2,20,5000)}</td></tr></table></div>
   <p class="sub">Infusion rates use actual weight. Check your unit's standard concentrations.</p>
   <button class="homebtn" data-open="2. Echo report: what matters" data-g="premed" data-tab="assess">Valve lesion or poor EF: goals → General › Pre-op › Echo ›</button>${src("Common UK/Malaysian ICU concentrations.")}</div>`; };
-gaCards.txa = () => `<div class="card"><h2>8. Tranexamic acid</h2>${gaDraft()}
+gaCards.txa = () => `<div class="card"><h2>2. Tranexamic acid</h2>${gaDraft()}
   ${f1Draft()}${GT([
     R("Tranexamic acid",`over 10 min at induction (or 15 mg/kg = ${dz(15*S.aw,"mg")} mg)`,"1 g","Repeat 1 g if bleeding continues or long case.","IV")])}
   <p class="sub">Caution: recent VTE, seizure history, severe renal impairment.</p>${src("Common practice.")}</div>`;
@@ -3849,7 +3850,7 @@ gaCards.extub = () => `<div class="card"><h2>Extubation criteria</h2>${gaDraft()
   <ul><li>Awake, obeys commands (or deep extubation planned)</li><li>TOF ratio ≥ 0.9</li><li>Regular breathing, RR &gt; 10, Vt &gt; 5 mL/kg</li><li>SpO₂ adequate on FiO₂ ≤ 0.4, normal EtCO₂</li><li>Haemodynamically stable, temperature &gt; 36 °C</li><li>Airway clear, suctioned; bite block</li></ul>
   <p class="sub">At-risk airway: DAS extubation plan (exchange catheter, awake, ICU).</p>${src("DAS extubation guideline 2012.")}</div>`;
 gaCards.analgesia = () => { const W2 = wts(), w = S.aw;
-  return `<div class="card"><h2>4. Analgesia ladder &amp; PCA</h2>${gaDraft()}
+  return `<div class="card"><h2>3. Analgesia ladder &amp; PCA</h2>${gaDraft()}
   ${f1Draft()}${GT([
     R("Paracetamol",`${w<50?"15 mg/kg · ":""}6-hourly`,w<50?`${dz(15*w,"mg")} mg`:"1 g",`max ${w<50?"60 mg/kg/day":"4 g/day"}`,"IV / PO"),
     R("NSAID: parecoxib","","40 mg",null,"IV"),
@@ -3896,9 +3897,9 @@ function laWeight(lt){
 }
 function laMaxMg(d, lt){ const {w} = laWeight(lt), D = LAD[d]; return Math.min((lt==="p"?pMaxFor(d):D.max)*w, D.cap); }
 const laKey = lt => lt==="p" ? "laP" : "laA";
-function laAddBtn(lt, d, conc, ml, sides, label){
+function laAddBtn(lt, d, conc, ml, sides, label){   // v2.143: fills in the calculator form (you check it and tap Add) — nothing is added from here
   const spec = esc(JSON.stringify({d, c:String(conc), ml:+sig(ml), bi:sides, l:label}));
-  return `<button class="addla" data-addla="${spec}" data-lt="${lt}">+ Add ${dz(ml,"mL")} mL ${conc}%${sides===2?" × 2 sides":""} to LA calculator</button>`;
+  return `<button class="addla" data-laprep="${spec}" data-lt="${lt}">Set up ${dz(ml,"mL")} mL ${conc}%${sides===2?" × 2 sides":""} in LA calculator ›</button>`;
 }
 // running total shown on every block card once something is in the calculator (v2.111)
 function laSoFar(lt){ const list = S[laKey(lt)] || []; if (!list.length) return "";
@@ -3917,7 +3918,8 @@ function laCalc(lt){
   return `<p class="sub">Max for this patient (${why}): ${maxLine}</p>
     <div class="sub">Add a block</div>${seg("laD",Object.entries(LAD).map(([k,v])=>[k,v.n]))}${seg("laC",D.concs.map(c=>[c,c+"%"]))}
     ${step("laMl","Volume","mL",1,60,1)}${seg("laBi",[["1","One side"],["2","Both sides"]])}
-    <button class="homebtn" data-addla="form" data-lt="${lt}">+ Add ${S.laMl} mL ${D.n} ${S.laC}%${S.laBi==="2"?" × 2":""}</button>
+    ${S.laLbl && S.laLbl.lt === lt ? `<p class="sub" style="margin:4px 0">Set up for <b>${esc(S.laLbl.l)}</b> — check the drug, %, volume and sides, then add.</p>` : ""}<button class="homebtn" data-addla="form" data-lt="${lt}">+ Add ${S.laMl} mL ${D.n} ${S.laC}%${S.laBi==="2"?" × 2":""}</button>
+    ${S.laNext && S.laNext.lt === lt && S.laNext.items.length ? `<button class="addla" data-lanext="${lt}">Next: ${esc(S.laNext.items[0].l)} — set up ›</button>` : ""}
     ${lt === "a" ? `<button class="addla" data-addla="${esc(JSON.stringify({d:"lido", c:"1", ml:5, bi:1, l:"Skin infiltration"}))}" data-lt="a">+ Lignocaine 1% skin infiltration, 5 mL</button>` : ""}
     ${list.length ? `<div style="overflow-x:auto"><table><tr><th>Block</th><th>Dose</th><th>% max</th><th></th></tr>${rows}</table></div>` : `<p class="sub">No blocks added yet. Use the form above or the "+ Add" button on any block card.</p>`}
     <div class="meter ${state}"><span style="width:${Math.min(total,100)}%"></span></div>
@@ -3941,7 +3943,7 @@ function blk(o){
   <tr><th>Cautions</th><td>${o.caut}</td></tr>${o.miss ? `<tr class="blkmiss"><th>Misses</th><td>${o.miss}${MISS_CHECKED ? "" : ' <span class="tagdraft">draft</span>'}</td></tr>` : ""}</table>
   <h3>Drug &amp; volume</h3>${f2Draft()}${FT([
     R(`bupi/levobupi ${conc}%`,`(${o.anal?"analgesia":"surgical"})`,`${o.vol[0]}–${o.vol[1]} mL${o.bilat?" per side":""}`,`= ${dz(mgLo,"mg")}–${dz(mgHi,"mg")} mg${o.bilat?" both sides":""} · <span class="${pct>100?"bad":""}">${Math.round(pct)}% of max</span>`,"perineural")])}
-  ${laAddBtn("a","bupi",conc,o.vol[1],bi,o.t)}${laSoFar("a")}${src(o.src || RSRC)}</div>`;
+  ${laAddBtn("a","bupi",conc,o.vol[0],bi,o.t)}${laSoFar("a")}${src(o.src || RSRC)}</div>`;
 }
 const raCards = {};
 raCards.spinalNonObs = () => `<div class="card"><h2>Spinal dose: non-obstetric</h2><div class="spcalc">${nonObsCalc()}</div></div>`;   // the calculator, listed as a card (v2.69)
@@ -4175,7 +4177,7 @@ function bfBlockRow(title, first, reg){
     <span class="sub bfw">${short} · <span class="${pct > 100 ? "bad" : ""}">${Math.round(pct)}% of max</span></span></summary>
     <div class="sub bfw">bupi/levobupi ${conc}% (${o.anal ? "analgesia" : "surgical"}) = ${rng(dz(lo,"mg"), dz(hi,"mg"), "mg")}${o.bilat ? " both sides" : ""}</div>
     <div class="sub bfw bfc">${o.caut}</div>${o.miss ? `<div class="sub bfw bfmiss"><b>Misses:</b> ${o.miss}</div>` : ""}${ae ? `<button class="rellink bfdeep" data-id="${ae.id}" data-open="${esc(ae.label)}" data-g="regional" data-tab="${ae.tab}">Deep block — check anticoagulant timing ›</button>` : ""}
-    ${laAddBtn("a", "bupi", conc, o.vol[1], bi, o.t)}<button class="bfo" data-id="${id}" data-open="${esc(e.label)}" data-g="regional" data-tab="${e.tab}"><span class="bfn">${esc(o.t)} ›</span><span class="sub">full card</span></button></details>`;
+    ${laAddBtn("a", "bupi", conc, o.vol[0], bi, o.t)}<button class="bfo" data-id="${id}" data-open="${esc(e.label)}" data-g="regional" data-tab="${e.tab}"><span class="bfn">${esc(o.t)} ›</span><span class="sub">full card</span></button></details>`;
 }
 const BF_PAIR_CHECKED = true;   // checked by author 25 Nov 2026;   // v2.125 pairs and deep-block reminder
 const BF_SIDED = ["shoulder", "clavicle", "arm", "hand", "breast", "hip", "thigh", "knee", "foot"];
@@ -4185,16 +4187,18 @@ const BF_PAIR = {knee: [["Adductor canal", "iPACK"], "iPACK is added to an adduc
   foot: [["Popliteal sciatic", "Adductor canal"], "A saphenous block (adductor canal) supplements a sciatic block when the inner ankle or foot is involved."],
   clavicle: [["Interscalene", "Superficial cervical plexus"], "Interscalene for the bone, superficial cervical plexus for the skin (supraclavicular nerves)."]};
 function bfPair(r){ const k = Object.keys(BF_REG).find(x => BF_REG[x] === r), pr = BF_PAIR[k]; if (!pr) return "";
-  const spec = t => { const o = BLKS[t]; return {d: "bupi", c: String(o.anal ? .25 : .5), ml: +sig(o.vol[1]), bi: o.bilat ? 2 : 1, l: t}; };
-  return `<div class="bfpair">${BF_PAIR_CHECKED ? "" : `<span class="bftag" style="color:var(--warn-ink,#92400e)">DRAFT (v2.125)</span>`}<b>Often used together:</b> ${pr[0].join(" + ")}<div class="sub">${pr[1]}</div><button class="addla" data-addpair="${esc(JSON.stringify(pr[0].map(spec)))}" data-lt="a">+ Add both to LA calculator</button></div>`; }
+  const spec = t => { const o = BLKS[t]; return {d: "bupi", c: String(o.anal ? .25 : .5), ml: +sig(o.vol[0]), bi: o.bilat ? 2 : 1, l: t}; };   // lower end of the range
+  return `<div class="bfpair">${BF_PAIR_CHECKED ? "" : `<span class="bftag" style="color:var(--warn-ink,#92400e)">DRAFT (v2.125)</span>`}<b>Often used together:</b> ${pr[0].join(" + ")}<div class="sub">${pr[1]}</div><button class="addla" data-addpair="${esc(JSON.stringify(pr[0].map(spec)))}" data-lt="a">Set up both in LA calculator ›</button><div class="sub">One at a time: you check each, then add it.</div></div>`; }
 // operation picker: a shortcut to the region (no new suggestions of its own)
-const BF_OPS = [["Total knee replacement (TKA)", "knee", "tkr tka knee arthroplasty"], ["ACL reconstruction / knee arthroscopy", "knee", "acl arthroscopy menisc"], ["Hip fracture (DHS, hemiarthroplasty)", "hip", "nof neck of femur dhs hemiarthroplasty"],
-  ["Total hip replacement (THA)", "hip", "thr tha hip arthroplasty"], ["Femur fixation", "thigh", "femoral shaft nail"], ["Skin graft donor site (thigh)", "thigh", "split skin graft ssg"],
-  ["Ankle fracture / foot surgery", "foot", "orif ankle bunion hallux amputation toe"], ["Below-knee amputation", "foot", "bka amputation"], ["Shoulder arthroscopy / replacement", "shoulder", "rotator cuff arthroplasty subacromial"],
-  ["Clavicle fixation", "clavicle", "clavicle orif"], ["Humerus, elbow or forearm surgery", "arm", "elbow forearm radius ulna humerus av fistula avf arteriovenous fistula creation"], ["Hand or wrist surgery", "hand", "carpal tunnel trigger finger wrist hand wrist fracture distal radius colles"],
-  ["Mastectomy / breast surgery", "breast", "mastectomy wide local excision wle breast axillary clearance"], ["Thoracotomy / VATS / rib fractures", "chest", "thoracotomy vats rib fracture chest drain"],
-  ["Laparotomy / laparoscopic cholecystectomy", "upabdo", "laparotomy lap chole cholecystectomy midline"], ["Inguinal hernia / appendicectomy", "loabdo", "hernia appendix appendicectomy"],
-  ["Caesarean section (LSCS)", "loabdo", "lscs caesarean cesarean c-section csection pfannenstiel"], ["Bladder tumour resection (TURBT)", "loabdo", "turbt bladder obturator"], ["Spine surgery", "back", "spine lumbar fusion laminectomy"]];
+// v2.143: 4th = usual anaesthetic for this operation (draft); 5th = extra blocks shown first for this operation
+const BF_OPS_CHECKED = true;   // checked by author 25 Nov 2026;
+const BF_OPS = [["Total knee replacement (TKA)", "knee", "tkr tka knee arthroplasty", "Spinal or GA. Blocks here are for analgesia: adductor canal ± iPACK, or the surgeon's local infiltration."], ["ACL reconstruction / knee arthroscopy", "knee", "acl arthroscopy menisc", "GA or spinal. Blocks here are for analgesia."], ["Hip fracture (DHS, hemiarthroplasty)", "hip", "nof neck of femur dhs hemiarthroplasty", "Spinal or GA. Give a block early for pain (fascia iliaca, femoral or PENG), including before positioning for the spinal."],
+  ["Total hip replacement (THA)", "hip", "thr tha hip arthroplasty", "Spinal or GA. Blocks here are for analgesia; PENG does not cover the skin incision."], ["Femur fixation", "thigh", "femoral shaft nail", "Spinal or GA. Blocks here are for analgesia."], ["Skin graft donor site (thigh)", "thigh", "split skin graft ssg", "LFCN can cover the skin of a lateral thigh donor site; the graft site needs its own plan."],
+  ["Ankle fracture / foot surgery", "foot", "orif ankle bunion hallux amputation toe", "Popliteal sciatic + saphenous can be the sole anaesthetic below the knee; a thigh tourniquet needs spinal or GA."], ["Below-knee amputation", "foot", "bka amputation", "Spinal or GA. Sciatic and saphenous (or femoral) blocks for analgesia."], ["Shoulder arthroscopy / replacement", "shoulder", "rotator cuff arthroplasty subacromial", "GA, often with an interscalene block; interscalene alone in selected cases. Lung disease: phrenic-sparing options."],
+  ["Clavicle fixation", "clavicle", "clavicle orif", "Usually GA. Interscalene + superficial cervical plexus for analgesia; sole anaesthetic only in selected patients."], ["Humerus, elbow or forearm surgery", "arm", "elbow forearm radius ulna humerus av fistula avf arteriovenous fistula creation", "A brachial plexus block (supraclavicular, infraclavicular or axillary) can be the sole anaesthetic, e.g. AV fistula."], ["Hand or wrist surgery", "hand", "carpal tunnel trigger finger wrist hand wrist fracture distal radius colles", "A brachial plexus block or a wrist block can be the sole anaesthetic; a wrist block does not cover an upper-arm tourniquet."],
+  ["Mastectomy / breast surgery", "breast", "mastectomy wide local excision wle breast axillary clearance", "GA. Blocks for analgesia: PECS II, serratus, paravertebral or ESP."], ["Thoracotomy / VATS / rib fractures", "chest", "thoracotomy vats rib fracture chest drain", "GA for thoracotomy or VATS. Analgesia: thoracic epidural or paravertebral; ESP or serratus as alternatives. Rib fractures: the same blocks for pain."],
+  ["Laparotomy / laparoscopic cholecystectomy", "upabdo", "laparotomy lap chole cholecystectomy midline", "GA ± thoracic epidural. Rectus sheath, TAP and QL cover the abdominal wall, not visceral pain."], ["Inguinal hernia / appendicectomy", "loabdo", "hernia appendix appendicectomy", "Hernia: GA, spinal, or an ilioinguinal block with local infiltration. Appendicectomy: GA; wall blocks for analgesia only."],
+  ["Caesarean section (LSCS)", "loabdo", "lscs caesarean cesarean c-section csection pfannenstiel", "Spinal / CSE, or GA. TAP or QL for analgesia — mainly when no intrathecal morphine was given."], ["Bladder tumour resection (TURBT)", "loabdo", "turbt bladder obturator", "Spinal. Lateral bladder wall: add an obturator block to stop the adductor jerk (or GA with full paralysis).", ["Obturator"]], ["Spine surgery", "back", "spine lumbar fusion laminectomy", "GA. ESP for analgesia."]];
 function bfOpsList(){ const q = (S.bfq || "").trim().toLowerCase(); if (!q) return "";
   const hits = BF_OPS.map((o, i) => [o, i]).filter(([o]) => (o[0] + " " + o[2]).toLowerCase().includes(q)).slice(0, 6);
   return hits.length ? hits.map(([o, i]) => `<button class="bfopb" data-bfop="${i}">${o[0]} <span class="sub">→ ${BF_REG[o[1]].t}</span></button>`).join("") : `<p class="sub" style="margin:4px 0">No match — tap the body or use the list.</p>`; }
@@ -4203,9 +4207,9 @@ function bfPanel(){
   if (!sel && BF.st.zone && bf3d()) return `<p class="sub bfempty">Now tap the exact spot on the ${BF.st.zone.z === "upper" ? "arm" : BF.st.zone.z === "lower" ? "leg" : "trunk"} — or Whole body to go back.</p>`;
   if (!sel) return `<p class="sub bfempty">${bf3d() && glAvail() && !BF.st.nogl ? "Tap" : "Pick"} where you operate — the suggested blocks appear here.</p>`;
   const r = BF_REG[sel.reg], side = sel.side ? sel.side + " " : "";
-  const nx = r.nx && findEntry(CARD_IDS[r.nx[0]]);
+  const nx = r.nx && findEntry(CARD_IDS[r.nx[0]]), op = S.bfOp != null && BF_OPS[S.bfOp] && BF_OPS[S.bfOp][1] === sel.reg ? BF_OPS[S.bfOp] : null, extra = op && op[4] ? op[4].filter(t => !r.blocks.includes(t)) : [];
   return `<h3 style="margin-top:0">${side}${side ? r.t.toLowerCase() : r.t}</h3>${sel.side ? `<p class="bfside">Mark the ${sel.side.toLowerCase()} side · Stop Before You Block</p>` : BF_SIDED.includes(sel.reg) ? `<div class="bfsidepick"><span>Which side?</span><button data-bfside="Left">Left</button><button data-bfside="Right">Right</button></div>` : ""}${r.note ? `<p class="sub" style="margin:0">${r.note}</p>` : ""}
-    ${bfPair(r)}${r.blocks.slice(0, 3).map((b, i) => bfBlockRow(b, i === 0, sel.reg)).join("")}${r.blocks.length > 3 ? `<details class="bfmore"><summary>More options (${r.blocks.length - 3})</summary>${r.blocks.slice(3).map(b => bfBlockRow(b, false, sel.reg)).join("")}</details>` : ""}
+    ${op ? `<div class="bfopl"><b>${op[0]}</b> — usually under: ${op[3]}${BF_OPS_CHECKED ? "" : ' <span class="tagdraft">draft</span>'}</div>` : ""}${extra.map((t, i) => bfBlockRow(t, i === 0, sel.reg)).join("")}${bfPair(r)}${r.blocks.slice(0, 3).map((b, i) => bfBlockRow(b, i === 0 && !extra.length, sel.reg)).join("")}${r.blocks.length > 3 ? `<details class="bfmore"><summary>More options (${r.blocks.length - 3})</summary>${r.blocks.slice(3).map(b => bfBlockRow(b, false, sel.reg)).join("")}</details>` : ""}
     ${BF_LIMB[sel.reg] ? `<button class="rellink" data-bfnerve="${BF_LIMB[sel.reg]}">See the nerves of this ${BF_LIMB[sel.reg] === "trunk" ? "area" : BF_LIMB[sel.reg]} ›</button>` : ""}
     ${nx ? `<button class="rellink" data-id="${nx.id}" data-open="${esc(nx.label)}" data-g="regional" data-tab="${nx.tab}">Or neuraxial: ${r.nx[1]} → ${esc(bareLabel(nx.label))} ›</button>` : ""}`;
 }
@@ -4664,7 +4668,7 @@ function nagCard(){
   return `${NAG_CHECKED ? "" : `<div class="warn" style="margin-top:0">DRAFT — updated to the Malaysian National Antimicrobial Guideline 2024 (v2.129). Check against NAG and your local policy before use.</div>`}
   ${nagPicker(false)}
   ${src(`Malaysian National Antimicrobial Guideline 2024 — <a href="${NAG_URL}" target="_blank" rel="noopener noreferrer">online ↗</a> (also post-splenectomy, eye, TOP).`)}`; }
-gaCards.abx = () => `<div class="card"><h2>7. Antibiotic prophylaxis</h2>${nagCard()}</div>`;
+gaCards.abx = () => `<div class="card"><h2>1. Antibiotic prophylaxis</h2>${nagCard()}</div>`;
 
 // v2.130 paediatric surgical antibiotic prophylaxis — NAG 2024 section B3 (transcribed). Token {p|Drug|mg/kg (or a–b)|max mg per dose|route|redose h|extra}
 const NAGP_CHECKED = true;   // checked by author 25 Nov 2026;
@@ -5464,6 +5468,27 @@ VGROUPS.find(g => g[0]==="General")[1].push(["Block finder roles (v2.142)", "25 
   "Supplementary: superficial cervical plexus, obturator, iPACK",
   "Analgesia: fascia iliaca, PENG, adductor canal, genicular, suprascapular, ESP, serratus, PECS II, rectus sheath, TAP, QL, ilioinguinal / iliohypogastric",
   "Misses line shown in the Finder row (same data as the block card); figure captions say schematic, not exact boundaries or guaranteed spread"]]);
+VGROUPS.find(g => g[0]==="General")[1].push(["Block finder operations and dosing (v2.143)", "25 Nov 2026", [
+  "Total knee replacement (TKA): Spinal or GA. Blocks here are for analgesia: adductor canal ± iPACK, or the surgeon's local infiltration.",
+  "ACL reconstruction / knee arthroscopy: GA or spinal. Blocks here are for analgesia.",
+  "Hip fracture (DHS, hemiarthroplasty): Spinal or GA. Give a block early for pain (fascia iliaca, femoral or PENG), including before positioning for the spinal.",
+  "Total hip replacement (THA): Spinal or GA. Blocks here are for analgesia; PENG does not cover the skin incision.",
+  "Femur fixation: Spinal or GA. Blocks here are for analgesia.",
+  "Skin graft donor site (thigh): LFCN can cover the skin of a lateral thigh donor site; the graft site needs its own plan.",
+  "Ankle fracture / foot surgery: Popliteal sciatic + saphenous can be the sole anaesthetic below the knee; a thigh tourniquet needs spinal or GA.",
+  "Below-knee amputation: Spinal or GA. Sciatic and saphenous (or femoral) blocks for analgesia.",
+  "Shoulder arthroscopy / replacement: GA, often with an interscalene block; interscalene alone in selected cases. Lung disease: phrenic-sparing options.",
+  "Clavicle fixation: Usually GA. Interscalene + superficial cervical plexus for analgesia; sole anaesthetic only in selected patients.",
+  "Humerus, elbow or forearm surgery: A brachial plexus block (supraclavicular, infraclavicular or axillary) can be the sole anaesthetic, e.g. AV fistula.",
+  "Hand or wrist surgery: A brachial plexus block or a wrist block can be the sole anaesthetic; a wrist block does not cover an upper-arm tourniquet.",
+  "Mastectomy / breast surgery: GA. Blocks for analgesia: PECS II, serratus, paravertebral or ESP.",
+  "Thoracotomy / VATS / rib fractures: GA for thoracotomy or VATS. Analgesia: thoracic epidural or paravertebral; ESP or serratus as alternatives. Rib fractures: the same blocks for pain.",
+  "Laparotomy / laparoscopic cholecystectomy: GA ± thoracic epidural. Rectus sheath, TAP and QL cover the abdominal wall, not visceral pain.",
+  "Inguinal hernia / appendicectomy: Hernia: GA, spinal, or an ilioinguinal block with local infiltration. Appendicectomy: GA; wall blocks for analgesia only.",
+  "Caesarean section (LSCS): Spinal / CSE, or GA. TAP or QL for analgesia — mainly when no intrathecal morphine was given.",
+  "Bladder tumour resection (TURBT): Spinal. Lateral bladder wall: add an obturator block to stop the adductor jerk (or GA with full paralysis).",
+  "Spine surgery: GA. ESP for analgesia.",
+  "\"+ Add\" on block cards and in the Finder now fills in the calculator form (lower end of the volume range); nothing is added until you tap Add; pairs one at a time; invalid entries rejected"]]);
 VGROUPS.find(g => g[0]==="General")[1].push(["Induction drugs & relaxants combined", "22 Nov 2026", [
   "Adult: General › Induction › 1. Induction drugs & relaxants — Opioid · Hypnotic · Muscle relaxant · No IV access (rows moved unchanged)",
   "Paeds: Paediatric › Induction › 3. Induction drugs & relaxants — Anticholinergic · Opioid · Hypnotic · Muscle relaxant · No IV access (rows moved unchanged)",
@@ -5546,6 +5571,8 @@ function vTicks(){
 }
 /* ---------- ABOUT ---------- */
 const CHANGES = [
+  ["2.144","General reordered for theatre: Induction — tube & airway kit, drugs & relaxants, RSI. Intra-op — Before incision (antibiotics, TXA, PONV), Maintenance (ventilation, TIVA, volatile), Analgesia & BP, Specialist (one-lung ventilation). Post-op — Emergence, Recovery, Day case & ward. PONV now sits in Intra-op with a link from Post-op. No clinical content changed. (checked)"],
+  ["2.143","Block finder: picking an operation now shows what it is usually done under (spinal, GA, or a block alone) — TURBT also shows the obturator block. LA dosing: \"Set up in LA calculator\" fills in the calculator form at the lower end of the volume range; you check it and tap Add. Pairs are set up one at a time. (checked)"],
   ["2.142","Block finder: no more \"First choice\" label; each block shows its role (Can be surgical, Analgesia or Supplementary) and its Misses line; the figure is labelled schematic; more search spellings (caesarean, c-section, fistula, wrist fracture). (checked)"],
   ["2.141","Regular drugs: ACEi / ARB and diuretics — usually omit the morning dose, consider continuing for heart failure or hard-to-control BP. Diabetes: insulin pump line. Steroid cover: known adrenal insufficiency always gets cover. (checked)"],
   ["2.140","Airway card: GLP-1 counts as an aspiration risk only with GI symptoms, dose escalation or another slow-emptying cause; RSI is suggested, no longer pre-ticked in Plan & consent. Which tests: \"Not routinely\" instead of No / Not needed. Optimise or postpone: two groups — Defer and treat; Correct or optimise first (thresholds unchanged). (checked)"],
@@ -5892,14 +5919,19 @@ const GROUPS = [
     see:[["premed-assess-airway-assessment-and-plan","Airway assessment"],["premed-prepare-anticoagulants-and-antiplatelets","Anticoagulants"],["regional-safety-anticoagulants","Neuraxial anticoagulant timing"]],
     cards:[["Anaesthetic plan & consent","1. Anaesthetic plan & consent"],"2. Premed note"], links:[["Failed intubation / CICO","adult","Failed intubation / CICO"]]}], cards:[]},
  {id:"ga", name:"General", sub:"Induction · Intra-op · Post-op", tabKey:"gaTab", tabs:[
-   {id:"ind", label:"Induction", input:()=>gaInputs(), hint:"Drugs & relaxants → RSI → tube & airway kit.",
-    cards:["1. Induction drugs & relaxants","2. RSI","3. Tube & airway kit"], see:[["ga-post-im-doses-no-iv-access-or-ward","No IV access: IM doses"]], seeLabel:"Also",
+   {id:"ind", label:"Induction", input:()=>gaInputs(), hint:"Tube & airway kit → drugs & relaxants → RSI.",
+    cards:["1. Tube & airway kit","2. Induction drugs & relaxants","3. RSI"], see:[["ga-post-im-doses-no-iv-access-or-ward","No IV access: IM doses"]], seeLabel:"Also",
     links:[["Failed intubation / CICO","adult","Failed intubation / CICO"],["Anaphylaxis","adult","Anaphylaxis"],["Bronchospasm","adult","Bronchospasm"]]},
-   {id:"maint", label:"Intra-op", input:()=>gaInputs(), hint:"Ventilate → keep them asleep and stable.",
-    cards:["1. Ventilation strategies","2. One-lung ventilation","3. TIVA","4. Volatile: MAC by age","5. Intra-op analgesia","6. Vasopressors & inotropes","7. Antibiotic prophylaxis","8. Tranexamic acid"],
+   {id:"maint", label:"Intra-op", input:()=>gaInputs(), hint:"Before incision → maintain → analgesia & BP → specialist.",
+    cards:["§Before incision","1. Antibiotic prophylaxis","2. Tranexamic acid",["PONV: Apfel score","3. PONV: Apfel score"],
+      "§Maintenance","4. Ventilation strategies","5. TIVA","6. Volatile: MAC by age",
+      "§Analgesia & BP","7. Intra-op analgesia","8. Vasopressors & inotropes",
+      "§Specialist","9. One-lung ventilation"], see:[["ga-post-im-doses-no-iv-access-or-ward","No IV access: IM doses"]], seeLabel:"Also",
     links:[["Bronchospasm","adult","Bronchospasm"],["Anaphylaxis","adult","Anaphylaxis"],["Malignant hyperthermia","adult","Malignant hyperthermia"],["LA toxicity (LAST)","adult","LA toxicity"],["Bradycardia & cardiac arrest","adult","Bradycardia / arrest"]]},
-   {id:"post", label:"Post-op", input:()=>gaInputs(), hint:"Reverse → extubate → prevent PONV → analgesia → discharge → IM doses.",
-    cards:["1. Reversal",["Extubation criteria","2. Extubation criteria"],["PONV: Apfel score","3. PONV: Apfel score"],"4. Analgesia ladder & PCA",["Discharge from recovery","5. Discharge from recovery"],["Discharge home (daycare)","6. Discharge home (daycare)"],"7. IM doses (no IV access, or ward)"],
+   {id:"post", label:"Post-op", input:()=>gaInputs(), hint:"Reverse → extubate → analgesia → discharge → IM doses. PONV prevention: Intra-op.",
+    cards:["§Emergence","1. Reversal",["Extubation criteria","2. Extubation criteria"],
+      "§Recovery","3. Analgesia ladder & PCA",["Discharge from recovery","4. Discharge from recovery"],
+      "§Day case & ward",["Discharge home (daycare)","5. Discharge home (daycare)"],"6. IM doses (no IV access, or ward)"], see:[["ga-post-ponv-apfel-score","PONV: Apfel score"]], seeLabel:"Also",
     links:[["Bronchospasm","adult","Bronchospasm"],["Anaphylaxis","adult","Anaphylaxis"]]}], cards:[]},
  {id:"regional", name:"Regional", sub:"Safety · Neuraxial · Upper · Lower · Trunk" + (FINDER_ON ? " · Finder" : ""), tabKey:"raTab", tabs:[
    {id:"safety", label:"Safety", input:()=>gaInputs(), hint:"Before every block: dose limits, checklist, anticoagulants.",
@@ -6148,24 +6180,24 @@ const CARD_IDS = {
   "7. Pacemaker / ICD":"premed-prepare-pacemaker-icd",
   "Anaesthetic plan & consent":"premed-plan-anaesthetic-plan-and-consent",
   "2. Premed note":"premed-plan-premed-note",
-  "1. Induction drugs & relaxants":"ga-ind-induction-drugs",
-  "2. RSI":"ga-ind-rsi",
-  "3. Tube & airway kit":"ga-ind-tube-and-airway-kit",
-  "1. Ventilation strategies":"ga-intra-ventilation-strategies",
-  "2. One-lung ventilation":"ga-intra-one-lung-ventilation",
-  "3. TIVA":"ga-intra-tiva",
-  "4. Volatile: MAC by age":"ga-intra-volatile-mac-by-age",
-  "5. Intra-op analgesia":"ga-intra-analgesia",
-  "6. Vasopressors & inotropes":"ga-intra-vasopressors-and-inotropes",
-  "7. Antibiotic prophylaxis":"ga-intra-antibiotic-prophylaxis",
-  "8. Tranexamic acid":"ga-intra-tranexamic-acid",
+  "2. Induction drugs & relaxants":"ga-ind-induction-drugs",
+  "3. RSI":"ga-ind-rsi",
+  "1. Tube & airway kit":"ga-ind-tube-and-airway-kit",
+  "4. Ventilation strategies":"ga-intra-ventilation-strategies",
+  "9. One-lung ventilation":"ga-intra-one-lung-ventilation",
+  "5. TIVA":"ga-intra-tiva",
+  "6. Volatile: MAC by age":"ga-intra-volatile-mac-by-age",
+  "7. Intra-op analgesia":"ga-intra-analgesia",
+  "8. Vasopressors & inotropes":"ga-intra-vasopressors-and-inotropes",
+  "1. Antibiotic prophylaxis":"ga-intra-antibiotic-prophylaxis",
+  "2. Tranexamic acid":"ga-intra-tranexamic-acid",
   "1. Reversal":"ga-post-reversal",
   "Extubation criteria":"ga-post-extubation-criteria",
   "PONV: Apfel score":"ga-post-ponv-apfel-score",
-  "4. Analgesia ladder & PCA":"ga-post-analgesia-ladder-and-pca",
+  "3. Analgesia ladder & PCA":"ga-post-analgesia-ladder-and-pca",
   "Discharge from recovery":"ga-post-discharge-from-recovery",
   "Discharge home (daycare)":"ga-post-discharge-home-daycare",
-  "7. IM doses (no IV access, or ward)":"ga-post-im-doses-no-iv-access-or-ward",
+  "6. IM doses (no IV access, or ward)":"ga-post-im-doses-no-iv-access-or-ward",
   "LA dose calculator":"regional-safety-la-dose-calculator",
   "Stop Before You Block & safe injection":"regional-safety-stop-before-you-block",
   "Neuraxial & deep blocks: anticoagulant timing":"regional-safety-anticoagulants",
@@ -6636,9 +6668,12 @@ document.addEventListener("click", e => {
   if (d.bfwhole){ if (S.bfView === "joints"){ S.joint = null; BF.nerveZoom(null); render(); return; } if (S.bfView === "nerve"){ S.nerve = 0; S.nerveLvl = -1; BF.nerveZoom(null); render(); return; } S.bf = null; BF.focus(null); render(); return; }
   if (d.bfnerve){ S.bfView = "nerve"; S.nerve = 0; S.nerveZoomReq = {limb: d.bfnerve, s: S.bf && S.bf.side === "Right" ? -1 : 1}; render(); return; }
   if (d.myo){ const k = +d.myo, r = MYO.find(x => x[0] === k); S.myo = S.myo === k ? null : k; if (S.myo != null && BF.st.ok && BF.st.mode === "myo"){ const z = BF.st.nzone; if (!z || z.limb !== r[5]) BF.nerveZoom(r[5], z ? z.s : 1); } render(); return; }
-  if (d.bfop){ const o = BF_OPS[+d.bfop]; S.bfq = ""; S.bf = {reg: o[1], side: ""}; S.bfList = false; BF.focus(S.bf); render(); return; }
+  if (d.bfop){ const o = BF_OPS[+d.bfop]; S.bfq = ""; S.bfOp = +d.bfop; S.bf = {reg: o[1], side: ""}; S.bfList = false; BF.focus(S.bf); render(); return; }
   if (d.bfside){ if (S.bf){ S.bf = {reg: S.bf.reg, side: d.bfside}; BF.focus(S.bf); } render(); return; }
-  if (d.addpair){ const lt = d.lt, k = laKey(lt); S[k] = S[k] || []; JSON.parse(d.addpair).forEach(it => S[k].push(it)); b.textContent = "✓ Added both"; setTimeout(render, 350); return; }
+  if (d.laprep || d.addpair || d.lanext){ const lt = d.lt || d.lanext, q = d.lanext ? S.laNext.items : d.laprep ? [JSON.parse(d.laprep)] : JSON.parse(d.addpair), it = q[0];   // v2.143: fill in the calculator form; pairs queue the second block
+    S.laD = it.d; S.laC = String(it.c); S.laMl = +it.ml; S.laBi = String(it.bi); S.laLbl = {lt, l: it.l}; S.laNext = {lt, items: q.slice(1)};
+    const e = findEntry(CARD_IDS[lt === "p" ? "Paeds LA dose calculator" : "LA dose calculator"]); if (d.lanext || !e){ render(); return; }
+    S.open = e.label; const og = GROUPS.find(x => x.id === e.g); if (og && og.tabs) S[og.tabKey] = e.tab; S.scrollTo = true; if (location.hash === "#g-" + e.g) render(); else location.hash = "#g-" + e.g; return; }
   if (d.tk){ S.tk = {...(S.tk || {}), [d.tk]: !(S.tk || {})[d.tk]}; render(); return; }
   if (d.tnote){ S.pnF = {...(S.pnF || {})}; const cur = (S.pnF.blood || "").trim(); if (!cur.includes(d.tnote)) S.pnF.blood = cur ? cur + "; " + d.tnote : d.tnote; S.tNoted = true; render(); setTimeout(() => { S.tNoted = false; }, 1500); return; }
   if (d.nagtab){ const [w, i] = d.nagtab.split("|"), k = w === "p" ? "nagp" : "nag"; S[k + "Sp"] = /^\d+$/.test(i) ? +i : i; S[k + "Q"] = ""; S[k + "Open"] = null; render(); return; }
@@ -6693,7 +6728,9 @@ document.addEventListener("click", e => {
     if (c.y === 0 && c.m === 0){ c.d = +S.cD; c.ga = +S.cGA; c.bw = +S.cBW; }
     switchClin(store.get("active",null), c.id); cs.push(c); store.set("cases", cs); store.set("active", c.id); applyCase(c); S.cNick = ""; render(); return; }
   if (d.addla){ const lt = d.lt, k = laKey(lt); S[k] = S[k] || [];
-    const it = d.addla==="form" ? {d:S.laD, c:S.laC, ml:+S.laMl, bi:+S.laBi, l:LAD[S.laD].n} : JSON.parse(d.addla);
+    const it = d.addla==="form" ? {d:S.laD, c:S.laC, ml:+S.laMl, bi:+S.laBi, l:(S.laLbl && S.laLbl.lt === lt ? S.laLbl.l : LAD[S.laD].n)} : JSON.parse(d.addla);
+    if (!(it.ml > 0) || !LAD[it.d] || !(+it.c > 0)) return;   // nothing invalid goes in
+    if (d.addla==="form") S.laLbl = null;
     S[k].push(it); b.textContent = "✓ Added"; setTimeout(render, 350); return; }
   if (d.rmla){ const [lt,i] = d.rmla.split(":"); S[laKey(lt)].splice(+i,1); render(); return; }
   if (d.clrla){ S[laKey(d.clrla)] = []; render(); return; }
