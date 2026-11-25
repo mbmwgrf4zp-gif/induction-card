@@ -303,6 +303,7 @@ b.dose{font-weight:700;background:var(--gc-soft);padding:0 .28em;border-radius:5
 .seg1{display:inline-block;margin-left:-.42em}.big,.qans{font-weight:400}
 .emlinks{display:grid;grid-template-columns:1fr 1fr;gap:var(--s2)}.emlinks .sub{grid-column:1/-1}.emlinks .emlink{margin:0;display:flex;align-items:center}
 @media (max-width:359px){.emlinks{grid-template-columns:1fr}}
+.pbsamp{display:inline-block;background:var(--warn-bg,#fef3c7);color:var(--warn-ink,#92400e);border:1px solid #f59e0b;border-radius:6px;padding:0 6px;font-size:12px;font-weight:700;vertical-align:2px;margin-right:4px}
 .ptbar{display:flex;align-items:center;justify-content:space-between;gap:var(--s2);width:100%;box-sizing:border-box;text-align:left;padding:var(--s3) var(--s4);border:1px solid var(--line);border-left:4px solid var(--gc);border-radius:var(--r);background:var(--card);color:var(--ink);font:inherit;font-weight:700;font-variant-numeric:tabular-nums;cursor:pointer}
 .ptbar .sub{font-weight:600;white-space:nowrap}
 @media (max-width:699px){.gside.slim{position:sticky;top:0;z-index:5;background:var(--bg);padding:var(--s1) 0}}
@@ -504,6 +505,8 @@ details.endo summary{cursor:pointer;font-weight:600;font-size:var(--fs-sm)}
   main{max-width:1000px}
   .gwrap{grid-template-columns:minmax(0,1fr) 320px;gap:var(--s4);align-items:start}
   .gwrap.noside{grid-template-columns:1fr}
+  .gwrap.fw{grid-template-columns:minmax(0,1fr)}.gwrap.fw .gside{order:0;position:static}.gwrap.fw .gside .ptbar{margin-top:var(--s2)}
+  .gwrap.fw .bfin{grid-template-columns:minmax(0,1.5fr) minmax(0,1fr)}.gwrap.fw .bfin .bfstage{height:80vh;height:80svh}
   .gside{order:2;position:sticky;top:var(--s3)}
   .gmain{order:1}
   .gwrap .gside .card:first-child{margin-top:var(--s3)}
@@ -523,6 +526,7 @@ details.endo summary{cursor:pointer;font-weight:600;font-size:var(--fs-sm)}
   .snkeys{margin-top:auto;padding:var(--s3);font-size:var(--fs-xs);color:var(--muted)}
   .content{min-width:0}
   .gwrap{grid-template-columns:minmax(0,820px) 340px}
+  .gwrap.fw{grid-template-columns:minmax(0,1fr)}
   .toprow{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,2fr);gap:var(--s4);align-items:stretch}
   .tr-emerg,.tr-quick{display:flex;flex-direction:column}.tr-emerg .t-emerg{flex:1}.tr-quick .quick{flex:1}
   .grid2{grid-template-columns:repeat(6,1fr)} .grid2 .sq:last-child:nth-child(odd){grid-column:auto}
@@ -813,7 +817,7 @@ if (window.top !== window.self && /\.github\.io$/.test(location.hostname)) {
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.127.1";
+const APP_VERSION = "2.128.1";
 const APP_DATE = "25 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
@@ -5233,6 +5237,7 @@ function vTicks(){
 }
 /* ---------- ABOUT ---------- */
 const CHANGES = [
+  ["2.128","Block finder on wide screens: the Finder tab uses the full width (figure about 60%, as tall as the window); the patient is a one-line strip with a Sample tag (checked)"],
   ["2.127","Which tests to order: pick surgery size, ASA and what applies — get Order / Consider / Not needed (NICE NG45), copy or add to the pre-op note (checked)"],
   ["2.126","Myotomes: thoracic levels added as two trunk groups — intercostals (T2–T11) and abdominal wall (T7–L1), marked not ASIA key muscles (checked)"],
   ["2.125","Block finder: operation search (TKA, mastectomy…), side buttons, shorter suggestion rows (tap for details), 'often used together' pairs with one-tap Add both, anticoagulant reminder on deep blocks, clearer paeds link (checked)"],
@@ -6068,13 +6073,13 @@ function accordion(c, t, gid, label, tab, id){
   const summ = mm ? `<span class="stepno">${mm[1]}</span><span class="st">${mm[2]}</span>` : `<span class="st">${sum}</span>`;
   return `<details class="card acc" ${isWide()?"":'name="acc"'} data-t="${esc(t)}" data-g="${gid}" data-tab="${tab||""}" data-id="${id||""}"><summary>${summ}</summary>${cl.innerHTML}${relLinks(gid, tab, id)}</details>`;
 }
-function ptBar(gid, tab){
+function ptBar(gid, tab, samp){
   const W2 = wts(), n = v => `<span class="n7">${v}</span>`, acx = activeCase(); let t, sub = "";
   if (gid==="paeds" || (gid==="emerg" && tab==="paeds")) { t = AGEM() < 1 ? `${n(sig(S.pw))} kg · day ${n(S.pD)} · ${n(S.gaB)} wk GA` : `${n(sig(S.pw))} kg · ${n(S.pY)} y${S.pM?` ${n(S.pM)} m`:""} · ${n(S.pHt)} cm`;
     sub = AGEM() < 1 ? `${isPreterm()?"preterm · ":""}PMA ${sig(pmaWk())} wk · birth weight ${sig(bwKg())} kg` : isPreterm() && AGEM() < 14 ? `ex-prem ${S.gaB} wk · PMA ${sig(pmaWk())} wk` : ""; }
   else if (gid==="emerg" || (gid==="tx" && tab==="don")) t = `${n(sig(S.aw))} kg`;
   else { t = `${sxi(S.sex)} ${n(S.height)} cm · ${n(sig(S.aw))} kg · ${n(S.age)} y`; sub = `BMI ${sig(W2.bmi)} · IBW/PBW ${sig(W2.ibwRaw)} · LBW ${sig(W2.lbw)} · AdjBW ${sig(W2.adj)} kg`; if (gid==="tx") sub += ` · K⁺ ${S.k} · Hb ${S.hb}`; }
-  return `<button class="ptbar" data-ptedit="1"><span>${acx ? `<span class="pbc">${caseName(acx)}</span>` : ""}<span class="pbm">${t}</span>${sub ? `<span class="pbs">${sub}</span>` : ""}</span><span class="sub">edit ✎</span></button>`;
+  return `<button class="ptbar" data-ptedit="1"><span>${acx ? `<span class="pbc">${caseName(acx)}</span>` : ""}<span class="pbm">${samp ? `<span class="pbsamp">Sample</span> ` : ""}${t}</span>${sub ? `<span class="pbs">${sub}</span>` : ""}</span><span class="sub">edit ✎</span></button>`;
 }
 const isHead = it => typeof it==="string" && it[0]==="§";
 const shortcut = (id, lab, gid, tid, row) => { const e = findEntry(id), tb = e && tabOf(e.g, e.tab); if (!tb) return ""; const where = (e.g===gid ? "" : GNAME[e.g] + " › ") + tb.label;
@@ -6095,17 +6100,18 @@ function groupScreen(g){
   if (g.tabs){
     const tab = g.tabs.find(t=>t.id===S[g.tabKey]) || g.tabs[0];
     const acx = activeCase(), childWarn = acx && acx.y < 16 && ["premed","ga","regional","tx"].includes(g.id) ? `<div class="danger"><b>Child case active (${caseAgeTxt(acx)}, ${sig(acx.w)} kg).</b> This section is for adults — use Paediatric for doses. Notes here use the case age.</div>` : "";
-    const ab = childWarn + (g.id==="paeds" && !PREV_CHECKED ? `<div class="warn">DRAFT — paediatric revisions (Nov 2026): auto-calculations and dose caps. Tick on the Values sheet.</div>` : "") + activeBar() + sampleWarn(SAMPLE_BY[g.id] ? (SAMPLE_BY[g.id][tab.id] || SAMPLE_BY[g.id]["*"] || []) : []);
+    const fw = g.id === "regional" && tab.id === "finder" && window.matchMedia("(min-width: 700px)").matches;   // v2.128: Finder tab on wide screens — full width, patient as a one-line strip
+    const ab = childWarn + (g.id==="paeds" && !PREV_CHECKED ? `<div class="warn">DRAFT — paediatric revisions (Nov 2026): auto-calculations and dose caps. Tick on the Values sheet.</div>` : "") + activeBar() + (fw ? "" : sampleWarn(SAMPLE_BY[g.id] ? (SAMPLE_BY[g.id][tab.id] || SAMPLE_BY[g.id]["*"] || []) : []));
     const links = (tab.links||[]).map(([t,tb,label])=>`<button class="emlink" data-open="${esc(t)}" data-g="emerg" data-tab="${tb}">⚠ ${esc(label)} ›</button>`).join("");
     const keys = SAMPLE_BY[g.id] ? (SAMPLE_BY[g.id][tab.id] || SAMPLE_BY[g.id]["*"] || []) : [];
     const filled = !!tab.input && keys.length > 0 && !keys.some(isSample), slim = filled && !S.ptEditing;
-    const side = ab + (tab.input ? (slim ? ptBar(g.id, tab.id) : `<div class="card">${tab.input()}${filled?`<button class="linkbtn" data-ptdone="1">Done ✓</button>`:""}</div>`) : "") + printBtn(g.id, tab.id);
+    const side = ab + (tab.input ? (fw ? (S.ptEditing ? `<div class="card">${tab.input()}<button class="linkbtn" data-ptdone="1">Done ✓</button></div>` : ptBar(g.id, tab.id, !filled)) : slim ? ptBar(g.id, tab.id) : `<div class="card">${tab.input()}${filled?`<button class="linkbtn" data-ptdone="1">Done ✓</button>`:""}</div>`) : "") + printBtn(g.id, tab.id);
     const see = (tab.see||[]).map(([id, lab]) => shortcut(id, lab, g.id, tab.id, tab.seeLabel)).join("");
     const neo = g.id==="paeds" && AGEM() < 1 ? NEO_JUMPS.map(([id, lab]) => shortcut(id, lab, g.id, tab.id)).join("") + `<button class="chip seechip" data-cat-open="paeds:cases:Neonate &amp; infant">Neonatal scenarios<small>Clinical Scenarios</small></button>` : "";
     const seeRow = see ? `<div class="seerow${g.id==="emerg"?" seeafter":""}"><span class="sub">${esc(tab.seeLabel || "Also here")}</span>${see}</div>` : "";
     const rows = (neo ? `<div class="seerow"><span class="sub">Neonate</span>${neo}</div>` : "") + (g.id==="emerg" ? "" : seeRow);   // emergencies: algorithms first
     return head(g.name,"home",g.id) + sbox + (g.tabs.length>1 ? `<div class="seg emtabs${g.tabs.length>=6?" five six":g.tabs.length>=5?" five":""}">${g.tabs.map(t=>`<button aria-pressed="${t===tab}" data-seg="${g.tabKey}" data-val="${t.id}">${t.label}</button>`).join("")}</div>` : `<div class="label" style="margin-top:0">${tab.label}</div>`) +
-      `<div class="gwrap${side.trim()?"":" noside"}"><aside class="gside${slim?" slim":""}">${side}</aside><div class="gmain">` + (tab.top ? tab.top() : "") +
+      `<div class="gwrap${side.trim()?"":" noside"}${fw?" fw":""}"><aside class="gside${slim||fw?" slim":""}">${side}</aside><div class="gmain">` + (tab.top ? tab.top() : "") +
       (tab.cards.length ? (tab.noHint ? "" : `<div class="hint">${tab.hint || "Tap a heading to open it."}${isWide()?" Several can be open at once.":""}</div>`) + rows + acc(tab.cards, tab.id, tab.collapse) + (g.id==="emerg" ? seeRow : "") : "") +
       (links ? `<div class="card emlinks"><div class="sub">If it goes wrong</div>${links}</div>` : "") + `</div></div>` + disc;
   }
