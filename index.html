@@ -799,8 +799,9 @@ details.bfb[open]>summary{margin-bottom:4px}details.bfb .bfo{margin-top:4px}deta
 .tticks{display:flex;flex-wrap:wrap;gap:6px}.tck{min-height:40px;padding:0 12px;border-radius:999px;border:1px solid var(--line);background:var(--card);color:var(--ink);font-size:14px}.tck[aria-pressed="true"]{border-color:var(--gc);background:var(--gc-soft);font-weight:600}
 .tres{border:1px solid var(--line);border-radius:var(--r-sm);padding:var(--s3);display:grid;gap:8px;margin:var(--s2) 0}.trow{display:grid;grid-template-columns:96px 1fr;gap:8px}.trow small{color:var(--muted)}.t-yes b{color:var(--ok-ink,#166534)}.t-consider b{color:var(--warn-ink,#92400e)}.t-no{color:var(--muted)}.tbtns{display:flex;gap:8px;flex-wrap:wrap}
 .nagsearch{margin:var(--s2) 0}.nagtabs{display:flex;gap:4px;overflow-x:auto;white-space:nowrap;border-bottom:1px solid var(--line);margin:0 calc(-1*var(--s4)) var(--s2);padding:0 var(--s4);scrollbar-width:none}.nagtabs::-webkit-scrollbar{display:none}
-.nagtabs button{flex:0 0 auto;background:none;border:0;border-bottom:3px solid transparent;padding:10px 10px 8px;font-size:15px;color:var(--muted);min-height:44px}.nagtabs button[aria-selected="true"]{color:var(--gc);border-bottom-color:var(--gc);font-weight:700}
+.nagtabs button{flex:0 0 auto;background:none;border:0;border-bottom:3px solid transparent;padding:10px 10px 8px;font-size:15px;color:var(--muted);min-height:44px}.nagtabs button.nagx{color:var(--ink)}.nagtabs button[aria-selected="true"]{color:var(--gc);border-bottom-color:var(--gc);font-weight:700}
 .naglist{display:grid;border:1px solid var(--line);border-radius:var(--r-sm);overflow:hidden}.nagrow+.nagrow{border-top:1px solid var(--line)}
+.nagpage{padding:var(--s2) var(--s3)}.nagpage ul{margin-top:0}.nagpage table{margin-left:calc(-1*var(--s3));width:calc(100% + 2*var(--s3))}
 .nagrh{display:grid;grid-template-columns:minmax(0,1fr) auto auto;align-items:center;gap:8px;width:100%;min-height:52px;padding:8px 12px;background:var(--card);border:0;text-align:left;color:var(--ink);font:inherit}
 .nagrn{font-weight:600;font-size:15px}.nagrn small{font-weight:400;color:var(--muted)}.nagsum{font-size:13px;color:var(--muted);max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.nagnone{font-size:13px;font-weight:700;color:var(--ok-ink,#166534);background:var(--ok-bg,#dcfce7);border-radius:6px;padding:2px 8px}.nagch{color:var(--muted)}
 .nagrow.open .nagrh{background:var(--gc-soft)}.nagrb{padding:4px 12px 12px}.naghd{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin-top:var(--s2)}.nagrb ul{margin:4px 0 0;padding-left:1.1em}.nagre{margin:var(--s2) 0 0;font-size:14px}
@@ -824,7 +825,7 @@ if (window.top !== window.self && /\.github\.io$/.test(location.hostname)) {
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.133.1";
+const APP_VERSION = "2.134.1";
 const APP_DATE = "25 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
@@ -1731,7 +1732,7 @@ const OLD_LABELS = {"ga|1. Induction drugs":"ga-ind-induction-drugs", "ga|3. Mus
   "paeds|3. Induction drugs":"paeds-ind-induction-drugs", "paeds|4. Muscle relaxants":"paeds-ind-muscle-relaxants", "paeds|5. RSI (child)":"paeds-ind-rsi", "paeds|6. Ketamine induction (short cases)":"paeds-ind-ketamine-anaesthesia",
   "paeds|7. TIVA: model check & propofol targets":"paeds-ind-tiva-model-check", "paeds|8. TIVA: remifentanil":"paeds-ind-remifentanil", "paeds|9. Ventilation settings":"paeds-ind-ventilation",
   "paeds|10. One-lung ventilation (Storz)":"paeds-ind-one-lung-ventilation-storz", "paeds|11. Lines: double-lumen CVC":"paeds-ind-double-lumen-cvc"};   // pre-v2.70 recent records {g, t}
-const ID_ALIAS = {"ga-ind-muscle-relaxants": ["ga-ind-induction-drugs", "relax"], "paeds-ind-muscle-relaxants": ["paeds-ind-induction-drugs", "relax"]};   // merged cards: old id → [card, section]
+const ID_ALIAS = {"ga-intra-antibiotic-timing-redosing": ["ga-intra-antibiotic-prophylaxis", null, "redose"], "ga-intra-endocarditis-prophylaxis": ["ga-intra-antibiotic-prophylaxis", null, "endocarditis"], "ga-ind-muscle-relaxants": ["ga-ind-induction-drugs", "relax"], "paeds-ind-muscle-relaxants": ["paeds-ind-induction-drugs", "relax"]};   // merged cards: old id → [card, section]
 const pindDraft = () => PIND_CHECKED ? "" : `<div class="warn" style="margin-top:0">DRAFT — paeds induction review (Nov 2026): opioids, gas induction, relaxants, RSI, reversal, bolus pressors, and the review fixes (glucose targets, ventilation by age, blood product doses, omeprazole, RCUK 2025 arrest, difficult airway, tonsil bleed, pyloric). Not yet ticked by you.</div>`;
 pCards.drugs = () => {
   const w = W(), mo = AGEM(), neo = mo < 1, pre = neo && isPreterm(), inf = mo < 12;
@@ -4537,7 +4538,9 @@ function nagTok(t){ const x = wts(), gw = x.tbw > 1.2*x.ibwRaw ? x.adj : x.tbw, 
 // v2.131 shared list UI for both antibiotic cards: search, one row of specialty tabs, procedure rows with a short answer, details open under the row, one redose line
 function nagShort(t){ return t.replace(/\{p\|([^|}]*)\|[^}]*\}/g, "$1").replace(/\{vanc\}/g, "Vancomycin").replace(/\{gent\d*\}/g, "Gentamicin").replace(/<[^>]+>/g, "").replace(/ (IV|PO)\b/g, "").replace(/^(or|PLUS) /i, "").replace(/ (PLUS|AND) /g, " + ").replace(/Amoxicillin\/clavulanate/gi, "Amox/clav").replace(/Ampicillin\/sulbactam/gi, "Amp/sulb").replace(/Metronidazole/g, "Metro"); }
 function nagList(paeds){ const D = paeds ? NAGP : NAG, key = paeds ? "nagp" : "nag", tok = paeds ? nagpTok : nagTok, q = (S[key + "Q"] || "").trim().toLowerCase();
-  if (!(S[key + "Sp"] >= 0 && S[key + "Sp"] < D.length)) S[key + "Sp"] = paeds ? 1 : 2;
+  if (!(S[key + "Sp"] === "t" || S[key + "Sp"] === "e" || S[key + "Sp"] >= 0 && S[key + "Sp"] < D.length)) S[key + "Sp"] = "t";
+  if (!q && S[key + "Sp"] === "t") return abxTiming(paeds);
+  if (!q && S[key + "Sp"] === "e") return abxEndo(paeds);
   const rows = q ? D.flatMap((sp, i) => sp[1].map((r, j) => [i, j, r, sp[0]])).filter(([, , r, spn]) => (r[0] + " " + r[1] + " " + spn).toLowerCase().includes(q)) : D[S[key + "Sp"]][1].map((r, j) => [S[key + "Sp"], j, r, ""]);
   const li = a => a.map(t => `<li>${tok(t)}</li>`).join(""), alLab = paeds ? "Antibiotic allergy" : "Severe penicillin allergy";
   if (!rows.length) return `<p class="sub">No procedure matches "${esc(q)}".</p>`;
@@ -4548,8 +4551,9 @@ function nagList(paeds){ const D = paeds ? NAGP : NAG, key = paeds ? "nagp" : "n
       ${al.length ? `<div class="naghd">Alternative</div><ul>${li(al)}</ul>` : ""}${ag.length ? `<div class="naghd">${alLab}</div><ul>${li(ag)}</ul>` : ""}
       ${cm.length ? `<div class="naghd">Comments</div><ul class="sub">${li(cm)}</ul>` : ""}</div>` : ""}</div>`; }).join(""); }
 function nagPicker(paeds){ const D = paeds ? NAGP : NAG, key = paeds ? "nagp" : "nag";
+  if (!(S[key + "Sp"] === "t" || S[key + "Sp"] === "e" || S[key + "Sp"] >= 0 && S[key + "Sp"] < D.length)) S[key + "Sp"] = "t";   // opens on Timing
   return `<div class="searchbox nagsearch">${svg("search")}<input id="${key}q" class="search" type="search" placeholder="Procedure, e.g. ${paeds ? "hypospadias, PEG" : "TURP, mastectomy, VATS"}" autocomplete="off" value="${esc(S[key + "Q"] || "")}"></div>
-  <div class="nagtabs" role="tablist">${D.map(([t], i) => `<button role="tab" aria-selected="${i === S[key + "Sp"] && !S[key + "Q"]}" data-nagtab="${paeds ? "p" : "a"}|${i}">${t}</button>`).join("")}</div>
+  <div class="nagtabs" role="tablist">${[["t", "⏱ Timing"], ["e", "♥ Endocarditis"]].concat(D.map(([t], i) => [i, t])).map(([i, t]) => `<button role="tab" aria-selected="${String(i) === String(S[key + "Sp"]) && !S[key + "Q"]}" data-nagtab="${paeds ? "p" : "a"}|${i}"${typeof i === "string" ? ' class="nagx"' : ""}>${t}</button>`).join("")}</div>
   <div class="naglist" id="${key}list">${nagList(paeds)}</div>`; }
 function nagCard(){
   return `${NAG_CHECKED ? "" : `<div class="warn" style="margin-top:0">DRAFT — updated to the Malaysian National Antimicrobial Guideline 2024 (v2.129). Check against NAG and your local policy before use.</div>`}
@@ -4596,30 +4600,31 @@ function nagpCard(){
   <p${isNeo() ? ' class="hl"' : ""}><b>Neonates (local manual):</b> clearance is slower — cefotaxime 25–50 mg/kg loading, then 25 mg/kg 12-hourly (&lt; 4 weeks); metronidazole 15 mg/kg loading, then 7.5 mg/kg 12-hourly. Cefazolin: redose less often than every 4 h; check with pharmacy.</p>
   ${src(`Malaysian National Antimicrobial Guideline 2024 — <a href="${NAGP_URL}" target="_blank" rel="noopener noreferrer">online ↗</a> (also post-splenectomy). Neonatal note and first endocarditis table: local manual.`)}`; }
 pCards.abx = () => `<div class="card"><h2>Paeds antibiotic prophylaxis</h2>${nagpCard()}</div>`;
-// v2.133: reminder cards, each shown once — not repeated under every procedure
-gaCards.abxtime = () => { const big = wts().tbw >= 120; return `<div class="card"><h2>7a. Antibiotic timing &amp; redosing</h2>
+// v2.134: timing & redosing and endocarditis are the first two tabs of each antibiotic card (shown once, not under every procedure)
+function abxTiming(paeds){ const big = !paeds && wts().tbw >= 120; return `<div class="nagpage">
 <ul><li><b>60 min before incision</b>, fully infused (vancomycin: up to 120 min before); one dose usually enough, never &gt; 24 h.</li>
     <li><b>Redose</b> if blood loss &gt; 1500 mL, &gt; 2 half-lives, or burns. Infection already present: treat it, not prophylaxis.</li></ul>
-  <table class="nagrt"><tr><th>Redose every</th><th>Adult</th><th>Child</th></tr>${[["Cefazolin", "4 h", "4 h"], ["Cefuroxime", "4 h", "4 h"], ["Ampicillin/sulbactam", "2 h", "2 h"], ["Amoxicillin/clavulanate", "2 h", "4 h"], ["Clindamycin", "6 h", "6 h"], ["Cefotaxime", "—", "3 h"], ["Cloxacillin", "—", "4 h"], ["Metronidazole", "—", "8 h"]].map(([d, a, c]) => `<tr><td>${d}</td><td>${a}</td><td>${c}</td></tr>`).join("")}</table>
-  <p class="sub">Adult intervals: ASHP (NAG's table is an image). Child: NAG 2024.</p>
+  <table class="nagrt"><tr><th>Redose every</th>${paeds ? "" : "<th>Adult</th>"}<th>Child</th></tr>${[["Cefazolin", "4 h", "4 h"], ["Cefuroxime", "4 h", "4 h"], ["Ampicillin/sulbactam", "2 h", "2 h"], ["Amoxicillin/clavulanate", "2 h", "4 h"], ["Clindamycin", "6 h", "6 h"], ["Cefotaxime", "—", "3 h"], ["Cloxacillin", "—", "4 h"], ["Metronidazole", "—", "8 h"]].filter(r => !paeds || r[2] !== "—").map(([d, a, c]) => `<tr><td>${d}</td>${paeds ? "" : `<td>${a}</td>`}<td>${c}</td></tr>`).join("")}</table>
+  <p class="sub">${paeds ? "" : "Adult intervals: ASHP (NAG's table is an image). "}Child: NAG 2024.</p>
   ${big ? `<p class="hl">Cefazolin 2 g (NAG); ASHP gives <b>3 g if ≥ 120 kg</b> (${sig(wts().tbw)} kg).</p>` : ""}
-  ${src("Malaysian National Antimicrobial Guideline 2024 (surgical antibiotic prophylaxis principles; paediatric section B3). ASHP 2013: adult redose intervals, cefazolin ≥ 120 kg.")}</div>`; };
-gaCards.endo = () => `<div class="card"><h2>7b. Endocarditis prophylaxis</h2>
-  <h3 style="margin-top:0">Adult (NAG 2024)</h3>
+  ${src(paeds ? "Malaysian National Antimicrobial Guideline 2024 (paediatric section B3)." : "Malaysian National Antimicrobial Guideline 2024 (surgical antibiotic prophylaxis principles; paediatric section B3). ASHP 2013: adult redose intervals, cefazolin ≥ 120 kg.")}</div>`; }
+function abxEndo(paeds){ const child = `<h3${paeds ? ' style="margin-top:0"' : ""}>Child</h3>${paeds ? "" : `<p class="sub">Child weight from the Paediatric section: ${sig(W())} kg.</p>`}
+  ${pEndo().replace('<details class="endo"><summary>Endocarditis prophylaxis (paeds, local)</summary>', '<h4>Local manual</h4>').replace('</details>', '')}
+  <h4>Child — NAG 2024 (compare with the local table above)</h4>
+    <table><tr><td>Amoxicillin PO 50 mg/kg (max 2 g)</td><td class="hl">${dz(Math.min(50*W(), 2000), "mg")} mg</td></tr><tr><td>or ampicillin IV 50 mg/kg (max 2 g)</td><td class="hl">${dz(Math.min(50*W(), 2000), "mg")} mg</td></tr>
+    <tr><td>Allergy: clindamycin IV / PO 20 mg/kg (max 900 mg)</td><td class="hl">${dz(Math.min(20*W(), 900), "mg")} mg</td></tr>
+    <tr><td>or cefazolin IV 50 mg/kg (max 2 g) — not after anaphylaxis, angioedema or urticaria</td><td class="hl">${dz(Math.min(50*W(), 2000), "mg")} mg</td></tr></table>
+    <p class="sub">30–60 min before. Highest-risk cardiac conditions (MOH IE CPG 2017). Always for: dental extraction, periodontal surgery, subgingival scaling, root planing, re-planting avulsed teeth, implants / apicectomy; incision and drainage of a local abscess; percutaneous endoscopic gastrostomy.</p>`;
+  return paeds ? `<div class="nagpage">${child}
+  ${src("Child NAG 2024 (MOH): non-surgical chemoprophylaxis, infective endocarditis. Child local table: local manual.")}</div>` : `<div class="nagpage"><h3 style="margin-top:0">Adult (NAG 2024)</h3>
     <p class="sub"><b>Who:</b> previous infective endocarditis; prosthetic valve or valve-repair material (surgical or transcatheter aortic / pulmonary); untreated cyanotic congenital heart disease, or repaired with shunts, conduits or prostheses (first 6 months after a complete repair); ventricular assist device; established rheumatic heart disease. Consider after transcatheter mitral / tricuspid repair; may consider after heart transplant.</p>
     <p class="sub"><b>For:</b> dental extraction, oral surgery, gum or root manipulation, dental implants; invasive respiratory procedures with incision or biopsy of the mucosa. Not routinely for GI or GU procedures.</p>
     <table><tr><td>Amoxicillin PO</td><td class="hl">2 g</td></tr><tr><td>Ampicillin IV</td><td class="hl">2 g</td></tr>
     <tr><td>Non-severe penicillin allergy: cephalexin PO</td><td class="hl">2 g</td></tr><tr><td>Non-severe penicillin allergy: cefazolin IV</td><td class="hl">1 g</td></tr>
     <tr><td>Severe penicillin allergy: doxycycline PO</td><td class="hl">100 mg</td></tr><tr><td>Severe penicillin allergy: azithromycin PO</td><td class="hl">500 mg</td></tr></table>
     <p class="sub">Single dose 30–60 min before the procedure.</p>
-  <h3>Child</h3><p class="sub">Child weight from the Paediatric section: ${sig(W())} kg.</p>
-  ${pEndo().replace('<details class="endo"><summary>Endocarditis prophylaxis (paeds, local)</summary>', '<h4>Local manual</h4>').replace('</details>', '')}
-  <h4>Child — NAG 2024 (compare with the local table above)</h4>
-    <table><tr><td>Amoxicillin PO 50 mg/kg (max 2 g)</td><td class="hl">${dz(Math.min(50*W(), 2000), "mg")} mg</td></tr><tr><td>or ampicillin IV 50 mg/kg (max 2 g)</td><td class="hl">${dz(Math.min(50*W(), 2000), "mg")} mg</td></tr>
-    <tr><td>Allergy: clindamycin IV / PO 20 mg/kg (max 900 mg)</td><td class="hl">${dz(Math.min(20*W(), 900), "mg")} mg</td></tr>
-    <tr><td>or cefazolin IV 50 mg/kg (max 2 g) — not after anaphylaxis, angioedema or urticaria</td><td class="hl">${dz(Math.min(50*W(), 2000), "mg")} mg</td></tr></table>
-    <p class="sub">30–60 min before. Highest-risk cardiac conditions (MOH IE CPG 2017). Always for: dental extraction, periodontal surgery, subgingival scaling, root planing, re-planting avulsed teeth, implants / apicectomy; incision and drainage of a local abscess; percutaneous endoscopic gastrostomy.</p>
-  ${src("Adult and child NAG 2024 (MOH): non-surgical chemoprophylaxis, infective endocarditis. Child local table: local manual.")}</div>`;
+  ${child}
+  ${src("Adult and child NAG 2024 (MOH): non-surgical chemoprophylaxis, infective endocarditis. Child local table: local manual.")}</div>`; }
 
 
 /* ---------- DISPLAY NAME (phone only) ---------- */
@@ -5363,6 +5368,7 @@ function vTicks(){
 }
 /* ---------- ABOUT ---------- */
 const CHANGES = [
+  ["2.134","Antibiotic prophylaxis cards (adult and paeds): Timing & redosing and Endocarditis are now the first two tabs, before the specialties; the card opens on Timing. Cards 7a and 7b are gone. Searching redose or endocarditis opens that tab. (checked)"],
   ["2.133","Antibiotic timing & redosing and Endocarditis prophylaxis are now their own cards (General › Intra-op 7a, 7b), shown once — no longer under every procedure (checked)"],
   ["2.132","Antibiotic cards: timing and redosing in one place (adult card, with an adult / child interval table); no redose line inside each procedure; paeds card links to it; shorter source lines; old unused card code removed (checked)"],
   ["2.131","Antibiotic cards: search box, one row of specialty tabs, procedure list with the short answer on each row (green None where not recommended); details open under the row; one redose line per procedure instead of after every drug (checked)"],
@@ -5704,7 +5710,7 @@ const GROUPS = [
     cards:["1. Induction drugs & relaxants","2. RSI","3. Tube & airway kit"], see:[["ga-post-im-doses-no-iv-access-or-ward","No IV access: IM doses"]], seeLabel:"Also",
     links:[["Failed intubation / CICO","adult","Failed intubation / CICO"],["Anaphylaxis","adult","Anaphylaxis"],["Bronchospasm","adult","Bronchospasm"]]},
    {id:"maint", label:"Intra-op", input:()=>gaInputs(), hint:"Ventilate → keep them asleep and stable.",
-    cards:["1. Ventilation strategies","2. One-lung ventilation","3. TIVA","4. Volatile: MAC by age","5. Intra-op analgesia","6. Vasopressors & inotropes","7. Antibiotic prophylaxis","7a. Antibiotic timing & redosing","7b. Endocarditis prophylaxis","8. Tranexamic acid"],
+    cards:["1. Ventilation strategies","2. One-lung ventilation","3. TIVA","4. Volatile: MAC by age","5. Intra-op analgesia","6. Vasopressors & inotropes","7. Antibiotic prophylaxis","8. Tranexamic acid"],
     links:[["Bronchospasm","adult","Bronchospasm"],["Anaphylaxis","adult","Anaphylaxis"],["Malignant hyperthermia","adult","Malignant hyperthermia"],["LA toxicity (LAST)","adult","LA toxicity"],["Bradycardia & cardiac arrest","adult","Bradycardia / arrest"]]},
    {id:"post", label:"Post-op", input:()=>gaInputs(), hint:"Reverse → extubate → prevent PONV → analgesia → discharge → IM doses.",
     cards:["1. Reversal",["Extubation criteria","2. Extubation criteria"],["PONV: Apfel score","3. PONV: Apfel score"],"4. Analgesia ladder & PCA",["Discharge from recovery","5. Discharge from recovery"],["Discharge home (daycare)","6. Discharge home (daycare)"],"7. IM doses (no IV access, or ward)"],
@@ -5818,8 +5824,6 @@ const SEARCH_EXTRA = {   // keyed by stable card id
   "premed-assess-osa-screen-stop-bang":"pre-op preop assessment risk stop-bang stopbang stop bang osa sleep apnoea snoring",
   "premed-assess-lung-risk-ariscat":"pre-op preop assessment risk ariscat pulmonary complications lung risk ppc",
   "premed-assess-frailty-clinical-frailty-scale":"pre-op preop assessment risk frailty clinical frailty scale cfs rockwood elderly",
-  "ga-intra-antibiotic-timing-redosing":"antibiotic timing redose redosing 60 minutes before incision half-life blood loss cefazolin redose interval vancomycin 120",
-  "ga-intra-endocarditis-prophylaxis":"endocarditis ie prophylaxis prosthetic valve rheumatic dental amoxicillin ampicillin high risk cardiac",
   "premed-assess-which-tests-to-order":"pre-op preop assessment risk investigations tests bloods ecg echo fbc renal profile coagulation hba1c nice ng45",
   "premed-assess-optimise-or-postpone":"pre-op preop assessment risk postpone cancel proceed elective optimise cut-off blood pressure hypertension diabetes hba1c ketones potassium sodium anaemia platelets inr mi myocardial infarction stent stroke tia heart failure aortic stenosis pacemaker icd asthma copd urti thyroid smoking common conditions",
   "obs-lscs-uterotonics":"uterotonic oxytocin syntocinon carbetocin duratocin ergometrine carboprost hemabate misoprostol tranexamic pph atony caesarean lscs rule of threes",
@@ -5888,9 +5892,9 @@ const SEARCH_EXTRA = {   // keyed by stable card id
   "regional-neuraxial-dermatomes-and-block-height":"myotome myotomes key muscles motor level motor block power dermatome dermatomes block height level t4 t10 nipple umbilicus xiphoid bromage sensory testing cold pinprick",
   "ga-intra-ventilation-strategies":"ventilation ventilator ventilate lung protective tidal volume tv peep recruitment recruit driving pressure plateau pcv vcv pcv-vg prvc ards asthma copd auto-peep laparoscopy trendelenburg obese neuro icp hyperventilation pregnancy lscs dopes desaturation hypoxia high airway pressure",
   "ga-intra-one-lung-ventilation":"one-lung ventilation olv dlt double-lumen double lumen tube bronchial blocker arndt thoracic vats lung isolation thoracotomy cpap",
-  "ga-intra-antibiotic-prophylaxis":"antibiotic prophylaxis cefazolin unasyn ampicillin sulbactam augmentin metronidazole gentamicin clindamycin vancomycin cefuroxime azithromycin endocarditis uro gynae ortho dental hpb colorectal",
+  "ga-intra-antibiotic-prophylaxis":"antibiotic prophylaxis cefazolin unasyn ampicillin sulbactam augmentin metronidazole gentamicin clindamycin vancomycin cefuroxime azithromycin endocarditis timing redose redosing half-life 60 minutes before incision uro gynae ortho dental hpb colorectal",
   "paeds-intra-other-drugs":"hypertonic saline mannitol potassium kcl insulin adenosine bicarbonate paeds",
-  "paeds-intra-antibiotic-prophylaxis":"antibiotic prophylaxis cefazolin unasyn metronidazole gentamicin clindamycin vancomycin paeds endocarditis",
+  "paeds-intra-antibiotic-prophylaxis":"antibiotic prophylaxis cefazolin unasyn metronidazole gentamicin clindamycin vancomycin paeds endocarditis timing redose redosing",
   "ga-ind-tube-and-airway-kit":"ett tube endotracheal chula lma igel i-gel supraglottic laryngoscope video adult",
   "regional-safety-anticoagulants":"anticoagulant antiplatelet clopidogrel enoxaparin clexane heparin warfarin doac rivaroxaban apixaban dabigatran asra platelets",
   "obs-lscs-spinal-dose":"lscs caesarean cesarean c-section sab spinal heavy bupivacaine marcaine dose height obstetric",
@@ -5968,8 +5972,6 @@ const CARD_IDS = {
   "5. Intra-op analgesia":"ga-intra-analgesia",
   "6. Vasopressors & inotropes":"ga-intra-vasopressors-and-inotropes",
   "7. Antibiotic prophylaxis":"ga-intra-antibiotic-prophylaxis",
-  "7a. Antibiotic timing & redosing":"ga-intra-antibiotic-timing-redosing",
-  "7b. Endocarditis prophylaxis":"ga-intra-endocarditis-prophylaxis",
   "8. Tranexamic acid":"ga-intra-tranexamic-acid",
   "1. Reversal":"ga-post-reversal",
   "Extubation criteria":"ga-post-extubation-criteria",
@@ -6452,7 +6454,7 @@ document.addEventListener("click", e => {
   if (d.addpair){ const lt = d.lt, k = laKey(lt); S[k] = S[k] || []; JSON.parse(d.addpair).forEach(it => S[k].push(it)); b.textContent = "✓ Added both"; setTimeout(render, 350); return; }
   if (d.tk){ S.tk = {...(S.tk || {}), [d.tk]: !(S.tk || {})[d.tk]}; render(); return; }
   if (d.tnote){ S.pnF = {...(S.pnF || {})}; const cur = (S.pnF.blood || "").trim(); if (!cur.includes(d.tnote)) S.pnF.blood = cur ? cur + "; " + d.tnote : d.tnote; S.tNoted = true; render(); setTimeout(() => { S.tNoted = false; }, 1500); return; }
-  if (d.nagtab){ const [w, i] = d.nagtab.split("|"), k = w === "p" ? "nagp" : "nag"; S[k + "Sp"] = +i; S[k + "Q"] = ""; S[k + "Open"] = null; render(); return; }
+  if (d.nagtab){ const [w, i] = d.nagtab.split("|"), k = w === "p" ? "nagp" : "nag"; S[k + "Sp"] = /^\d+$/.test(i) ? +i : i; S[k + "Q"] = ""; S[k + "Open"] = null; render(); return; }
   if (d.nagrow){ const [w, id] = d.nagrow.split("|"), k = (w === "p" ? "nagp" : "nag") + "Open"; S[k] = S[k] === id ? null : id; render(); return; }
   if (d.nerve){ const k = +d.nerve; S.nerve = S.nerve === k ? 0 : k; S.nerveLvl = -1; if (S.nerve && BF.st.ok && S.bfView === "nerve"){ const lb = k >= 20 ? "trunk" : k >= 10 ? "leg" : "arm", z = BF.st.nzone; if (!z || z.limb !== lb) BF.nerveZoom(lb, z ? z.s : 1); } render(); return; }   // a nerve button also zooms onto its limb
   if (d.bfreg){ S.bf = S.bf && S.bf.reg === d.bfreg && !S.bf.side ? null : {reg: d.bfreg, side: ""}; BF.focus(S.bf); render(); return; }
@@ -6485,7 +6487,9 @@ document.addEventListener("click", e => {
   if (d.open || d.id){ let open = d.open, gid = d.g, tab = d.tab;
     { const from = b.closest("details.acc"), cg = (location.hash || "").replace("#g-", ""), cog = GROUPS.find(x=>x.id===cg);   // link inside a card → remember it, so Back returns there
       S.ret = from && cog ? {g: cg, tab: cog.tabs ? S[cog.tabKey] : null, open: from.dataset.t} : null; }
-    if (d.id){ const en = findEntry(d.id, gid, tab); if (en){ open = en.label; gid = en.g; tab = en.tab; } if (ID_ALIAS[d.id]) S.anchor = ID_ALIAS[d.id][1]; }
+    if (d.id){ const en = findEntry(d.id, gid, tab); if (en){ open = en.label; gid = en.g; tab = en.tab; } if (ID_ALIAS[d.id]) S.anchor = ID_ALIAS[d.id][1];
+      const ab = {"ga-intra-antibiotic-prophylaxis":"nag", "paeds-intra-antibiotic-prophylaxis":"nagp"}[ID_ALIAS[d.id] ? ID_ALIAS[d.id][0] : d.id], qv = (($("#q") || {}).value || "") + " " + (ID_ALIAS[d.id] ? ID_ALIAS[d.id][2] || "" : "");   // v2.134: "redose" / "endocarditis" opens that antibiotic tab
+      if (ab){ const t = /endocard|\bie\b/i.test(qv) ? "e" : /redos|timing|half-life/i.test(qv) ? "t" : null; if (t){ S[ab + "Sp"] = t; S[ab + "Q"] = ""; S[ab + "Open"] = null; } } }
     const og = GROUPS.find(x=>x.id===gid); if (og && og.tabs){ tab = tab || (og.tabs.find(t=>t.cards.some(c=>(Array.isArray(c)?c[1]:c)===open))||og.tabs[0]).id; S[og.tabKey] = tab; }
     S.srch = false; S.open = d.calc ? null : open; S.scrollTo = !d.calc; if (!d.calc) remember(gid, tab, d.id ? (ID_ALIAS[d.id] ? ID_ALIAS[d.id][0] : d.id) : idOf(gid, tab, open));
     const target = "#g-"+gid; if (location.hash===target) render(); else { location.hash = target; } if (d.calc) window.scrollTo(0,0); return; }
