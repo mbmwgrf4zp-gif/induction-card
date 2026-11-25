@@ -798,8 +798,13 @@ details.bfb[open]>summary{margin-bottom:4px}details.bfb .bfo{margin-top:4px}deta
 .tpick{display:grid;gap:4px;margin:var(--s2) 0}.tlab{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin-top:6px}.tpick .seg{margin:0}.tpick .seg small{display:block;font-weight:400;font-size:12px;color:var(--muted)}.tpick .seg button[aria-pressed="true"] small{color:inherit;opacity:.85}
 .tticks{display:flex;flex-wrap:wrap;gap:6px}.tck{min-height:40px;padding:0 12px;border-radius:999px;border:1px solid var(--line);background:var(--card);color:var(--ink);font-size:14px}.tck[aria-pressed="true"]{border-color:var(--gc);background:var(--gc-soft);font-weight:600}
 .tres{border:1px solid var(--line);border-radius:var(--r-sm);padding:var(--s3);display:grid;gap:8px;margin:var(--s2) 0}.trow{display:grid;grid-template-columns:96px 1fr;gap:8px}.trow small{color:var(--muted)}.t-yes b{color:var(--ok-ink,#166534)}.t-consider b{color:var(--warn-ink,#92400e)}.t-no{color:var(--muted)}.tbtns{display:flex;gap:8px;flex-wrap:wrap}
-.nagsp,.nagpr{display:flex;flex-wrap:wrap;gap:6px;margin:var(--s2) 0}.nagsp button,.nagpr button{min-height:40px;padding:4px 12px;border-radius:999px;border:1px solid var(--line);background:var(--card);color:var(--ink);font-size:14px;text-align:left}.nagsp button[aria-pressed="true"]{background:var(--gc);color:#fff;border-color:var(--gc)}.nagpr button[aria-pressed="true"]{border-color:var(--gc);background:var(--gc-soft);font-weight:600}
-.nagbox{border:1px solid var(--line);border-radius:var(--r-sm);padding:var(--s3);margin:var(--s2) 0}.naghd{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin-top:var(--s2)}.nagbox ul{margin:4px 0 0;padding-left:1.1em}
+.nagsearch{margin:var(--s2) 0}.nagtabs{display:flex;gap:4px;overflow-x:auto;white-space:nowrap;border-bottom:1px solid var(--line);margin:0 calc(-1*var(--s4)) var(--s2);padding:0 var(--s4);scrollbar-width:none}.nagtabs::-webkit-scrollbar{display:none}
+.nagtabs button{flex:0 0 auto;background:none;border:0;border-bottom:3px solid transparent;padding:10px 10px 8px;font-size:15px;color:var(--muted);min-height:44px}.nagtabs button[aria-selected="true"]{color:var(--gc);border-bottom-color:var(--gc);font-weight:700}
+.naglist{display:grid;border:1px solid var(--line);border-radius:var(--r-sm);overflow:hidden}.nagrow+.nagrow{border-top:1px solid var(--line)}
+.nagrh{display:grid;grid-template-columns:minmax(0,1fr) auto auto;align-items:center;gap:8px;width:100%;min-height:52px;padding:8px 12px;background:var(--card);border:0;text-align:left;color:var(--ink);font:inherit}
+.nagrn{font-weight:600;font-size:15px}.nagrn small{font-weight:400;color:var(--muted)}.nagsum{font-size:13px;color:var(--muted);max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.nagnone{font-size:13px;font-weight:700;color:var(--ok-ink,#166534);background:var(--ok-bg,#dcfce7);border-radius:6px;padding:2px 8px}.nagch{color:var(--muted)}
+.nagrow.open .nagrh{background:var(--gc-soft)}.nagrb{padding:4px 12px 12px}.naghd{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin-top:var(--s2)}.nagrb ul{margin:4px 0 0;padding-left:1.1em}.nagre{margin:var(--s2) 0 0;font-size:14px}
+@media (min-width:560px){.nagsum{max-width:260px}}
 .bfpanel{display:grid;gap:8px;margin:var(--s2) 0}.bfpanel:empty{display:none}.bfside{margin:0;color:var(--danger-ink);font-weight:600;font-size:14px}
 .bfb{border-radius:var(--r-sm);padding:10px 12px;background:var(--bg);display:grid;gap:2px}.bfb.first{background:var(--gc-soft)}
 .bftag{font-size:13px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--gc)}
@@ -819,7 +824,7 @@ if (window.top !== window.self && /\.github\.io$/.test(location.hostname)) {
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.130.1";
+const APP_VERSION = "2.131.1";
 const APP_DATE = "25 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
@@ -4534,19 +4539,36 @@ function nagTok(t){ const x = wts(), gw = x.tbw > 1.2*x.ibwRaw ? x.adj : x.tbw, 
     .replace(/\{gent5\}/g, `Gentamicin 5 mg/kg IV = <b>${dz(5*gw,"mg")} mg</b> <span class="sub">(${gn} ${sig(gw)} kg)</span>`)
     .replace(/\{gent3\}/g, `gentamicin 3 mg/kg IV = <b>${dz(3*gw,"mg")} mg</b> <span class="sub">(${gn} ${sig(gw)} kg)</span>`)
     .replace(/\{gent35\}/g, `gentamicin 3–5 mg/kg IV = <b>${dz(3*gw,"mg")}–${dz(5*gw,"mg")} mg</b> <span class="sub">(${gn} ${sig(gw)} kg)</span>`); }
-function nagCard(){ if (!(S.nagSp >= 0 && S.nagSp < NAG.length)) S.nagSp = 2; const sp = NAG[S.nagSp]; if (!(S.nagPr >= 0 && S.nagPr < sp[1].length)) S.nagPr = 0;
-  const [n, ex, pr, al, ag, cm] = sp[1][S.nagPr], li = a => a.map(t => `<li>${nagTok(t)}</li>`).join(""), big = wts().tbw >= 120;
+
+// v2.131 shared list UI for both antibiotic cards: search, one row of specialty tabs, procedure rows with a short answer, details open under the row, one redose line
+const NAG_RE = {"cefazolin": 4, "cefuroxime": 4, "ampicillin/sulbactam": 2, "amoxicillin/clavulanate": 2, "clindamycin": 6};   // adult: ASHP intervals (NAG's table is an image)
+function nagShort(t){ return t.replace(/\{p\|([^|}]*)\|[^}]*\}/g, "$1").replace(/\{vanc\}/g, "Vancomycin").replace(/\{gent\d*\}/g, "Gentamicin").replace(/<[^>]+>/g, "").replace(/ (IV|PO)\b/g, "").replace(/^(or|PLUS) /i, "").replace(/ (PLUS|AND) /g, " + ").replace(/Amoxicillin\/clavulanate/gi, "Amox/clav").replace(/Ampicillin\/sulbactam/gi, "Amp/sulb").replace(/Metronidazole/g, "Metro"); }
+function nagRedose(row, paeds){ const all = [row[2] || [], row[3], row[4]].flat().join(" "), out = [];
+  if (paeds){ const seen = {}; all.replace(/\{p\|([^|}]*)\|[^|}]*\|[^|}]*\|[^|}]*\|([^|}]*)/g, (m, n, re) => { if (re && !seen[n]) { seen[n] = 1; out.push(`${n.toLowerCase()} every ${re} h`); } return m; }); return out.length ? `<p class="nagre"><b>Redose:</b> ${out.join(" · ")}</p>` : ""; }
+  const low = all.toLowerCase(); for (const [k, h] of Object.entries(NAG_RE)) if (low.includes(k)) out.push(`${k} every ${h} h`);
+  return out.length ? `<p class="nagre"><b>Redose (ASHP):</b> ${out.join(" · ")}</p>` : ""; }
+function nagList(paeds){ const D = paeds ? NAGP : NAG, key = paeds ? "nagp" : "nag", tok = paeds ? nagpTok : nagTok, q = (S[key + "Q"] || "").trim().toLowerCase();
+  if (!(S[key + "Sp"] >= 0 && S[key + "Sp"] < D.length)) S[key + "Sp"] = paeds ? 1 : 2;
+  const rows = q ? D.flatMap((sp, i) => sp[1].map((r, j) => [i, j, r, sp[0]])).filter(([, , r, spn]) => (r[0] + " " + r[1] + " " + spn).toLowerCase().includes(q)) : D[S[key + "Sp"]][1].map((r, j) => [S[key + "Sp"], j, r, ""]);
+  const li = a => a.map(t => `<li>${tok(t)}</li>`).join(""), alLab = paeds ? "Antibiotic allergy" : "Severe penicillin allergy";
+  if (!rows.length) return `<p class="sub">No procedure matches "${esc(q)}".</p>`;
+  return rows.map(([i, j, r, spn]) => { const [n, ex, pr, al, ag, cm] = r, id = `${i}:${j}`, open = S[key + "Open"] === id;
+    const short = pr === 0 ? `<span class="nagnone">None</span>` : `<span class="nagsum">${esc(nagShort(pr.join(" · ")).split(" · ")[0])}</span>`;
+    return `<div class="nagrow${open ? " open" : ""}"><button class="nagrh" data-nagrow="${paeds ? "p" : "a"}|${id}" aria-expanded="${open}"><span class="nagrn">${spn ? `<small>${spn} › </small>` : ""}${n}</span>${short}<span class="nagch">${open ? "▴" : "▾"}</span></button>
+    ${open ? `<div class="nagrb">${ex ? `<p class="sub" style="margin:0 0 var(--s1)">${ex}</p>` : ""}${pr === 0 ? `<div class="result ok"><b>${NO}</b></div>` : `<div class="naghd">Preferred</div><ul>${li(pr)}</ul>`}
+      ${al.length ? `<div class="naghd">Alternative</div><ul>${li(al)}</ul>` : ""}${ag.length ? `<div class="naghd">${alLab}</div><ul>${li(ag)}</ul>` : ""}${nagRedose(r, paeds)}
+      ${cm.length ? `<div class="naghd">Comments</div><ul class="sub">${li(cm)}</ul>` : ""}</div>` : ""}</div>`; }).join(""); }
+function nagPicker(paeds){ const D = paeds ? NAGP : NAG, key = paeds ? "nagp" : "nag";
+  return `<div class="searchbox nagsearch">${svg("search")}<input id="${key}q" class="search" type="search" placeholder="Procedure, e.g. ${paeds ? "hypospadias, PEG" : "TURP, mastectomy, VATS"}" autocomplete="off" value="${esc(S[key + "Q"] || "")}"></div>
+  <div class="nagtabs" role="tablist">${D.map(([t], i) => `<button role="tab" aria-selected="${i === S[key + "Sp"] && !S[key + "Q"]}" data-nagtab="${paeds ? "p" : "a"}|${i}">${t}</button>`).join("")}</div>
+  <div class="naglist" id="${key}list">${nagList(paeds)}</div>`; }
+function nagCard(){ const big = wts().tbw >= 120;
   return `${NAG_CHECKED ? "" : `<div class="warn" style="margin-top:0">DRAFT — updated to the Malaysian National Antimicrobial Guideline 2024 (v2.129). Check against NAG and your local policy before use.</div>`}
-  <div class="nagsp">${NAG.map(([t], i) => `<button aria-pressed="${i === S.nagSp}" data-nagsp="${i}">${t}</button>`).join("")}</div>
-  <div class="nagpr">${sp[1].map(([t], i) => `<button aria-pressed="${i === S.nagPr}" data-nagpr="${i}">${t}</button>`).join("")}</div>
-  <div class="nagbox"><h3 style="margin-top:0">${n}</h3>${ex ? `<p class="sub" style="margin:0 0 var(--s2)">${ex}</p>` : ""}
-  ${pr === 0 ? `<div class="result ok"><b>${NO}</b></div>` : `<div class="naghd">Preferred</div><ul>${li(pr)}</ul>`}
-  ${al.length ? `<div class="naghd">Alternative</div><ul>${li(al)}</ul>` : ""}${ag.length ? `<div class="naghd">Severe penicillin allergy</div><ul>${li(ag)}</ul>` : ""}
-  ${cm.length ? `<div class="naghd">Comments</div><ul class="sub">${li(cm)}</ul>` : ""}</div>
+  ${nagPicker(false)}
   ${big ? `<p class="hl">Cefazolin: NAG gives 2 g for adults; ASHP uses <b>3 g if ≥ 120 kg</b> (this patient ${sig(wts().tbw)} kg).</p>` : `<p class="sub">Cefazolin: NAG gives 2 g for adults; ASHP uses 3 g if ≥ 120 kg.</p>`}
   <h3>Timing and redosing (NAG)</h3><ul><li>Give <b>60 min before incision</b>, fully infused before the incision. Single dose is usually enough; if continued, keep it short.</li>
     <li>Redose if blood loss <b>&gt; 1500 mL</b>, the operation lasts longer than <b>two half-lives</b>, or the half-life is shortened (e.g. extensive burns).</li>
-    <li>Redose intervals (ASHP; check NAG's table): cefazolin and cefuroxime every 4 h · ampicillin/sulbactam and amoxicillin/clavulanate every 2 h · clindamycin every 6 h.</li>
+    <li>Each procedure lists the redose interval for its drugs (ASHP; check NAG's table).</li>
     <li>Known or suspected infection before surgery: give a treatment course, not prophylaxis.</li></ul>
   <details class="endo"><summary>Endocarditis prophylaxis (high-risk cardiac patients)</summary>
     <p class="sub"><b>Who:</b> previous infective endocarditis; prosthetic valve or valve-repair material (surgical or transcatheter aortic / pulmonary); untreated cyanotic congenital heart disease, or repaired with shunts, conduits or prostheses (first 6 months after a complete repair); ventricular assist device; established rheumatic heart disease. Consider after transcatheter mitral / tricuspid repair; may consider after heart transplant.</p>
@@ -4590,19 +4612,13 @@ function nagpTok(t){ const w = W();
   return t.replace(/\{p\|([^|}]*)\|([^|}]*)\|([^|}]*)\|([^|}]*)\|([^|}]*)(?:\|([^}]*))?\}/g, (m0, n, k, mx, rt, re, ex) => {
     const [a, b] = k.split("-").map(Number), cap = mx ? +mx : Infinity, d = v => dz(Math.min(v*w, cap), "mg");
     const dose = b ? `${d(a)}–${d(b)} mg` : `${d(a)} mg`, capped = mx && a*w > cap;
-    return `${n} ${b ? a + "–" + b : a} mg/kg${rt ? " " + rt : ""}${mx ? ` (max ${+mx >= 1000 ? +mx/1000 + " g" : mx + " mg"})` : ""} = <b>${dose}</b>${capped ? ' <span class="sub">capped</span>' : ""}${ex ? ` <span class="sub">(${ex})</span>` : ""}${re ? ` <span class="sub">· redose every ${re} h</span>` : ""}`; }); }
-function nagpCard(){ if (!(S.nagpSp >= 0 && S.nagpSp < NAGP.length)) S.nagpSp = 1; const sp = NAGP[S.nagpSp]; if (!(S.nagpPr >= 0 && S.nagpPr < sp[1].length)) S.nagpPr = 0;
-  const [n, ex, pr, al, ag, cm] = sp[1][S.nagpPr], li = a => a.map(t => `<li>${nagpTok(t)}</li>`).join("");
+    return `${n} ${b ? a + "–" + b : a} mg/kg${rt ? " " + rt : ""}${mx ? ` (max ${+mx >= 1000 ? +mx/1000 + " g" : mx + " mg"})` : ""} = <b>${dose}</b>${capped ? ' <span class="sub">capped</span>' : ""}${ex ? ` <span class="sub">(${ex})</span>` : ""}`; }); }
+function nagpCard(){
   return `${NAGP_CHECKED ? "" : `<div class="warn" style="margin-top:0">DRAFT — updated to the Malaysian National Antimicrobial Guideline 2024 (v2.130). Check against NAG and your local policy before use.</div>`}
   <p class="sub">Doses for ${sig(W())} kg (per kg, with NAG's maximum).</p>
-  <div class="nagsp">${NAGP.map(([t], i) => `<button aria-pressed="${i === S.nagpSp}" data-nagpsp="${i}">${t}</button>`).join("")}</div>
-  <div class="nagpr">${sp[1].map(([t], i) => `<button aria-pressed="${i === S.nagpPr}" data-nagppr="${i}">${t}</button>`).join("")}</div>
-  <div class="nagbox"><h3 style="margin-top:0">${n}</h3>${ex ? `<p class="sub" style="margin:0 0 var(--s2)">${ex}</p>` : ""}
-  ${pr === 0 ? `<div class="result ok"><b>${NO}</b></div>` : `<div class="naghd">Preferred</div><ul>${li(pr)}</ul>`}
-  ${al.length ? `<div class="naghd">Alternative</div><ul>${li(al)}</ul>` : ""}${ag.length ? `<div class="naghd">Antibiotic allergy</div><ul>${li(ag)}</ul>` : ""}
-  ${cm.length ? `<div class="naghd">Comments</div><ul class="sub">${li(cm)}</ul>` : ""}</div>
+  ${nagPicker(true)}
   <h3>Timing (NAG)</h3><ul><li>Within <b>60 min before incision</b>; vancomycin within 120 min.</li><li>Single dose is usually enough; no longer than 24 hours.</li>
-    <li>Redose if the operation lasts longer than two half-lives (intervals above) or with excessive blood loss.</li></ul>
+    <li>Redose if the operation lasts longer than two half-lives (each procedure lists its drugs' intervals) or with excessive blood loss.</li></ul>
   <p${isNeo() ? ' class="hl"' : ""}><b>Neonates (local manual):</b> clearance is slower — cefotaxime 25–50 mg/kg loading, then 25 mg/kg 12-hourly (&lt; 4 weeks); metronidazole 15 mg/kg loading, then 7.5 mg/kg 12-hourly. Cefazolin: redose less often than every 4 h; check with pharmacy.</p>
   ${pEndo()}
   <details class="endo"><summary>Endocarditis prophylaxis — NAG 2024 (compare with the local table above)</summary>
@@ -5355,6 +5371,7 @@ function vTicks(){
 }
 /* ---------- ABOUT ---------- */
 const CHANGES = [
+  ["2.131","Antibiotic cards: search box, one row of specialty tabs, procedure list with the short answer on each row (green None where not recommended); details open under the row; one redose line per procedure instead of after every drug (checked)"],
   ["2.130","Paeds antibiotic prophylaxis updated to the Malaysian National Antimicrobial Guideline 2024 (section B3): per-kg doses with maxima and redose intervals; local neonatal and endocarditis notes kept (checked)"],
   ["2.129","Antibiotic prophylaxis (adult) updated to the Malaysian National Antimicrobial Guideline 2024: pick specialty and procedure; endocarditis list and regimen updated (checked)"],
   ["2.128","Block finder on wide screens: the Finder tab uses the full width (figure about 60%, as tall as the window); the patient is a one-line strip with a Sample tag (checked)"],
@@ -6323,6 +6340,7 @@ function renderNow(){
   S.scrollTo = false;
   if (S.srchFocus){ S.srchFocus = false; const q = app.querySelector("#q"); if (q) q.focus(); }
   if (app.querySelector("#bfstage")) BF.mount();
+  app.querySelectorAll('.nagtabs [aria-selected="true"]').forEach(t => { const r = t.parentElement; r.scrollLeft = t.offsetLeft - (r.clientWidth - t.offsetWidth)/2; });   // keep the chosen specialty tab in view
   if (S.faqOpen != null && location.hash === "#about"){ const el = document.getElementById("faq-" + S.faqOpen); if (el) requestAnimationFrame(() => el.scrollIntoView({block: "center"})); S.faqOpen = null; }
   if (S.dermAnim){ const a = S.dermAnim; S.dermAnim = null; requestAnimationFrame(() => { dermAnimate(a); BF.dermRise(a.prev); }); }
   if (active){ const el = app.querySelector(`[data-in="${active}"]`); if (el){ el.focus(); const v=el.value; el.value=""; el.value=v; } }
@@ -6393,7 +6411,7 @@ document.addEventListener("click", e => { const t = e.target.closest && e.target
 let vtaps = 0, vtimer = null;
 document.addEventListener("click", e => { if (!e.target.closest || !e.target.closest(".vtap")) return; vtaps++; clearTimeout(vtimer); vtimer = setTimeout(()=>vtaps=0, 1500); if (vtaps >= 5){ vtaps = 0; location.hash = "#values"; window.scrollTo(0,0); } });
 document.addEventListener("change", e => { if (e.target.id==="csNote"){ S.csNote = e.target.value.slice(0,300); render(); } if (e.target.id==="leNote"){ S.leNote = e.target.value.slice(0,300); render(); } if (e.target.id==="pnNote"){ S.pnNote = e.target.value.slice(0,300); render(); } if (e.target.dataset && e.target.dataset.pnf){ const f = e.target.dataset.pnf, v = e.target.value.slice(0,300); (S.pnF = S.pnF || {})[f] = v; if (f === "cr"){ const n = parseFloat(v); if (n >= 30 && n <= 1200){ S.crea = n; S.touched.crea = true; } } render(); } });
-document.addEventListener("input", e => { if (e.target.id==="csNote") S.csNote = e.target.value.slice(0,300); if (e.target.id==="leNote"){ S.leNote = e.target.value.slice(0,300); store.set("consLast","le"); } if (e.target.id==="pnNote") S.pnNote = e.target.value.slice(0,300); if (e.target.dataset && e.target.dataset.pnf) (S.pnF = S.pnF || {})[e.target.dataset.pnf] = e.target.value.slice(0,300); if (e.target.id==="q") runSearch(e.target.value); if (e.target.id==="bfq"){ S.bfq = e.target.value; const r = document.getElementById("bfopsr"); if (r) r.innerHTML = bfOpsList(); } if (e.target.id==="vq"){ S.vq = e.target.value; const pos = e.target.selectionStart; render(); const el = document.getElementById("vq"); if (el){ el.focus(); try{ el.setSelectionRange(pos,pos); }catch(_){} } } if (e.target.id==="cNick") S.cNick = e.target.value.slice(0,12); if (e.target.id==="dname") S.dname = e.target.value.slice(0,24); });
+document.addEventListener("input", e => { if (e.target.id==="csNote") S.csNote = e.target.value.slice(0,300); if (e.target.id==="leNote"){ S.leNote = e.target.value.slice(0,300); store.set("consLast","le"); } if (e.target.id==="pnNote") S.pnNote = e.target.value.slice(0,300); if (e.target.dataset && e.target.dataset.pnf) (S.pnF = S.pnF || {})[e.target.dataset.pnf] = e.target.value.slice(0,300); if (e.target.id==="q") runSearch(e.target.value); if (e.target.id==="nagq" || e.target.id==="nagpq"){ const pd = e.target.id === "nagpq"; S[(pd ? "nagp" : "nag") + "Q"] = e.target.value; S[(pd ? "nagp" : "nag") + "Open"] = null; const l = document.getElementById(pd ? "nagplist" : "naglist"); if (l) l.innerHTML = nagList(pd); document.querySelectorAll(`[data-nagtab^="${pd ? "p" : "a"}|"]`).forEach(b => b.setAttribute("aria-selected", "false")); } if (e.target.id==="bfq"){ S.bfq = e.target.value; const r = document.getElementById("bfopsr"); if (r) r.innerHTML = bfOpsList(); } if (e.target.id==="vq"){ S.vq = e.target.value; const pos = e.target.selectionStart; render(); const el = document.getElementById("vq"); if (el){ el.focus(); try{ el.setSelectionRange(pos,pos); }catch(_){} } } if (e.target.id==="cNick") S.cNick = e.target.value.slice(0,12); if (e.target.id==="dname") S.dname = e.target.value.slice(0,24); });
 function clamp(v,min,max){ return Math.min(max, Math.max(min, v)); }
 /* hold − / + : repeat, speeding up; the click after a hold is ignored */
 (() => { let tm = null, n = 0, held = false, key = null, dd = 0, mn = 0, mx = 0;
@@ -6436,10 +6454,8 @@ document.addEventListener("click", e => {
   if (d.addpair){ const lt = d.lt, k = laKey(lt); S[k] = S[k] || []; JSON.parse(d.addpair).forEach(it => S[k].push(it)); b.textContent = "✓ Added both"; setTimeout(render, 350); return; }
   if (d.tk){ S.tk = {...(S.tk || {}), [d.tk]: !(S.tk || {})[d.tk]}; render(); return; }
   if (d.tnote){ S.pnF = {...(S.pnF || {})}; const cur = (S.pnF.blood || "").trim(); if (!cur.includes(d.tnote)) S.pnF.blood = cur ? cur + "; " + d.tnote : d.tnote; S.tNoted = true; render(); setTimeout(() => { S.tNoted = false; }, 1500); return; }
-  if (d.nagpsp){ S.nagpSp = +d.nagpsp; S.nagpPr = 0; render(); return; }
-  if (d.nagppr){ S.nagpPr = +d.nagppr; render(); return; }
-  if (d.nagsp){ S.nagSp = +d.nagsp; S.nagPr = 0; render(); return; }
-  if (d.nagpr){ S.nagPr = +d.nagpr; render(); return; }
+  if (d.nagtab){ const [w, i] = d.nagtab.split("|"), k = w === "p" ? "nagp" : "nag"; S[k + "Sp"] = +i; S[k + "Q"] = ""; S[k + "Open"] = null; render(); return; }
+  if (d.nagrow){ const [w, id] = d.nagrow.split("|"), k = (w === "p" ? "nagp" : "nag") + "Open"; S[k] = S[k] === id ? null : id; render(); return; }
   if (d.nerve){ const k = +d.nerve; S.nerve = S.nerve === k ? 0 : k; S.nerveLvl = -1; if (S.nerve && BF.st.ok && S.bfView === "nerve"){ const lb = k >= 20 ? "trunk" : k >= 10 ? "leg" : "arm", z = BF.st.nzone; if (!z || z.limb !== lb) BF.nerveZoom(lb, z ? z.s : 1); } render(); return; }   // a nerve button also zooms onto its limb
   if (d.bfreg){ S.bf = S.bf && S.bf.reg === d.bfreg && !S.bf.side ? null : {reg: d.bfreg, side: ""}; BF.focus(S.bf); render(); return; }
   if (d.bfturn){ BF.turn(); return; }
