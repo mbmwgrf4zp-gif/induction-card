@@ -824,7 +824,7 @@ if (window.top !== window.self && /\.github\.io$/.test(location.hostname)) {
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.132.1";
+const APP_VERSION = "2.133.1";
 const APP_DATE = "25 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
@@ -4551,22 +4551,10 @@ function nagPicker(paeds){ const D = paeds ? NAGP : NAG, key = paeds ? "nagp" : 
   return `<div class="searchbox nagsearch">${svg("search")}<input id="${key}q" class="search" type="search" placeholder="Procedure, e.g. ${paeds ? "hypospadias, PEG" : "TURP, mastectomy, VATS"}" autocomplete="off" value="${esc(S[key + "Q"] || "")}"></div>
   <div class="nagtabs" role="tablist">${D.map(([t], i) => `<button role="tab" aria-selected="${i === S[key + "Sp"] && !S[key + "Q"]}" data-nagtab="${paeds ? "p" : "a"}|${i}">${t}</button>`).join("")}</div>
   <div class="naglist" id="${key}list">${nagList(paeds)}</div>`; }
-function nagCard(){ const big = wts().tbw >= 120;
+function nagCard(){
   return `${NAG_CHECKED ? "" : `<div class="warn" style="margin-top:0">DRAFT — updated to the Malaysian National Antimicrobial Guideline 2024 (v2.129). Check against NAG and your local policy before use.</div>`}
   ${nagPicker(false)}
-  <h3>Timing &amp; redosing</h3><ul><li><b>60 min before incision</b>, fully infused (vancomycin: up to 120 min before); one dose usually enough, never &gt; 24 h.</li>
-    <li><b>Redose</b> if blood loss &gt; 1500 mL, &gt; 2 half-lives, or burns. Infection already present: treat it, not prophylaxis.</li></ul>
-  <table class="nagrt"><tr><th>Redose every</th><th>Adult</th><th>Child</th></tr>${[["Cefazolin", "4 h", "4 h"], ["Cefuroxime", "4 h", "4 h"], ["Ampicillin/sulbactam", "2 h", "2 h"], ["Amoxicillin/clavulanate", "2 h", "4 h"], ["Clindamycin", "6 h", "6 h"], ["Cefotaxime", "—", "3 h"], ["Cloxacillin", "—", "4 h"], ["Metronidazole", "—", "8 h"]].map(([d, a, c]) => `<tr><td>${d}</td><td>${a}</td><td>${c}</td></tr>`).join("")}</table>
-  <p class="sub">Adult intervals: ASHP (NAG's table is an image). Child: NAG 2024.</p>
-  ${big ? `<p class="hl">Cefazolin 2 g (NAG); ASHP gives <b>3 g if ≥ 120 kg</b> (${sig(wts().tbw)} kg).</p>` : ""}
-  <details class="endo"><summary>Endocarditis prophylaxis (high-risk cardiac patients)</summary>
-    <p class="sub"><b>Who:</b> previous infective endocarditis; prosthetic valve or valve-repair material (surgical or transcatheter aortic / pulmonary); untreated cyanotic congenital heart disease, or repaired with shunts, conduits or prostheses (first 6 months after a complete repair); ventricular assist device; established rheumatic heart disease. Consider after transcatheter mitral / tricuspid repair; may consider after heart transplant.</p>
-    <p class="sub"><b>For:</b> dental extraction, oral surgery, gum or root manipulation, dental implants; invasive respiratory procedures with incision or biopsy of the mucosa. Not routinely for GI or GU procedures.</p>
-    <table><tr><td>Amoxicillin PO</td><td class="hl">2 g</td></tr><tr><td>Ampicillin IV</td><td class="hl">2 g</td></tr>
-    <tr><td>Non-severe penicillin allergy: cephalexin PO</td><td class="hl">2 g</td></tr><tr><td>Non-severe penicillin allergy: cefazolin IV</td><td class="hl">1 g</td></tr>
-    <tr><td>Severe penicillin allergy: doxycycline PO</td><td class="hl">100 mg</td></tr><tr><td>Severe penicillin allergy: azithromycin PO</td><td class="hl">500 mg</td></tr></table>
-    <p class="sub">Single dose 30–60 min before the procedure.</p></details>
-  ${src(`Malaysian National Antimicrobial Guideline 2024 — <a href="${NAG_URL}" target="_blank" rel="noopener noreferrer">online ↗</a> (also post-splenectomy, eye, TOP). ASHP 2013: redose intervals, cefazolin ≥ 120 kg.`)}`; }
+  ${src(`Malaysian National Antimicrobial Guideline 2024 — <a href="${NAG_URL}" target="_blank" rel="noopener noreferrer">online ↗</a> (also post-splenectomy, eye, TOP).`)}`; }
 gaCards.abx = () => `<div class="card"><h2>7. Antibiotic prophylaxis</h2>${nagCard()}</div>`;
 
 // v2.130 paediatric surgical antibiotic prophylaxis — NAG 2024 section B3 (transcribed). Token {p|Drug|mg/kg (or a–b)|max mg per dose|route|redose h|extra}
@@ -4605,16 +4593,34 @@ function nagpCard(){
   return `${NAGP_CHECKED ? "" : `<div class="warn" style="margin-top:0">DRAFT — updated to the Malaysian National Antimicrobial Guideline 2024 (v2.130). Check against NAG and your local policy before use.</div>`}
   <p class="sub">Doses for ${sig(W())} kg (per kg, with NAG's maximum).</p>
   ${nagPicker(true)}
-  ${gLink("7. Antibiotic prophylaxis", "Timing &amp; redosing → General › Antibiotic prophylaxis")}
   <p${isNeo() ? ' class="hl"' : ""}><b>Neonates (local manual):</b> clearance is slower — cefotaxime 25–50 mg/kg loading, then 25 mg/kg 12-hourly (&lt; 4 weeks); metronidazole 15 mg/kg loading, then 7.5 mg/kg 12-hourly. Cefazolin: redose less often than every 4 h; check with pharmacy.</p>
-  ${pEndo()}
-  <details class="endo"><summary>Endocarditis prophylaxis — NAG 2024 (compare with the local table above)</summary>
+  ${src(`Malaysian National Antimicrobial Guideline 2024 — <a href="${NAGP_URL}" target="_blank" rel="noopener noreferrer">online ↗</a> (also post-splenectomy). Neonatal note and first endocarditis table: local manual.`)}`; }
+pCards.abx = () => `<div class="card"><h2>Paeds antibiotic prophylaxis</h2>${nagpCard()}</div>`;
+// v2.133: reminder cards, each shown once — not repeated under every procedure
+gaCards.abxtime = () => { const big = wts().tbw >= 120; return `<div class="card"><h2>7a. Antibiotic timing &amp; redosing</h2>
+<ul><li><b>60 min before incision</b>, fully infused (vancomycin: up to 120 min before); one dose usually enough, never &gt; 24 h.</li>
+    <li><b>Redose</b> if blood loss &gt; 1500 mL, &gt; 2 half-lives, or burns. Infection already present: treat it, not prophylaxis.</li></ul>
+  <table class="nagrt"><tr><th>Redose every</th><th>Adult</th><th>Child</th></tr>${[["Cefazolin", "4 h", "4 h"], ["Cefuroxime", "4 h", "4 h"], ["Ampicillin/sulbactam", "2 h", "2 h"], ["Amoxicillin/clavulanate", "2 h", "4 h"], ["Clindamycin", "6 h", "6 h"], ["Cefotaxime", "—", "3 h"], ["Cloxacillin", "—", "4 h"], ["Metronidazole", "—", "8 h"]].map(([d, a, c]) => `<tr><td>${d}</td><td>${a}</td><td>${c}</td></tr>`).join("")}</table>
+  <p class="sub">Adult intervals: ASHP (NAG's table is an image). Child: NAG 2024.</p>
+  ${big ? `<p class="hl">Cefazolin 2 g (NAG); ASHP gives <b>3 g if ≥ 120 kg</b> (${sig(wts().tbw)} kg).</p>` : ""}
+  ${src("Malaysian National Antimicrobial Guideline 2024 (surgical antibiotic prophylaxis principles; paediatric section B3). ASHP 2013: adult redose intervals, cefazolin ≥ 120 kg.")}</div>`; };
+gaCards.endo = () => `<div class="card"><h2>7b. Endocarditis prophylaxis</h2>
+  <h3 style="margin-top:0">Adult (NAG 2024)</h3>
+    <p class="sub"><b>Who:</b> previous infective endocarditis; prosthetic valve or valve-repair material (surgical or transcatheter aortic / pulmonary); untreated cyanotic congenital heart disease, or repaired with shunts, conduits or prostheses (first 6 months after a complete repair); ventricular assist device; established rheumatic heart disease. Consider after transcatheter mitral / tricuspid repair; may consider after heart transplant.</p>
+    <p class="sub"><b>For:</b> dental extraction, oral surgery, gum or root manipulation, dental implants; invasive respiratory procedures with incision or biopsy of the mucosa. Not routinely for GI or GU procedures.</p>
+    <table><tr><td>Amoxicillin PO</td><td class="hl">2 g</td></tr><tr><td>Ampicillin IV</td><td class="hl">2 g</td></tr>
+    <tr><td>Non-severe penicillin allergy: cephalexin PO</td><td class="hl">2 g</td></tr><tr><td>Non-severe penicillin allergy: cefazolin IV</td><td class="hl">1 g</td></tr>
+    <tr><td>Severe penicillin allergy: doxycycline PO</td><td class="hl">100 mg</td></tr><tr><td>Severe penicillin allergy: azithromycin PO</td><td class="hl">500 mg</td></tr></table>
+    <p class="sub">Single dose 30–60 min before the procedure.</p>
+  <h3>Child</h3><p class="sub">Child weight from the Paediatric section: ${sig(W())} kg.</p>
+  ${pEndo().replace('<details class="endo"><summary>Endocarditis prophylaxis (paeds, local)</summary>', '<h4>Local manual</h4>').replace('</details>', '')}
+  <h4>Child — NAG 2024 (compare with the local table above)</h4>
     <table><tr><td>Amoxicillin PO 50 mg/kg (max 2 g)</td><td class="hl">${dz(Math.min(50*W(), 2000), "mg")} mg</td></tr><tr><td>or ampicillin IV 50 mg/kg (max 2 g)</td><td class="hl">${dz(Math.min(50*W(), 2000), "mg")} mg</td></tr>
     <tr><td>Allergy: clindamycin IV / PO 20 mg/kg (max 900 mg)</td><td class="hl">${dz(Math.min(20*W(), 900), "mg")} mg</td></tr>
     <tr><td>or cefazolin IV 50 mg/kg (max 2 g) — not after anaphylaxis, angioedema or urticaria</td><td class="hl">${dz(Math.min(50*W(), 2000), "mg")} mg</td></tr></table>
-    <p class="sub">30–60 min before. Highest-risk cardiac conditions (MOH IE CPG 2017). Always for: dental extraction, periodontal surgery, subgingival scaling, root planing, re-planting avulsed teeth, implants / apicectomy; incision and drainage of a local abscess; percutaneous endoscopic gastrostomy.</p></details>
-  ${src(`Malaysian National Antimicrobial Guideline 2024 — <a href="${NAGP_URL}" target="_blank" rel="noopener noreferrer">online ↗</a> (also post-splenectomy). Neonatal note and first endocarditis table: local manual.`)}`; }
-pCards.abx = () => `<div class="card"><h2>Paeds antibiotic prophylaxis</h2>${nagpCard()}</div>`;
+    <p class="sub">30–60 min before. Highest-risk cardiac conditions (MOH IE CPG 2017). Always for: dental extraction, periodontal surgery, subgingival scaling, root planing, re-planting avulsed teeth, implants / apicectomy; incision and drainage of a local abscess; percutaneous endoscopic gastrostomy.</p>
+  ${src("Adult and child NAG 2024 (MOH): non-surgical chemoprophylaxis, infective endocarditis. Child local table: local manual.")}</div>`;
+
 
 /* ---------- DISPLAY NAME (phone only) ---------- */
 const cleanName = v => String(v||"").replace(/[<>&"'`]/g,"").trim().slice(0,24);
@@ -5357,6 +5363,7 @@ function vTicks(){
 }
 /* ---------- ABOUT ---------- */
 const CHANGES = [
+  ["2.133","Antibiotic timing & redosing and Endocarditis prophylaxis are now their own cards (General › Intra-op 7a, 7b), shown once — no longer under every procedure (checked)"],
   ["2.132","Antibiotic cards: timing and redosing in one place (adult card, with an adult / child interval table); no redose line inside each procedure; paeds card links to it; shorter source lines; old unused card code removed (checked)"],
   ["2.131","Antibiotic cards: search box, one row of specialty tabs, procedure list with the short answer on each row (green None where not recommended); details open under the row; one redose line per procedure instead of after every drug (checked)"],
   ["2.130","Paeds antibiotic prophylaxis updated to the Malaysian National Antimicrobial Guideline 2024 (section B3): per-kg doses with maxima and redose intervals; local neonatal and endocarditis notes kept (checked)"],
@@ -5697,7 +5704,7 @@ const GROUPS = [
     cards:["1. Induction drugs & relaxants","2. RSI","3. Tube & airway kit"], see:[["ga-post-im-doses-no-iv-access-or-ward","No IV access: IM doses"]], seeLabel:"Also",
     links:[["Failed intubation / CICO","adult","Failed intubation / CICO"],["Anaphylaxis","adult","Anaphylaxis"],["Bronchospasm","adult","Bronchospasm"]]},
    {id:"maint", label:"Intra-op", input:()=>gaInputs(), hint:"Ventilate → keep them asleep and stable.",
-    cards:["1. Ventilation strategies","2. One-lung ventilation","3. TIVA","4. Volatile: MAC by age","5. Intra-op analgesia","6. Vasopressors & inotropes","7. Antibiotic prophylaxis","8. Tranexamic acid"],
+    cards:["1. Ventilation strategies","2. One-lung ventilation","3. TIVA","4. Volatile: MAC by age","5. Intra-op analgesia","6. Vasopressors & inotropes","7. Antibiotic prophylaxis","7a. Antibiotic timing & redosing","7b. Endocarditis prophylaxis","8. Tranexamic acid"],
     links:[["Bronchospasm","adult","Bronchospasm"],["Anaphylaxis","adult","Anaphylaxis"],["Malignant hyperthermia","adult","Malignant hyperthermia"],["LA toxicity (LAST)","adult","LA toxicity"],["Bradycardia & cardiac arrest","adult","Bradycardia / arrest"]]},
    {id:"post", label:"Post-op", input:()=>gaInputs(), hint:"Reverse → extubate → prevent PONV → analgesia → discharge → IM doses.",
     cards:["1. Reversal",["Extubation criteria","2. Extubation criteria"],["PONV: Apfel score","3. PONV: Apfel score"],"4. Analgesia ladder & PCA",["Discharge from recovery","5. Discharge from recovery"],["Discharge home (daycare)","6. Discharge home (daycare)"],"7. IM doses (no IV access, or ward)"],
@@ -5811,6 +5818,8 @@ const SEARCH_EXTRA = {   // keyed by stable card id
   "premed-assess-osa-screen-stop-bang":"pre-op preop assessment risk stop-bang stopbang stop bang osa sleep apnoea snoring",
   "premed-assess-lung-risk-ariscat":"pre-op preop assessment risk ariscat pulmonary complications lung risk ppc",
   "premed-assess-frailty-clinical-frailty-scale":"pre-op preop assessment risk frailty clinical frailty scale cfs rockwood elderly",
+  "ga-intra-antibiotic-timing-redosing":"antibiotic timing redose redosing 60 minutes before incision half-life blood loss cefazolin redose interval vancomycin 120",
+  "ga-intra-endocarditis-prophylaxis":"endocarditis ie prophylaxis prosthetic valve rheumatic dental amoxicillin ampicillin high risk cardiac",
   "premed-assess-which-tests-to-order":"pre-op preop assessment risk investigations tests bloods ecg echo fbc renal profile coagulation hba1c nice ng45",
   "premed-assess-optimise-or-postpone":"pre-op preop assessment risk postpone cancel proceed elective optimise cut-off blood pressure hypertension diabetes hba1c ketones potassium sodium anaemia platelets inr mi myocardial infarction stent stroke tia heart failure aortic stenosis pacemaker icd asthma copd urti thyroid smoking common conditions",
   "obs-lscs-uterotonics":"uterotonic oxytocin syntocinon carbetocin duratocin ergometrine carboprost hemabate misoprostol tranexamic pph atony caesarean lscs rule of threes",
@@ -5959,6 +5968,8 @@ const CARD_IDS = {
   "5. Intra-op analgesia":"ga-intra-analgesia",
   "6. Vasopressors & inotropes":"ga-intra-vasopressors-and-inotropes",
   "7. Antibiotic prophylaxis":"ga-intra-antibiotic-prophylaxis",
+  "7a. Antibiotic timing & redosing":"ga-intra-antibiotic-timing-redosing",
+  "7b. Endocarditis prophylaxis":"ga-intra-endocarditis-prophylaxis",
   "8. Tranexamic acid":"ga-intra-tranexamic-acid",
   "1. Reversal":"ga-post-reversal",
   "Extubation criteria":"ga-post-extubation-criteria",
