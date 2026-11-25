@@ -824,7 +824,7 @@ if (window.top !== window.self && /\.github\.io$/.test(location.hostname)) {
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.131.1";
+const APP_VERSION = "2.132.1";
 const APP_DATE = "25 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
@@ -3788,12 +3788,6 @@ gaCards.pressors = () => { const w = S.aw, rate = (lo,hi,conc) => `${dz(lo*w*60/
   <tr data-dr="1"><td><span class="dn">Dobutamine</span><div class="sub dnote">250 mg in 50 mL = 5 mg/mL</div></td><td>2–20 mcg/kg/min</td><td class="hl">${rate(2,20,5000)}</td></tr></table></div>
   <p class="sub">Infusion rates use actual weight. Check your unit's standard concentrations.</p>
   <button class="homebtn" data-open="2. Echo report: what matters" data-g="premed" data-tab="assess">Valve lesion or poor EF: goals → General › Pre-op › Echo ›</button>${src("Common UK/Malaysian ICU concentrations.")}</div>`; };
-gaCards.abx = () => { const w = S.aw;
-  return `<div class="card"><h2>7. Antibiotic prophylaxis</h2>${gaDraft()}
-  <table><tr><th>Cefazolin</th><td><b>${w>=120?"3 g":"2 g"} IV</b> (${w>=120?"≥ 120 kg":"&lt; 120 kg"}) within 60 min before incision; redose every 4 h or blood loss &gt; 1.5 L</td></tr>
-  <tr><th>Penicillin allergy / MRSA</th><td>Vancomycin 15 mg/kg TBW = <b>${dz(Math.min(15*w,2000),"mg")} mg</b> over ≥ 60 min, start 60–120 min before; or clindamycin 900 mg</td></tr>
-  <tr><th>Colorectal / gynae</th><td>Add metronidazole 500 mg</td></tr></table>
-  ${src("ASHP/IDSA/SIS 2013; MOH Malaysia antibiotic guideline. Follow local policy.")}</div>`; };
 gaCards.txa = () => `<div class="card"><h2>8. Tranexamic acid</h2>${gaDraft()}
   ${f1Draft()}${GT([
     R("Tranexamic acid",`over 10 min at induction (or 15 mg/kg = ${dz(15*S.aw,"mg")} mg)`,"1 g","Repeat 1 g if bleeding continues or long case.","IV")])}
@@ -4541,12 +4535,7 @@ function nagTok(t){ const x = wts(), gw = x.tbw > 1.2*x.ibwRaw ? x.adj : x.tbw, 
     .replace(/\{gent35\}/g, `gentamicin 3–5 mg/kg IV = <b>${dz(3*gw,"mg")}–${dz(5*gw,"mg")} mg</b> <span class="sub">(${gn} ${sig(gw)} kg)</span>`); }
 
 // v2.131 shared list UI for both antibiotic cards: search, one row of specialty tabs, procedure rows with a short answer, details open under the row, one redose line
-const NAG_RE = {"cefazolin": 4, "cefuroxime": 4, "ampicillin/sulbactam": 2, "amoxicillin/clavulanate": 2, "clindamycin": 6};   // adult: ASHP intervals (NAG's table is an image)
 function nagShort(t){ return t.replace(/\{p\|([^|}]*)\|[^}]*\}/g, "$1").replace(/\{vanc\}/g, "Vancomycin").replace(/\{gent\d*\}/g, "Gentamicin").replace(/<[^>]+>/g, "").replace(/ (IV|PO)\b/g, "").replace(/^(or|PLUS) /i, "").replace(/ (PLUS|AND) /g, " + ").replace(/Amoxicillin\/clavulanate/gi, "Amox/clav").replace(/Ampicillin\/sulbactam/gi, "Amp/sulb").replace(/Metronidazole/g, "Metro"); }
-function nagRedose(row, paeds){ const all = [row[2] || [], row[3], row[4]].flat().join(" "), out = [];
-  if (paeds){ const seen = {}; all.replace(/\{p\|([^|}]*)\|[^|}]*\|[^|}]*\|[^|}]*\|([^|}]*)/g, (m, n, re) => { if (re && !seen[n]) { seen[n] = 1; out.push(`${n.toLowerCase()} every ${re} h`); } return m; }); return out.length ? `<p class="nagre"><b>Redose:</b> ${out.join(" · ")}</p>` : ""; }
-  const low = all.toLowerCase(); for (const [k, h] of Object.entries(NAG_RE)) if (low.includes(k)) out.push(`${k} every ${h} h`);
-  return out.length ? `<p class="nagre"><b>Redose (ASHP):</b> ${out.join(" · ")}</p>` : ""; }
 function nagList(paeds){ const D = paeds ? NAGP : NAG, key = paeds ? "nagp" : "nag", tok = paeds ? nagpTok : nagTok, q = (S[key + "Q"] || "").trim().toLowerCase();
   if (!(S[key + "Sp"] >= 0 && S[key + "Sp"] < D.length)) S[key + "Sp"] = paeds ? 1 : 2;
   const rows = q ? D.flatMap((sp, i) => sp[1].map((r, j) => [i, j, r, sp[0]])).filter(([, , r, spn]) => (r[0] + " " + r[1] + " " + spn).toLowerCase().includes(q)) : D[S[key + "Sp"]][1].map((r, j) => [S[key + "Sp"], j, r, ""]);
@@ -4556,7 +4545,7 @@ function nagList(paeds){ const D = paeds ? NAGP : NAG, key = paeds ? "nagp" : "n
     const short = pr === 0 ? `<span class="nagnone">None</span>` : `<span class="nagsum">${esc(nagShort(pr.join(" · ")).split(" · ")[0])}</span>`;
     return `<div class="nagrow${open ? " open" : ""}"><button class="nagrh" data-nagrow="${paeds ? "p" : "a"}|${id}" aria-expanded="${open}"><span class="nagrn">${spn ? `<small>${spn} › </small>` : ""}${n}</span>${short}<span class="nagch">${open ? "▴" : "▾"}</span></button>
     ${open ? `<div class="nagrb">${ex ? `<p class="sub" style="margin:0 0 var(--s1)">${ex}</p>` : ""}${pr === 0 ? `<div class="result ok"><b>${NO}</b></div>` : `<div class="naghd">Preferred</div><ul>${li(pr)}</ul>`}
-      ${al.length ? `<div class="naghd">Alternative</div><ul>${li(al)}</ul>` : ""}${ag.length ? `<div class="naghd">${alLab}</div><ul>${li(ag)}</ul>` : ""}${nagRedose(r, paeds)}
+      ${al.length ? `<div class="naghd">Alternative</div><ul>${li(al)}</ul>` : ""}${ag.length ? `<div class="naghd">${alLab}</div><ul>${li(ag)}</ul>` : ""}
       ${cm.length ? `<div class="naghd">Comments</div><ul class="sub">${li(cm)}</ul>` : ""}</div>` : ""}</div>`; }).join(""); }
 function nagPicker(paeds){ const D = paeds ? NAGP : NAG, key = paeds ? "nagp" : "nag";
   return `<div class="searchbox nagsearch">${svg("search")}<input id="${key}q" class="search" type="search" placeholder="Procedure, e.g. ${paeds ? "hypospadias, PEG" : "TURP, mastectomy, VATS"}" autocomplete="off" value="${esc(S[key + "Q"] || "")}"></div>
@@ -4565,11 +4554,11 @@ function nagPicker(paeds){ const D = paeds ? NAGP : NAG, key = paeds ? "nagp" : 
 function nagCard(){ const big = wts().tbw >= 120;
   return `${NAG_CHECKED ? "" : `<div class="warn" style="margin-top:0">DRAFT — updated to the Malaysian National Antimicrobial Guideline 2024 (v2.129). Check against NAG and your local policy before use.</div>`}
   ${nagPicker(false)}
-  ${big ? `<p class="hl">Cefazolin: NAG gives 2 g for adults; ASHP uses <b>3 g if ≥ 120 kg</b> (this patient ${sig(wts().tbw)} kg).</p>` : `<p class="sub">Cefazolin: NAG gives 2 g for adults; ASHP uses 3 g if ≥ 120 kg.</p>`}
-  <h3>Timing and redosing (NAG)</h3><ul><li>Give <b>60 min before incision</b>, fully infused before the incision. Single dose is usually enough; if continued, keep it short.</li>
-    <li>Redose if blood loss <b>&gt; 1500 mL</b>, the operation lasts longer than <b>two half-lives</b>, or the half-life is shortened (e.g. extensive burns).</li>
-    <li>Each procedure lists the redose interval for its drugs (ASHP; check NAG's table).</li>
-    <li>Known or suspected infection before surgery: give a treatment course, not prophylaxis.</li></ul>
+  <h3>Timing &amp; redosing</h3><ul><li><b>60 min before incision</b>, fully infused (vancomycin: up to 120 min before); one dose usually enough, never &gt; 24 h.</li>
+    <li><b>Redose</b> if blood loss &gt; 1500 mL, &gt; 2 half-lives, or burns. Infection already present: treat it, not prophylaxis.</li></ul>
+  <table class="nagrt"><tr><th>Redose every</th><th>Adult</th><th>Child</th></tr>${[["Cefazolin", "4 h", "4 h"], ["Cefuroxime", "4 h", "4 h"], ["Ampicillin/sulbactam", "2 h", "2 h"], ["Amoxicillin/clavulanate", "2 h", "4 h"], ["Clindamycin", "6 h", "6 h"], ["Cefotaxime", "—", "3 h"], ["Cloxacillin", "—", "4 h"], ["Metronidazole", "—", "8 h"]].map(([d, a, c]) => `<tr><td>${d}</td><td>${a}</td><td>${c}</td></tr>`).join("")}</table>
+  <p class="sub">Adult intervals: ASHP (NAG's table is an image). Child: NAG 2024.</p>
+  ${big ? `<p class="hl">Cefazolin 2 g (NAG); ASHP gives <b>3 g if ≥ 120 kg</b> (${sig(wts().tbw)} kg).</p>` : ""}
   <details class="endo"><summary>Endocarditis prophylaxis (high-risk cardiac patients)</summary>
     <p class="sub"><b>Who:</b> previous infective endocarditis; prosthetic valve or valve-repair material (surgical or transcatheter aortic / pulmonary); untreated cyanotic congenital heart disease, or repaired with shunts, conduits or prostheses (first 6 months after a complete repair); ventricular assist device; established rheumatic heart disease. Consider after transcatheter mitral / tricuspid repair; may consider after heart transplant.</p>
     <p class="sub"><b>For:</b> dental extraction, oral surgery, gum or root manipulation, dental implants; invasive respiratory procedures with incision or biopsy of the mucosa. Not routinely for GI or GU procedures.</p>
@@ -4577,8 +4566,7 @@ function nagCard(){ const big = wts().tbw >= 120;
     <tr><td>Non-severe penicillin allergy: cephalexin PO</td><td class="hl">2 g</td></tr><tr><td>Non-severe penicillin allergy: cefazolin IV</td><td class="hl">1 g</td></tr>
     <tr><td>Severe penicillin allergy: doxycycline PO</td><td class="hl">100 mg</td></tr><tr><td>Severe penicillin allergy: azithromycin PO</td><td class="hl">500 mg</td></tr></table>
     <p class="sub">Single dose 30–60 min before the procedure.</p></details>
-  <p class="sub">Post-splenectomy, eye and termination-of-pregnancy regimens: <a href="${NAG_URL}" target="_blank" rel="noopener noreferrer">NAG 2024 chemoprophylaxis ↗</a></p>
-  ${src(`Malaysian National Antimicrobial Guideline 2024 (MOH Pharmaceutical Services Programme), section A3 surgical and non-surgical chemoprophylaxis, and Surgical antibiotic prophylaxis principles — <a href="${NAG_URL}" target="_blank" rel="noopener noreferrer">online ↗</a>, read 25 Nov 2026. ASHP/IDSA/SIS/SHEA 2013 for redose intervals and cefazolin ≥ 120 kg.`)}`; }
+  ${src(`Malaysian National Antimicrobial Guideline 2024 — <a href="${NAG_URL}" target="_blank" rel="noopener noreferrer">online ↗</a> (also post-splenectomy, eye, TOP). ASHP 2013: redose intervals, cefazolin ≥ 120 kg.`)}`; }
 gaCards.abx = () => `<div class="card"><h2>7. Antibiotic prophylaxis</h2>${nagCard()}</div>`;
 
 // v2.130 paediatric surgical antibiotic prophylaxis — NAG 2024 section B3 (transcribed). Token {p|Drug|mg/kg (or a–b)|max mg per dose|route|redose h|extra}
@@ -4617,8 +4605,7 @@ function nagpCard(){
   return `${NAGP_CHECKED ? "" : `<div class="warn" style="margin-top:0">DRAFT — updated to the Malaysian National Antimicrobial Guideline 2024 (v2.130). Check against NAG and your local policy before use.</div>`}
   <p class="sub">Doses for ${sig(W())} kg (per kg, with NAG's maximum).</p>
   ${nagPicker(true)}
-  <h3>Timing (NAG)</h3><ul><li>Within <b>60 min before incision</b>; vancomycin within 120 min.</li><li>Single dose is usually enough; no longer than 24 hours.</li>
-    <li>Redose if the operation lasts longer than two half-lives (each procedure lists its drugs' intervals) or with excessive blood loss.</li></ul>
+  ${gLink("7. Antibiotic prophylaxis", "Timing &amp; redosing → General › Antibiotic prophylaxis")}
   <p${isNeo() ? ' class="hl"' : ""}><b>Neonates (local manual):</b> clearance is slower — cefotaxime 25–50 mg/kg loading, then 25 mg/kg 12-hourly (&lt; 4 weeks); metronidazole 15 mg/kg loading, then 7.5 mg/kg 12-hourly. Cefazolin: redose less often than every 4 h; check with pharmacy.</p>
   ${pEndo()}
   <details class="endo"><summary>Endocarditis prophylaxis — NAG 2024 (compare with the local table above)</summary>
@@ -4626,8 +4613,7 @@ function nagpCard(){
     <tr><td>Allergy: clindamycin IV / PO 20 mg/kg (max 900 mg)</td><td class="hl">${dz(Math.min(20*W(), 900), "mg")} mg</td></tr>
     <tr><td>or cefazolin IV 50 mg/kg (max 2 g) — not after anaphylaxis, angioedema or urticaria</td><td class="hl">${dz(Math.min(50*W(), 2000), "mg")} mg</td></tr></table>
     <p class="sub">30–60 min before. Highest-risk cardiac conditions (MOH IE CPG 2017). Always for: dental extraction, periodontal surgery, subgingival scaling, root planing, re-planting avulsed teeth, implants / apicectomy; incision and drainage of a local abscess; percutaneous endoscopic gastrostomy.</p></details>
-  <p class="sub">Post-splenectomy prophylaxis and vaccines: <a href="${NAGP_URL}" target="_blank" rel="noopener noreferrer">NAG 2024 paediatric chemoprophylaxis ↗</a></p>
-  ${src(`Malaysian National Antimicrobial Guideline 2024 (MOH Pharmaceutical Services Programme), section B3 paediatric chemoprophylaxis — <a href="${NAGP_URL}" target="_blank" rel="noopener noreferrer">online ↗</a>, read 25 Nov 2026. Neonatal note and the first endocarditis table: local manual.`)}`; }
+  ${src(`Malaysian National Antimicrobial Guideline 2024 — <a href="${NAGP_URL}" target="_blank" rel="noopener noreferrer">online ↗</a> (also post-splenectomy). Neonatal note and first endocarditis table: local manual.`)}`; }
 pCards.abx = () => `<div class="card"><h2>Paeds antibiotic prophylaxis</h2>${nagpCard()}</div>`;
 
 /* ---------- DISPLAY NAME (phone only) ---------- */
@@ -5371,6 +5357,7 @@ function vTicks(){
 }
 /* ---------- ABOUT ---------- */
 const CHANGES = [
+  ["2.132","Antibiotic cards: timing and redosing in one place (adult card, with an adult / child interval table); no redose line inside each procedure; paeds card links to it; shorter source lines; old unused card code removed (checked)"],
   ["2.131","Antibiotic cards: search box, one row of specialty tabs, procedure list with the short answer on each row (green None where not recommended); details open under the row; one redose line per procedure instead of after every drug (checked)"],
   ["2.130","Paeds antibiotic prophylaxis updated to the Malaysian National Antimicrobial Guideline 2024 (section B3): per-kg doses with maxima and redose intervals; local neonatal and endocarditis notes kept (checked)"],
   ["2.129","Antibiotic prophylaxis (adult) updated to the Malaysian National Antimicrobial Guideline 2024: pick specialty and procedure; endocarditis list and regimen updated (checked)"],
