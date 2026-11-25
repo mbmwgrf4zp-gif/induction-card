@@ -825,7 +825,7 @@ if (window.top !== window.self && /\.github\.io$/.test(location.hostname)) {
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.138.1";
+const APP_VERSION = "2.139.1";
 const APP_DATE = "25 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
@@ -2909,9 +2909,10 @@ function awEval(){
   const any = items.length || mp || neck || bmiHi || old;
   const asp = AW_ASP.filter(([k]) => awOn(k));
   const answered = any || S.pnMP || S.pnNeck || scv("awc","none") === 1;
-  const tier = !answered ? "" : path || (M >= 2 && L >= 2) ? "ati" : awOn("prev") || L >= 2 || M >= 2 ? "diff" : any ? "one" : "routine";
+  const tier = !answered ? "" : path || (M >= 2 && L >= 2) ? "ati" : awOn("prev") || L >= 2 || M >= 2 ? "diff" : any ? "one" : scv("awc","none") === 1 ? "routine" : "partial";   // v2.139: a few normal findings are not a full assessment
   return {M, L, F, path, asp, tier, bmiHi, old, mp, neck}; }
-const AW_TIER = {routine:["result ok","Routine","No predictors found. Standard plan; difficult-airway trolley available as always."],
+const AW_TIER = {partial:["result","Partial assessment","No predictor recorded so far. Finish the checks, then tap \"No predictors found\"."],
+  routine:["result ok","Routine","No predictors found. Standard plan; difficult-airway trolley available as always."],
   one:["result","Single predictor","Routine plan with the difficult-airway trolley and videolaryngoscope ready."],
   diff:["warn","Anticipated difficult airway","Senior anaesthetist present; videolaryngoscope first; state plans A–D to the team; preoxygenate well (consider high-flow nasal oxygen)."],
   ati:["danger","Consider awake tracheal intubation","Predicted difficult mask ventilation <b>and</b> laryngoscopy, or airway pathology. Senior decision; DAS awake intubation guideline."]};
@@ -2923,6 +2924,7 @@ function awSummary(){ const e = awEval(), p = [];
   if (e.tier === "diff") p.push("predicted difficult airway: videolaryngoscope first, senior present");
   if (e.tier === "ati") p.push("consider awake tracheal intubation");
   if (e.tier === "routine") p.push("no predictors of difficulty");
+  if (e.tier === "partial") p.push("airway assessment incomplete");
   if (e.asp.length) p.push("aspiration risk (" + e.asp.map(([, l]) => l.replace(/&gt;/g,">").replace(/ \(.*\)$/,"").replace(/^[A-Z](?=[a-z])/, c => c.toLowerCase())).join(", ") + "): RSI");
   return p; }
 gaCards.airway = () => { const e = awEval(), t = AW_TIER[e.tier];
@@ -2986,11 +2988,12 @@ gaCards.mets = () => { const d = dasiScore(), vo2 = 0.43*d + 9.6, m = vo2/3.5;
   ${src("Hlatky et al. 1989 (DASI); Wijeysundera et al. METS study, Lancet 2018 / BJA 2020; ESC 2022.")}</div>`; };
 const RCRI = [["surg","High-risk surgery (intraperitoneal, intrathoracic, suprainguinal vascular)"],["ihd","Ischaemic heart disease (MI, angina, positive stress test, nitrates, Q waves)"],["hf","Heart failure (history, pulmonary oedema, S3, CXR congestion)"],["cva","Stroke or TIA"],["ins","Diabetes on insulin"],["cr","Creatinine &gt; 177 µmol/L (2 mg/dL)"]];
 const RCRI_RISK = [["3.9%","0.4%"],["6.0%","0.9%"],["10.1%","6.6%"],["15%","11%"]];
-gaCards.rcri = () => { const n = cnt("rcri", RCRI.map(x=>x[0])), r = RCRI_RISK[Math.min(n,3)];
+gaCards.rcri = () => { const n = cnt("rcri", RCRI.map(x=>x[0])), r = RCRI_RISK[Math.min(n,3)], fin = rcriDone() || n >= 3;   // v2.139: no risk shown until complete (≥ 3 is already the top band)
   return `<div class="card"><h2>Cardiac risk (RCRI)</h2>${preDraft()}
   <div class="txck">${RCRI.map(([k,l])=>tog("rcri",k,l)).join("")}</div>${rcriDone() ? "" : `<div class="scdone"><span class="sub">${RCRI.filter(([k])=>scv("rcri",k)!=null).length} of ${RCRI.length} answered — unticked items count only once you confirm.</span><button class="linkbtn" data-restno="rcri">Rest are No ✓</button></div>`}
-  <div class="${n>=2?"warn":"result"+(n===0?" ok":"")}" style="margin-top:var(--s2)"><div class="big">${n}</div>RCRI points · risk of MI, cardiac arrest or death at 30 days ≈ <b>${r[0]}</b> <span class="sub">(pooled 2017 data; original 1999 estimate ${r[1]})</span></div>${reset("rcri")}
-  <table><tr><th>Points</th><th>2017 pooled</th><th>1999 original</th></tr>${RCRI_RISK.map((x,i)=>`<tr class="${Math.min(n,3)===i?"hl":""}"><td>${i===3?"≥ 3":i}</td><td>${x[0]}</td><td>${x[1]}</td></tr>`).join("")}</table>
+  ${fin ? `<div class="${n>=2?"warn":"result"+(n===0?" ok":"")}" style="margin-top:var(--s2)"><div class="big">${n}</div>RCRI points · risk of MI, cardiac arrest or death at 30 days ≈ <b>${r[0]}</b> <span class="sub">(pooled 2017 data; original 1999 estimate ${r[1]})</span></div>`
+    : `<div class="result" style="margin-top:var(--s2)"><div class="big">${n}</div>Score so far — answer every item, or tap "Rest are No", for the risk.</div>`}${reset("rcri")}
+  <table><tr><th>Points</th><th>2017 pooled</th><th>1999 original</th></tr>${RCRI_RISK.map((x,i)=>`<tr class="${fin && Math.min(n,3)===i?"hl":""}"><td>${i===3?"≥ 3":i}</td><td>${x[0]}</td><td>${x[1]}</td></tr>`).join("")}</table>
   <ul><li><b>RCRI ≥ 1, age ≥ 65, or known cardiovascular disease</b> before intermediate / high-risk surgery: 12-lead ECG; consider NT-proBNP / troponin baseline</li>
   <li><b>Poor functional capacity, raised NT-proBNP, new murmur or symptoms:</b> echo</li><li>RCRI ≥ 2 with &lt; 4 METs: senior / cardiology discussion; no routine stress test or angiography just for surgery</li></ul>
   ${src("Lee et al. Circulation 1999; Duceppe et al. CCS guidelines 2017; ESC 2022; ACC/AHA 2024.")}</div>`; };
@@ -3000,11 +3003,13 @@ const sbDone = () => SB_MAN.every(([k]) => scv("sb",k) === 0 || scv("sb",k) === 
 const rcriDone = () => RCRI.every(([k]) => scv("rcri",k) === 0 || scv("rcri",k) === 1);
 const sbTouched = () => SB_MAN.some(([k]) => scv("sb",k)!=null);
 gaCards.stopbang = () => { const x = wts(), n = sbScore(), auto = (on, t) => `<div class="txci ${on?"on":""}" style="cursor:default"><span class="box">${on?"✓":""}</span><span>${t} <span class="sub">(from patient box)</span></span></div>`;
+  const fin = sbDone() || n >= 5;   // v2.139: no risk shown until complete (≥ 5 is already high)
   const lvl = n<=2 ? ["result ok","Low risk of OSA",""] : n<=4 ? ["warn","Intermediate risk","Treat as possible OSA if other features."] : ["danger","High risk of moderate–severe OSA","Opioid-sparing plan, extubate awake and sitting up, monitored bed if opioids needed; consider sleep study / CPAP if time allows."];
   return `<div class="card"><h2>OSA screen (STOP-BANG)</h2>${preDraft()}
   <div class="txck">${SB_MAN.slice(0,4).map(([k,l])=>tog("sb",k,l)).join("")}${auto(x.bmi>35,`<b>B</b>MI &gt; 35 — now ${sig(x.bmi)}`)}${auto(S.age>50,`<b>A</b>ge &gt; 50 — now ${S.age}`)}${tog("sb","n",SB_MAN[4][1])}${auto(S.sex==="M","<b>G</b>ender male")}</div>${sbDone() ? "" : `<div class="scdone"><span class="sub">${SB_MAN.filter(([k])=>scv("sb",k)!=null).length} of ${SB_MAN.length} questions answered${["aw","height","age","sex"].every(k=>S.touched[k]) ? "" : "; enter sex, age, height and weight"} — the note shows \"incomplete\" until then.</span><button class="linkbtn" data-restno="sb">Rest are No ✓</button></div>`}
-  <div class="${lvl[0]}" style="margin-top:var(--s2)"><div class="big">${n} / 8</div><b>${lvl[1]}.</b> ${lvl[2]}</div>${reset("sb")}
-  <p class="sub">0–2 low · 3–4 intermediate · 5–8 high. Also high if ≥ 2 STOP items plus male, BMI &gt; 35 or neck &gt; 40 cm.</p>
+  ${fin ? `<div class="${lvl[0]}" style="margin-top:var(--s2)"><div class="big">${n} / 8</div><b>${lvl[1]}.</b> ${lvl[2]}</div>`
+    : `<div class="result" style="margin-top:var(--s2)"><div class="big">${n} / 8</div>Score so far — answer every question for the risk.</div>`}${reset("sb")}
+  <p class="sub">Screening, not a diagnosis. 0–2 low · 3–4 intermediate · 5–8 high. Also high if ≥ 2 STOP items plus male, BMI &gt; 35 or neck &gt; 40 cm.</p>
   ${n>=5?`<button class="homebtn" data-open="5. Intra-op analgesia" data-g="ga" data-tab="maint">Opioid-sparing plan → Intra-op analgesia ›</button>`:""}
   ${src("Chung et al. STOP-BANG (Anesthesiology 2008; BJA 2012); SASM guidance.")}</div>`; };
 const ARI = () => [
@@ -5510,6 +5515,7 @@ function vTicks(){
 }
 /* ---------- ABOUT ---------- */
 const CHANGES = [
+  ["2.139","Pre-op scores: RCRI and STOP-BANG show only \"score so far\" until every item is answered (or Rest are No). Airway card: a few normal findings now read \"Partial assessment\"; Routine and \"no predictors\" appear only after you tap No predictors found. (checked)"],
   ["2.138","Femoral, fascia iliaca, PENG, adductor canal, ESP, serratus anterior, rectus sheath and TAP: a Misses row — what each block does not reliably cover. (checked)"],
   ["2.137","Stop Before You Block in three stages: before the block, immediately before the needle (Prep, Stop, Block), after the block. LA calculator: an \"arithmetic only\" line, and the maximum is never shown rounded up. (checked)"],
   ["2.136","Epidural, CSE and Failed or patchy block: a When to escalate box — expected effects, red flags needing urgent review (MRI, neurosurgery), and a link to High / total spinal. (checked)"],
