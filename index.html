@@ -808,7 +808,7 @@ details.bfb[open]>summary{margin-bottom:4px}details.bfb .bfo{margin-top:4px}deta
 @media (min-width:560px){.nagsum{max-width:260px}}
 .bfpanel{display:grid;gap:8px;margin:var(--s2) 0}.bfpanel:empty{display:none}.bfside{margin:0;color:var(--danger-ink);font-weight:600;font-size:14px}
 .bfb{border-radius:var(--r-sm);padding:10px 12px;background:var(--bg);display:grid;gap:2px}.bfb.first{background:var(--gc-soft)}
-.bftag{font-size:13px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--gc)}.bfopl{margin:var(--s2) 0;padding:var(--s2) var(--s3);border-left:4px solid var(--gc);background:var(--card);border-radius:var(--r-sm)}.bfrole{display:block;font-size:13px;font-weight:700;color:var(--muted)}.bfrole.rs{color:var(--gc)}.bfrole.rx{color:var(--warn-ink)}
+.bftag{font-size:13px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--gc)}.fbgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:var(--s2) 0}.fbin{display:flex;flex-direction:column;gap:2px;font-size:14px;color:var(--muted)}.fbin small{font-size:13px}.fbin input{font:inherit;font-size:17px;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px;min-height:44px;width:100%;box-sizing:border-box}.bfopl{margin:var(--s2) 0;padding:var(--s2) var(--s3);border-left:4px solid var(--gc);background:var(--card);border-radius:var(--r-sm)}.bfrole{display:block;font-size:13px;font-weight:700;color:var(--muted)}.bfrole.rs{color:var(--gc)}.bfrole.rx{color:var(--warn-ink)}
 .bfo{display:flex;justify-content:space-between;align-items:baseline;gap:8px;background:none;border:0;padding:0;color:var(--ink);font:inherit;text-align:left;cursor:pointer}
 .bfn{font-weight:700;font-size:16px;color:var(--gc);text-decoration:underline;text-decoration-thickness:1.5px;text-underline-offset:3px}.bfempty{margin:0;font-size:15px}.bfd{font-weight:700;font-size:20px;white-space:nowrap}.bfw{font-size:14px;color:var(--muted)}.bfw.bfc{color:var(--ink)}
 </style>
@@ -825,7 +825,7 @@ if (window.top !== window.self && /\.github\.io$/.test(location.hostname)) {
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.144.1";
+const APP_VERSION = "2.145.1";
 const APP_DATE = "25 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
@@ -843,7 +843,7 @@ const store = {
 // Inputs are not remembered between uses (per plan): state lives in memory only.
 window.addEventListener("hashchange", () => { if (typeof S !== "undefined"){ S.tmrOpen = false; S.tmrArm = null; } });
 const S = { ettMode:"adult", sex:"F", height:158, ageY:4, ageM:0, wt:3.0,
-            touched:{}, sc:{}, fastH:6, leLen:"brief", leNote:"", csDec:"", pnNote:"", pnF:{}, pnLay:"mine", pnMP:"", pnNeck:"", pnPonv:"", pnUrg:"", crea:80, hbNow:12, hbLow:8, hbTarget:10, derm:"", abxSp:"general", spOp:"lscs", spHt:155, morWt:60, pw:10, pY:1, pM:0, pHt:75, pBE:-5, aw:70, emTab:"adult", obTab:"labour", pTab:"pre", gaTab:"ind", pmTab:"assess", raTab:"safety", laA:[], laP:[], cSex:"F", cY:40, cM:0, cH:160, cW:60, cD:7, cGA:40, cBW:3, cNick:"", laD:"bupi", laC:"0.5", laMl:15, laBi:"1", age:45, apfel:0, pump:"pcea_cse", topup:"lig", ventSc:"std", vfio:"", txTab:"pre", txck:{}, gaB:40, chW:6, pD:7, bw:3, dermMode:"block", asa:"", met:"", csWho:"patient", csOut:"full", csLen:"brief", csLang:"English", csNote:"", k:4.5, hb:10, todayWt:70, hdH:12 };
+            touched:{}, sc:{}, abg:{}, fbal:{}, blIn:{}, hbU:"gdl", fastH:6, leLen:"brief", leNote:"", csDec:"", pnNote:"", pnF:{}, pnLay:"mine", pnMP:"", pnNeck:"", pnPonv:"", pnUrg:"", crea:80, hbNow:12, hbLow:8, hbTarget:10, derm:"", abxSp:"general", spOp:"lscs", spHt:155, morWt:60, pw:10, pY:1, pM:0, pHt:75, pBE:-5, aw:70, emTab:"adult", obTab:"labour", pTab:"pre", gaTab:"ind", pmTab:"assess", raTab:"safety", laA:[], laP:[], cSex:"F", cY:40, cM:0, cH:160, cW:60, cD:7, cGA:40, cBW:3, cNick:"", laD:"bupi", laC:"0.5", laMl:15, laBi:"1", age:45, apfel:0, pump:"pcea_cse", topup:"lig", ventSc:"std", vfio:"", txTab:"pre", txck:{}, gaB:40, chW:6, pD:7, bw:3, dermMode:"block", asa:"", met:"", csWho:"patient", csOut:"full", csLen:"brief", csLang:"English", csNote:"", k:4.5, hb:10, todayWt:70, hdH:12 };
 
 function src(text){ return `<div class="src">Source: ${text}</div>`; }
 function protoSrc(){
@@ -1068,7 +1068,7 @@ const QT = (() => {
     ans:()=>{ const w=S.pw, m0=w<=10?4*w:w<=20?40+2*(w-10):60+(w-20); return sm(dz(Math.min(m0,100),"mL/h"),"mL/h maintenance"); }},
   padr:{lab:"Paeds arrest adrenaline", ic:"emerg", cls:"t-emerg", kind:"paeds", keys:["pw"], inp:()=>`${sig(S.pw)} kg`, open:["Paeds cardiac arrest","emerg","paeds"],
     ans:()=>{ const ml=dz(Math.min(0.1*S.pw,10),"mL",10); return sm(ml,`mL of 1:10 000 (10 mcg/kg)`); }},
-  dlt:{lab:"Double-lumen tube", ic:"airway", cls:"t-ga", kind:"adult", keys:["height"], inp:aHt, open:["9. One-lung ventilation","ga","maint"],
+  dlt:{lab:"Double-lumen tube", ic:"airway", cls:"t-ga", kind:"adult", keys:["height"], inp:aHt, open:["12. One-lung ventilation","ga","maint"],
     ans:()=>sm(dltSize(),`Fr left · ${sig(12+S.height/10)} cm`)},
   prop:{lab:"Propofol induction", ic:"airway", cls:"t-ga", kind:"adult", keys:A, inp:aBoth, open:["2. Induction drugs & relaxants","ga","ind"],
     ans:()=>{ const w=wts().lbw, r=x=>dz(dz(x/10,"mL")*10,"mg"); return sm(`${r(1.5*w)}–${r(2.5*w)}`,`mg · 1.5–2.5 mg/kg LBW`); }},
@@ -1728,7 +1728,8 @@ const irDraft = () => IR_CHECKED ? "" : `<div class="warn" style="margin-top:0">
 const IR_SECS = {anti:"Anticholinergic", opioid:"Opioid", hyp:"Hypnotic", relax:"Muscle relaxant", noiv:"No IV access"};
 const irJump = ids => `<div class="jumprow">${ids.map(k => `<button class="chip" data-jump="${k}">${IR_SECS[k]}</button>`).join("")}</div>`;
 const irHead = k => `<h3 class="irh" data-anchor="${k}">${IR_SECS[k]}</h3>`;
-const OLD_LABELS = {"ga|3. Tube & airway kit":"ga-ind-tube-and-airway-kit", "ga|1. Induction drugs & relaxants":"ga-ind-induction-drugs", "ga|2. RSI":"ga-ind-rsi", "ga|7. Antibiotic prophylaxis":"ga-intra-antibiotic-prophylaxis", "ga|8. Tranexamic acid":"ga-intra-tranexamic-acid", "ga|1. Ventilation strategies":"ga-intra-ventilation-strategies", "ga|3. TIVA":"ga-intra-tiva", "ga|4. Volatile: MAC by age":"ga-intra-volatile-mac-by-age", "ga|5. Intra-op analgesia":"ga-intra-analgesia", "ga|6. Vasopressors & inotropes":"ga-intra-vasopressors-and-inotropes", "ga|2. One-lung ventilation":"ga-intra-one-lung-ventilation", "ga|4. Analgesia ladder & PCA":"ga-post-analgesia-ladder-and-pca", "ga|7. IM doses (no IV access, or ward)":"ga-post-im-doses-no-iv-access-or-ward",   // v2.144 General reorder
+const OLD_LABELS = {"ga|8. Vasopressors & inotropes":"ga-intra-vasopressors-and-inotropes", "ga|9. One-lung ventilation":"ga-intra-one-lung-ventilation",   // v2.145
+  "ga|3. Tube & airway kit":"ga-ind-tube-and-airway-kit", "ga|1. Induction drugs & relaxants":"ga-ind-induction-drugs", "ga|2. RSI":"ga-ind-rsi", "ga|7. Antibiotic prophylaxis":"ga-intra-antibiotic-prophylaxis", "ga|8. Tranexamic acid":"ga-intra-tranexamic-acid", "ga|1. Ventilation strategies":"ga-intra-ventilation-strategies", "ga|3. TIVA":"ga-intra-tiva", "ga|4. Volatile: MAC by age":"ga-intra-volatile-mac-by-age", "ga|5. Intra-op analgesia":"ga-intra-analgesia", "ga|6. Vasopressors & inotropes":"ga-intra-vasopressors-and-inotropes", "ga|2. One-lung ventilation":"ga-intra-one-lung-ventilation", "ga|4. Analgesia ladder & PCA":"ga-post-analgesia-ladder-and-pca", "ga|7. IM doses (no IV access, or ward)":"ga-post-im-doses-no-iv-access-or-ward",   // v2.144 General reorder
   "ga|1. Induction drugs":"ga-ind-induction-drugs", "ga|3. Muscle relaxants":"ga-ind-muscle-relaxants", "ga|4. Tube & airway kit":"ga-ind-tube-and-airway-kit",
   "paeds|3. Induction drugs":"paeds-ind-induction-drugs", "paeds|4. Muscle relaxants":"paeds-ind-muscle-relaxants", "paeds|5. RSI (child)":"paeds-ind-rsi", "paeds|6. Ketamine induction (short cases)":"paeds-ind-ketamine-anaesthesia",
   "paeds|7. TIVA: model check & propofol targets":"paeds-ind-tiva-model-check", "paeds|8. TIVA: remifentanil":"paeds-ind-remifentanil", "paeds|9. Ventilation settings":"paeds-ind-ventilation",
@@ -2674,6 +2675,158 @@ gaCards.optpost = () => `<div class="card"><h2>10. Optimise or postpone</h2>${aw
   <button class="homebtn" data-open="3. PONV: Apfel score" data-g="ga" data-tab="maint">PONV risk (Apfel) → General › Intra-op ›</button>
   ${src("Association of Anaesthetists / BHS peri-operative BP guideline (2016, updated 2026); CPOC diabetes 2021; ESC 2022 / ACC-AHA 2024 non-cardiac surgery; International consensus on peri-operative anaemia 2017; WHO anaemia thresholds; BHRS / Association CIED guidance.")}</div>`;
 
+/* ---------- v2.145 INTRA-OP: FLUIDS, BLOOD, ABG (adult) ---------- */
+const FBG_CHECKED = true;   // checked by author 25 Nov 2026 (author asked for these to go live without a draft step)
+const numIn = (grp, k, lab, unit, ph) => `<label class="fbin"><span>${lab}${unit ? ` <small>${unit}</small>` : ""}</span><input inputmode="decimal" autocomplete="off" data-${grp}="${k}" value="${esc(((S[grp === "abg" ? "abg" : grp === "fb" ? "fbal" : "blIn"] || {})[k]) ?? "")}" placeholder="${ph || ""}"></label>`;
+const numV = (o, k) => { const v = (o || {})[k]; if (v == null || String(v).trim() === "") return null; const n = parseFloat(String(v).replace(",", ".")); return isFinite(n) ? n : NaN; };
+const hbU = () => S.hbU === "gl" ? "gl" : "gdl";
+const hbToGdl = v => v == null || isNaN(v) ? v : hbU() === "gl" ? v / 10 : v;   // g/L → g/dL
+const hbSeg = () => `<div class="pnf"><span class="sub">Hb unit</span>${seg("hbU", [["gdl", "g/dL"], ["gl", "g/L"]])}</div>`;
+const gLinkId = (id, txt) => { const e = findEntry(id); return e ? `<button class="rellink" data-id="${e.id}" data-open="${esc(e.label)}" data-g="${e.g}" data-tab="${e.tab}">${txt} ›</button>` : ""; };
+
+// 8. Fluid management
+function fbBalance(){ const f = S.fbal || {}, v = k => numV(f, k), ins = ["crys", "coll", "bld"], outs = ["ebl", "uo", "oth"];
+  const bad = [...ins, ...outs].filter(k => v(k) != null && (isNaN(v(k)) || v(k) < 0 || v(k) > 50000));
+  if (bad.length) return `<div class="danger">Check the entries: each must be a number of mL between 0 and 50 000.</div>`;
+  if (![...ins, ...outs].some(k => v(k) != null)) return `<p class="sub">Enter what has been given and lost (mL).</p>`;
+  const I = ins.reduce((a, k) => a + (v(k) || 0), 0), O = outs.reduce((a, k) => a + (v(k) || 0), 0), n = I - O;
+  return `<div class="result"><b>In ${Math.round(I)} mL · Out ${Math.round(O)} mL · Net ${n >= 0 ? "+" : "−"}${Math.abs(Math.round(n))} mL</b><div class="sub">Recorded balance only — not the patient's volume status. Blood loss is an estimate; insensible losses are not counted.</div></div>`; }
+gaCards.fluids = () => { const x = wts(), sm = isSample("aw") || isSample("height"), ob = x.bmi >= 30, w = ob ? x.ibw : x.tbw, lo = w*25/24, hi = w*30/24;
+  return `<div class="card"><h2>8. Fluid management</h2>
+  <p class="sub" style="margin-top:0">Maintenance, replacement of losses and resuscitation are separate questions. Reassess after every bolus.</p>
+  <h3>Assess</h3><ul><li>Volume status, ongoing bleeding, expected surgical losses</li><li>HR, BP, perfusion, lactate trend, urine output</li><li>Tolerance: heart, kidney and lung disease; procedure and stage of surgery</li></ul>
+  <h3>Maintenance — starting estimate</h3>
+  <div class="result"><b>${sm ? "Enter weight and height" : `${dz(lo, "mL/h")}–${dz(hi, "mL/h")} mL/h`}</b> <span class="sub">25–30 mL/kg/day on ${ob ? `ideal weight ${sig(x.ibw)} kg (BMI ≥ 30)` : `actual weight ${sig(x.tbw)} kg`}</span>
+    <div class="sub">A starting point, not a prescription. No fasting-deficit or "third-space" replacement. Intra-op: replace measured losses and aim for a roughly zero balance — overly restrictive regimens increased kidney injury (RELIEF 2018).</div></div>
+  <h3>Fluid challenge</h3><ul><li>Only with signs of poor perfusion <b>and</b> a likely response — low BP under anaesthesia is often vasodilation: treat with a vasopressor</li>
+    <li>250 mL (about 3–4 mL/kg) over 5–10 min, then reassess BP, HR and stroke volume if monitored; stop if no response — don't repeat ineffective boluses</li>
+    <li>Pulse pressure / stroke volume variation &gt; 12–13% suggests a response. <b>Unreliable:</b> spontaneous breathing, arrhythmia (AF), tidal volume &lt; 8 mL/kg PBW, open chest, raised abdominal pressure, right heart failure, stiff lungs</li>
+    <li>Watch for overload: rising airway pressure, falling SpO₂, oedema, crackles</li></ul>
+  <h3>Which fluid</h3><table>
+    <tr><th>Balanced crystalloid</th><td>Hartmann's, Plasma-Lyte: the usual choice. The small K⁺ content is not a reason to avoid it in kidney disease</td></tr>
+    <tr><th>0.9% saline</th><td>Large volumes → hyperchloraemic acidosis. Prefer in brain injury / raised ICP (Hartmann's is slightly hypotonic), hyponatraemia, vomiting with alkalosis</td></tr>
+    <tr><th>Albumin</th><td>Specific uses only; not routine</td></tr>
+    <tr><th>Starches (HES)</th><td><b>Avoid</b>: kidney injury and bleeding</td></tr>
+    <tr><th>Gelatins</th><td>No proven advantage over crystalloid; anaphylaxis risk</td></tr>
+    <tr><th>Blood</th><td>For bleeding, not crystalloid — see Blood management</td></tr></table>
+  <details class="ndet"><summary>Special situations</summary><ul>
+    <li><b>Kidney impairment:</b> balanced crystalloid; avoid hypotension and overload; measure urine output</li>
+    <li><b>Heart failure:</b> small boluses (100–250 mL) with reassessment; early vasopressor or inotrope; consider cardiac-output monitoring</li>
+    <li><b>Major abdominal or long surgery:</b> goal-directed therapy with a cardiac-output monitor for high-risk patients (ERAS)</li>
+    <li><b>Sepsis / vasodilatory shock:</b> 30 mL/kg crystalloid within 3 h for sepsis-induced hypoperfusion, reassessing as you go (SSC 2021); noradrenaline early</li>
+    <li><b>Bleeding:</b> blood and products, control the source — see Blood management</li>
+    <li><b>High risk of overload</b> (heart, kidney or lung disease, the elderly): smaller volumes, set limits, reassess often</li></ul></details>
+  <details class="ndet"><summary>Running fluid balance</summary>
+    <div class="fbgrid">${numIn("fb", "crys", "Crystalloid", "mL")}${numIn("fb", "coll", "Colloid", "mL")}${numIn("fb", "bld", "Blood products", "mL")}${numIn("fb", "ebl", "Blood loss (estimate)", "mL")}${numIn("fb", "uo", "Urine", "mL")}${numIn("fb", "oth", "Other measured losses", "mL")}</div>
+    <div id="fbres">${fbBalance()}</div><button class="linkbtn" data-fbreset="1">Reset balance</button></details>
+  ${gLinkId("ga-intra-blood-management", "Bleeding → Blood management")}${gLinkId("ga-intra-vasopressors-and-inotropes", "Vasopressors & inotropes")}
+  ${src("NICE CG174 Intravenous fluid therapy in adults in hospital (2013, updated 2017); Myles et al. RELIEF, NEJM 2018; Surviving Sepsis Campaign 2021; ERAS Society guidance; Michard, dynamic indices of fluid responsiveness.")}</div>`; };
+
+// 10. Blood management
+function ablText(){ const x = wts(), male = S.sex === "M", ebv = (male ? 70 : 65) * x.tbw, b = S.blIn || {}, a = hbToGdl(numV(b, "now")), l = hbToGdl(numV(b, "low"));
+  if (a == null || l == null) return `<p class="sub">Enter Hb now and the lowest Hb you would accept for this patient.</p>`;
+  if (isNaN(a) || isNaN(l) || a < 3 || a > 25 || l < 3 || l > 25) return `<div class="danger">Hb must be between 3 and 25 g/dL (30–250 g/L).</div>`;
+  if (l >= a) return `<div class="warn">The lowest acceptable Hb is at or above Hb now — no allowable loss.</div>`;
+  const abl = ebv * (a - l) / a;
+  return `<div class="result"><b>Allowable blood loss ≈ ${dz(abl, "mL")} mL</b> <span class="sub">= EBV × (Hb now − lowest) / Hb now</span><div class="sub">A planning estimate, not a transfusion trigger. Not valid in fast bleeding or haemodynamic instability.</div></div>`; }
+function abgForBlood(){ const g = S.abg || {}, p = [["hb", "Hb", hbU() === "gl" ? "g/L" : "g/dL"], ["lac", "Lactate", "mmol/L"], ["ph", "pH", ""], ["ica", "Ionised Ca", "mmol/L"], ["k", "K⁺", "mmol/L"]].filter(([k]) => numV(g, k) != null && !isNaN(numV(g, k)));
+  return p.length ? `<p class="sub"><b>From the ABG card:</b> ${p.map(([k, l, u]) => `${l} ${numV(g, k)}${u ? " " + u : ""}`).join(" · ")} — for context only.</p>` : ""; }
+gaCards.blood = () => { const x = wts(), sm = isSample("aw") || isSample("sex"), male = S.sex === "M", ebv = (male ? 70 : 65) * x.tbw, w = x.tbw;
+  return `<div class="card"><h2>10. Blood management</h2>
+  <div class="danger" style="margin-top:0"><b>Major haemorrhage</b> (e.g. &gt; 150 mL/min, half the blood volume in 3 h, or shock with ongoing loss): call for help and <b>activate your hospital's major haemorrhage protocol</b>; tell the blood bank · control the bleeding (surgeon, pressure, radiology) · tranexamic acid early · warm everything · check ionised Ca, K⁺, pH, fibrinogen, platelets and clotting (point-of-care tests if available) · plasma and platelets alongside red cells, guided by results where possible.</div>
+  <h3>Estimated blood volume</h3>
+  <div class="result"><b>${sm ? "Enter sex and weight" : `EBV ≈ ${dz(ebv, "mL")} mL (${sig(ebv/1000)} L)`}</b> <span class="sub">${male ? 70 : 65} mL/kg × actual weight ${sig(x.tbw)} kg</span>
+    <div class="sub">An estimate only.${x.bmi >= 30 ? " <b>Obese:</b> overestimates (fat holds little blood) — read it as an upper limit." : ""}</div></div>
+  <h3>Allowable blood loss</h3>${hbSeg()}
+  <div class="fbgrid">${numIn("bl", "now", "Hb now", hbU() === "gl" ? "g/L" : "g/dL")}${numIn("bl", "low", "Lowest acceptable Hb", hbU() === "gl" ? "g/L" : "g/dL")}</div>
+  <div id="blres">${sm ? `<p class="sub">Enter sex and weight in the patient box first.</p>` : ablText()}</div>
+  <h3>Measuring loss</h3><ul><li>Suction volume minus irrigation; weigh swabs (1 g ≈ 1 mL); count packs</li><li>Watch the trend and the field, not one number; repeat Hb and gases while bleeding</li></ul>
+  <h3>Red cells</h3><ul><li><b>Stable adults:</b> transfuse at Hb <b>&lt; 7 g/dL</b>; <b>&lt; 7.5</b> in cardiac surgery; <b>&lt; 8</b> in orthopaedic surgery or known cardiovascular disease (AABB 2023)</li>
+    <li><b>Acute myocardial infarction:</b> a higher threshold may be safer (MINT 2023) — discuss</li>
+    <li>Hb alone is not the trigger: weigh ongoing loss, haemodynamics, signs of poor oxygen delivery and reserve. Stable patient: one unit, then reassess (≈ +1 g/dL in an average adult)</li></ul>
+  <h3>Products</h3><table>
+    <tr><th>FFP</th><td>Bleeding with prolonged PT / INR (&gt; 1.5×): 15 mL/kg${sm ? "" : ` ≈ <b>${dz(15*w, "mL")} mL</b>`}</td></tr>
+    <tr><th>Platelets</th><td>One adult dose. Keep &gt; 50 ×10⁹/L when bleeding or for most surgery; &gt; 100 for neurosurgery, posterior eye surgery, or major trauma with head injury</td></tr>
+    <tr><th>Cryoprecipitate / fibrinogen</th><td>Fibrinogen &lt; 1.5 g/L with bleeding (obstetric targets: the obstetric card). Cryo about 1 unit per 5–10 kg — unit sizes vary; check with your blood bank. Fibrinogen concentrate where available</td></tr>
+    <tr><th>Tranexamic acid</th><td>See the Tranexamic acid card</td></tr>
+    <tr><th>Cell salvage</th><td>Where available, for expected large loss</td></tr>
+    <tr><th>Viscoelastic tests</th><td>ROTEM / TEG where available, to target products</td></tr></table>
+  ${abgForBlood()}
+  ${gLinkId("ga-intra-abg-analysis", "ABG analysis")}${gLinkId("ga-intra-vasopressors-and-inotropes", "Vasopressors & inotropes")}${gLinkId("ga-intra-tranexamic-acid", "Tranexamic acid")}${gLinkId("emerg-adult-massive-obstetric-haemorrhage", "Obstetric: Massive obstetric haemorrhage")}
+  ${src("AABB red cell transfusion guideline (Carson et al., JAMA 2023); MINT trial (NEJM 2023); NICE NG24 Blood transfusion (2015); British Society for Haematology guidance; Malaysian National Blood Centre Transfusion Practice Guidelines. Follow your hospital's major haemorrhage protocol.")}</div>`; };
+
+// 11. ABG analysis — interpretation engine (no treatment advice)
+const ABG_F = [["ph", "pH", "", 6.5, 8.0, true], ["pco2", "PaCO₂", "mmHg", 5, 200, true], ["hco3", "HCO₃⁻", "mmol/L", 1, 70, true],
+  ["po2", "PaO₂", "mmHg", 10, 700], ["fio2", "FiO₂", "0.21–1 or %", 0.21, 100], ["na", "Na⁺", "mmol/L", 90, 200], ["k", "K⁺", "mmol/L", 1, 12], ["cl", "Cl⁻", "mmol/L", 50, 160],
+  ["lac", "Lactate", "mmol/L", 0, 40], ["be", "Base excess", "mmol/L", -40, 40], ["hb", "Hb", "", 2, 250], ["alb", "Albumin", "g/L", 5, 60], ["ica", "Ionised Ca", "mmol/L", 0.3, 3], ["glu", "Glucose", "mmol/L", 0.5, 80]];
+function abgEval(o, age){ const v = k => numV(o, k), r = {err: [], prim: "", comp: [], extra: [], oxy: [], cons: [], lim: [], flag: []};
+  ABG_F.forEach(([k, l, , lo, hi]) => { const x = v(k); if (x != null && (isNaN(x) || x < lo || x > hi)) r.err.push(`${l}: ${isNaN(x) ? "not a number" : "outside " + lo + "–" + hi}`); });
+  const pH = v("ph"), C = v("pco2"), H = v("hco3");
+  if (pH == null || C == null || H == null){ r.err.push("pH, PaCO₂ and HCO₃⁻ are needed"); return r; }
+  if (r.err.length) return r;
+  const hM = Math.pow(10, 9 - pH), hC = 24 * C / H, mis = Math.abs(hC - hM) / hM;
+  if (mis > 0.1) r.flag.push(`pH, PaCO₂ and HCO₃⁻ don't fit together (${Math.round(mis*100)}% apart) — check for a transcription, sampling or analyser error before interpreting.`);
+  const acid = pH < 7.35, alk = pH > 7.45, cH = C > 45, cL = C < 35, bH = H > 26, bL = H < 22;
+  let met = null, resp = null;
+  if (acid){ if (bL && cH){ r.prim = "Mixed metabolic and respiratory acidosis"; met = "acid"; resp = "both"; } else if (bL){ r.prim = "Metabolic acidosis"; met = "acid"; } else if (cH){ r.prim = "Respiratory acidosis"; resp = "acid"; } else r.prim = "Acidaemia without a clear primary change — recheck the values"; }
+  else if (alk){ if (bH && cL){ r.prim = "Mixed metabolic and respiratory alkalosis"; met = "alk"; resp = "both"; } else if (bH){ r.prim = "Metabolic alkalosis"; met = "alk"; } else if (cL){ r.prim = "Respiratory alkalosis"; resp = "alk"; } else r.prim = "Alkalaemia without a clear primary change — recheck the values"; }
+  else { if (!cH && !cL && !bH && !bL) r.prim = "Normal pH, PaCO₂ and HCO₃⁻"; else if ((cH && bH) || (cL && bL)) { r.prim = "Normal pH with abnormal PaCO₂ and HCO₃⁻ — a mixed disorder, or a fully compensated chronic one"; met = bL ? "acid" : "alk"; } else r.prim = "Normal pH with a single abnormal value — possibly a mild or compensated disorder"; }
+  if (met === "acid" && resp !== "both"){ const e = 1.5*H + 8; r.comp.push(`Expected PaCO₂ (Winter's) = 1.5 × ${H} + 8 = <b>${sig(e)} ± 2 mmHg</b>; measured ${C}.`);
+    if (C > e + 2) r.comp.push("PaCO₂ higher than expected → <b>additional respiratory acidosis</b>."); else if (C < e - 2) r.comp.push("PaCO₂ lower than expected → <b>additional respiratory alkalosis</b>."); else r.comp.push("Respiratory compensation as expected."); }
+  if (met === "alk" && resp !== "both"){ const e = 40 + 0.7*(H - 24); r.comp.push(`Expected PaCO₂ = 40 + 0.7 × (${H} − 24) = <b>${sig(e)} ± 5 mmHg</b>; measured ${C}.`);
+    if (C > e + 5) r.comp.push("PaCO₂ higher than expected → <b>additional respiratory acidosis</b>."); else if (C < e - 5) r.comp.push("PaCO₂ lower than expected → <b>additional respiratory alkalosis</b>."); else r.comp.push("Respiratory compensation as expected."); }
+  if (resp === "acid" || resp === "alk"){ const d = C - 40, ac = 24 + (resp === "acid" ? 0.1 : 0.2)*d, ch = 24 + (resp === "acid" ? 0.35 : 0.4)*d, lo = Math.min(ac, ch) - 2, hi = Math.max(ac, ch) + 2;
+    r.comp.push(`Expected HCO₃⁻: acute ≈ <b>${sig(ac)}</b>, chronic ≈ <b>${sig(ch)}</b> mmol/L; measured ${H}.`);
+    if (Math.abs(H - ac) <= 2 && Math.abs(H - ch) > 2) r.comp.push("Fits an <b>acute</b> change.");
+    else if (Math.abs(H - ch) <= 2 && Math.abs(H - ac) > 2) r.comp.push("Fits a <b>chronic</b> (compensated) change.");
+    else if (H >= lo && H <= hi) r.comp.push("Between acute and chronic — acute on chronic, or partly compensated. History decides.");
+    else if (H > hi) r.comp.push("HCO₃⁻ higher than expected → <b>additional metabolic alkalosis</b>.");
+    else r.comp.push("HCO₃⁻ lower than expected → <b>additional metabolic acidosis</b>.");
+    r.lim.push("Acute or chronic can't be proved from one gas — use the history."); }
+  const Na = v("na"), Cl = v("cl"), alb = v("alb");
+  if (Na != null && Cl != null){ const ag = Na - Cl - H, agc = alb != null ? ag + 0.25*(40 - alb) : null, use = agc ?? ag;
+    r.extra.push(`Anion gap = Na⁺ − (Cl⁻ + HCO₃⁻) = <b>${sig(ag)}</b> mmol/L${agc != null ? `; corrected for albumin ${alb} g/L = <b>${sig(agc)}</b> (+2.5 per 10 g/L below 40)` : ""}. Normal about 8–12 — check your lab's range.`);
+    if (alb == null) r.lim.push("No albumin: a low albumin hides a raised anion gap.");
+    if (use > 12){ r.extra.push("<b>Raised anion gap</b> metabolic acidosis" + (met === "acid" ? "" : " component") + ".");
+      if (H < 24){ const dr = (use - 12) / (24 - H); r.extra.push(`Delta ratio = (AG − 12) / (24 − HCO₃⁻) = <b>${sig(dr)}</b>: ${dr < 0.4 ? "normal-gap (hyperchloraemic) acidosis dominates" : dr < 0.8 ? "mixed raised- and normal-gap acidosis" : dr <= 2 ? "raised-gap acidosis alone" : "raised-gap acidosis plus metabolic alkalosis (or a compensated chronic respiratory acidosis)"}. Rough guide only.`); }
+      r.cons.push("Raised gap: lactate, ketones (diabetic, starvation, alcohol), kidney failure, toxins (methanol, ethylene glycol, salicylate)."); }
+    else if (met === "acid") { r.extra.push("<b>Normal anion gap</b> metabolic acidosis."); r.cons.push("Normal gap: large-volume saline (hyperchloraemia), diarrhoea or GI losses, renal tubular acidosis, urinary diversion."); } }
+  else if (met === "acid") r.lim.push("No Na⁺ / Cl⁻: anion gap not calculated.");
+  if (met === "alk") r.cons.push("Metabolic alkalosis: vomiting or NG losses, diuretics, after correcting chronic hypercapnia, massive transfusion (citrate).");
+  if (resp === "acid" || (resp === "both" && acid)) r.cons.push("Respiratory acidosis: hypoventilation — opioids, residual block, ventilator settings, COPD, CO₂ insufflation.");
+  if (resp === "alk" || (resp === "both" && alk)) r.cons.push("Respiratory alkalosis: overventilation, pain, anxiety, hypoxaemia, sepsis, pregnancy.");
+  const lac = v("lac"); if (lac != null) r.extra.push(`Lactate ${lac} mmol/L: ${lac >= 4 ? "<b>high</b>" : lac > 2 ? "raised" : "normal"}. One value doesn't diagnose shock — follow the trend.`);
+  const be = v("be"); if (be != null) r.extra.push(`Base excess ${be}: ${be < -2 ? "metabolic acidosis component" : be > 2 ? "metabolic alkalosis component" : "within normal (−2 to +2)"}.`);
+  const k = v("k"); if (k != null) r.extra.push(`K⁺ ${k} mmol/L${k >= 6 ? " — <b>high</b>: see the Hyperkalaemia card" : k > 5.5 ? " — raised" : k < 3.5 ? " — low" : ""}.`);
+  const ic = v("ica"); if (ic != null) r.extra.push(`Ionised Ca ${ic} mmol/L${ic < 1.1 ? " — <b>low</b> (common with massive transfusion)" : ""}.`);
+  const g = v("glu"); if (g != null) r.extra.push(`Glucose ${g} mmol/L${g < 4 ? " — <b>low</b>" : g > 10 ? " — high" : ""}.`);
+  const hb = v("hb"); if (hb != null) r.extra.push(`Hb ${hb} ${hbU() === "gl" ? "g/L" : "g/dL"} — see Blood management.`);
+  const po2 = v("po2"); let fi = v("fio2"); if (fi != null && fi > 1) fi = fi / 100;
+  if (po2 != null && fi != null){ if (fi < 0.21 || fi > 1) r.err.push("FiO₂ must be 0.21–1 (or 21–100%)"); else {
+      const pf = po2 / fi, pA = fi*(760 - 47) - C/0.8, aa = pA - po2;
+      r.oxy.push(`P/F ratio = ${po2} / ${sig(fi)} = <b>${Math.round(pf)} mmHg</b>${pf < 100 ? " (&lt; 100)" : pf < 200 ? " (100–200)" : pf < 300 ? " (200–300)" : ""}. Impaired oxygenation below 300; this ratio alone does not diagnose ARDS.`);
+      r.oxy.push(`A–a gradient = <b>${Math.round(aa)} mmHg</b> (PAO₂ = FiO₂ × (760 − 47) − PaCO₂ / 0.8; assumes sea level and RQ 0.8)${fi === 0.21 && age ? `; expected on air ≈ age/4 + 4 = ${Math.round(age/4 + 4)}` : "; expected values apply on air only"}.`); } }
+  else if (po2 != null) r.lim.push("FiO₂ not entered: no P/F ratio or A–a gradient (room air is not assumed).");
+  r.lim.push("One gas is a snapshot: interpret with the patient and repeat after changes.");
+  return r; }
+function abgResult(){ const o = S.abg || {}; if (!ABG_F.some(([k]) => numV(o, k) != null)) return `<p class="sub">Enter at least pH, PaCO₂ and HCO₃⁻.</p>`;
+  const r = abgEval(o, S.age); if (r.err.length) return `<div class="danger">${r.err.join("<br>")}</div>`;
+  const sec = (t, a) => a.length ? `<h4>${t}</h4><ul>${a.map(x => `<li>${x}</li>`).join("")}</ul>` : "";
+  return `${r.flag.map(f => `<div class="danger">${f}</div>`).join("")}<div class="result"><b>${r.prim}</b></div>${sec("Compensation", r.comp)}${sec("Other findings", [...r.extra, ...r.oxy])}${sec("Consider (depends on the clinical picture)", r.cons)}${sec("Limits", r.lim)}`; }
+gaCards.abg = () => `<div class="card"><h2>11. ABG analysis</h2>
+  <p class="sub" style="margin-top:0">Step-by-step acid–base and oxygenation. Units: mmHg, mmol/L, albumin g/L. Blank fields are left out, never assumed normal. No treatment advice.</p>
+  ${hbSeg()}<div class="fbgrid">${ABG_F.map(([k, l, u, , , req]) => numIn("abg", k, l + (req ? " *" : ""), k === "hb" ? (hbU() === "gl" ? "g/L" : "g/dL") : u)).join("")}</div>
+  <div id="abgres">${abgResult()}</div><button class="linkbtn" data-abgreset="1">Reset</button>
+  <details class="ndet"><summary>Formulas used</summary><ul class="sub">
+    <li>Primary: pH &lt; 7.35 acidaemia, &gt; 7.45 alkalaemia; PaCO₂ 35–45 mmHg; HCO₃⁻ 22–26 mmol/L</li>
+    <li>Metabolic acidosis: expected PaCO₂ = 1.5 × HCO₃⁻ + 8 ± 2 (Winter's)</li><li>Metabolic alkalosis: expected PaCO₂ = 40 + 0.7 × (HCO₃⁻ − 24) ± 5</li>
+    <li>Respiratory acidosis: HCO₃⁻ rises 1 (acute) or 3.5 (chronic) per 10 mmHg PaCO₂ above 40; respiratory alkalosis: falls 2 (acute) or 4 (chronic) per 10 mmHg below 40</li>
+    <li>Anion gap = Na⁺ − (Cl⁻ + HCO₃⁻); albumin correction + 0.25 × (40 − albumin g/L); delta ratio = (AG − 12) / (24 − HCO₃⁻)</li>
+    <li>Consistency: [H⁺] = 24 × PaCO₂ / HCO₃⁻ compared with 10^(9 − pH); &gt; 10% apart is flagged</li>
+    <li>P/F = PaO₂ / FiO₂; A–a = FiO₂ × (760 − 47) − PaCO₂ / 0.8 − PaO₂</li></ul></details>
+  ${gLinkId("ga-intra-blood-management", "Bleeding → Blood management")}${gLinkId("ga-intra-ventilation-strategies", "Ventilation strategies")}${gLinkId("emerg-adult-hyperkalaemia", "Hyperkalaemia")}
+  ${src("Berend, Hulter & Narins, Physiological approach to assessment of acid–base disturbances, NEJM 2014; Winter's formula (Albert, Dell & Winters 1967); Figge albumin correction (1998); ARDS Definition Task Force (Berlin 2012).")}</div>`;
+
 /* Prepare 6 — anticoagulants & antiplatelets */
 const crcl = () => { if (isSample("crea") || !S.crea) return null; const f = S.sex === "M" ? 1.23 : 1.04; return (140 - S.age) * S.aw * f / S.crea; };
 gaCards.pmAnticoag = () => { const c = crcl(), cr = c == null ? "" : ` · CrCl ≈ <b>${Math.round(c)} mL/min</b> (Cockcroft–Gault, actual weight)`;
@@ -3083,7 +3236,7 @@ gaCards.echo = () => `<div class="card"><h2>Echo report: what matters</h2>${echo
     `Fluid overload or RV failure: cautious fluids. Not valid on positive-pressure ventilation.`)}
   </table></div>
   <p class="sub">Severe lesion → arterial line before induction; cardiac-output monitor or TOE if available for major surgery. Valve severity is graded on several measures together — read the report's conclusion.</p>
-  <button class="homebtn" data-open="8. Vasopressors & inotropes" data-g="ga" data-tab="maint">Pressor and inotrope doses → General › Intra-op ›</button>
+  <button class="homebtn" data-open="9. Vasopressors & inotropes" data-g="ga" data-tab="maint">Pressor and inotrope doses → General › Intra-op ›</button>
   ${src("ASE/EACVI chamber quantification 2015 and diastolic function 2016; ASE valvular regurgitation 2017; ACC/AHA valvular heart disease 2020; ESC/ERS pulmonary hypertension 2022; ESC 2022 / ACC-AHA 2024 perioperative guidelines; BJA Education reviews.")}</div>`;
 // v2.127: answers for this patient from NICE NG45 (adults); the full table stays below
 const TESTS_CHECKED = true;   // checked by author 25 Nov 2026;
@@ -3426,7 +3579,7 @@ gaCards.vent = () => {
   if (!VENT_SC[S.ventSc]) S.ventSc = "std";
   const sc = VENT_SC[S.ventSc];
   const body = sc.olv
-    ? `<button class="homebtn primary" data-open="9. One-lung ventilation" data-g="ga" data-tab="maint">Open 9. One-lung ventilation ›</button>`
+    ? `<button class="homebtn primary" data-open="12. One-lung ventilation" data-g="ga" data-tab="maint">Open 12. One-lung ventilation ›</button>`
     : ventSettings(sc) + `<ul>${sc.li.map(t=>`<li>${t}</li>`).join("")}</ul>` + (S.ventSc==="ards" ? `<h3>PEEP by FiO₂ (ARDSNet lower-PEEP table)</h3><p class="sub">Tap the FiO₂ you are on.</p>
       <table><tr><th>FiO₂</th><th>PEEP cmH₂O</th></tr>${ARDS_TBL.map(([f,p])=>`<tr class="${S.vfio===f?"hl":""}"><td><button class="linkish" data-seg="vfio" data-val="${f}">${f}</button></td><td>${p}</td></tr>`).join("")}</table>` : "");
   return `<div class="card"><h2>4. Ventilation strategies</h2>${ventDraft()}
@@ -3453,12 +3606,12 @@ gaCards.vent = () => {
   <button class="emlink" data-open="Bronchospasm" data-g="emerg" data-tab="adult">⚠ Bronchospasm → Emergencies</button>
   <button class="emlink" data-open="Anaphylaxis" data-g="emerg" data-tab="adult">⚠ Anaphylaxis → Emergencies</button>
   <button class="homebtn" data-open="8. Ventilation settings" data-g="paeds" data-tab="ind">Child? → Paediatric › Induction › Ventilation ›</button>
-  ${src("Young et al. BJA 2019 intra-op lung-protective ventilation consensus; ARDSNet; Brain Trauma Foundation 4th ed.; obstetric GA ventilation studies.")}<button class="rellink navonly" data-id="ga-intra-one-lung-ventilation" data-open="9. One-lung ventilation" data-g="ga" data-tab="maint">One-lung ventilation ›</button></div>`;
+  ${src("Young et al. BJA 2019 intra-op lung-protective ventilation consensus; ARDSNet; Brain Trauma Foundation 4th ed.; obstetric GA ventilation studies.")}<button class="rellink navonly" data-id="ga-intra-one-lung-ventilation" data-open="12. One-lung ventilation" data-g="ga" data-tab="maint">One-lung ventilation ›</button></div>`;
 };
 // left DLT starting size: Asian / Malaysian adults; confirm with fibreoptic
 function dltSize(){ const h = S.height; return S.sex==="F" ? (h<160 ? 35 : 37) : (h<170 ? 37 : 39); }
 gaCards.olv = () => { const d = dltSize(), dep = 12 + S.height/10;
-  return `<div class="card"><h2>9. One-lung ventilation</h2>${ventDraft()}
+  return `<div class="card"><h2>12. One-lung ventilation</h2>${ventDraft()}
   <h3>Left double-lumen tube (DLT)</h3>
   ${f6Draft()}${ET([EQ("Starting size", `(${sxi(S.sex)} ${S.height} cm)`, `${d} Fr`, null), EQ("Depth", "(12 + height/10)", `≈ ${sig(dep)} cm`, "at mouth corner")])}
   <p class="sub">${sxi("F")} &lt; 160 cm 35 Fr, ≥ 160 cm 37 Fr · ${sxi("M")} &lt; 170 cm 37 Fr, ≥ 170 cm 39 Fr (41 rarely needed). Height predicts size poorly in Asian patients: have one size smaller ready, and <b>always confirm with a fibreoptic scope</b>.</p>
@@ -3624,7 +3777,7 @@ txCards.bp = () => `<div class="card"><h2>Kidney: BP target &amp; pressors</h2>$
   <table><tr><th>Target</th><td>Patient's own baseline (often 140–150 / 80–90); highest need at <b>reperfusion</b></td></tr>
   <tr><th>First choice</th><td><b>Noradrenaline</b> (bolus or infusion) after depth and volume are optimised</td></tr>
   <tr><th>Why</th><td>Cold, ischaemic, vasospastic graft needs high perfusion pressure; a hypertensive donor's kidney expects a higher MAP</td></tr></table>
-  <button class="homebtn" data-open="8. Vasopressors & inotropes" data-g="ga" data-tab="maint">Pressor doses → General › Intra-op ›</button>
+  <button class="homebtn" data-open="9. Vasopressors & inotropes" data-g="ga" data-tab="maint">Pressor doses → General › Intra-op ›</button>
   ${src(TXP+"; Mayhew BJA Education 2016.")}</div>`;
 txCards.fluid = () => { const w = txW(), hi = kHigh();
   return `<div class="card"><h2>Kidney: fluids &amp; blood</h2>${tx2Draft()}
@@ -3792,7 +3945,7 @@ gaCards.opioid = () => {
   <button class="homebtn" data-open="3. Analgesia ladder & PCA" data-g="ga" data-tab="post">Post-op ladder & PCA → General › Post-op ›</button>
   ${src("Foo et al. Anaesthesia 2021 (IV lidocaine consensus); ASRA/AAPM/ASA ketamine guideline 2018; PROSPECT (ESRA) procedure recommendations; dexmedetomidine and magnesium trials; product labels.")}</div>`; };
 gaCards.pressors = () => { const w = S.aw, rate = (lo,hi,conc) => `${dz(lo*w*60/conc,"mL/h")}–${dz(hi*w*60/conc,"mL/h")} mL/h`;
-  return `<div class="card"><h2>8. Vasopressors &amp; inotropes</h2>${gaDraft()}
+  return `<div class="card"><h2>9. Vasopressors &amp; inotropes</h2>${gaDraft()}
   <div class="dfor" data-w="${sig(w)}"></div><div style="overflow-x:auto"><table class="dt"><tr class="dth"><th>Drug · mix</th><th>Dose</th><th>For ${sig(w)} kg</th></tr>
   <tr data-dr="1"><td><span class="dn">Ephedrine</span><div class="sub dnote">30 mg in 5 mL = 6 mg/mL</div></td><td>3–6 mg bolus</td><td class="hl">0.5–1 mL</td></tr>
   <tr data-dr="1"><td><span class="dn">Phenylephrine</span><div class="sub dnote">10 mg in 100 mL = 100 mcg/mL</div></td><td>50–100 mcg bolus; infusion 25–100 mcg/min</td><td class="hl">0.5–1 mL; 15–60 mL/h</td></tr>
@@ -5489,6 +5642,11 @@ VGROUPS.find(g => g[0]==="General")[1].push(["Block finder operations and dosing
   "Bladder tumour resection (TURBT): Spinal. Lateral bladder wall: add an obturator block to stop the adductor jerk (or GA with full paralysis).",
   "Spine surgery: GA. ESP for analgesia.",
   "\"+ Add\" on block cards and in the Finder now fills in the calculator form (lower end of the volume range); nothing is added until you tap Add; pairs one at a time; invalid entries rejected"]]);
+VGROUPS.find(g => g[0]==="General")[1].push(["Intra-op fluids, blood and ABG (v2.145)", "25 Nov 2026", [
+  "Fluids: maintenance 25–30 mL/kg/day (NICE CG174; ideal weight if BMI ≥ 30) as a starting estimate; challenge 250 mL then reassess; balanced crystalloid usual; avoid HES; RELIEF 2018 (avoid over-restriction); SSC 2021 30 mL/kg for sepsis hypoperfusion",
+  "Blood: EBV 70 (M) / 65 (F) mL/kg actual weight; ABL = EBV × (Hb now − lowest) / Hb now; red cells < 7, < 7.5 cardiac surgery, < 8 orthopaedic / CVD (AABB 2023); MI: discuss (MINT 2023); FFP 15 mL/kg; platelets > 50 (> 100 neuro / eye / head injury); fibrinogen < 1.5 g/L; local major haemorrhage protocol",
+  "ABG: Winter's 1.5 × HCO₃ + 8 ± 2; metabolic alkalosis 40 + 0.7 × (HCO₃ − 24) ± 5; respiratory 1 / 3.5 and 2 / 4 per 10 mmHg; AG = Na − (Cl + HCO₃), albumin + 0.25 × (40 − alb); delta ratio; Henderson–Hasselbalch consistency flag (> 10%); P/F; A–a at 760 mmHg, RQ 0.8",
+  "Author asked for these to go live without a draft step (25 Nov 2026)"]]);
 VGROUPS.find(g => g[0]==="General")[1].push(["Induction drugs & relaxants combined", "22 Nov 2026", [
   "Adult: General › Induction › 1. Induction drugs & relaxants — Opioid · Hypnotic · Muscle relaxant · No IV access (rows moved unchanged)",
   "Paeds: Paediatric › Induction › 3. Induction drugs & relaxants — Anticholinergic · Opioid · Hypnotic · Muscle relaxant · No IV access (rows moved unchanged)",
@@ -5530,7 +5688,7 @@ function sampleWarn(keys){ const k = keys.filter(isSample); if (!k.length) retur
   const names = {k:"K⁺", hb:"Hb", height:"height", aw:"weight", pw:"weight", pY:"age", spHt:"height", morWt:"weight", sex:"sex", age:"age"};
   return `<div class="samplewarn"><b>Sample values</b> — ${(a => a.length > 1 ? a.slice(0,-1).join(", ") + " and " + a[a.length-1] : a[0])([...new Set(k.map(x=>names[x]))])} not entered. Enter the patient or tap a case.</div>`; }
 /* Each case keeps its own clinical entries, in memory only (never saved). */
-const CLIN = ["csDec","sc","asa","met","pnF","pnMP","pnNeck","pnPonv","pnUrg","pnLay","csNote","leNote","pnNote","csWho","csLang","csOut","csLen","leLen","csMode","crea","k","hb","todayWt","hdH","hbNow","hbLow","hbTarget","fastH","pBE","laA","txck","derm"];
+const CLIN = ["csDec","sc","asa","met","pnF","pnMP","pnNeck","pnPonv","pnUrg","pnLay","csNote","leNote","pnNote","csWho","csLang","csOut","csLen","leLen","csMode","crea","k","hb","todayWt","hdH","hbNow","hbLow","hbTarget","fastH","pBE","laA","txck","derm","abg","fbal","blIn","hbU"];
 const CLIN_T = ["crea","k","hb","todayWt","hdH"];
 const CLIN_OBJ = {sc:{}, pnF:{}, txck:{}, laA:[]};
 const clone = v => v === undefined ? undefined : JSON.parse(JSON.stringify(v));
@@ -5571,6 +5729,7 @@ function vTicks(){
 }
 /* ---------- ABOUT ---------- */
 const CHANGES = [
+  ["2.145","General › Intra-op: three new adult cards under Circulation & physiology — 8. Fluid management (maintenance estimate, fluid challenge, which fluid, running balance), 10. Blood management (major haemorrhage box, EBV, allowable blood loss, thresholds, products), 11. ABG analysis (step-by-step acid–base, anion gap, compensation, P/F and A–a). Vasopressors now 9, one-lung ventilation 12. (checked)"],
   ["2.144","General reordered for theatre: Induction — tube & airway kit, drugs & relaxants, RSI. Intra-op — Before incision (antibiotics, TXA, PONV), Maintenance (ventilation, TIVA, volatile), Analgesia & BP, Specialist (one-lung ventilation). Post-op — Emergence, Recovery, Day case & ward. PONV now sits in Intra-op with a link from Post-op. No clinical content changed. (checked)"],
   ["2.143","Block finder: picking an operation now shows what it is usually done under (spinal, GA, or a block alone) — TURBT also shows the obturator block. LA dosing: \"Set up in LA calculator\" fills in the calculator form at the lower end of the volume range; you check it and tap Add. Pairs are set up one at a time. (checked)"],
   ["2.142","Block finder: no more \"First choice\" label; each block shows its role (Can be surgical, Analgesia or Supplementary) and its Misses line; the figure is labelled schematic; more search spellings (caesarean, c-section, fistula, wrist fracture). (checked)"],
@@ -5922,11 +6081,12 @@ const GROUPS = [
    {id:"ind", label:"Induction", input:()=>gaInputs(), hint:"Tube & airway kit → drugs & relaxants → RSI.",
     cards:["1. Tube & airway kit","2. Induction drugs & relaxants","3. RSI"], see:[["ga-post-im-doses-no-iv-access-or-ward","No IV access: IM doses"]], seeLabel:"Also",
     links:[["Failed intubation / CICO","adult","Failed intubation / CICO"],["Anaphylaxis","adult","Anaphylaxis"],["Bronchospasm","adult","Bronchospasm"]]},
-   {id:"maint", label:"Intra-op", input:()=>gaInputs(), hint:"Before incision → maintain → analgesia & BP → specialist.",
+   {id:"maint", label:"Intra-op", input:()=>gaInputs(), hint:"Before incision → maintain → analgesia → circulation (fluids, pressors, blood, ABG) → specialist.",
     cards:["§Before incision","1. Antibiotic prophylaxis","2. Tranexamic acid",["PONV: Apfel score","3. PONV: Apfel score"],
       "§Maintenance","4. Ventilation strategies","5. TIVA","6. Volatile: MAC by age",
-      "§Analgesia & BP","7. Intra-op analgesia","8. Vasopressors & inotropes",
-      "§Specialist","9. One-lung ventilation"], see:[["ga-post-im-doses-no-iv-access-or-ward","No IV access: IM doses"]], seeLabel:"Also",
+      "§Analgesia","7. Intra-op analgesia",
+      "§Circulation & physiology","8. Fluid management","9. Vasopressors & inotropes","10. Blood management","11. ABG analysis",
+      "§Specialist","12. One-lung ventilation"], see:[["ga-post-im-doses-no-iv-access-or-ward","No IV access: IM doses"]], seeLabel:"Also",
     links:[["Bronchospasm","adult","Bronchospasm"],["Anaphylaxis","adult","Anaphylaxis"],["Malignant hyperthermia","adult","Malignant hyperthermia"],["LA toxicity (LAST)","adult","LA toxicity"],["Bradycardia & cardiac arrest","adult","Bradycardia / arrest"]]},
    {id:"post", label:"Post-op", input:()=>gaInputs(), hint:"Reverse → extubate → analgesia → discharge → IM doses. PONV prevention: Intra-op.",
     cards:["§Emergence","1. Reversal",["Extubation criteria","2. Extubation criteria"],
@@ -6110,6 +6270,9 @@ const SEARCH_EXTRA = {   // keyed by stable card id
   "regional-neuraxial-dermatomes-and-block-height":"myotome myotomes key muscles motor level motor block power dermatome dermatomes block height level t4 t10 nipple umbilicus xiphoid bromage sensory testing cold pinprick",
   "ga-intra-ventilation-strategies":"ventilation ventilator ventilate lung protective tidal volume tv peep recruitment recruit driving pressure plateau pcv vcv pcv-vg prvc ards asthma copd auto-peep laparoscopy trendelenburg obese neuro icp hyperventilation pregnancy lscs dopes desaturation hypoxia high airway pressure",
   "ga-intra-one-lung-ventilation":"one-lung ventilation olv dlt double-lumen double lumen tube bronchial blocker arndt thoracic vats lung isolation thoracotomy cpap",
+  "ga-intra-fluid-management":"fluids fluid crystalloid hartmann plasma-lyte saline maintenance bolus fluid challenge ppv svv fluid balance colloid albumin starch",
+  "ga-intra-blood-management":"blood transfusion haemorrhage hemorrhage bleeding major haemorrhage massive transfusion ebv allowable blood loss abl ffp platelets cryo fibrinogen prbc cell salvage rotem teg",
+  "ga-intra-abg-analysis":"abg blood gas arterial acid base acidosis alkalosis anion gap winter lactate base excess pf ratio a-a gradient",
   "ga-intra-antibiotic-prophylaxis":"antibiotic prophylaxis cefazolin unasyn ampicillin sulbactam augmentin metronidazole gentamicin clindamycin vancomycin cefuroxime azithromycin endocarditis timing redose redosing half-life 60 minutes before incision uro gynae ortho dental hpb colorectal",
   "paeds-intra-other-drugs":"hypertonic saline mannitol potassium kcl insulin adenosine bicarbonate paeds",
   "paeds-intra-antibiotic-prophylaxis":"antibiotic prophylaxis cefazolin unasyn metronidazole gentamicin clindamycin vancomycin paeds endocarditis timing redose redosing",
@@ -6184,11 +6347,14 @@ const CARD_IDS = {
   "3. RSI":"ga-ind-rsi",
   "1. Tube & airway kit":"ga-ind-tube-and-airway-kit",
   "4. Ventilation strategies":"ga-intra-ventilation-strategies",
-  "9. One-lung ventilation":"ga-intra-one-lung-ventilation",
+  "12. One-lung ventilation":"ga-intra-one-lung-ventilation",
   "5. TIVA":"ga-intra-tiva",
   "6. Volatile: MAC by age":"ga-intra-volatile-mac-by-age",
   "7. Intra-op analgesia":"ga-intra-analgesia",
-  "8. Vasopressors & inotropes":"ga-intra-vasopressors-and-inotropes",
+  "9. Vasopressors & inotropes":"ga-intra-vasopressors-and-inotropes",
+  "8. Fluid management":"ga-intra-fluid-management",
+  "10. Blood management":"ga-intra-blood-management",
+  "11. ABG analysis":"ga-intra-abg-analysis",
   "1. Antibiotic prophylaxis":"ga-intra-antibiotic-prophylaxis",
   "2. Tranexamic acid":"ga-intra-tranexamic-acid",
   "1. Reversal":"ga-post-reversal",
@@ -6629,7 +6795,7 @@ document.addEventListener("click", e => { const t = e.target.closest && e.target
 let vtaps = 0, vtimer = null;
 document.addEventListener("click", e => { if (!e.target.closest || !e.target.closest(".vtap")) return; vtaps++; clearTimeout(vtimer); vtimer = setTimeout(()=>vtaps=0, 1500); if (vtaps >= 5){ vtaps = 0; location.hash = "#values"; window.scrollTo(0,0); } });
 document.addEventListener("change", e => { if (e.target.id==="csNote"){ S.csNote = e.target.value.slice(0,300); render(); } if (e.target.id==="leNote"){ S.leNote = e.target.value.slice(0,300); render(); } if (e.target.id==="pnNote"){ S.pnNote = e.target.value.slice(0,300); render(); } if (e.target.dataset && e.target.dataset.pnf){ const f = e.target.dataset.pnf, v = e.target.value.slice(0,300); (S.pnF = S.pnF || {})[f] = v; if (f === "cr"){ const n = parseFloat(v); if (n >= 30 && n <= 1200){ S.crea = n; S.touched.crea = true; } } render(); } });
-document.addEventListener("input", e => { if (e.target.id==="csNote") S.csNote = e.target.value.slice(0,300); if (e.target.id==="leNote"){ S.leNote = e.target.value.slice(0,300); store.set("consLast","le"); } if (e.target.id==="pnNote") S.pnNote = e.target.value.slice(0,300); if (e.target.dataset && e.target.dataset.pnf) (S.pnF = S.pnF || {})[e.target.dataset.pnf] = e.target.value.slice(0,300); if (e.target.id==="q") runSearch(e.target.value); if (e.target.id==="nagq" || e.target.id==="nagpq"){ const pd = e.target.id === "nagpq"; S[(pd ? "nagp" : "nag") + "Q"] = e.target.value; S[(pd ? "nagp" : "nag") + "Open"] = null; const l = document.getElementById(pd ? "nagplist" : "naglist"); if (l) l.innerHTML = nagList(pd); document.querySelectorAll(`[data-nagtab^="${pd ? "p" : "a"}|"]`).forEach(b => b.setAttribute("aria-selected", "false")); } if (e.target.id==="bfq"){ S.bfq = e.target.value; const r = document.getElementById("bfopsr"); if (r) r.innerHTML = bfOpsList(); } if (e.target.id==="vq"){ S.vq = e.target.value; const pos = e.target.selectionStart; render(); const el = document.getElementById("vq"); if (el){ el.focus(); try{ el.setSelectionRange(pos,pos); }catch(_){} } } if (e.target.id==="cNick") S.cNick = e.target.value.slice(0,12); if (e.target.id==="dname") S.dname = e.target.value.slice(0,24); });
+document.addEventListener("input", e => { if (e.target.id==="csNote") S.csNote = e.target.value.slice(0,300); if (e.target.id==="leNote"){ S.leNote = e.target.value.slice(0,300); store.set("consLast","le"); } if (e.target.id==="pnNote") S.pnNote = e.target.value.slice(0,300); if (e.target.dataset && e.target.dataset.pnf) (S.pnF = S.pnF || {})[e.target.dataset.pnf] = e.target.value.slice(0,300); if (e.target.id==="q") runSearch(e.target.value); if (e.target.id==="nagq" || e.target.id==="nagpq"){ const pd = e.target.id === "nagpq"; S[(pd ? "nagp" : "nag") + "Q"] = e.target.value; S[(pd ? "nagp" : "nag") + "Open"] = null; const l = document.getElementById(pd ? "nagplist" : "naglist"); if (l) l.innerHTML = nagList(pd); document.querySelectorAll(`[data-nagtab^="${pd ? "p" : "a"}|"]`).forEach(b => b.setAttribute("aria-selected", "false")); } const fbg = e.target.dataset && (e.target.dataset.abg ? ["abg", "abg", "abgres", abgResult] : e.target.dataset.fb ? ["fbal", "fb", "fbres", fbBalance] : e.target.dataset.bl ? ["blIn", "bl", "blres", ablText] : null); if (fbg){ (S[fbg[0]] = S[fbg[0]] || {})[e.target.dataset[fbg[1]]] = e.target.value.slice(0, 12); const r = document.getElementById(fbg[2]); if (r) r.innerHTML = fbg[3](); } if (e.target.id==="bfq"){ S.bfq = e.target.value; const r = document.getElementById("bfopsr"); if (r) r.innerHTML = bfOpsList(); } if (e.target.id==="vq"){ S.vq = e.target.value; const pos = e.target.selectionStart; render(); const el = document.getElementById("vq"); if (el){ el.focus(); try{ el.setSelectionRange(pos,pos); }catch(_){} } } if (e.target.id==="cNick") S.cNick = e.target.value.slice(0,12); if (e.target.id==="dname") S.dname = e.target.value.slice(0,24); });
 function clamp(v,min,max){ return Math.min(max, Math.max(min, v)); }
 /* hold − / + : repeat, speeding up; the click after a hold is ignored */
 (() => { let tm = null, n = 0, held = false, key = null, dd = 0, mn = 0, mx = 0;
@@ -6668,6 +6834,8 @@ document.addEventListener("click", e => {
   if (d.bfwhole){ if (S.bfView === "joints"){ S.joint = null; BF.nerveZoom(null); render(); return; } if (S.bfView === "nerve"){ S.nerve = 0; S.nerveLvl = -1; BF.nerveZoom(null); render(); return; } S.bf = null; BF.focus(null); render(); return; }
   if (d.bfnerve){ S.bfView = "nerve"; S.nerve = 0; S.nerveZoomReq = {limb: d.bfnerve, s: S.bf && S.bf.side === "Right" ? -1 : 1}; render(); return; }
   if (d.myo){ const k = +d.myo, r = MYO.find(x => x[0] === k); S.myo = S.myo === k ? null : k; if (S.myo != null && BF.st.ok && BF.st.mode === "myo"){ const z = BF.st.nzone; if (!z || z.limb !== r[5]) BF.nerveZoom(r[5], z ? z.s : 1); } render(); return; }
+  if (d.abgreset){ S.abg = {}; render(); return; }
+  if (d.fbreset){ S.fbal = {}; render(); return; }
   if (d.bfop){ const o = BF_OPS[+d.bfop]; S.bfq = ""; S.bfOp = +d.bfop; S.bf = {reg: o[1], side: ""}; S.bfList = false; BF.focus(S.bf); render(); return; }
   if (d.bfside){ if (S.bf){ S.bf = {reg: S.bf.reg, side: d.bfside}; BF.focus(S.bf); } render(); return; }
   if (d.laprep || d.addpair || d.lanext){ const lt = d.lt || d.lanext, q = d.lanext ? S.laNext.items : d.laprep ? [JSON.parse(d.laprep)] : JSON.parse(d.addpair), it = q[0];   // v2.143: fill in the calculator form; pairs queue the second block
