@@ -798,6 +798,8 @@ details.bfb[open]>summary{margin-bottom:4px}details.bfb .bfo{margin-top:4px}deta
 .tpick{display:grid;gap:4px;margin:var(--s2) 0}.tlab{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin-top:6px}.tpick .seg{margin:0}.tpick .seg small{display:block;font-weight:400;font-size:12px;color:var(--muted)}.tpick .seg button[aria-pressed="true"] small{color:inherit;opacity:.85}
 .tticks{display:flex;flex-wrap:wrap;gap:6px}.tck{min-height:40px;padding:0 12px;border-radius:999px;border:1px solid var(--line);background:var(--card);color:var(--ink);font-size:14px}.tck[aria-pressed="true"]{border-color:var(--gc);background:var(--gc-soft);font-weight:600}
 .tres{border:1px solid var(--line);border-radius:var(--r-sm);padding:var(--s3);display:grid;gap:8px;margin:var(--s2) 0}.trow{display:grid;grid-template-columns:96px 1fr;gap:8px}.trow small{color:var(--muted)}.t-yes b{color:var(--ok-ink,#166534)}.t-consider b{color:var(--warn-ink,#92400e)}.t-no{color:var(--muted)}.tbtns{display:flex;gap:8px;flex-wrap:wrap}
+.nagsp,.nagpr{display:flex;flex-wrap:wrap;gap:6px;margin:var(--s2) 0}.nagsp button,.nagpr button{min-height:40px;padding:4px 12px;border-radius:999px;border:1px solid var(--line);background:var(--card);color:var(--ink);font-size:14px;text-align:left}.nagsp button[aria-pressed="true"]{background:var(--gc);color:#fff;border-color:var(--gc)}.nagpr button[aria-pressed="true"]{border-color:var(--gc);background:var(--gc-soft);font-weight:600}
+.nagbox{border:1px solid var(--line);border-radius:var(--r-sm);padding:var(--s3);margin:var(--s2) 0}.naghd{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin-top:var(--s2)}.nagbox ul{margin:4px 0 0;padding-left:1.1em}
 .bfpanel{display:grid;gap:8px;margin:var(--s2) 0}.bfpanel:empty{display:none}.bfside{margin:0;color:var(--danger-ink);font-weight:600;font-size:14px}
 .bfb{border-radius:var(--r-sm);padding:10px 12px;background:var(--bg);display:grid;gap:2px}.bfb.first{background:var(--gc-soft)}
 .bftag{font-size:13px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--gc)}
@@ -817,7 +819,7 @@ if (window.top !== window.self && /\.github\.io$/.test(location.hostname)) {
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.128.1";
+const APP_VERSION = "2.129.1";
 const APP_DATE = "25 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
@@ -1104,7 +1106,7 @@ const QT = (() => {
   dant:{lab:"Dantrolene (MH)", ic:"emerg", cls:"t-emerg", kind:"adult", keys:["aw"], inp:aWt, open:["Malignant hyperthermia","emerg","adult"],
     ans:()=>{ const mg = Math.min(2.5*S.aw, 300); return sm(dz(mg,"mg"),`mg · 2.5 mg/kg (max 300) · ${Math.ceil(mg/20)} × 20 mg vials`); }},
   abx:{lab:"Antibiotic prophylaxis", ic:"airway", cls:"t-ga", kind:"adult", keys:["aw"], inp:aWt, open:["7. Antibiotic prophylaxis","ga","maint"],
-    ans:()=>sm(S.aw>=120?"3 g":"2 g","cefazolin IV · ≤ 60 min before · redose 4 h")},
+    ans:()=>sm("2 g", S.aw>=120 ? "cefazolin IV (NAG 2024; ASHP 3 g ≥ 120 kg) · 60 min before · redose 4 h" : "cefazolin IV (NAG 2024) · 60 min before · redose 4 h")},
   lac:{lab:"LA dose calc", ic:"spinal", cls:"t-regional", kind:"any", txt:true, keys:[], inp:()=>"shortcut", open:["1. LA dose calculator","regional","safety"],
     ans:()=>{ const n = (S.laA||[]).length; return n ? sm(`${n} added`,"tap to see the total") : sm("Add","tap to total your blocks"); }}};
 })();
@@ -4505,7 +4507,112 @@ function abxCard(paeds){
       <p class="sub">30–60 min before. AHA 2021 (clindamycin no longer recommended).</p></details>`}
     ${src("Malaysian National Antimicrobial Guideline 2019; ASHP/IDSA/SIS/SHEA 2013; AHA 2021 · latest available, checked Nov 2026")}`;
 }
-gaCards.abx = () => `<div class="card"><h2>7. Antibiotic prophylaxis</h2>${abxDraft()}${abxNewer()}${abxCard(false)}</div>`;
+// v2.129 adult surgical antibiotic prophylaxis — Malaysian National Antimicrobial Guideline (NAG) 2024, section A3 (transcribed; tokens {vanc} {gent5} {gent3} {gent35} are worked out for the patient)
+const NAG_CHECKED = true;   // checked by author 25 Nov 2026;
+const NAG_URL = "https://sites.google.com/moh.gov.my/nag/contents/section-a-adult/a3-chemoprophyxlaxis";
+const NO = "Surgical antibiotic prophylaxis not recommended.";
+const CZ = "Cefazolin 2 g IV", MT = "Metronidazole 500 mg IV", CX = "Cefuroxime 1.5 g IV", AU = "Amoxicillin/clavulanate 1.2 g IV", US = "Ampicillin/sulbactam 3 g IV", CL = "Clindamycin 600–900 mg IV";
+const NAG = [
+ ["Cardiac", [
+  ["Cardiac surgery (general)", "Aortic dissection, TEVAR, valve repair or replacement, LVAD", [`${CZ}, then 2 g IV q8h`, `MRSA colonised: ${CZ} STAT + {vanc} STAT, then cefazolin 2 g IV q8h + vancomycin 15 mg/kg IV q12h`], [], [`{vanc} STAT, then 15 mg/kg IV q12h`], ["Vancomycin 20 mg/kg before surgery may be preferred for tissue levels at surgery.", "At the start of bypass: may consider an extra 1–2 g cefazolin via the bypass circuit."]],
+  ["Coronary artery bypass", "", [CZ], [CX], [], ["Single dose", "Duration: 24–48 hours"]],
+  ["Cardiac device insertion", "Pacemaker, defibrillator", [CZ], [CX], [], ["Single dose"]],
+  ["Thoracic surgery", "Decortication, lobectomy, thymectomy, VATS", [CZ, "MRSA colonised: {vanc}"], [], [CL, "or {vanc}"], ["Single dose"]]]],
+ ["Vascular", [
+  ["Vascular surgery (general)", "Artery or vein repair, AVF / AVG, aortic stent graft, bypass, open or endovascular aneurysm repair", [`${CZ}, then 2 g IV q8h`, `MRSA colonised: ${CZ} + {vanc}, then cefazolin 2 g IV q8h + vancomycin 15 mg/kg IV q12h`], [AU], [`${CL} STAT, then 600 mg IV q8h`, "or {vanc} STAT, then 15 mg/kg IV q12h"], ["Single dose"]],
+  ["Amputation of an ischaemic limb", "", [US], [AU], [], ["Single dose"]],
+  ["Angioplasty, stent insertion", "", 0, [], [], []]]],
+ ["General surgery", [
+  ["Gastroduodenal and oesophageal", "", [CZ], [CX], ["{gent5}; may add clindamycin 600–900 mg IV"], ["Single dose"]],
+  ["Appendicectomy", "", [`${CZ} + ${MT}`], [`${CX} + ${MT}`, `or ${AU}`], ["{gent5}; may add clindamycin 600–900 mg IV"], ["No perforation: single dose, not continued after surgery. Perforated: continue as treatment.", "Clindamycin resistance is increasing in Bacteroides; metronidazole may be preferred when the lower GI tract is crossed."]],
+  ["Small intestine", "", [`${CZ} + ${MT}`], [`${CX} + ${MT}`], ["{gent5}; may add clindamycin 600–900 mg IV"], ["Single dose"]],
+  ["Colorectal", "", [`${CZ} + ${MT}`, "With mechanical bowel preparation (if given): neomycin 1 g PO + erythromycin base 1 g PO, or neomycin 1 g PO + metronidazole 1 g PO — 3 doses over 10 hours the day before (1 pm–11 pm); each institution decides"], ["Cefoperazone 2 g IV or ceftriaxone 2 g IV, + " + MT], ["{gent5}; may add metronidazole 500 mg IV or clindamycin 600–900 mg IV"], ["Single dose", "Clindamycin resistance is increasing in Bacteroides; metronidazole may be preferred when the lower GI tract is crossed."]],
+  ["Hernia repair with mesh", "Including laparoscopic", [CZ], [], ["{vanc}"], ["Single dose", "Hernia repair without mesh: no antibiotic needed."]],
+  ["Breast cancer surgery (no reconstruction)", "", 0, [], [], ["With risk factors (after neoadjuvant chemotherapy, immunocompromised): cefazolin 2 g IV; severe penicillin allergy: clindamycin 600–900 mg IV or {vanc}. Single dose."]],
+  ["Breast lump excision / wire-localised biopsy", "", 0, [], [], ["If needed, use the breast cancer surgery choices; no more than a single dose."]]]],
+ ["Hepatobiliary", [
+  ["Biliary tract (incl. laparoscopic cholecystectomy)", "", [CZ], [AU, "or ceftriaxone 2 g IV"], ["{vanc} or clindamycin 600–900 mg IV, + {gent5}"], ["Single dose", "Laparoscopic cholecystectomy: reasonable to give a single dose, although low-risk patients may not need it."]],
+  ["Hepatectomy", "", [CZ], [AU, "or ceftriaxone 2 g IV"], ["{vanc} or clindamycin 600–900 mg IV, + {gent5}"], ["Single dose; up to 24 hours", "If the lower GI tract is involved, consider adding anaerobic cover."]],
+  ["Splenectomy / left-sided pancreatic surgery", "", [CZ], [AU], ["{vanc}"], ["Single dose", "No need to extend for patients who are not immunised — give the immunisations. Post-splenectomy oral prophylaxis and vaccines: see NAG."]]]],
+ ["Neurosurgery", [
+  ["Clean", "Elective craniotomy, spinal procedures", [CZ], [CX], ["{vanc}", "or " + CL], ["Single dose", "Vancomycin is appropriate if MRSA colonised, allergic to penicillins or cephalosporins, or where MRSA / MRCoNS often cause wound infection. Give it slowly: rapid IV vancomycin can cause an infusion reaction and / or hypotension."]],
+  ["Clean with foreign body or instrumentation", "CSF shunts, cranial or spinal implants", [CZ], [CX], ["{vanc}", "or " + CL], ["Single dose", "Vancomycin: as for clean neurosurgery; give it slowly."]],
+  ["Clean-contaminated", "Transsphenoidal, transoral, breach of the air sinuses", [`${CX} + ${MT}`], [AU], ["{vanc} + {gent5} + " + MT], ["Consider ceftriaxone 2 g IV if the dura is breached or there is a CSF leak."]]]],
+ ["Obstetrics & gynaecology", [
+  ["Caesarean section (elective / emergency)", "", [CZ], [US], ["Clindamycin 900 mg IV"], ["Continuing up to 2 days may be considered with major risk factors (obesity, complicated caesarean, immunocompromised).", "<b>Local option, not in NAG 2024:</b> azithromycin 500 mg IV added in labour or after ruptured membranes — use only if your unit does."]],
+  ["Operative vaginal delivery", "Instrumental delivery", [`${CZ} + ${MT}`], [`${CX} + ${MT}`, `or ${US}`, `or ${AU}`], ["Clindamycin 600–900 mg IV"], ["GBS and PPROM prophylaxis: see NAG obstetric infections."]],
+  ["Normal vaginal delivery (no instruments)", "", 0, [], [], []],
+  ["1st / 2nd degree perineal tear", "", 0, [], [], []],
+  ["3rd / 4th degree perineal tear", "", [`Cefazolin 2 g IV q8h + metronidazole 500 mg IV q8h`], ["Ampicillin/sulbactam 3 g IV q6h", "or amoxicillin/clavulanate 1.2 g IV q8h"], [], []],
+  ["Manual removal of placenta", "", [`${CZ} + ${MT}`], [`Ampicillin 2 g IV + ${MT}`, `or ${AU}`], [], []],
+  ["Evacuation of retained products (ERPOC)", "", ["1st trimester: doxycycline 400 mg PO single dose, 1–2 h before", `2nd trimester: ${CZ} + ${MT}`], ["1st trimester: azithromycin 1 g PO, 1–2 h before", `2nd trimester: ampicillin 2 g IV + ${MT}, or ${AU}`], [], ["Single dose"]],
+  ["Hysterectomy (abdominal, vaginal, or laparoscopic with uterus / vagina entered)", "TAH-BSO", [`${CZ} + ${MT}`], [`${CX} + ${MT}`, `or ${US}`, `or ${AU}`], ["Clindamycin 600–900 mg IV + {gent5}"], ["Emergency laparotomy: as for elective surgery."]],
+  ["Laparoscopy, uterus / vagina not entered", "", 0, [], [], []],
+  ["Hysteroscopy, HSG, endometrial biopsy, cervical excision / cone, IUD", "", 0, [], [], ["Hysteroscopy / HSG / IUD: consider only if high risk (dilated tubes, previous PID, tubal damage); treat any infection found."]],
+  ["Surgical termination of pregnancy", "", ["Oral regimen 1–2 h before the procedure: see NAG 2024"], [], [], []]]],
+ ["Eye", [["Intraocular surgery", "", ["By the surgeon: povidone-iodine and intracameral antibiotic — see NAG 2024"], [], [], []]]],
+ ["Oral & dental", [
+  ["Clean / minor clean-contaminated", "Submandibular gland, TMJ, benign cysts; soft tissue, dentoalveolar, periodontal", ["Not indicated for most surgeries"], [], [], ["May be indicated if very long, for ORIF of facial fractures, or if immunocompromised — use the implant / graft choices.", "Raised infective endocarditis risk: see Endocarditis below."]],
+  ["Dental implants, grafts, difficult or long surgery", "", ["Benzylpenicillin 2 MU IV"], ["PO: amoxicillin 2 g, or amoxicillin/clavulanate 1.25 g, or cephalexin 2 g + metronidazole 400 mg", `IV: ampicillin 2 g, or ${AU}, or ${CZ} + ${MT}`], ["Clindamycin 600–900 mg PO / IV"], ["Single dose", "Metronidazole only with a cephalosporin."]],
+  ["Major clean-contaminated", "Orthognathic, large tumours / cysts, oral cancer, ORIF facial fractures", ["Benzylpenicillin 2 MU IV"], [AU, `or ${CX} + ${MT}`], [], ["Single dose", "Facial fractures: antibiotics in the immediate post-trauma period, stopped once ORIF is done.", "Metronidazole only with a cephalosporin."]]]],
+ ["Orthopaedics", [
+  ["Fracture fixation (closed), joint replacement, spine, arthroscopy", "", [CZ], [CX], [CL], ["Routine post-op antibiotics: benefit uncertain; if used, no more than 24 hours."]],
+  ["Hand, knee or foot surgery without implants", "", 0, [], [], []]]],
+ ["ENT / head & neck", [
+  ["Clean head & neck", "Thyroidectomy, parotidectomy, salivary gland excision", 0, [], [], []],
+  ["Clean-contaminated head & neck", "Including neck dissection", [`${CZ} + ${MT}`], [`${CX} + ${MT}`, `or ${US}`], [`${CL}; may add {gent5}`], ["Single dose; up to 24 hours", "A prolonged oral course doesn't reduce infection and may add complications.", "Gentamicin when gram-negative contamination is more likely."]],
+  ["Ear: clean", "", 0, [], [], []],
+  ["Ear with a prosthesis (not grommets)", "", [CZ], [], [`${CL}; may add {gent5}`], []],
+  ["Ear: clean-contaminated", "Mastoidectomy", [`${CZ} + ${MT}`], [`${CX} + ${MT}`, `or ${AU}`], [`${CL}; may add {gent5}`], ["Up to 24 hours"]],
+  ["Tonsillectomy", "", 0, [], [], []],
+  ["Septorhinoplasty", "", ["Simple: not recommended (packing / splint ≤ 48 h)", `Complex: ${CZ} + ${MT}`], [`Complex: ${AU}`], [`${CL}; may add {gent5}`], ["Complex: up to 24 hours"]],
+  ["Endoscopic sinus surgery", "", [`${CZ} + ${MT}`], [AU], [`${CL}; may add {gent5}`], ["No post-op antibiotics if no mucus is seen during surgery."]]]],
+ ["Plastics", [
+  ["Clean", "Breast reduction, body contouring, face lift, blepharoplasty", ["Not required unless risk factors (below)"], [], [], ["Only with risk factors: prosthetic material, prior skin irradiation."]],
+  ["Clean-contaminated", "Ear or nasal cartilage", [CZ], [AU], [], ["Up to 24 hours"]],
+  ["Breast augmentation", "", [`${CZ}, then 2 g IV q8h`], [], [], ["Up to 24 hours (up to 72 h if high risk)"]],
+  ["Breast reconstruction", "", [`${CZ}, then 2 g IV q8h`], [`${AU}, then 1.2 g IV q8h`], [`${CL} STAT, then 600 mg IV q8h`, "or {vanc} STAT, then 15 mg/kg IV q12h"], ["Up to 24 hours; with a drain, the surgeon decides."]],
+  ["Cleft surgery", "", ["Amoxicillin/clavulanate 1.2 g IV q8h"], ["Ampicillin/sulbactam 3 g IV q8h"], [], ["3–5 days"]],
+  ["Skin graft (full thickness, non-burn) / flap", "", ["No consensus (below)"], [], [], ["No consensus: choose by the latest culture from the recipient site. Flaps: up to 72 h for microsurgery, major skin cancer, large flap harvest."]]]],
+ ["Urology", [
+  ["Endourology", "TURP, TURBT, PCNL, URS, RIRS", [AU, `or ${US}`], [CX], [], ["For culture-negative urine; tailor to the latest urine culture."]],
+  ["Open, urinary tract opened", "Nephrectomy, prostatectomy, open stone surgery", [AU, `or ${US}`], [`${CZ} or ceftriaxone 2 g IV, + {gent35}`], [], ["For culture-negative urine; tailor to the latest urine culture."]],
+  ["Using bowel segments", "Cystectomy with diversion, cystoplasty", [`${CX} + ${MT}`], [AU, `or cefoperazone 2 g IV + ${MT}`], [`{gent35} + ${MT}`], []],
+  ["Prosthetic devices", "Penile prosthesis, artificial sphincter, slings, sacral neuromodulator", [AU, `or ${US}`], ["Ceftriaxone 2 g IV", "MRSA colonised: {vanc}"], [`${CL} + {gent35}`], []],
+  ["Transrectal prostate biopsy", "", [`${US} or ${AU}, + {gent3}`], ["Fosfomycin 3 g PO 3 h before, then 3 g PO 24 h after"], [], ["Rectal povidone-iodine wash-out; consider a rectal swab for targeted prophylaxis."]],
+  ["Transperineal biopsy / brachytherapy", "", 0, [], [], ["With risk factors (steroids, immunocompromised, recent chemotherapy, poorly controlled diabetes, previous urosepsis or post-biopsy infection): ampicillin/sulbactam 3 g IV."]],
+  ["Cystoscopy / urodynamics", "", 0, [], [], ["High risk (immunocompromised, long-term catheter, prosthesis or valve, diabetes, transplant): cefuroxime 500 mg PO."]],
+  ["Clean open, stents, circumcision, lithotripsy", "Orchidectomy, orchidopexy, varicocele, renal cyst; retrograde pyelogram / ureteric stent; circumcision; shock-wave lithotripsy", 0, [], [], ["Laparoscopic: as for the matching open procedure."]]]]];
+
+function nagTok(t){ const x = wts(), gw = x.tbw > 1.2*x.ibwRaw ? x.adj : x.tbw, gn = x.tbw > 1.2*x.ibwRaw ? "AdjBW" : "TBW", v = k => Math.min(k*x.tbw, 2000);
+  return t.replace(/\{vanc\}/g, `Vancomycin 15–20 mg/kg IV = <b>${dz(v(15),"mg")}–${dz(v(20),"mg")} mg</b> <span class="sub">(TBW ${sig(x.tbw)} kg; max 2 g per dose, ASHP; infuse over ≥ 60 min)</span>`)
+    .replace(/\{gent5\}/g, `Gentamicin 5 mg/kg IV = <b>${dz(5*gw,"mg")} mg</b> <span class="sub">(${gn} ${sig(gw)} kg)</span>`)
+    .replace(/\{gent3\}/g, `gentamicin 3 mg/kg IV = <b>${dz(3*gw,"mg")} mg</b> <span class="sub">(${gn} ${sig(gw)} kg)</span>`)
+    .replace(/\{gent35\}/g, `gentamicin 3–5 mg/kg IV = <b>${dz(3*gw,"mg")}–${dz(5*gw,"mg")} mg</b> <span class="sub">(${gn} ${sig(gw)} kg)</span>`); }
+function nagCard(){ if (!(S.nagSp >= 0 && S.nagSp < NAG.length)) S.nagSp = 2; const sp = NAG[S.nagSp]; if (!(S.nagPr >= 0 && S.nagPr < sp[1].length)) S.nagPr = 0;
+  const [n, ex, pr, al, ag, cm] = sp[1][S.nagPr], li = a => a.map(t => `<li>${nagTok(t)}</li>`).join(""), big = wts().tbw >= 120;
+  return `${NAG_CHECKED ? "" : `<div class="warn" style="margin-top:0">DRAFT — updated to the Malaysian National Antimicrobial Guideline 2024 (v2.129). Check against NAG and your local policy before use.</div>`}
+  <div class="nagsp">${NAG.map(([t], i) => `<button aria-pressed="${i === S.nagSp}" data-nagsp="${i}">${t}</button>`).join("")}</div>
+  <div class="nagpr">${sp[1].map(([t], i) => `<button aria-pressed="${i === S.nagPr}" data-nagpr="${i}">${t}</button>`).join("")}</div>
+  <div class="nagbox"><h3 style="margin-top:0">${n}</h3>${ex ? `<p class="sub" style="margin:0 0 var(--s2)">${ex}</p>` : ""}
+  ${pr === 0 ? `<div class="result ok"><b>${NO}</b></div>` : `<div class="naghd">Preferred</div><ul>${li(pr)}</ul>`}
+  ${al.length ? `<div class="naghd">Alternative</div><ul>${li(al)}</ul>` : ""}${ag.length ? `<div class="naghd">Severe penicillin allergy</div><ul>${li(ag)}</ul>` : ""}
+  ${cm.length ? `<div class="naghd">Comments</div><ul class="sub">${li(cm)}</ul>` : ""}</div>
+  ${big ? `<p class="hl">Cefazolin: NAG gives 2 g for adults; ASHP uses <b>3 g if ≥ 120 kg</b> (this patient ${sig(wts().tbw)} kg).</p>` : `<p class="sub">Cefazolin: NAG gives 2 g for adults; ASHP uses 3 g if ≥ 120 kg.</p>`}
+  <h3>Timing and redosing (NAG)</h3><ul><li>Give <b>60 min before incision</b>, fully infused before the incision. Single dose is usually enough; if continued, keep it short.</li>
+    <li>Redose if blood loss <b>&gt; 1500 mL</b>, the operation lasts longer than <b>two half-lives</b>, or the half-life is shortened (e.g. extensive burns).</li>
+    <li>Redose intervals (ASHP; check NAG's table): cefazolin and cefuroxime every 4 h · ampicillin/sulbactam and amoxicillin/clavulanate every 2 h · clindamycin every 6 h.</li>
+    <li>Known or suspected infection before surgery: give a treatment course, not prophylaxis.</li></ul>
+  <details class="endo"><summary>Endocarditis prophylaxis (high-risk cardiac patients)</summary>
+    <p class="sub"><b>Who:</b> previous infective endocarditis; prosthetic valve or valve-repair material (surgical or transcatheter aortic / pulmonary); untreated cyanotic congenital heart disease, or repaired with shunts, conduits or prostheses (first 6 months after a complete repair); ventricular assist device; established rheumatic heart disease. Consider after transcatheter mitral / tricuspid repair; may consider after heart transplant.</p>
+    <p class="sub"><b>For:</b> dental extraction, oral surgery, gum or root manipulation, dental implants; invasive respiratory procedures with incision or biopsy of the mucosa. Not routinely for GI or GU procedures.</p>
+    <table><tr><td>Amoxicillin PO</td><td class="hl">2 g</td></tr><tr><td>Ampicillin IV</td><td class="hl">2 g</td></tr>
+    <tr><td>Non-severe penicillin allergy: cephalexin PO</td><td class="hl">2 g</td></tr><tr><td>Non-severe penicillin allergy: cefazolin IV</td><td class="hl">1 g</td></tr>
+    <tr><td>Severe penicillin allergy: doxycycline PO</td><td class="hl">100 mg</td></tr><tr><td>Severe penicillin allergy: azithromycin PO</td><td class="hl">500 mg</td></tr></table>
+    <p class="sub">Single dose 30–60 min before the procedure.</p></details>
+  <p class="sub">Post-splenectomy, eye and termination-of-pregnancy regimens: <a href="${NAG_URL}" target="_blank" rel="noopener noreferrer">NAG 2024 chemoprophylaxis ↗</a></p>
+  ${src(`Malaysian National Antimicrobial Guideline 2024 (MOH Pharmaceutical Services Programme), section A3 surgical and non-surgical chemoprophylaxis, and Surgical antibiotic prophylaxis principles — <a href="${NAG_URL}" target="_blank" rel="noopener noreferrer">online ↗</a>, read 25 Nov 2026. ASHP/IDSA/SIS/SHEA 2013 for redose intervals and cefazolin ≥ 120 kg.`)}`; }
+gaCards.abx = () => `<div class="card"><h2>7. Antibiotic prophylaxis</h2>${nagCard()}</div>`;
 pCards.abx = () => `<div class="card"><h2>Paeds antibiotic prophylaxis</h2>${abxDraft()}${abxNewer()}${abxCard(true)}</div>`;
 
 /* ---------- DISPLAY NAME (phone only) ---------- */
@@ -5042,6 +5149,13 @@ VGROUPS.find(g => g[0]==="General")[1].push(["Paeds doses vs local manual & pain
 VGROUPS.find(g => g[0]==="General")[1].push(["Equipment sizes in rows", "23 Nov 2026", [
   "Tube ID and depth, supraglottic sizes, paeds tube / depth / suction / laryngoscope, neonate tube, NPA, bag, DLT size and depth, NG and CVC depth: same numbers, now in rows labelled 'Equipment' (test-checked)",
   "Size chips replaced by 'have X and Y ready'; lookup tables (HMEF, bag weight bands, LMA by weight, Storz, lung isolation by age) and ventilator settings unchanged"]]);
+VGROUPS.find(g => g[0]==="General")[1].push(["Antibiotic prophylaxis: NAG 2024 (v2.129)", "25 Nov 2026", [
+  "Adult card rebuilt from the Malaysian National Antimicrobial Guideline 2024, section A3: 13 specialties, each procedure with Preferred / Alternative / Severe penicillin allergy / Comments as written, including 'not recommended'",
+  "Changes from the old card: LSCS azithromycin moved to a local-option note (not in NAG 2024); urology endourology now amoxicillin/clavulanate or ampicillin/sulbactam; hysterectomy cefazolin + metronidazole; lap chole single dose reasonable; breast cancer surgery none unless risk factors; clindamycin 600–900 mg",
+  "Cefazolin 2 g (NAG); note that ASHP uses 3 g if ≥ 120 kg. Gentamicin and vancomycin worked out for the patient (vancomycin max 2 g per dose, ASHP)",
+  "Timing and redosing: NAG principles (60 min, > 1500 mL, two half-lives); intervals from ASHP as NAG's table is an image",
+  "Endocarditis: NAG 2024 list of who and which procedures; amoxicillin 2 g PO / ampicillin 2 g IV; non-severe allergy cephalexin 2 g PO / cefazolin 1 g IV; severe allergy doxycycline 100 mg PO / azithromycin 500 mg PO",
+  "Paeds card unchanged for now (NAG 2019 / ASHP); NAG section B3 to follow"]]);
 VGROUPS.find(g => g[0]==="General")[1].push(["Which tests to order: patient picker (v2.127)", "25 Nov 2026", [
   "Surgery size (minor / intermediate / major) + ASA + ticks give Order / Consider / Not needed, following NICE NG45 rows exactly; full table kept below",
   "Diabetes adds HbA1c if none in 3 months; liver disease / anticoagulant adds coagulation (ASA 3–4) and a link to anticoagulant timing",
@@ -5237,6 +5351,7 @@ function vTicks(){
 }
 /* ---------- ABOUT ---------- */
 const CHANGES = [
+  ["2.129","Antibiotic prophylaxis (adult) updated to the Malaysian National Antimicrobial Guideline 2024: pick specialty and procedure; endocarditis list and regimen updated (checked)"],
   ["2.128","Block finder on wide screens: the Finder tab uses the full width (figure about 60%, as tall as the window); the patient is a one-line strip with a Sample tag (checked)"],
   ["2.127","Which tests to order: pick surgery size, ASA and what applies — get Order / Consider / Not needed (NICE NG45), copy or add to the pre-op note (checked)"],
   ["2.126","Myotomes: thoracic levels added as two trunk groups — intercostals (T2–T11) and abdominal wall (T7–L1), marked not ASIA key muscles (checked)"],
@@ -6316,6 +6431,8 @@ document.addEventListener("click", e => {
   if (d.addpair){ const lt = d.lt, k = laKey(lt); S[k] = S[k] || []; JSON.parse(d.addpair).forEach(it => S[k].push(it)); b.textContent = "✓ Added both"; setTimeout(render, 350); return; }
   if (d.tk){ S.tk = {...(S.tk || {}), [d.tk]: !(S.tk || {})[d.tk]}; render(); return; }
   if (d.tnote){ S.pnF = {...(S.pnF || {})}; const cur = (S.pnF.blood || "").trim(); if (!cur.includes(d.tnote)) S.pnF.blood = cur ? cur + "; " + d.tnote : d.tnote; S.tNoted = true; render(); setTimeout(() => { S.tNoted = false; }, 1500); return; }
+  if (d.nagsp){ S.nagSp = +d.nagsp; S.nagPr = 0; render(); return; }
+  if (d.nagpr){ S.nagPr = +d.nagpr; render(); return; }
   if (d.nerve){ const k = +d.nerve; S.nerve = S.nerve === k ? 0 : k; S.nerveLvl = -1; if (S.nerve && BF.st.ok && S.bfView === "nerve"){ const lb = k >= 20 ? "trunk" : k >= 10 ? "leg" : "arm", z = BF.st.nzone; if (!z || z.limb !== lb) BF.nerveZoom(lb, z ? z.s : 1); } render(); return; }   // a nerve button also zooms onto its limb
   if (d.bfreg){ S.bf = S.bf && S.bf.reg === d.bfreg && !S.bf.side ? null : {reg: d.bfreg, side: ""}; BF.focus(S.bf); render(); return; }
   if (d.bfturn){ BF.turn(); return; }
