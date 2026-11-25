@@ -825,7 +825,7 @@ if (window.top !== window.self && /\.github\.io$/.test(location.hostname)) {
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.136.1";
+const APP_VERSION = "2.137.1";
 const APP_DATE = "25 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
@@ -3902,7 +3902,7 @@ function laCalc(lt){
   const rows = list.map((it,i) => { const mg = it.ml * it.bi * (+it.c) * 10, pct = mg / laMaxMg(it.d, lt) * 100; total += pct;
     return `<tr><td>${esc(it.l||LAD[it.d].n)}<div class="sub">${LAD[it.d].n} ${it.c}% · ${dz(it.ml,"mL")} mL${it.bi===2?" × 2":""}</div></td><td class="hl">${dz(mg,"mg")} mg</td><td class="hl">${Math.round(pct)}%</td><td><button class="rmla" data-rmla="${lt}:${i}" aria-label="Remove">×</button></td></tr>`; }).join("");
   const state = total > 100 ? "over" : total > 80 ? "near" : "ok";
-  const maxLine = Object.entries(LAD).map(([k,v]) => `${v.n} ${dz(laMaxMg(k,lt),"mg")} mg`).join(" · ");
+  const maxLine = Object.entries(LAD).map(([k,v]) => `${v.n} ${dz(laMaxMg(k,lt),"mg",laMaxMg(k,lt))} mg`).join(" · ");   // v2.137: the maximum is never shown rounded up
   return `<p class="sub">Max for this patient (${why}): ${maxLine}</p>
     <div class="sub">Add a block</div>${seg("laD",Object.entries(LAD).map(([k,v])=>[k,v.n]))}${seg("laC",D.concs.map(c=>[c,c+"%"]))}
     ${step("laMl","Volume","mL",1,60,1)}${seg("laBi",[["1","One side"],["2","Both sides"]])}
@@ -3912,7 +3912,8 @@ function laCalc(lt){
     <div class="meter ${state}"><span style="width:${Math.min(total,100)}%"></span></div>
     <div class="${state==="over"?"danger":state==="near"?"warn":"result"}" style="margin-top:var(--s2)"><b>Total: ${Math.round(total)}% of maximum</b>${state==="over"?" — ABOVE MAXIMUM. Reduce volume or concentration.":state==="near"?" — close to maximum.":""}</div>
     ${list.length?`<button class="linkbtn" data-clrla="${lt}">Clear list</button>`:""}
-    <p class="sub">Different drugs combine as % of each one's own maximum. Doses apply to one sitting: doses given over the same few hours count together, whatever the order (for example lignocaine first, ropivacaine or levobupivacaine later): LA toxicity is additive.</p>`;
+    <p class="sub">Different drugs combine as % of each one's own maximum. Doses apply to one sitting: doses given over the same few hours count together, whatever the order (for example lignocaine first, ropivacaine or levobupivacaine later): LA toxicity is additive.</p>
+    <p class="sub"><b>Arithmetic only — the maximum is not a guaranteed safe dose.</b> Use less for the elderly or frail; heart, liver or kidney disease; and vascular sites (intercostal, bilateral blocks).</p>`;
 }
 
 /* block card builder */
@@ -3932,12 +3933,28 @@ function blk(o){
 const raCards = {};
 raCards.spinalNonObs = () => `<div class="card"><h2>Spinal dose: non-obstetric</h2><div class="spcalc">${nonObsCalc()}</div></div>`;   // the calculator, listed as a card (v2.69)
 raCards.calc = () => `<div class="card"><h2>LA dose calculator</h2>${raDraft()}${laCalc("a")}</div>`;
-raCards.sbyb = () => `<div class="card"><h2>Stop Before You Block &amp; safe injection</h2>${raDraft()}
-  <ol><li>Consent, site and side marked</li><li><b>Stop Before You Block</b>: anaesthetist + assistant re-check the mark immediately before needle insertion</li>
-  <li>Monitoring (SpO₂, ECG, NIBP), IV access, resuscitation drugs and <b>Intralipid</b> available</li><li>Aseptic technique; ultrasound ± nerve stimulator</li>
-  <li>Inject slowly, aspirate every 5 mL, keep injection pressure low</li><li>Stop if pain, paraesthesia, high pressure or no spread seen</li></ol>
+const SBYB3_CHECKED = true;   // checked by author 25 Nov 2026;   // v2.137 three stages
+raCards.sbyb = () => `<div class="card"><h2>Stop Before You Block &amp; safe injection</h2>${raDraft()}${SBYB3_CHECKED ? "" : `<div class="warn" style="margin-top:0">DRAFT — before / at the needle / after (v2.137). Compare with your references before use.</div>`}
+  <h3 style="margin-top:0">1. Before the block</h3>
+  <ul><li>Consent, site and side marked</li><li>Allergies and contraindications; anticoagulants checked <button class="linkish" data-open="3. Anticoagulant timing" data-g="regional" data-tab="safety">Anticoagulant timing ›</button></li>
+  <li>Baseline neurology where relevant — record any weakness or numbness already there</li>
+  <li>Monitoring (SpO₂, ECG, NIBP), IV access, resuscitation drugs and <b>Intralipid</b> available</li>
+  <li>LA dose worked out <button class="linkish" data-open="1. LA dose calculator" data-g="regional" data-tab="safety">LA dose calculator ›</button></li></ul>
+  <h3>2. Immediately before the needle</h3>
+  <ul><li><b>Stop Before You Block</b>: anaesthetist + assistant re-check the mark immediately before needle insertion</li>
+  <li><b>Prep, Stop, Block:</b> prep and drape, then stop and confirm the side with the mark just before the needle — again for each new side or after any pause (turning the patient, a second block)</li>
+  <li>Aseptic technique; ultrasound ± nerve stimulator</li>
+  <li>Inject slowly, aspirate every 5 mL, keep injection pressure low</li><li>Stop if pain, paraesthesia, high pressure or no spread seen</li></ul>
+  <h3>3. After the block</h3>
+  <ul><li>Record what you actually did: drug, %, mL and total mg; site and side; technique, and any paraesthesia, blood or pain on injection</li>
+  <li>Check the block (sensory and motor) before surgery starts</li>
+  <li>Keep monitoring — LA toxicity can come late</li>
+  <li>Protect the numb limb: sling or padding, heels and elbows; no walking until power is back (falls)</li>
+  <li>Hand over: what was given, when it should wear off, what to watch for</li>
+  <li>Numbness or weakness still there after the block should have worn off: review, record, and refer if it persists</li></ul>
+  <p class="sub">A checklist to work through — the app does not record that it was done.</p>
   <button class="emlink" data-open="LA toxicity (LAST)" data-g="emerg" data-tab="adult">⚠ LA toxicity → Emergencies</button>
-  ${src("RCoA / RA-UK Stop Before You Block; Association of Anaesthetists LAST.")}</div>`;
+  ${src("RCoA / RA-UK Stop Before You Block (Prep, Stop, Block); Association of Anaesthetists LAST.")}</div>`;
 
 /* NEURAXIAL */
 // v2.136 neuraxial "When to escalate": shared by Epidural, CSE and Failed / patchy block
@@ -5394,6 +5411,11 @@ VGROUPS.find(g => g[0]==="General")[1].push(["Neuraxial: when to escalate (v2.13
   "Action: stop infusion, examine, senior now, urgent MRI, neurosurgery at once if haematoma or abscess suspected (best within 8 h), hold anticoagulants",
   "No observation period before escalating; emergency → existing High / total spinal card (not copied)",
   "Sources: ASRA antithrombotic guideline (RAPM 2018); FPM / RCoA epidural best practice; RCoA NAP3 (2009)"]]);
+VGROUPS.find(g => g[0]==="General")[1].push(["Stop Before You Block: three stages (v2.137)", "25 Nov 2026", [
+  "Before: consent and mark, allergies and contraindications, anticoagulants (link), baseline neurology, monitoring / IV / resuscitation / Intralipid, LA dose (link)",
+  "At the needle: the existing Stop Before You Block line word for word, plus Prep, Stop, Block — again for each side or after any pause",
+  "After: record drug, %, mL, mg, site, side and technique; check the block; keep monitoring; protect the limb; hand over; follow up numbness or weakness that hasn't resolved",
+  "The app records nothing; LA calculator: arithmetic-only line, maximum never shown rounded up"]]);
 VGROUPS.find(g => g[0]==="General")[1].push(["Induction drugs & relaxants combined", "22 Nov 2026", [
   "Adult: General › Induction › 1. Induction drugs & relaxants — Opioid · Hypnotic · Muscle relaxant · No IV access (rows moved unchanged)",
   "Paeds: Paediatric › Induction › 3. Induction drugs & relaxants — Anticholinergic · Opioid · Hypnotic · Muscle relaxant · No IV access (rows moved unchanged)",
@@ -5476,6 +5498,7 @@ function vTicks(){
 }
 /* ---------- ABOUT ---------- */
 const CHANGES = [
+  ["2.137","Stop Before You Block in three stages: before the block, immediately before the needle (Prep, Stop, Block), after the block. LA calculator: an \"arithmetic only\" line, and the maximum is never shown rounded up. (checked)"],
   ["2.136","Epidural, CSE and Failed or patchy block: a When to escalate box — expected effects, red flags needing urgent review (MRI, neurosurgery), and a link to High / total spinal. (checked)"],
   ["2.135","Block finder › Joints: a skeleton under a see-through body — tap a joint to light up the nerves that supply it and see the blocks that cover it. Each nerve name has its own colour dot (hollow = not on the nerve map); the full table is folded below. (checked)"],
   ["2.134","Antibiotic prophylaxis cards (adult and paeds): Timing & redosing and Endocarditis are now the first two tabs, before the specialties; the card opens on Timing. Cards 7a and 7b are gone. Searching redose or endocarditis opens that tab. (checked)"],
