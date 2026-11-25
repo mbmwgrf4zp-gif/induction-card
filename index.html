@@ -808,7 +808,7 @@ details.bfb[open]>summary{margin-bottom:4px}details.bfb .bfo{margin-top:4px}deta
 @media (min-width:560px){.nagsum{max-width:260px}}
 .bfpanel{display:grid;gap:8px;margin:var(--s2) 0}.bfpanel:empty{display:none}.bfside{margin:0;color:var(--danger-ink);font-weight:600;font-size:14px}
 .bfb{border-radius:var(--r-sm);padding:10px 12px;background:var(--bg);display:grid;gap:2px}.bfb.first{background:var(--gc-soft)}
-.bftag{font-size:13px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--gc)}
+.bftag{font-size:13px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--gc)}.bfrole{display:block;font-size:13px;font-weight:700;color:var(--muted)}.bfrole.rs{color:var(--gc)}.bfrole.rx{color:var(--warn-ink)}
 .bfo{display:flex;justify-content:space-between;align-items:baseline;gap:8px;background:none;border:0;padding:0;color:var(--ink);font:inherit;text-align:left;cursor:pointer}
 .bfn{font-weight:700;font-size:16px;color:var(--gc);text-decoration:underline;text-decoration-thickness:1.5px;text-underline-offset:3px}.bfempty{margin:0;font-size:15px}.bfd{font-weight:700;font-size:20px;white-space:nowrap}.bfw{font-size:14px;color:var(--muted)}.bfw.bfc{color:var(--ink)}
 </style>
@@ -825,7 +825,7 @@ if (window.top !== window.self && /\.github\.io$/.test(location.hostname)) {
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.140.1";
+const APP_VERSION = "2.142.1";
 const APP_DATE = "25 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
@@ -2604,6 +2604,7 @@ function gaInputs(){
     `${S.aw < W2.ibwRaw ? `<div class="sub" style="margin-top:4px">Actual weight below ideal: actual weight used for IBW / AdjBW doses. PBW (for tidal volume) stays height-based.</div>` : ""}`;
 }
 
+const MEDS3_CHECKED = true;   // checked by author 25 Nov 2026;   // v2.141 ACEi / ARB / diuretics, insulin pump, adrenal insufficiency lines
 const gaCards = {};
 /* PRE-OP */
 gaCards.fasting = () => `<div class="card"><h2>5. Fasting</h2>${gaDraft()}
@@ -2616,13 +2617,14 @@ gaCards.fasting = () => `<div class="card"><h2>5. Fasting</h2>${gaDraft()}
 gaCards.meds = () => `<div class="card"><h2>1. Regular drugs: stop or continue</h2>${gaDraft()}
   <table>
   <tr><th>Continue</th><td>Beta-blockers, statins, antiepileptics, inhalers, thyroxine, antiparkinson, steroids</td></tr>
-  <tr><th>Omit morning</th><td>ACEi / ARB, diuretics, sulfonylureas</td></tr>
+  <tr><th>Omit morning</th><td>Sulfonylureas</td></tr>
+  <tr class="medadd"><th>ACEi / ARB, diuretics</th><td>Usually omit the morning dose — consider continuing if for heart failure or hard-to-control BP (individualise)${MEDS3_CHECKED ? "" : ' <span class="tagdraft">draft</span>'}</td></tr>
   <tr><th>SGLT2 inhibitors</th><td><b>Stop 3 days before</b> (ertugliflozin 4 days) — euglycaemic DKA risk</td></tr>
   <tr><th>Metformin</th><td>Continue if ≤ 1 missed meal; omit if eGFR &lt; 60, contrast or long fast</td></tr>
   <tr><th>Insulin</th><td>Long-acting basal: give <b>80%</b> of usual dose. Short-acting: omit while fasting. &gt; 1 missed meal: variable-rate insulin infusion</td></tr>
   <tr><th>Anticoagulants / antiplatelets</th><td>See Regional › Anticoagulants</td></tr></table>
   <button class="homebtn" data-open="3. Anticoagulant timing" data-g="regional" data-tab="safety">Open anticoagulant timing table ›</button>
-  ${src("CPOC 2021 perioperative diabetes; FDA SGLT2i advice · latest available, checked Nov 2026")}</div>`;
+  ${src("CPOC 2021 perioperative diabetes; FDA SGLT2i advice · latest available, checked Nov 2026. ACEi / ARB, diuretics: ACC/AHA 2024 perioperative guideline.")}</div>`;
 /* ---------- PREMED EXPANSION (Nov 2026) — DRAFT ---------- */
 const PM2_CHECKED = true;
 const pm2Draft = () => PM2_CHECKED ? "" : `<div class="warn" style="margin-top:0">DRAFT — premed expansion (Nov 2026), checked against two sources where available. Not yet ticked by you.</div>`;
@@ -2709,7 +2711,8 @@ gaCards.dmplan = () => `<div class="card"><h2>3. Diabetes: day-of-surgery plan</
   <tr><th>Sulfonylureas</th><td>Omit on the day of surgery</td></tr>
   <tr><th>SGLT2 inhibitors</th><td><b>Stop 3 days before</b> (ertugliflozin 4) — euglycaemic DKA</td></tr>
   <tr><th>DPP-4 inhibitors, pioglitazone</th><td>Continue</td></tr>
-  <tr><th>GLP-1 agonists</th><td>Usually continue; check the fasting card for GI symptoms</td></tr></table>
+  <tr><th>GLP-1 agonists</th><td>Usually continue; check the fasting card for GI symptoms</td></tr>
+  <tr class="medadd"><th>Insulin pump</th><td>Short procedure, ≤ 1 missed meal, the patient can manage it and local policy allows: keep the basal rate. Otherwise variable-rate insulin infusion — start it before the pump comes off. Involve the diabetes team. Type 1: never leave without basal insulin (CPOC 2021)${MEDS3_CHECKED ? "" : ' <span class="tagdraft">draft</span>'}</td></tr></table>
   <h3>Variable-rate insulin infusion when</h3><ul><li>More than one missed meal expected</li><li>Poorly controlled (glucose &gt; 12 mmol/L on two readings)</li><li>Type 1 diabetes without basal insulin, or emergency surgery with high glucose</li></ul>
   <p class="sub">Check capillary glucose at least hourly in theatre and recovery. Ketones ≥ 3 mmol/L: treat as DKA.</p>
   <h3>Hypoglycaemia (&lt; 4 mmol/L)</h3>${f2Draft()}${FT([
@@ -2884,7 +2887,8 @@ gaCards.imAdult = () => `<div class="card"><h2>7. IM doses (no IV access, or war
   ${src("BNF (2026); Resuscitation Council UK anaphylaxis 2021; Association of Anaesthetists 2020 steroid guideline; product information (promethazine, diclofenac, pethidine).")}</div>`;
 gaCards.steroid = () => `<div class="card"><h2>4. Steroid cover</h2>${gaDraft()}
   <p>On ≥ 5 mg prednisolone (or equivalent) for &gt; 4 weeks:</p>
-  <ul><li>Give usual morning dose</li></ul>${f2Draft()}${FT([
+  <ul><li>Give usual morning dose</li></ul>
+  <p class="medadd"><b>Known adrenal insufficiency</b> (Addison's, hypopituitarism, CAH): always give cover as below, whatever the steroid dose; involve endocrinology.${MEDS3_CHECKED ? "" : ' <span class="tagdraft">draft</span>'}</p>${f2Draft()}${FT([
     R("Major / moderate surgery: hydrocortisone","at induction (or IM if no IV)","100 mg","then 200 mg / 24 h infusion (or 50 mg 6-hourly)","IV"),
     R("Minor surgery: usual dose ±","at induction","100 mg",null,"IV")])}
   ${src("Association of Anaesthetists 2020 steroid guideline · latest available, checked Nov 2026")}</div>`;
@@ -4153,15 +4157,24 @@ const BF_REG = {
 const BF_LIMB = {shoulder: "arm", clavicle: "arm", arm: "arm", hand: "arm", hip: "leg", thigh: "leg", knee: "leg", foot: "leg", chest: "trunk", breast: "trunk", upabdo: "trunk", loabdo: "trunk", back: "trunk"};
 const BF_ORDER = ["shoulder", "clavicle", "arm", "hand", "breast", "chest", "upabdo", "loabdo", "back", "hip", "thigh", "knee", "foot"];
 const BF_DEEP = ["Thoracic paravertebral", "Quadratus lumborum (QL)"];
+// v2.142 role of each block in the Finder (display only; the block cards are unchanged)
+const BF_ROLE_CHECKED = true;   // checked by author 25 Nov 2026;
+const BF_ROLE = {"Interscalene": "s", "Supraclavicular": "s", "Infraclavicular": "s", "Axillary": "s", "Wrist block": "s", "Ankle block": "s", "Thoracic paravertebral": "s",
+  "Femoral": ["s", "with sciatic"], "Popliteal sciatic": ["s", "+ saphenous"], "Lateral femoral cutaneous (LFCN)": ["s", "skin only"],
+  "Superficial cervical plexus": "x", "Obturator": "x", "iPACK": "x",
+  "Fascia iliaca (suprainguinal)": "a", "PENG": "a", "Adductor canal": "a", "Genicular": "a", "Suprascapular": "a", "Erector spinae (ESP)": "a", "Serratus anterior": "a",
+  "PECS II": "a", "Rectus sheath": "a", "TAP": "a", "Quadratus lumborum (QL)": "a", "Ilioinguinal / iliohypogastric": "a"};
+const bfRole = t => { const r = [].concat(BF_ROLE[t] || []), k = r[0]; if (!k) return "";
+  return `<span class="bfrole r${k}">${k === "s" ? "Can be surgical" : k === "x" ? "Supplementary" : "Analgesia"}${r[1] ? ` · ${r[1]}` : ""}${BF_ROLE_CHECKED ? "" : " · draft"}</span>`; };
 function bfBlockRow(title, first, reg){
   const o = BLKS[title], id = CARD_IDS[title], e = findEntry(id); if (!o || !e) return "";
   const conc = o.anal ? 0.25 : 0.5, bi = o.bilat ? 2 : 1, lo = o.vol[0]*conc*10*bi, hi = o.vol[1]*conc*10*bi, pct = hi / laMaxMg("bupi","a") * 100;
   const rng = (a, b, u) => a === b ? `${a} ${u}` : `${a}–${b} ${u}`, short = o.ind.split(/ — |;| · /)[0];
   const deep = BF_DEEP.includes(title) || (title === "Erector spinae (ESP)" && reg === "back"), ae = deep && findEntry("regional-safety-anticoagulants");
-  return `<details class="bfb${first ? " first" : ""}"${first ? " open" : ""}><summary>${first ? `<span class="bftag">First choice</span>` : ""}<span class="bfsum"><span class="bfn2">${esc(o.t)}</span><span class="bfd">${rng(o.vol[0], o.vol[1], "mL")}${o.bilat ? " per side" : ""}</span></span>
+  return `<details class="bfb${first ? " first" : ""}"${first ? " open" : ""}><summary>${bfRole(title)}<span class="bfsum"><span class="bfn2">${esc(o.t)}</span><span class="bfd">${rng(o.vol[0], o.vol[1], "mL")}${o.bilat ? " per side" : ""}</span></span>
     <span class="sub bfw">${short} · <span class="${pct > 100 ? "bad" : ""}">${Math.round(pct)}% of max</span></span></summary>
     <div class="sub bfw">bupi/levobupi ${conc}% (${o.anal ? "analgesia" : "surgical"}) = ${rng(dz(lo,"mg"), dz(hi,"mg"), "mg")}${o.bilat ? " both sides" : ""}</div>
-    <div class="sub bfw bfc">${o.caut}</div>${ae ? `<button class="rellink bfdeep" data-id="${ae.id}" data-open="${esc(ae.label)}" data-g="regional" data-tab="${ae.tab}">Deep block — check anticoagulant timing ›</button>` : ""}
+    <div class="sub bfw bfc">${o.caut}</div>${o.miss ? `<div class="sub bfw bfmiss"><b>Misses:</b> ${o.miss}</div>` : ""}${ae ? `<button class="rellink bfdeep" data-id="${ae.id}" data-open="${esc(ae.label)}" data-g="regional" data-tab="${ae.tab}">Deep block — check anticoagulant timing ›</button>` : ""}
     ${laAddBtn("a", "bupi", conc, o.vol[1], bi, o.t)}<button class="bfo" data-id="${id}" data-open="${esc(e.label)}" data-g="regional" data-tab="${e.tab}"><span class="bfn">${esc(o.t)} ›</span><span class="sub">full card</span></button></details>`;
 }
 const BF_PAIR_CHECKED = true;   // checked by author 25 Nov 2026;   // v2.125 pairs and deep-block reminder
@@ -4178,10 +4191,10 @@ function bfPair(r){ const k = Object.keys(BF_REG).find(x => BF_REG[x] === r), pr
 const BF_OPS = [["Total knee replacement (TKA)", "knee", "tkr tka knee arthroplasty"], ["ACL reconstruction / knee arthroscopy", "knee", "acl arthroscopy menisc"], ["Hip fracture (DHS, hemiarthroplasty)", "hip", "nof neck of femur dhs hemiarthroplasty"],
   ["Total hip replacement (THA)", "hip", "thr tha hip arthroplasty"], ["Femur fixation", "thigh", "femoral shaft nail"], ["Skin graft donor site (thigh)", "thigh", "split skin graft ssg"],
   ["Ankle fracture / foot surgery", "foot", "orif ankle bunion hallux amputation toe"], ["Below-knee amputation", "foot", "bka amputation"], ["Shoulder arthroscopy / replacement", "shoulder", "rotator cuff arthroplasty subacromial"],
-  ["Clavicle fixation", "clavicle", "clavicle orif"], ["Humerus, elbow or forearm surgery", "arm", "elbow forearm radius ulna humerus av fistula avf"], ["Hand or wrist surgery", "hand", "carpal tunnel trigger finger wrist hand"],
+  ["Clavicle fixation", "clavicle", "clavicle orif"], ["Humerus, elbow or forearm surgery", "arm", "elbow forearm radius ulna humerus av fistula avf arteriovenous fistula creation"], ["Hand or wrist surgery", "hand", "carpal tunnel trigger finger wrist hand wrist fracture distal radius colles"],
   ["Mastectomy / breast surgery", "breast", "mastectomy wide local excision wle breast axillary clearance"], ["Thoracotomy / VATS / rib fractures", "chest", "thoracotomy vats rib fracture chest drain"],
   ["Laparotomy / laparoscopic cholecystectomy", "upabdo", "laparotomy lap chole cholecystectomy midline"], ["Inguinal hernia / appendicectomy", "loabdo", "hernia appendix appendicectomy"],
-  ["Caesarean section (LSCS)", "loabdo", "lscs caesarean pfannenstiel"], ["Bladder tumour resection (TURBT)", "loabdo", "turbt bladder obturator"], ["Spine surgery", "back", "spine lumbar fusion laminectomy"]];
+  ["Caesarean section (LSCS)", "loabdo", "lscs caesarean cesarean c-section csection pfannenstiel"], ["Bladder tumour resection (TURBT)", "loabdo", "turbt bladder obturator"], ["Spine surgery", "back", "spine lumbar fusion laminectomy"]];
 function bfOpsList(){ const q = (S.bfq || "").trim().toLowerCase(); if (!q) return "";
   const hits = BF_OPS.map((o, i) => [o, i]).filter(([o]) => (o[0] + " " + o[2]).toLowerCase().includes(q)).slice(0, 6);
   return hits.length ? hits.map(([o, i]) => `<button class="bfopb" data-bfop="${i}">${o[0]} <span class="sub">→ ${BF_REG[o[1]].t}</span></button>`).join("") : `<p class="sub" style="margin:4px 0">No match — tap the body or use the list.</p>`; }
@@ -4208,6 +4221,7 @@ raCards.finder = () => { const can = glAvail() && !BF.st.nogl, on = can && bf3d(
   ${on ? `<div class="bfstage" id="bfstage"><div class="bfhint${BF.st.touched ? " gone" : ""}" id="bfhint">Drag to turn · tap the body to zoom in</div>
     <button class="bfwhole" data-bfwhole="1"${BF.st.zone || S.bf ? "" : " hidden"}><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>Whole body</button>
     <button class="bfturn" data-bfturn="1" aria-label="Turn the figure: front, side, back" title="Turn"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12a8 8 0 1 1-2.3-5.6"/><path d="M20 4v5h-5"/></svg></button></div>
+  <p class="sub bfschem">Schematic — not exact nerve boundaries or guaranteed block spread.</p>
   <div class="bfrow bfquiet"><button class="bflink bfmute" data-bflist="1" aria-expanded="${!!S.bfList}">${S.bfList ? "Hide list" : "List"}</button><span class="bfsep">·</span><button class="bflink bfmute" data-bf3d="off">Hide 3D</button></div>`
     : `${can ? `<div class="bfshowrow"><button class="bfshow" data-bf3d="on">Show 3D figure</button></div>` : ""}${fail ? `<p class="sub bfnote">3D turned off on this device after a problem.</p>` : ""}`}
   </div><div class="bfright">
@@ -4900,7 +4914,7 @@ function nerveView(){
   ${on3 ? `<div class="bfstage" id="bfstage" data-mode="nerve"><div class="bfhint${BF.st.touched ? " gone" : ""}" id="bfhint">Drag to turn · tap a limb to zoom in</div>
       <button class="bfwhole" data-bfwhole="1"${zl || S.nerve ? "" : " hidden"}><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>Whole body</button>
       <button class="bfturn" data-bfturn="1" aria-label="${leg ? "Turn: front, back, side, sole" : zl === "arm" ? "Turn: front, back, palm, back of hand" : "Turn: front, back, side"}" title="Turn"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12a8 8 0 1 1-2.3-5.6"/><path d="M20 4v5h-5"/></svg></button></div>
-      <div class="bfrow"><span class="sub">3D body · typical territories, schematic</span><button class="bflink bfmute" data-bf3d="off">Hide 3D</button></div>`
+      <div class="bfrow"><span class="sub">3D body · typical territories, schematic — not exact boundaries or guaranteed spread</span><button class="bflink bfmute" data-bf3d="off">Hide 3D</button></div>`
     : `<p class="sub">The map needs the 3D body.${can ? ` <button class="linkbtn" data-bf3d="on">Show 3D body ›</button>` : ""}</p>`}
   </div><div class="bfright">
   ${[["Arm", NERVE_ORDER], ["Trunk", NERVE_TRUNK], ["Leg", NERVE_LEG]].map(([h, ids]) => `<h3 class="nhd">${h}</h3><div class="nchips">${ids.map(i => `<button data-nerve="${i}" aria-pressed="${k === i}"><span class="bfdot" style="background:${NERVES[i].c}"></span>${NERVES[i].n.replace(/ \(.*\)$/, "")}</button>`).join("")}</div>`).join("")}
@@ -4938,7 +4952,7 @@ function jointView(){ const on3 = glAvail() && !BF.st.nogl && bf3d(), can = glAv
   ${on3 ? `<div class="bfstage" id="bfstage" data-mode="joint"><div class="bfhint${BF.st.touched ? " gone" : ""}" id="bfhint">Drag to turn · tap a limb to zoom in</div>
       <button class="bfwhole" data-bfwhole="1"${zl || k ? "" : " hidden"}><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>Whole body</button>
       <button class="bfturn" data-bfturn="1" aria-label="Turn the figure" title="Turn"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12a8 8 0 1 1-2.3-5.6"/><path d="M20 4v5h-5"/></svg></button></div>
-      <div class="bfrow"><span class="sub">Schematic skeleton · ${k ? "shaded: skin areas of these nerves" : "joints on the left side"}</span><button class="bflink bfmute" data-bf3d="off">Hide 3D</button></div>`
+      <div class="bfrow"><span class="sub">Schematic skeleton · ${k ? "shaded: skin areas of these nerves, not exact boundaries" : "joints on the left side"}</span><button class="bflink bfmute" data-bf3d="off">Hide 3D</button></div>`
     : `${can ? `<p class="sub">The skeleton needs the 3D body. <button class="linkbtn" data-bf3d="on">Show 3D body ›</button></p>` : ""}`}
   </div><div class="bfright">
   ${[["Arm", JNT_ARM], ["Leg", JNT_LEG]].map(([h, js]) => `<h3 class="nhd">${h}</h3><div class="nchips">${js.map(i => `<button data-joint="${i}" aria-pressed="${k === i}">${JNT[i].n}</button>`).join("")}</div>`).join("")}
@@ -5440,6 +5454,16 @@ VGROUPS.find(g => g[0]==="General")[1].push(["Pre-op decide (v2.140)", "25 Nov 2
   "RSI: suggested on the airway card and labelled in Plan & consent, never pre-ticked; note reads \"RSI suggested\"",
   "Which tests: \"Not routinely\" (NG45 wording) for No / Not needed",
   "Optimise or postpone: Defer and treat (BP, ketones / DKA, MI, stent, stroke, active cardiac, chest infection) vs Correct or optimise first (HbA1c, K, Na, anaemia, platelets / INR); no threshold changed"]]);
+VGROUPS.find(g => g[0]==="General")[1].push(["Pre-op medicines (v2.141)", "25 Nov 2026", [
+  "ACEi / ARB, diuretics: usually omit the morning dose; consider continuing for heart failure or hard-to-control BP (ACC/AHA 2024). Sulfonylureas: omit morning (unchanged)",
+  "Insulin pump: short procedure, ≤ 1 missed meal, patient able and local policy allows — keep the basal rate; otherwise VRIII started before the pump comes off; diabetes team; type 1 never without basal insulin (CPOC 2021)",
+  "Known adrenal insufficiency (Addison's, hypopituitarism, CAH): always cover, whatever the dose; endocrinology (Association of Anaesthetists 2020). Doses unchanged"]]);
+VGROUPS.find(g => g[0]==="General")[1].push(["Block finder roles (v2.142)", "25 Nov 2026", [
+  "\"First choice\" removed (it came only from list order)",
+  "Can be surgical: interscalene, supraclavicular, infraclavicular, axillary, wrist, ankle, thoracic paravertebral; femoral (with sciatic); popliteal sciatic (+ saphenous); LFCN (skin only)",
+  "Supplementary: superficial cervical plexus, obturator, iPACK",
+  "Analgesia: fascia iliaca, PENG, adductor canal, genicular, suprascapular, ESP, serratus, PECS II, rectus sheath, TAP, QL, ilioinguinal / iliohypogastric",
+  "Misses line shown in the Finder row (same data as the block card); figure captions say schematic, not exact boundaries or guaranteed spread"]]);
 VGROUPS.find(g => g[0]==="General")[1].push(["Induction drugs & relaxants combined", "22 Nov 2026", [
   "Adult: General › Induction › 1. Induction drugs & relaxants — Opioid · Hypnotic · Muscle relaxant · No IV access (rows moved unchanged)",
   "Paeds: Paediatric › Induction › 3. Induction drugs & relaxants — Anticholinergic · Opioid · Hypnotic · Muscle relaxant · No IV access (rows moved unchanged)",
@@ -5522,6 +5546,8 @@ function vTicks(){
 }
 /* ---------- ABOUT ---------- */
 const CHANGES = [
+  ["2.142","Block finder: no more \"First choice\" label; each block shows its role (Can be surgical, Analgesia or Supplementary) and its Misses line; the figure is labelled schematic; more search spellings (caesarean, c-section, fistula, wrist fracture). (checked)"],
+  ["2.141","Regular drugs: ACEi / ARB and diuretics — usually omit the morning dose, consider continuing for heart failure or hard-to-control BP. Diabetes: insulin pump line. Steroid cover: known adrenal insufficiency always gets cover. (checked)"],
   ["2.140","Airway card: GLP-1 counts as an aspiration risk only with GI symptoms, dose escalation or another slow-emptying cause; RSI is suggested, no longer pre-ticked in Plan & consent. Which tests: \"Not routinely\" instead of No / Not needed. Optimise or postpone: two groups — Defer and treat; Correct or optimise first (thresholds unchanged). (checked)"],
   ["2.139","Pre-op scores: RCRI and STOP-BANG show only \"score so far\" until every item is answered (or Rest are No). Airway card: a few normal findings now read \"Partial assessment\"; Routine and \"no predictors\" appear only after you tap No predictors found. (checked)"],
   ["2.138","Femoral, fascia iliaca, PENG, adductor canal, ESP, serratus anterior, rectus sheath and TAP: a Misses row — what each block does not reliably cover. (checked)"],
