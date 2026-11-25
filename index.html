@@ -825,7 +825,7 @@ if (window.top !== window.self && /\.github\.io$/.test(location.hostname)) {
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.147.1";
+const APP_VERSION = "2.148.1";
 const APP_DATE = "25 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
@@ -2694,7 +2694,14 @@ function gzText(){ const g = S.gz || {}, a = numV(g, "now"), t = numV(g, "tgt"),
   if (t <= a) return `<div class="warn">Target is at or below Hb now.</div>`;
   if (sm) return `<p class="sub">Enter the weight in the patient box first.</p>`;
   const mg = (t - a)*2.4*w + 500;
-  return `<div class="result"><b>Total iron ≈ ${dz(mg, "mg")} mg</b> <span class="sub">= (${t} − ${a}) × 2.4 × ${sig(w)} kg + 500</span><div class="sub">Maximum single infusion 20 mg/kg = ${dz(20*w, "mg")} mg (iron sucrose 7 mg/kg = ${dz(7*w, "mg")} mg) — split if needed. Check the product's own label.</div></div>`; }
+  const P = [["Iron sucrose (Venofer)", "100 mg/5 mL", Math.min(7*w, 500), "weekly (max 500 mg a week)", "NaCl 0.9% only. Push 100 mg over 5 min, 200 mg over 10 min; infusion 200 mg / 30 min · 300 mg / 1½ h · 400 mg / 2½ h · 500 mg / 3½ h"],
+    ["Ferric carboxymaltose (Ferinject)", "500 mg/10 mL", Math.min(20*w, 1000), "weekly (max 1000 mg a week)", "NaCl 0.9% only. 100–200 mg in 50 mL; 200–500 mg in 100 mL over > 6 min; 500–1000 mg in 250 mL over > 15 min. Injection max 15 mg/kg"],
+    ["Ferric derisomaltose (Monofer)", "100 mg/mL", 20*w, "split ≥ 1 week apart", "Infusion ≤ 1000 mg over > 15 min; > 1000 mg over ≥ 30 min. Bolus ≤ 500 mg up to 3 times a week (250 mg/min)"],
+    ["LMW iron dextran (Cosmofer)", "50 mg/mL", 20*w, "split ≥ 1 week apart", "In 500 mL NaCl 0.9%: <b>first 25 mg over 15 min</b>, then the rest over 4–6 h"]];
+  const rows = P.map(([n, c, mx, sp, how]) => { const per = Math.floor(mx/10)*10, k = Math.ceil(mg / per);
+    return `<tr><th>${n}<div class="sub">${c}</div></th><td>Max per dose <b>${per} mg</b>${k > 1 ? ` → <b>${k} doses</b>, ${sp}` : " → one dose"}<div class="sub">${how}</div></td></tr>`; }).join("");
+  return `<div class="result"><b>Total iron ≈ ${dz(mg, "mg")} mg</b> <span class="sub">= (${t} − ${a}) × 2.4 × ${sig(w)} kg + 500</span><div class="sub">Maximum single infusion 20 mg/kg = ${dz(20*w, "mg", 20*w)} mg (iron sucrose 7 mg/kg = ${dz(7*w, "mg", 7*w)} mg) — split if needed. Check the product's own label.</div></div>
+    <table class="ivfe">${rows}</table><p class="sub">Maximum per dose rounded down to 10 mg. Avoid "iron sucrose similars" (non-Venofer generics): effect and safety may differ. Source: MOH PBM 2024, Appendix 1 (Table 1.4).</p>`; }
 // 8. Fluid management
 function fbBalance(){ const f = S.fbal || {}, v = k => numV(f, k), ins = ["crys", "coll", "bld"], outs = ["ebl", "uo", "oth"];
   const bad = [...ins, ...outs].filter(k => v(k) != null && (isNaN(v(k)) || v(k) < 0 || v(k) > 50000));
@@ -5687,6 +5694,11 @@ VGROUPS.find(g => g[0]==="General")[1].push(["MOH PBM 2024, other modules (v2.14
   "Paeds MOH: Hb 70–90 g/L symptom-based, > 90 usually unnecessary; platelets ≥ 50 for invasive procedures; FFP only for bleeding with coagulopathy; volume factor 4 (existing card agrees)",
   "Aspirin: kept at 7 days for closed-space surgery (author's choice); MOH day −3 to +7 noted. Ganzoni: (target − Hb) × 2.4 × kg + 500; max 20 mg/kg per infusion (iron sucrose 7 mg/kg)",
   "Author asked for this to go live without a draft step"]]);
+VGROUPS.find(g => g[0]==="General")[1].push(["IV iron products (v2.148)", "25 Nov 2026", [
+  "Iron sucrose (Venofer) 100 mg/5 mL: 7 mg/kg, max 500 mg a week; push 100 mg/5 min, 200 mg/10 min; infusion 200 mg/30 min to 500 mg/3½ h",
+  "Ferric carboxymaltose (Ferinject) 500 mg/10 mL: 20 mg/kg, max 1000 mg a week (injection 15 mg/kg); dilution volumes by dose",
+  "Ferric derisomaltose (Monofer) 100 mg/mL: 20 mg/kg per infusion; > 1000 mg over ≥ 30 min; split ≥ 1 week if more",
+  "LMW iron dextran (Cosmofer) 50 mg/mL: 20 mg/kg; first 25 mg over 15 min, rest over 4–6 h; split ≥ 1 week if more. Source: MOH PBM 2024 Appendix 1 Table 1.4. Author asked for this to go live without a draft step"]]);
 VGROUPS.find(g => g[0]==="General")[1].push(["Induction drugs & relaxants combined", "22 Nov 2026", [
   "Adult: General › Induction › 1. Induction drugs & relaxants — Opioid · Hypnotic · Muscle relaxant · No IV access (rows moved unchanged)",
   "Paeds: Paediatric › Induction › 3. Induction drugs & relaxants — Anticholinergic · Opioid · Hypnotic · Muscle relaxant · No IV access (rows moved unchanged)",
@@ -5769,6 +5781,7 @@ function vTicks(){
 }
 /* ---------- ABOUT ---------- */
 const CHANGES = [
+  ["2.148","IV iron calculator: the four IV irons available in Malaysia (iron sucrose, ferric carboxymaltose, ferric derisomaltose, LMW iron dextran — generic and brand) with the maximum per dose for this patient, how many doses the total needs, and how to give each (MOH PBM 2024 Appendix 1). (checked)"],
   ["2.147","More from the MOH Patient Blood Management consensus 2024: Massive obstetric haemorrhage gets product triggers and doses (FFP 15 mL/kg, platelets 1 adult dose, cryo 1 unit/10 kg); Blood management — cryo 1 unit/10 kg and Hb targets for special groups (ACS, TBI, SAH, stroke, sepsis); Paeds transfusion — MOH points; Anticoagulants — MOH agreement noted (aspirin stays 7 days); Optimise or postpone — IV iron (Ganzoni) calculator. (checked)"],
   ["2.146","Blood management now follows the MOH Malaysia Patient Blood Management consensus (March 2024): major haemorrhage definition, MTP / T-MTP pack and targets, blood loss visual guide, red cell and platelet points, adjuncts and reversal; EBV 70 mL/kg. Tranexamic acid: before incision if expected loss > 500 mL. Which tests: ferritin and group, screen & hold for major surgery. Optimise or postpone: anaemia — wait 4 weeks to treat. (checked)"],
   ["2.145","General › Intra-op: three new adult cards under Circulation & physiology — 8. Fluid management (maintenance estimate, fluid challenge, which fluid, running balance), 10. Blood management (major haemorrhage box, EBV, allowable blood loss, thresholds, products), 11. ABG analysis (step-by-step acid–base, anion gap, compensation, P/F and A–a). Vasopressors now 9, one-lung ventilation 12. (checked)"],
