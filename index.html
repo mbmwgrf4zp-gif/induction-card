@@ -231,7 +231,7 @@ header h1{font-size:var(--fs-lg);font-weight:700;margin:0;flex:1;display:flex;al
 .trio span.main{border:2px solid var(--gc);color:var(--ink);font-weight:800}
 .src{color:var(--muted);font-size:var(--fs-xs);margin-top:var(--s3);line-height:1.4}
 .warn,.danger,.unv{border-radius:var(--r-sm);padding:var(--s2) var(--s3);margin:var(--s2) 0;font-size:var(--fs-sm);line-height:1.45}
-.warn{background:var(--warn-bg);color:var(--warn-ink);border:1px solid var(--warn-line)}
+.warn{background:var(--warn-bg);color:var(--warn-ink);border:1px solid var(--warn-line)}.nxesc{margin-top:var(--s3);padding:var(--s3);border:1px solid var(--danger-line,var(--line));border-left:4px solid var(--danger-ink);border-radius:var(--r-sm)}.nxesc ul{margin:0 0 var(--s2)}
 .danger{background:var(--danger-bg);color:var(--danger-ink);border:1px solid var(--danger-line);font-weight:400}
 .unv{background:var(--unv-bg);color:var(--unv-ink);border:1px dashed var(--line)}
 .unv b{letter-spacing:.03em}
@@ -825,7 +825,7 @@ if (window.top !== window.self && /\.github\.io$/.test(location.hostname)) {
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.135.1";
+const APP_VERSION = "2.136.1";
 const APP_DATE = "25 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
@@ -3940,6 +3940,19 @@ raCards.sbyb = () => `<div class="card"><h2>Stop Before You Block &amp; safe inj
   ${src("RCoA / RA-UK Stop Before You Block; Association of Anaesthetists LAST.")}</div>`;
 
 /* NEURAXIAL */
+// v2.136 neuraxial "When to escalate": shared by Epidural, CSE and Failed / patchy block
+const NEURAX_ESC_CHECKED = true;   // checked by author 25 Nov 2026;
+const neuraxEsc = () => `<div class="nxesc">${NEURAX_ESC_CHECKED ? "" : `<div class="warn" style="margin-top:0">DRAFT — When to escalate (v2.136). Compare with your references before use.</div>`}<h3 style="margin-top:0">When to escalate</h3>
+  <p class="sub"><b>Expected:</b> numbness and leg weakness within the planned levels that wear off as the drug should; some hypotension; itch or urinary retention with neuraxial opioid.</p>
+  <p style="margin:var(--s2) 0 var(--s1)"><b>Urgent review now — don't wait for it to wear off:</b></p>
+  <ul><li>New, increasing or one-sided leg weakness, or a dense motor block on a low-dose analgesic infusion</li>
+  <li>A block lasting longer than the drug should</li>
+  <li>Severe or increasing back pain, or tenderness at the insertion site</li>
+  <li>New bladder or bowel problems, or saddle numbness</li>
+  <li>Fever with back pain or new neurology (abscess)</li></ul>
+  <p><b>Do:</b> stop the infusion · examine (Bromage, sensory level) · senior anaesthetist now · <b>urgent MRI spine</b> · call neurosurgery at once if haematoma or abscess is suspected — recovery is best with decompression within 8 h · hold anticoagulants; check clotting and platelets.</p>
+  <p><b>Emergency:</b> block rising with arm weakness, breathlessness, bradycardia, hypotension or falling consciousness → <button class="rellink" data-id="emerg-adult-high-total-spinal">⚠ High / total spinal ›</button></p>
+  ${src("ASRA antithrombotic guideline (Horlocker et al., RAPM 2018): neuraxial haematoma — MRI and decompression, best recovery within 8 h. FPM / RCoA: Best practice in the management of epidural analgesia in the hospital setting. RCoA NAP3 (2009): major complications of central neuraxial block.")}</div>`;
 raCards.epidural = () => `<div class="card"><h2>Epidural (adult)</h2>${raDraft()}
   <table class="blk"><tr><th>Level</th><td>Thoracotomy / upper abdo: T4–T10 · lower abdo: T10–L1 · lower limb: L2–L4</td></tr>
   <tr><th>Catheter</th><td>4–5 cm in the space</td></tr>
@@ -3949,12 +3962,12 @@ raCards.epidural = () => `<div class="card"><h2>Epidural (adult)</h2>${raDraft()
     R("Loading — levobupi 0.25%","3–5 mL increments","~1–1.5 mL per segment thoracic, 1.5–2 mL lumbar",null,"epidural"),
     R("Surgical top-up — levobupi 0.5% or lignocaine 2% + adrenaline","","5 mL increments",null,"epidural"),
     R("Infusion — bupi/levobupi 0.1% + fentanyl 2 mcg/mL","","thoracic 4–10 mL/h · lumbar 6–14 mL/h",null,"epidural"),
-    R("Breakthrough","check block and BP","3–5 mL bolus",null,"epidural")])}${src("Common acute pain service practice.")}</div>`;
+    R("Breakthrough","check block and BP","3–5 mL bolus",null,"epidural")])}${src("Common acute pain service practice.")}${neuraxEsc()}</div>`;
 raCards.cse = () => `<div class="card"><h2>CSE (combined spinal–epidural)</h2>${raDraft()}
   <ul><li>When: long or uncertain duration, high-risk patient needing slow titration, post-op epidural analgesia</li>
   <li>Needle-through-needle at L3–4 or below; spinal first, then thread epidural catheter</li>
   <li>Spinal dose can be reduced (e.g. heavy bupi 1.5–2.5 mL) and extended via the epidural</li>
-  <li>Catheter can pass through the dural hole: test carefully, give top-ups in small increments</li></ul>${src(RSRC)}</div>`;
+  <li>Catheter can pass through the dural hole: test carefully, give top-ups in small increments</li></ul>${src(RSRC)}${neuraxEsc()}</div>`;
 raCards.pdph = () => `<div class="card"><h2>Post-dural puncture headache</h2>${raDraft()}
   ${updNote("2024 multisociety PDPH guideline","ASRA announcement + AAFP practice-guideline summary")}
   <ul><li>Suspect PDPH with any headache or neurological symptom <b>within 5 days</b> of a neuraxial procedure (typically worse upright)</li>
@@ -3969,7 +3982,7 @@ raCards.pdph = () => `<div class="card"><h2>Post-dural puncture headache</h2>${r
   <p><b>SPG block</b> (diagnosis established, CT brain to exclude other pathology): supine, neck extended; cotton-tipped applicator soaked in <b>lignocaine 2%</b> into each nostril, slightly cephalad until resistance; drip 1–2 mL more; leave 10–15 min; watch for LA toxicity; may repeat after 24 h; if no lasting relief after 2 → blood patch.</p>${protoSrc()}</div>`;
 raCards.failed = () => `<div class="card"><h2>Failed or patchy block</h2>${raDraft()}
   <h3>Spinal</h3><ul><li>Wait 10–15 min; check level with cold and touch</li><li>Hyperbaric: tilt to encourage spread</li><li>Options: supplement with local infiltration / analgesia, repeat spinal with reduced dose (count total LA), or convert to GA</li></ul>
-  <h3>Epidural</h3><ul><li>Unilateral: withdraw catheter 1–2 cm, top up with patient lying on the weak side</li><li>Patchy: stronger LA (0.5% levobupi or 2% lignocaine + adrenaline)</li><li>No block after adequate dose: re-site, or GA</li></ul>${src(RSRC)}</div>`;
+  <h3>Epidural</h3><ul><li>Unilateral: withdraw catheter 1–2 cm, top up with patient lying on the weak side</li><li>Patchy: stronger LA (0.5% levobupi or 2% lignocaine + adrenaline)</li><li>No block after adequate dose: re-site, or GA</li></ul>${src(RSRC)}${neuraxEsc()}</div>`;
 raCards.adjuncts = () => { const x = wts();
   return `<div class="card"><h2>Adjuncts</h2>${raDraft()}
   ${f2Draft()}${GT([
@@ -5376,6 +5389,11 @@ VGROUPS.find(g => g[0]==="General")[1].push(["Joints on a skeleton (v2.135)", "2
   "Chosen joint: its nerves' skin areas shaded in their nerve-map colours; NYSORA Tables 5–6 names, each with its colour dot (hollow = not on the map; sciatic = common peroneal + tibial)",
   "Blocks that cover each joint (draft): shoulder — interscalene, suprascapular + axillary; elbow, forearm, wrist — supraclavicular, infraclavicular, axillary; hand — plus wrist block; hip — PENG, fascia iliaca; knee — adductor canal, iPACK, genicular, femoral; ankle — popliteal sciatic + saphenous; foot — ankle block, popliteal sciatic",
   "Full joints table kept, folded under the picture"]]);
+VGROUPS.find(g => g[0]==="General")[1].push(["Neuraxial: when to escalate (v2.136)", "25 Nov 2026", [
+  "Shared box on Epidural, CSE and Failed or patchy block: expected effects; urgent red flags (new / increasing / one-sided weakness, dense block on a low-dose infusion, block outlasting the drug, severe back pain, bladder / bowel / saddle, fever with neurology)",
+  "Action: stop infusion, examine, senior now, urgent MRI, neurosurgery at once if haematoma or abscess suspected (best within 8 h), hold anticoagulants",
+  "No observation period before escalating; emergency → existing High / total spinal card (not copied)",
+  "Sources: ASRA antithrombotic guideline (RAPM 2018); FPM / RCoA epidural best practice; RCoA NAP3 (2009)"]]);
 VGROUPS.find(g => g[0]==="General")[1].push(["Induction drugs & relaxants combined", "22 Nov 2026", [
   "Adult: General › Induction › 1. Induction drugs & relaxants — Opioid · Hypnotic · Muscle relaxant · No IV access (rows moved unchanged)",
   "Paeds: Paediatric › Induction › 3. Induction drugs & relaxants — Anticholinergic · Opioid · Hypnotic · Muscle relaxant · No IV access (rows moved unchanged)",
@@ -5458,6 +5476,7 @@ function vTicks(){
 }
 /* ---------- ABOUT ---------- */
 const CHANGES = [
+  ["2.136","Epidural, CSE and Failed or patchy block: a When to escalate box — expected effects, red flags needing urgent review (MRI, neurosurgery), and a link to High / total spinal. (checked)"],
   ["2.135","Block finder › Joints: a skeleton under a see-through body — tap a joint to light up the nerves that supply it and see the blocks that cover it. Each nerve name has its own colour dot (hollow = not on the nerve map); the full table is folded below. (checked)"],
   ["2.134","Antibiotic prophylaxis cards (adult and paeds): Timing & redosing and Endocarditis are now the first two tabs, before the specialties; the card opens on Timing. Cards 7a and 7b are gone. Searching redose or endocarditis opens that tab. (checked)"],
   ["2.133","Antibiotic timing & redosing and Endocarditis prophylaxis are now their own cards (General › Intra-op 7a, 7b), shown once — no longer under every procedure (checked)"],
