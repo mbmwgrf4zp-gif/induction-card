@@ -791,6 +791,9 @@ details.bfb[open]>summary{margin-bottom:4px}details.bfb .bfo{margin-top:4px}deta
 .bfsidepick{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.bfsidepick span{font-weight:600}.bfsidepick button{min-height:40px;padding:0 16px;border-radius:999px;border:1px solid var(--line);background:var(--card);color:var(--ink);font-weight:600}
 .bfops{margin:0 0 var(--s2)}.bfops .searchbox{margin:0}#bfopsr{display:grid;gap:4px;margin-top:4px}.bfopb{text-align:left;min-height:44px;padding:6px 12px;border-radius:var(--r-sm);border:1px solid var(--line);background:var(--card);color:var(--ink);font:inherit}
 .bfquiet{justify-content:flex-end!important;gap:6px!important}.bfsep{color:var(--muted)}
+.tpick{display:grid;gap:4px;margin:var(--s2) 0}.tlab{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin-top:6px}.tpick .seg{margin:0}.tpick .seg small{display:block;font-weight:400;font-size:12px;color:var(--muted)}.tpick .seg button[aria-pressed="true"] small{color:inherit;opacity:.85}
+.tticks{display:flex;flex-wrap:wrap;gap:6px}.tck{min-height:40px;padding:0 12px;border-radius:999px;border:1px solid var(--line);background:var(--card);color:var(--ink);font-size:14px}.tck[aria-pressed="true"]{border-color:var(--gc);background:var(--gc-soft);font-weight:600}
+.tres{border:1px solid var(--line);border-radius:var(--r-sm);padding:var(--s3);display:grid;gap:8px;margin:var(--s2) 0}.trow{display:grid;grid-template-columns:96px 1fr;gap:8px}.trow small{color:var(--muted)}.t-yes b{color:var(--ok-ink,#166534)}.t-consider b{color:var(--warn-ink,#92400e)}.t-no{color:var(--muted)}.tbtns{display:flex;gap:8px;flex-wrap:wrap}
 .bfpanel{display:grid;gap:8px;margin:var(--s2) 0}.bfpanel:empty{display:none}.bfside{margin:0;color:var(--danger-ink);font-weight:600;font-size:14px}
 .bfb{border-radius:var(--r-sm);padding:10px 12px;background:var(--bg);display:grid;gap:2px}.bfb.first{background:var(--gc-soft)}
 .bftag{font-size:13px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--gc)}
@@ -810,7 +813,7 @@ if (window.top !== window.self && /\.github\.io$/.test(location.hostname)) {
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.126.1";
+const APP_VERSION = "2.127.1";
 const APP_DATE = "25 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
@@ -3058,8 +3061,46 @@ gaCards.echo = () => `<div class="card"><h2>Echo report: what matters</h2>${echo
   <p class="sub">Severe lesion → arterial line before induction; cardiac-output monitor or TOE if available for major surgery. Valve severity is graded on several measures together — read the report's conclusion.</p>
   <button class="homebtn" data-open="6. Vasopressors & inotropes" data-g="ga" data-tab="maint">Pressor and inotrope doses → General › Intra-op ›</button>
   ${src("ASE/EACVI chamber quantification 2015 and diastolic function 2016; ASE valvular regurgitation 2017; ACC/AHA valvular heart disease 2020; ESC/ERS pulmonary hypertension 2022; ESC 2022 / ACC-AHA 2024 perioperative guidelines; BJA Education reviews.")}</div>`;
-gaCards.tests = () => { const a = +S.asa || 0, col = a>=3 ? 3 : a===2 ? 2 : a===1 ? 1 : 0, h = i => col===i ? ' class="hl"' : "";
+// v2.127: answers for this patient from NICE NG45 (adults); the full table stays below
+const TESTS_CHECKED = true;   // checked by author 25 Nov 2026;
+const TK = [["heart", "Heart disease"], ["renal", "Kidney disease / AKI risk"], ["dm", "Diabetes"], ["liver", "Liver disease or on an anticoagulant"], ["noecg", "No ECG in the last 12 months"], ["resp", "Respiratory disease"]];
+function testPlan(){ const z = S.tSize, a = +S.asa || 0, g = a >= 3 ? 3 : a, t = k => !!(S.tk || {})[k], old = S.age > 65, out = [];   // [test, "yes" | "consider" | "no", reason]
+  if (!z || !a) return null;
+  const add = (n, v, r) => out.push([n, v, r || ""]);
+  if (z === "minor"){ add("ECG", g >= 3 && t("noecg") ? "consider" : "no", "ASA 3–4, no ECG in 12 months"); add("Renal profile", g >= 3 && t("renal") ? "consider" : "no", "ASA 3–4, AKI risk"); add("FBC", "no"); add("Coagulation", "no"); }
+  if (z === "inter"){ add("FBC", g >= 3 && (t("heart") || t("renal")) ? "consider" : "no", "ASA 3–4, heart or kidney disease with new symptoms");
+    add("Renal profile", g >= 3 ? "yes" : g === 2 && t("renal") ? "consider" : "no", g === 2 ? "AKI risk" : "");
+    add("ECG", g >= 3 ? "yes" : g === 2 && (t("heart") || t("renal") || t("dm")) ? "consider" : "no", g === 2 ? "heart, kidney disease or diabetes" : "");
+    add("Coagulation", g >= 3 && t("liver") ? "consider" : "no", "ASA 3–4, liver disease or anticoagulant");
+    if (g >= 3 && t("resp")) add("Lung function / ABG", "consider", "ASA 3–4 with respiratory disease, on senior advice"); }
+  if (z === "major"){ add("FBC", "yes"); add("Renal profile", g >= 2 ? "yes" : t("renal") ? "consider" : "no", g === 1 ? "AKI risk" : "");
+    add("ECG", g >= 2 ? "yes" : old && t("noecg") ? "consider" : "no", g === 1 ? "age over 65 and no ECG in 12 months" : "");
+    add("Coagulation", g >= 3 && t("liver") ? "consider" : "no", "ASA 3–4, liver disease or anticoagulant");
+    if (g >= 3 && t("resp")) add("Lung function / ABG", "consider", "ASA 3–4 with respiratory disease, on senior advice"); }
+  if (t("dm")) add("HbA1c", "yes", "diabetes — if none in the last 3 months");
+  return out; }
+function testText(pl){ const y = pl.filter(r => r[1] === "yes").map(r => r[0]), c = pl.filter(r => r[1] === "consider").map(r => `${r[0]} (${r[2]})`);
+  return `Tests (NICE NG45): ${y.length ? y.join(", ") : "none routinely"}${c.length ? "; consider " + c.join(", ") : ""}`; }
+const gLink = (t, txt) => { const e = findEntry(CARD_IDS[t]); return e ? `<button class="rellink" data-id="${e.id}" data-open="${esc(e.label)}" data-g="${e.g}" data-tab="${e.tab}">${txt || esc(t)} ›</button>` : ""; };
+gaCards.tests = () => { const a = +S.asa || 0, col = a>=3 ? 3 : a===2 ? 2 : a===1 ? 1 : 0, h = i => col===i ? ' class="hl"' : "", pl = testPlan(), tk = S.tk || {};
+  const chip = (k, v, l) => `<button aria-pressed="${S[k] === v}" data-seg="${k}" data-val="${v}">${l}</button>`;
   return `<div class="card"><h2>Which tests to order</h2>${preDraft()}
+  ${TESTS_CHECKED ? "" : `<div class="warn" style="margin-top:0">DRAFT — patient picker (v2.127). Compare with NICE NG45 and your local policy before use.</div>`}
+  <p class="sub">Adults (NICE NG45 is for over-16s). Pick the surgery size and ASA; tick what applies.</p>
+  <div class="tpick"><div class="tlab">Surgery</div><div class="seg">${chip("tSize", "minor", "Minor<small>skin lesion, breast abscess</small>")}${chip("tSize", "inter", "Intermediate<small>hernia, tonsils, knee arthroscopy</small>")}${chip("tSize", "major", "Major<small>hysterectomy, colectomy, joint replacement, thyroid</small>")}</div>
+  <div class="tlab">ASA</div><div class="seg">${["1", "2", "3", "4"].map(v => `<button aria-pressed="${String(S.asa) === v}" data-seg="asa" data-val="${v}">${v}</button>`).join("")}</div>
+  <div class="tlab">Applies to this patient</div><div class="tticks">${TK.map(([k, l]) => `<button class="tck" aria-pressed="${!!tk[k]}" data-tk="${k}">${tk[k] ? "✓ " : ""}${l}</button>`).join("")}</div>
+  <p class="sub" style="margin:4px 0 0">Age ${S.age} from the patient box${S.age > 65 ? " (over 65)" : ""}.</p></div>
+  ${pl ? `<div class="tres">${[["yes", "Order"], ["consider", "Consider"], ["no", "Not needed"]].map(([v, l]) => { const rs = pl.filter(r => r[1] === v); return rs.length ? `<div class="trow t-${v}"><b>${l}</b><span>${rs.map(r => v === "consider" ? `${r[0]} <small>(${r[2]})</small>` : r[0]).join(" · ")}</span></div>` : ""; }).join("")}
+    <div class="tbtns"><button class="iconbtn" data-copy="${esc(testText(pl))}">${S.copied ? "Copied ✓" : "Copy"}</button><button class="iconbtn" data-tnote="${esc(testText(pl))}">${S.tNoted ? "✓ Added to pre-op note" : "Add to pre-op note"}</button></div></div>`
+    : `<p class="sub"><b>Pick the surgery size${a ? "" : " and ASA"}</b> to see the list.</p>`}
+  <ul><li><b>HbA1c:</b> known diabetes if none in the last 3 months; not for non-diabetics</li><li><b>Echo:</b> murmur with cardiac symptoms, or signs of heart failure — not routine</li>
+  <li><b>CXR, urine dipstick:</b> not routine</li><li><b>Lung function / ABG:</b> ASA 3–4 with respiratory disease, on senior advice</li><li><b>Pregnancy test:</b> ask every woman of child-bearing age on the day; test with consent if any doubt</li>
+  <li><b>Group &amp; screen / crossmatch:</b> by expected blood loss and local blood-ordering schedule</li>
+  <li><b>Thalassaemia trait</b> is common locally (NG45 advises against routine sickle cell / thalassaemia testing): check the FBC indices if anaemia is known</li>
+  <li><b>Children:</b> no routine tests for healthy children (NG45 covers adults). <b>Obstetric:</b> follow the obstetric cards and local policy.</li></ul>
+  ${gLink("Echo report: what matters", "Reading an echo report")}${tk.liver ? gLink("Neuraxial & deep blocks: anticoagulant timing", "Anticoagulant timing") : ""}
+  <details class="ndet"><summary>Full NG45 table</summary>
   <p class="sub">${col?`Column for ASA ${S.asa} is highlighted.`:"Choose the ASA grade (card 1) to highlight a column."} "Consider" = only if the reason in brackets applies.</p>
   <div style="overflow-x:auto"><table><tr><th>Surgery</th><th>Test</th><th${h(1)}>ASA 1</th><th${h(2)}>ASA 2</th><th${h(3)}>ASA 3–4</th></tr>
   <tr><td rowspan="2"><b>Minor</b><div class="sub">skin lesion, breast abscess</div></td><td>ECG</td><td${h(1)}>No</td><td${h(2)}>No</td><td${h(3)}>Consider (none in 12 months)</td></tr>
@@ -3071,10 +3112,7 @@ gaCards.tests = () => { const a = +S.asa || 0, col = a>=3 ? 3 : a===2 ? 2 : a===
   <tr><td rowspan="4"><b>Major</b><div class="sub">hysterectomy, colectomy, joint replacement, thyroid</div></td><td>FBC</td><td${h(1)}><b>Yes</b></td><td${h(2)}><b>Yes</b></td><td${h(3)}><b>Yes</b></td></tr>
   <tr><td>Renal profile</td><td${h(1)}>Consider (AKI risk)</td><td${h(2)}><b>Yes</b></td><td${h(3)}><b>Yes</b></td></tr>
   <tr><td>ECG</td><td${h(1)}>Consider (age &gt; 65, none in 12 months)</td><td${h(2)}><b>Yes</b></td><td${h(3)}><b>Yes</b></td></tr>
-  <tr><td>Coagulation</td><td${h(1)}>No</td><td${h(2)}>No</td><td${h(3)}>Consider (liver disease, anticoagulant)</td></tr></table></div>
-  <ul><li><b>HbA1c:</b> known diabetes if none in the last 3 months; not for non-diabetics</li><li><b>Echo:</b> murmur with cardiac symptoms, or signs of heart failure — not routine</li>
-  <li><b>CXR, urine dipstick:</b> not routine</li><li><b>Lung function / ABG:</b> ASA 3–4 with respiratory disease, on senior advice</li><li><b>Pregnancy test:</b> ask every woman of child-bearing age on the day; test with consent if any doubt</li>
-  <li><b>Group &amp; screen / crossmatch:</b> by expected blood loss and local blood-ordering schedule</li></ul>
+  <tr><td>Coagulation</td><td${h(1)}>No</td><td${h(2)}>No</td><td${h(3)}>Consider (liver disease, anticoagulant)</td></tr></table></div></details>
   ${src("NICE NG45 Routine preoperative tests for elective surgery (2016, checked 2023). Follow local policy.")}</div>`; };
 /* summary at top of the Pre-op tab */
 function preSummary(){
@@ -5000,6 +5038,11 @@ VGROUPS.find(g => g[0]==="General")[1].push(["Paeds doses vs local manual & pain
 VGROUPS.find(g => g[0]==="General")[1].push(["Equipment sizes in rows", "23 Nov 2026", [
   "Tube ID and depth, supraglottic sizes, paeds tube / depth / suction / laryngoscope, neonate tube, NPA, bag, DLT size and depth, NG and CVC depth: same numbers, now in rows labelled 'Equipment' (test-checked)",
   "Size chips replaced by 'have X and Y ready'; lookup tables (HMEF, bag weight bands, LMA by weight, Storz, lung isolation by age) and ventilator settings unchanged"]]);
+VGROUPS.find(g => g[0]==="General")[1].push(["Which tests to order: patient picker (v2.127)", "25 Nov 2026", [
+  "Surgery size (minor / intermediate / major) + ASA + ticks give Order / Consider / Not needed, following NICE NG45 rows exactly; full table kept below",
+  "Diabetes adds HbA1c if none in 3 months; liver disease / anticoagulant adds coagulation (ASA 3–4) and a link to anticoagulant timing",
+  "Copy line and 'Add to pre-op note' (Investigations); links to the echo card",
+  "Local line: thalassaemia trait common — check FBC indices if anaemia is known (NG45 advises against routine testing); children: no routine tests"]]);
 VGROUPS.find(g => g[0]==="General")[1].push(["Myotomes: trunk (v2.126)", "25 Nov 2026", [
   "T2–T11 intercostal muscles (deep breath, cough) — chest wall; NYSORA names T3–T9 for the intercostal muscles; a high block weakens cough and deep breath, the diaphragm keeps breathing going",
   "T7–L1 abdominal wall (sit up, cough) — anterior rami T7–T12 and L1 (NYSORA); a high spinal or epidural relaxes it and weakens the cough",
@@ -5190,6 +5233,7 @@ function vTicks(){
 }
 /* ---------- ABOUT ---------- */
 const CHANGES = [
+  ["2.127","Which tests to order: pick surgery size, ASA and what applies — get Order / Consider / Not needed (NICE NG45), copy or add to the pre-op note (checked)"],
   ["2.126","Myotomes: thoracic levels added as two trunk groups — intercostals (T2–T11) and abdominal wall (T7–L1), marked not ASIA key muscles (checked)"],
   ["2.125","Block finder: operation search (TKA, mastectomy…), side buttons, shorter suggestion rows (tap for details), 'often used together' pairs with one-tap Add both, anticoagulant reminder on deep blocks, clearer paeds link (checked)"],
   ["2.124","Myotomes: Block finder › Myotomes (and Dermatomes card › Myotomes) shows the ASIA key muscle for each level and the diaphragm on the 3D body (checked)"],
@@ -6264,6 +6308,8 @@ document.addEventListener("click", e => {
   if (d.bfop){ const o = BF_OPS[+d.bfop]; S.bfq = ""; S.bf = {reg: o[1], side: ""}; S.bfList = false; BF.focus(S.bf); render(); return; }
   if (d.bfside){ if (S.bf){ S.bf = {reg: S.bf.reg, side: d.bfside}; BF.focus(S.bf); } render(); return; }
   if (d.addpair){ const lt = d.lt, k = laKey(lt); S[k] = S[k] || []; JSON.parse(d.addpair).forEach(it => S[k].push(it)); b.textContent = "✓ Added both"; setTimeout(render, 350); return; }
+  if (d.tk){ S.tk = {...(S.tk || {}), [d.tk]: !(S.tk || {})[d.tk]}; render(); return; }
+  if (d.tnote){ S.pnF = {...(S.pnF || {})}; const cur = (S.pnF.blood || "").trim(); if (!cur.includes(d.tnote)) S.pnF.blood = cur ? cur + "; " + d.tnote : d.tnote; S.tNoted = true; render(); setTimeout(() => { S.tNoted = false; }, 1500); return; }
   if (d.nerve){ const k = +d.nerve; S.nerve = S.nerve === k ? 0 : k; S.nerveLvl = -1; if (S.nerve && BF.st.ok && S.bfView === "nerve"){ const lb = k >= 20 ? "trunk" : k >= 10 ? "leg" : "arm", z = BF.st.nzone; if (!z || z.limb !== lb) BF.nerveZoom(lb, z ? z.s : 1); } render(); return; }   // a nerve button also zooms onto its limb
   if (d.bfreg){ S.bf = S.bf && S.bf.reg === d.bfreg && !S.bf.side ? null : {reg: d.bfreg, side: ""}; BF.focus(S.bf); render(); return; }
   if (d.bfturn){ BF.turn(); return; }
