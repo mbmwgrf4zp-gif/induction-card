@@ -825,7 +825,7 @@ if (window.top !== window.self && /\.github\.io$/.test(location.hostname)) {
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.145.1";
+const APP_VERSION = "2.146.1";
 const APP_DATE = "25 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
@@ -2657,7 +2657,7 @@ gaCards.optpost = () => `<div class="card"><h2>10. Optimise or postpone</h2>${aw
   <table>  <tr><th>HbA1c</th><td><b>≥ 69 mmol/mol (8.5%)</b>: refer to optimise first</td></tr>
   <tr><th>Potassium</th><td>&lt; 3.0 or &gt; 5.5 mmol/L: correct first <span class="sub">(common practice)</span></td></tr>
   <tr><th>Sodium</th><td>&lt; 130 or &gt; 150 mmol/L: investigate before major surgery <span class="sub">(common practice)</span></td></tr>
-  <tr><th>Anaemia</th><td>Hb <b>&lt; 13 g/dL</b> (men and women) before major surgery with expected blood loss &gt; 500 mL: investigate and treat <span class="sub">(WHO definition uses &lt; 12 g/dL for women; 13 avoids under-treating women)</span></td></tr>
+  <tr><th>Anaemia</th><td>Hb <b>&lt; 13 g/dL</b> (men and women) before major surgery with expected blood loss &gt; 500 mL: investigate and treat <span class="sub">(WHO definition uses &lt; 12 g/dL for women; 13 avoids under-treating women)</span><div class="medadd sub"><b>MOH PBM 2024:</b> postpone non-urgent elective surgery at least 4 weeks to investigate and treat; ferritin &lt; 100 µg/L with large expected loss → iron; cancer surgery: individualise the timing</div></td></tr>
   <tr><th>Platelets · INR</th><td>Platelets &lt; 50 ×10⁹/L or INR &gt; 1.5 for major surgery: correct / discuss. Neuraxial: Regional › Anticoagulant timing</td></tr></table>
   <div class="result" style="margin-top:var(--s2)">None of these: proceed with a plan — this is not a fitness certificate.</div>
   <h3>How to optimise</h3>
@@ -2723,7 +2723,7 @@ gaCards.fluids = () => { const x = wts(), sm = isSample("aw") || isSample("heigh
   ${src("NICE CG174 Intravenous fluid therapy in adults in hospital (2013, updated 2017); Myles et al. RELIEF, NEJM 2018; Surviving Sepsis Campaign 2021; ERAS Society guidance; Michard, dynamic indices of fluid responsiveness.")}</div>`; };
 
 // 10. Blood management
-function ablText(){ const x = wts(), male = S.sex === "M", ebv = (male ? 70 : 65) * x.tbw, b = S.blIn || {}, a = hbToGdl(numV(b, "now")), l = hbToGdl(numV(b, "low"));
+function ablText(){ const x = wts(), ebv = 70 * x.tbw, b = S.blIn || {}, a = hbToGdl(numV(b, "now")), l = hbToGdl(numV(b, "low"));
   if (a == null || l == null) return `<p class="sub">Enter Hb now and the lowest Hb you would accept for this patient.</p>`;
   if (isNaN(a) || isNaN(l) || a < 3 || a > 25 || l < 3 || l > 25) return `<div class="danger">Hb must be between 3 and 25 g/dL (30–250 g/L).</div>`;
   if (l >= a) return `<div class="warn">The lowest acceptable Hb is at or above Hb now — no allowable loss.</div>`;
@@ -2731,29 +2731,45 @@ function ablText(){ const x = wts(), male = S.sex === "M", ebv = (male ? 70 : 65
   return `<div class="result"><b>Allowable blood loss ≈ ${dz(abl, "mL")} mL</b> <span class="sub">= EBV × (Hb now − lowest) / Hb now</span><div class="sub">A planning estimate, not a transfusion trigger. Not valid in fast bleeding or haemodynamic instability.</div></div>`; }
 function abgForBlood(){ const g = S.abg || {}, p = [["hb", "Hb", hbU() === "gl" ? "g/L" : "g/dL"], ["lac", "Lactate", "mmol/L"], ["ph", "pH", ""], ["ica", "Ionised Ca", "mmol/L"], ["k", "K⁺", "mmol/L"]].filter(([k]) => numV(g, k) != null && !isNaN(numV(g, k)));
   return p.length ? `<p class="sub"><b>From the ABG card:</b> ${p.map(([k, l, u]) => `${l} ${numV(g, k)}${u ? " " + u : ""}`).join(" · ")} — for context only.</p>` : ""; }
-gaCards.blood = () => { const x = wts(), sm = isSample("aw") || isSample("sex"), male = S.sex === "M", ebv = (male ? 70 : 65) * x.tbw, w = x.tbw;
+gaCards.blood = () => { const x = wts(), sm = isSample("aw"), ebv = 70 * x.tbw, w = x.tbw;
   return `<div class="card"><h2>10. Blood management</h2>
-  <div class="danger" style="margin-top:0"><b>Major haemorrhage</b> (e.g. &gt; 150 mL/min, half the blood volume in 3 h, or shock with ongoing loss): call for help and <b>activate your hospital's major haemorrhage protocol</b>; tell the blood bank · control the bleeding (surgeon, pressure, radiology) · tranexamic acid early · warm everything · check ionised Ca, K⁺, pH, fibrinogen, platelets and clotting (point-of-care tests if available) · plasma and platelets alongside red cells, guided by results where possible.</div>
+  <div class="danger" style="margin-top:0"><b>Major haemorrhage</b>: bleeding ≥ 150 mL/min with SBP &lt; 90 and/or HR &gt; 110 · half the blood volume in 3 h · the whole blood volume in 24 h. Shock index (HR ÷ SBP) normally 0.5–0.7; rising = worse.
+    <br><b>Activate MTP</b> (specialist decides; a medical officer coordinates with the blood bank) · send 10 mL EDTA for GXM · baseline FBC, coagulation + fibrinogen, renal, liver, troponin, CK, blood gas · stop the bleeding (surgery, radiology) · warm everything.
+    <br><b>MTP pack:</b> 4 PRBC + 4 FFP + 4 cryo + 4 random platelets (or 1 apheresis) — 1:1:1:1; next pack prepared at once. <b>T-MTP:</b> you choose the products, guided by point-of-care tests.
+    <br><b>Every 30–60 min:</b> FBC, coagulation, ionised Ca, blood gas (TEG / ROTEM if available). <b>Aim:</b> normothermia · pH 7.35–7.45 · BE −2 to +2 · lactate ≤ 2 · iCa &gt; 1.1 · platelets &gt; 50 · PT / APTT &lt; 1.5 × normal · INR ≤ 1.5 · fibrinogen &gt; 1.5 g/L.
+    <br><span class="sub">Ready: safe group O on site · first-stage crossmatch ≤ 30 min · full crossmatch ≤ 45 min · FFP, cryo ≤ 30 min · platelets immediately (carried without ice). MOH PBM 2024 template — your hospital's pack may differ.</span></div></div>
   <h3>Estimated blood volume</h3>
-  <div class="result"><b>${sm ? "Enter sex and weight" : `EBV ≈ ${dz(ebv, "mL")} mL (${sig(ebv/1000)} L)`}</b> <span class="sub">${male ? 70 : 65} mL/kg × actual weight ${sig(x.tbw)} kg</span>
+  <div class="result"><b>${sm ? "Enter weight" : `EBV ≈ ${dz(ebv, "mL")} mL (${sig(ebv/1000)} L)`}</b> <span class="sub">70 mL/kg × actual weight ${sig(x.tbw)} kg (MOH PBM 2024)</span>
     <div class="sub">An estimate only.${x.bmi >= 30 ? " <b>Obese:</b> overestimates (fat holds little blood) — read it as an upper limit." : ""}</div></div>
   <h3>Allowable blood loss</h3>${hbSeg()}
   <div class="fbgrid">${numIn("bl", "now", "Hb now", hbU() === "gl" ? "g/L" : "g/dL")}${numIn("bl", "low", "Lowest acceptable Hb", hbU() === "gl" ? "g/L" : "g/dL")}</div>
-  <div id="blres">${sm ? `<p class="sub">Enter sex and weight in the patient box first.</p>` : ablText()}</div>
+  <div id="blres">${sm ? `<p class="sub">Enter weight in the patient box first.</p>` : ablText()}</div>
   <h3>Measuring loss</h3><ul><li>Suction volume minus irrigation; weigh swabs (1 g ≈ 1 mL); count packs</li><li>Watch the trend and the field, not one number; repeat Hb and gases while bleeding</li></ul>
+  <details class="ndet"><summary>Visual guide (MOH PBM 2024)</summary><table>
+    <tr><th>Gauze 7 × 7 cm</th><td>10 mL partly · 30 mL fully soaked</td></tr><tr><th>Abdominal pad 15 × 20 cm</th><td>50–100 mL</td></tr><tr><th>Gamgee 20 × 20 cm</th><td>250 mL</td></tr>
+    <tr><th>Maternity pad 21 × 7.5 cm</th><td>30–90 mL; with soaked sheet 150 mL</td></tr><tr><th>Kidney dish (full)</th><td>500 mL</td></tr><tr><th>Floor pool</th><td>≈ 50 cm across: 500 mL · ≈ 100 cm: 1500 mL</td></tr>
+    <tr><th>Closed fractures</th><td>Pelvis 2–4 L · femur 1–1.5 L · tibia or humerus 0.5–1 L · each rib 150 mL; one haemothorax 2 L; fist-sized haematoma 500 mL. Open fractures: up to double</td></tr></table></details>
   <h3>Red cells</h3><ul><li><b>Stable adults:</b> transfuse at Hb <b>&lt; 7 g/dL</b>; <b>&lt; 7.5</b> in cardiac surgery; <b>&lt; 8</b> in orthopaedic surgery or known cardiovascular disease (AABB 2023)</li>
     <li><b>Acute myocardial infarction:</b> a higher threshold may be safer (MINT 2023) — discuss</li>
-    <li>Hb alone is not the trigger: weigh ongoing loss, haemodynamics, signs of poor oxygen delivery and reserve. Stable patient: one unit, then reassess (≈ +1 g/dL in an average adult)</li></ul>
+    <li>Hb alone is not the trigger: weigh ongoing loss, haemodynamics, signs of poor oxygen delivery and reserve. Stable patient: one unit, then reassess (≈ +1 g/dL in an average adult)</li>
+    <li><b>MOH PBM 2024:</b> restrictive during surgery unless unstable; no transfusion at Hb ≥ 10; after surgery, Hb &gt; 8 usually needs none unless acute myocardial or cerebral ischaemia — then at Hb 7–10 give <b>one unit and reassess</b></li></ul>
   <h3>Products</h3><table>
     <tr><th>FFP</th><td>Bleeding with prolonged PT / INR (&gt; 1.5×): 15 mL/kg${sm ? "" : ` ≈ <b>${dz(15*w, "mL")} mL</b>`}</td></tr>
-    <tr><th>Platelets</th><td>One adult dose. Keep &gt; 50 ×10⁹/L when bleeding or for most surgery; &gt; 100 for neurosurgery, posterior eye surgery, or major trauma with head injury</td></tr>
-    <tr><th>Cryoprecipitate / fibrinogen</th><td>Fibrinogen &lt; 1.5 g/L with bleeding (obstetric targets: the obstetric card). Cryo about 1 unit per 5–10 kg — unit sizes vary; check with your blood bank. Fibrinogen concentrate where available</td></tr>
-    <tr><th>Tranexamic acid</th><td>See the Tranexamic acid card</td></tr>
+    <tr><th>Platelets</th><td>One adult dose. Keep &gt; 50 ×10⁹/L when bleeding or for most surgery; &gt; 100 for neurosurgery, posterior eye surgery, or major trauma with head injury. MOH: platelets ≥ 50 or INR ≤ 2 usually allow invasive procedures; ask haematology for intracranial, eye or neuraxial procedures, platelets &lt; 100 or coagulopathy</td></tr>
+    <tr><th>Cryoprecipitate / fibrinogen</th><td>Fibrinogen &lt; 1.5 g/L with bleeding (obstetric targets: the obstetric card). 4 units per MTP pack; aim fibrinogen &gt; 1.5 g/L. Fibrinogen concentrate where available</td></tr>
+    <tr><th>Tranexamic acid</th><td>Before incision if expected loss &gt; 500 mL — see the Tranexamic acid card</td></tr>
     <tr><th>Cell salvage</th><td>Where available, for expected large loss</td></tr>
     <tr><th>Viscoelastic tests</th><td>ROTEM / TEG where available, to target products</td></tr></table>
+  <details class="ndet"><summary>Adjuncts and reversal (MOH PBM 2024)</summary><ul>
+    <li><b>Calcium:</b> keep ionised Ca normal during massive transfusion (calcium chloride or gluconate)</li>
+    <li><b>Tranexamic acid</b> in trauma: 1 g over 10 min within 3 h of injury, then 1 g over 8 h</li>
+    <li><b>Desmopressin 0.3 mcg/kg</b>${sm ? "" : ` (= ${dz(0.3*w, "mcg")} mcg)`}: consider if bleeding on antiplatelet drugs, or von Willebrand disease</li>
+    <li><b>Warfarin</b>, life-threatening bleeding with INR ≥ 1.5: stop it; IV vitamin K and/or PCC and/or FFP</li>
+    <li><b>Reversal:</b> UFH, LMWH → protamine · fondaparinux → PCC · dabigatran → idarucizumab or PCC · rivaroxaban, apixaban → andexanet alfa or PCC</li>
+    <li>rFVIIa and PCC: not routine — only after conventional measures fail, or licensed uses; haematology advice</li></ul></details>
   ${abgForBlood()}
   ${gLinkId("ga-intra-abg-analysis", "ABG analysis")}${gLinkId("ga-intra-vasopressors-and-inotropes", "Vasopressors & inotropes")}${gLinkId("ga-intra-tranexamic-acid", "Tranexamic acid")}${gLinkId("emerg-adult-massive-obstetric-haemorrhage", "Obstetric: Massive obstetric haemorrhage")}
-  ${src("AABB red cell transfusion guideline (Carson et al., JAMA 2023); MINT trial (NEJM 2023); NICE NG24 Blood transfusion (2015); British Society for Haematology guidance; Malaysian National Blood Centre Transfusion Practice Guidelines. Follow your hospital's major haemorrhage protocol.")}</div>`; };
+  ${src("MOH Malaysia Consensus Statement on Patient Blood Management (March 2024): perioperative and massive haemorrhage modules. AABB red cell transfusion guideline (Carson et al., JAMA 2023); MINT trial (NEJM 2023); NICE NG24 Blood transfusion (2015); British Society for Haematology guidance; Malaysian National Blood Centre Transfusion Practice Guidelines. Follow your hospital's major haemorrhage protocol.")}</div>`; };
 
 // 11. ABG analysis — interpretation engine (no treatment advice)
 const ABG_F = [["ph", "pH", "", 6.5, 8.0, true], ["pco2", "PaCO₂", "mmHg", 5, 200, true], ["hco3", "HCO₃⁻", "mmol/L", 1, 70, true],
@@ -3250,7 +3266,7 @@ function testPlan(){ const z = S.tSize, a = +S.asa || 0, g = a >= 3 ? 3 : a, t =
     add("ECG", g >= 3 ? "yes" : g === 2 && (t("heart") || t("renal") || t("dm")) ? "consider" : "no", g === 2 ? "heart, kidney disease or diabetes" : "");
     add("Coagulation", g >= 3 && t("liver") ? "consider" : "no", "ASA 3–4, liver disease or anticoagulant");
     if (g >= 3 && t("resp")) add("Lung function / ABG", "consider", "ASA 3–4 with respiratory disease, on senior advice"); }
-  if (z === "major"){ add("FBC", "yes"); add("Renal profile", g >= 2 ? "yes" : t("renal") ? "consider" : "no", g === 1 ? "AKI risk" : "");
+  if (z === "major"){ add("FBC", "yes"); add("Serum ferritin", "yes"); add("Group, screen & hold", "yes");   // MOH PBM 2024: expected loss > 500 mL add("Renal profile", g >= 2 ? "yes" : t("renal") ? "consider" : "no", g === 1 ? "AKI risk" : "");
     add("ECG", g >= 2 ? "yes" : old && t("noecg") ? "consider" : "no", g === 1 ? "age over 65 and no ECG in 12 months" : "");
     add("Coagulation", g >= 3 && t("liver") ? "consider" : "no", "ASA 3–4, liver disease or anticoagulant");
     if (g >= 3 && t("resp")) add("Lung function / ABG", "consider", "ASA 3–4 with respiratory disease, on senior advice"); }
@@ -3274,6 +3290,7 @@ gaCards.tests = () => { const a = +S.asa || 0, col = a>=3 ? 3 : a===2 ? 2 : a===
   <ul><li><b>HbA1c:</b> known diabetes if none in the last 3 months; not for non-diabetics</li><li><b>Echo:</b> murmur with cardiac symptoms, or signs of heart failure — not routine</li>
   <li><b>CXR, urine dipstick:</b> not routine</li><li><b>Lung function / ABG:</b> ASA 3–4 with respiratory disease, on senior advice</li><li><b>Pregnancy test:</b> ask every woman of child-bearing age on the day; test with consent if any doubt</li>
   <li><b>Group &amp; screen / crossmatch:</b> by expected blood loss and local blood-ordering schedule</li>
+  <li class="medadd"><b>MOH PBM 2024:</b> major surgery (expected loss &gt; 500 mL) — FBC, serum ferritin and group, screen &amp; hold</li>
   <li><b>Thalassaemia trait</b> is common locally (NG45 advises against routine sickle cell / thalassaemia testing): check the FBC indices if anaemia is known</li>
   <li><b>Children:</b> no routine tests for healthy children (NG45 covers adults). <b>Obstetric:</b> follow the obstetric cards and local policy.</li></ul>
   ${gLink("Echo report: what matters", "Reading an echo report")}${tk.liver ? gLink("Neuraxial & deep blocks: anticoagulant timing", "Anticoagulant timing") : ""}
@@ -3957,7 +3974,7 @@ gaCards.pressors = () => { const w = S.aw, rate = (lo,hi,conc) => `${dz(lo*w*60/
 gaCards.txa = () => `<div class="card"><h2>2. Tranexamic acid</h2>${gaDraft()}
   ${f1Draft()}${GT([
     R("Tranexamic acid",`over 10 min at induction (or 15 mg/kg = ${dz(15*S.aw,"mg")} mg)`,"1 g","Repeat 1 g if bleeding continues or long case.","IV")])}
-  <p class="sub">Caution: recent VTE, seizure history, severe renal impairment.</p>${src("Common practice.")}</div>`;
+  <p class="sub">Caution: recent VTE, seizure history, severe renal impairment.<p class="medadd"><b>MOH PBM 2024:</b> give IV tranexamic acid before incision for any surgery with expected blood loss &gt; 500 mL. Trauma: 1 g over 10 min within 3 h of injury, then 1 g over 8 h.</p></p>${src("Common practice.")}</div>`;
 
 /* WAKE & POST-OP */
 gaCards.reversal = () => { const W2 = wts(); const neo = Math.min(0.05*W2.ibw, 5);
@@ -5647,6 +5664,11 @@ VGROUPS.find(g => g[0]==="General")[1].push(["Intra-op fluids, blood and ABG (v2
   "Blood: EBV 70 (M) / 65 (F) mL/kg actual weight; ABL = EBV × (Hb now − lowest) / Hb now; red cells < 7, < 7.5 cardiac surgery, < 8 orthopaedic / CVD (AABB 2023); MI: discuss (MINT 2023); FFP 15 mL/kg; platelets > 50 (> 100 neuro / eye / head injury); fibrinogen < 1.5 g/L; local major haemorrhage protocol",
   "ABG: Winter's 1.5 × HCO₃ + 8 ± 2; metabolic alkalosis 40 + 0.7 × (HCO₃ − 24) ± 5; respiratory 1 / 3.5 and 2 / 4 per 10 mmHg; AG = Na − (Cl + HCO₃), albumin + 0.25 × (40 − alb); delta ratio; Henderson–Hasselbalch consistency flag (> 10%); P/F; A–a at 760 mmHg, RQ 0.8",
   "Author asked for these to go live without a draft step (25 Nov 2026)"]]);
+VGROUPS.find(g => g[0]==="General")[1].push(["MOH Patient Blood Management 2024 (v2.146)", "25 Nov 2026", [
+  "Major haemorrhage: ≥ 150 mL/min with SBP < 90 and/or HR > 110; 50% blood volume in 3 h; whole volume in 24 h. MTP 4 PRBC + 4 FFP + 4 cryo + 4 random platelets (or 1 apheresis), 1:1:1:1; T-MTP flexible. Targets: pH 7.35–7.45, BE −2 to +2, lactate ≤ 2, iCa > 1.1, platelets > 50, PT/APTT < 1.5×, INR ≤ 1.5, fibrinogen > 1.5 g/L",
+  "EBV 70 mL/kg (all adults). No transfusion at Hb ≥ 10; post-op > 8 usually none unless ischaemia (then 1 unit at 7–10 and reassess). Platelets ≥ 50 or INR ≤ 2 for invasive procedures",
+  "TXA before incision if expected loss > 500 mL; trauma 1 g + 1 g over 8 h within 3 h. Desmopressin 0.3 mcg/kg; warfarin reversal; Xa / dabigatran reversal agents",
+  "Major surgery: FBC, ferritin, GSH; anaemia: postpone non-urgent elective surgery ≥ 4 weeks; ferritin < 100 → iron. Author asked for this to go live without a draft step"]]);
 VGROUPS.find(g => g[0]==="General")[1].push(["Induction drugs & relaxants combined", "22 Nov 2026", [
   "Adult: General › Induction › 1. Induction drugs & relaxants — Opioid · Hypnotic · Muscle relaxant · No IV access (rows moved unchanged)",
   "Paeds: Paediatric › Induction › 3. Induction drugs & relaxants — Anticholinergic · Opioid · Hypnotic · Muscle relaxant · No IV access (rows moved unchanged)",
@@ -5729,6 +5751,7 @@ function vTicks(){
 }
 /* ---------- ABOUT ---------- */
 const CHANGES = [
+  ["2.146","Blood management now follows the MOH Malaysia Patient Blood Management consensus (March 2024): major haemorrhage definition, MTP / T-MTP pack and targets, blood loss visual guide, red cell and platelet points, adjuncts and reversal; EBV 70 mL/kg. Tranexamic acid: before incision if expected loss > 500 mL. Which tests: ferritin and group, screen & hold for major surgery. Optimise or postpone: anaemia — wait 4 weeks to treat. (checked)"],
   ["2.145","General › Intra-op: three new adult cards under Circulation & physiology — 8. Fluid management (maintenance estimate, fluid challenge, which fluid, running balance), 10. Blood management (major haemorrhage box, EBV, allowable blood loss, thresholds, products), 11. ABG analysis (step-by-step acid–base, anion gap, compensation, P/F and A–a). Vasopressors now 9, one-lung ventilation 12. (checked)"],
   ["2.144","General reordered for theatre: Induction — tube & airway kit, drugs & relaxants, RSI. Intra-op — Before incision (antibiotics, TXA, PONV), Maintenance (ventilation, TIVA, volatile), Analgesia & BP, Specialist (one-lung ventilation). Post-op — Emergence, Recovery, Day case & ward. PONV now sits in Intra-op with a link from Post-op. No clinical content changed. (checked)"],
   ["2.143","Block finder: picking an operation now shows what it is usually done under (spinal, GA, or a block alone) — TURBT also shows the obturator block. LA dosing: \"Set up in LA calculator\" fills in the calculator form at the lower end of the volume range; you check it and tap Add. Pairs are set up one at a time. (checked)"],
