@@ -785,6 +785,12 @@ details.faqg>summary{cursor:pointer;font-weight:700;color:var(--accent);min-heig
 .nlv{display:inline-block;background:var(--gc-soft);color:var(--gc);border-radius:6px;padding:0 6px;font-size:.9em}.ncov{display:flex;flex-wrap:wrap;align-items:center;gap:4px 10px;margin:0 0 4px}.ncov .rellink{margin:0}
 .nchips{display:flex;flex-wrap:wrap;gap:6px;margin:var(--s2) 0}.nchips button{min-height:40px;padding:0 12px;border-radius:999px;border:1px solid var(--line);background:var(--card);color:var(--ink);font-size:14px;display:inline-flex;align-items:center}.nchips button[aria-pressed="true"]{border-color:var(--gc);background:var(--gc-soft);font-weight:600}
 .npanel{border:1px solid var(--line);border-radius:var(--r-sm);padding:var(--s3);margin:var(--s2) 0}
+details.bfb>summary{list-style:none;cursor:pointer;display:grid;gap:2px}details.bfb>summary::-webkit-details-marker{display:none}.bfsum{display:flex;justify-content:space-between;align-items:baseline;gap:8px}.bfn2{font-weight:700;font-size:16px;color:var(--gc)}
+details.bfb[open]>summary{margin-bottom:4px}details.bfb .bfo{margin-top:4px}details.bfb .bfo .sub{font-weight:400}.bfdeep{margin:4px 0 0}
+.bfpair{border:1px dashed var(--gc);border-radius:var(--r-sm);padding:10px 12px;display:grid;gap:4px}.bfpair .addla{justify-self:start}
+.bfsidepick{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.bfsidepick span{font-weight:600}.bfsidepick button{min-height:40px;padding:0 16px;border-radius:999px;border:1px solid var(--line);background:var(--card);color:var(--ink);font-weight:600}
+.bfops{margin:0 0 var(--s2)}.bfops .searchbox{margin:0}#bfopsr{display:grid;gap:4px;margin-top:4px}.bfopb{text-align:left;min-height:44px;padding:6px 12px;border-radius:var(--r-sm);border:1px solid var(--line);background:var(--card);color:var(--ink);font:inherit}
+.bfquiet{justify-content:flex-end!important;gap:6px!important}.bfsep{color:var(--muted)}
 .bfpanel{display:grid;gap:8px;margin:var(--s2) 0}.bfpanel:empty{display:none}.bfside{margin:0;color:var(--danger-ink);font-weight:600;font-size:14px}
 .bfb{border-radius:var(--r-sm);padding:10px 12px;background:var(--bg);display:grid;gap:2px}.bfb.first{background:var(--gc-soft)}
 .bftag{font-size:13px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--gc)}
@@ -804,7 +810,7 @@ if (window.top !== window.self && /\.github\.io$/.test(location.hostname)) {
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.124.1";
+const APP_VERSION = "2.125.1";
 const APP_DATE = "25 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
@@ -4050,7 +4056,7 @@ const finderDraft = () => FINDER_CHECKED ? "" : `<div class="warn" style="margin
 const BF_REG = {
   shoulder: {t: "Shoulder", blocks: ["Interscalene", "Suprascapular"], note: "Lung disease? → Upper › Phrenic-sparing shoulder options.", nx: null},
   arm:      {t: "Arm / forearm", blocks: ["Supraclavicular", "Infraclavicular", "Axillary"], nx: null},
-  clavicle: {t: "Clavicle", blocks: ["Interscalene", "Superficial cervical plexus"], note: "Use both: interscalene for the bone, superficial cervical plexus for the skin (supraclavicular nerves).", nx: null},
+  clavicle: {t: "Clavicle", blocks: ["Interscalene", "Superficial cervical plexus"], nx: null},
   breast:   {t: "Breast", blocks: ["PECS II", "Thoracic paravertebral", "Serratus anterior", "Erector spinae (ESP)"], nx: null},
   chest:    {t: "Chest wall", blocks: ["Serratus anterior", "Erector spinae (ESP)"], nx: ["Epidural (adult)", "thoracic epidural"]},
   upabdo:   {t: "Upper abdomen", blocks: ["Rectus sheath", "Erector spinae (ESP)", "Quadratus lumborum (QL)"], nx: ["Epidural (adult)", "thoracic epidural"]},
@@ -4063,24 +4069,47 @@ const BF_REG = {
   foot:     {t: "Lower leg / foot / ankle", blocks: ["Popliteal sciatic", "Ankle block", "Adductor canal"], nx: ["Spinal dose: non-obstetric", "spinal"]}};
 const BF_LIMB = {shoulder: "arm", clavicle: "arm", arm: "arm", hand: "arm", hip: "leg", thigh: "leg", knee: "leg", foot: "leg", chest: "trunk", breast: "trunk", upabdo: "trunk", loabdo: "trunk", back: "trunk"};
 const BF_ORDER = ["shoulder", "clavicle", "arm", "hand", "breast", "chest", "upabdo", "loabdo", "back", "hip", "thigh", "knee", "foot"];
-function bfBlockRow(title, first){
+const BF_DEEP = ["Thoracic paravertebral", "Quadratus lumborum (QL)"];
+function bfBlockRow(title, first, reg){
   const o = BLKS[title], id = CARD_IDS[title], e = findEntry(id); if (!o || !e) return "";
   const conc = o.anal ? 0.25 : 0.5, bi = o.bilat ? 2 : 1, lo = o.vol[0]*conc*10*bi, hi = o.vol[1]*conc*10*bi, pct = hi / laMaxMg("bupi","a") * 100;
-  const rng = (a, b, u) => a === b ? `${a} ${u}` : `${a}–${b} ${u}`;
-  return `<div class="bfb${first ? " first" : ""}">${first ? `<span class="bftag">First choice</span>` : ""}
-    <button class="bfo" data-id="${id}" data-open="${esc(e.label)}" data-g="regional" data-tab="${e.tab}"><span class="bfn">${esc(o.t)} ›</span><span class="bfd">${rng(o.vol[0], o.vol[1], "mL")}${o.bilat ? " per side" : ""}</span></button>
-    <div class="sub bfw">${o.ind}</div>
-    <div class="sub bfw">bupi/levobupi ${conc}% (${o.anal ? "analgesia" : "surgical"}) = ${rng(dz(lo,"mg"), dz(hi,"mg"), "mg")}${o.bilat ? " both sides" : ""} · <span class="${pct > 100 ? "bad" : ""}">${Math.round(pct)}% of max</span></div>
-    <div class="sub bfw bfc">${o.caut}</div>${laAddBtn("a", "bupi", conc, o.vol[1], bi, o.t)}</div>`;
+  const rng = (a, b, u) => a === b ? `${a} ${u}` : `${a}–${b} ${u}`, short = o.ind.split(/ — |;| · /)[0];
+  const deep = BF_DEEP.includes(title) || (title === "Erector spinae (ESP)" && reg === "back"), ae = deep && findEntry("regional-safety-anticoagulants");
+  return `<details class="bfb${first ? " first" : ""}"${first ? " open" : ""}><summary>${first ? `<span class="bftag">First choice</span>` : ""}<span class="bfsum"><span class="bfn2">${esc(o.t)}</span><span class="bfd">${rng(o.vol[0], o.vol[1], "mL")}${o.bilat ? " per side" : ""}</span></span>
+    <span class="sub bfw">${short} · <span class="${pct > 100 ? "bad" : ""}">${Math.round(pct)}% of max</span></span></summary>
+    <div class="sub bfw">bupi/levobupi ${conc}% (${o.anal ? "analgesia" : "surgical"}) = ${rng(dz(lo,"mg"), dz(hi,"mg"), "mg")}${o.bilat ? " both sides" : ""}</div>
+    <div class="sub bfw bfc">${o.caut}</div>${ae ? `<button class="rellink bfdeep" data-id="${ae.id}" data-open="${esc(ae.label)}" data-g="regional" data-tab="${ae.tab}">Deep block — check anticoagulant timing ›</button>` : ""}
+    ${laAddBtn("a", "bupi", conc, o.vol[1], bi, o.t)}<button class="bfo" data-id="${id}" data-open="${esc(e.label)}" data-g="regional" data-tab="${e.tab}"><span class="bfn">${esc(o.t)} ›</span><span class="sub">full card</span></button></details>`;
 }
+const BF_PAIR_CHECKED = true;   // checked by author 25 Nov 2026;   // v2.125 pairs and deep-block reminder
+const BF_SIDED = ["shoulder", "clavicle", "arm", "hand", "breast", "hip", "thigh", "knee", "foot"];
+// pairs only where a NYSORA page we read says so
+const BF_PAIR = {knee: [["Adductor canal", "iPACK"], "iPACK is added to an adductor canal (or femoral) block for knee surgery."],
+  hip: [["PENG", "Lateral femoral cutaneous (LFCN)"], "One trial cited by NYSORA: PENG + LFCN after hip replacement — earlier walking than suprainguinal fascia iliaca."],
+  foot: [["Popliteal sciatic", "Adductor canal"], "A saphenous block (adductor canal) supplements a sciatic block when the inner ankle or foot is involved."],
+  clavicle: [["Interscalene", "Superficial cervical plexus"], "Interscalene for the bone, superficial cervical plexus for the skin (supraclavicular nerves)."]};
+function bfPair(r){ const k = Object.keys(BF_REG).find(x => BF_REG[x] === r), pr = BF_PAIR[k]; if (!pr) return "";
+  const spec = t => { const o = BLKS[t]; return {d: "bupi", c: String(o.anal ? .25 : .5), ml: +sig(o.vol[1]), bi: o.bilat ? 2 : 1, l: t}; };
+  return `<div class="bfpair">${BF_PAIR_CHECKED ? "" : `<span class="bftag" style="color:var(--warn-ink,#92400e)">DRAFT (v2.125)</span>`}<b>Often used together:</b> ${pr[0].join(" + ")}<div class="sub">${pr[1]}</div><button class="addla" data-addpair="${esc(JSON.stringify(pr[0].map(spec)))}" data-lt="a">+ Add both to LA calculator</button></div>`; }
+// operation picker: a shortcut to the region (no new suggestions of its own)
+const BF_OPS = [["Total knee replacement (TKA)", "knee", "tkr tka knee arthroplasty"], ["ACL reconstruction / knee arthroscopy", "knee", "acl arthroscopy menisc"], ["Hip fracture (DHS, hemiarthroplasty)", "hip", "nof neck of femur dhs hemiarthroplasty"],
+  ["Total hip replacement (THA)", "hip", "thr tha hip arthroplasty"], ["Femur fixation", "thigh", "femoral shaft nail"], ["Skin graft donor site (thigh)", "thigh", "split skin graft ssg"],
+  ["Ankle fracture / foot surgery", "foot", "orif ankle bunion hallux amputation toe"], ["Below-knee amputation", "foot", "bka amputation"], ["Shoulder arthroscopy / replacement", "shoulder", "rotator cuff arthroplasty subacromial"],
+  ["Clavicle fixation", "clavicle", "clavicle orif"], ["Humerus, elbow or forearm surgery", "arm", "elbow forearm radius ulna humerus av fistula avf"], ["Hand or wrist surgery", "hand", "carpal tunnel trigger finger wrist hand"],
+  ["Mastectomy / breast surgery", "breast", "mastectomy wide local excision wle breast axillary clearance"], ["Thoracotomy / VATS / rib fractures", "chest", "thoracotomy vats rib fracture chest drain"],
+  ["Laparotomy / laparoscopic cholecystectomy", "upabdo", "laparotomy lap chole cholecystectomy midline"], ["Inguinal hernia / appendicectomy", "loabdo", "hernia appendix appendicectomy"],
+  ["Caesarean section (LSCS)", "loabdo", "lscs caesarean pfannenstiel"], ["Bladder tumour resection (TURBT)", "loabdo", "turbt bladder obturator"], ["Spine surgery", "back", "spine lumbar fusion laminectomy"]];
+function bfOpsList(){ const q = (S.bfq || "").trim().toLowerCase(); if (!q) return "";
+  const hits = BF_OPS.map((o, i) => [o, i]).filter(([o]) => (o[0] + " " + o[2]).toLowerCase().includes(q)).slice(0, 6);
+  return hits.length ? hits.map(([o, i]) => `<button class="bfopb" data-bfop="${i}">${o[0]} <span class="sub">→ ${BF_REG[o[1]].t}</span></button>`).join("") : `<p class="sub" style="margin:4px 0">No match — tap the body or use the list.</p>`; }
 function bfPanel(){
   const sel = S.bf && BF_REG[S.bf.reg] ? S.bf : null;
   if (!sel && BF.st.zone && bf3d()) return `<p class="sub bfempty">Now tap the exact spot on the ${BF.st.zone.z === "upper" ? "arm" : BF.st.zone.z === "lower" ? "leg" : "trunk"} — or Whole body to go back.</p>`;
   if (!sel) return `<p class="sub bfempty">${bf3d() && glAvail() && !BF.st.nogl ? "Tap" : "Pick"} where you operate — the suggested blocks appear here.</p>`;
   const r = BF_REG[sel.reg], side = sel.side ? sel.side + " " : "";
   const nx = r.nx && findEntry(CARD_IDS[r.nx[0]]);
-  return `<h3 style="margin-top:0">${side}${side ? r.t.toLowerCase() : r.t}</h3>${sel.side ? `<p class="bfside">Mark the ${sel.side.toLowerCase()} side · Stop Before You Block</p>` : ""}${r.note ? `<p class="sub" style="margin:0">${r.note}</p>` : ""}
-    ${r.blocks.slice(0, 3).map((b, i) => bfBlockRow(b, i === 0)).join("")}${r.blocks.length > 3 ? `<details class="bfmore"><summary>More options (${r.blocks.length - 3})</summary>${r.blocks.slice(3).map(b => bfBlockRow(b, false)).join("")}</details>` : ""}
+  return `<h3 style="margin-top:0">${side}${side ? r.t.toLowerCase() : r.t}</h3>${sel.side ? `<p class="bfside">Mark the ${sel.side.toLowerCase()} side · Stop Before You Block</p>` : BF_SIDED.includes(sel.reg) ? `<div class="bfsidepick"><span>Which side?</span><button data-bfside="Left">Left</button><button data-bfside="Right">Right</button></div>` : ""}${r.note ? `<p class="sub" style="margin:0">${r.note}</p>` : ""}
+    ${bfPair(r)}${r.blocks.slice(0, 3).map((b, i) => bfBlockRow(b, i === 0, sel.reg)).join("")}${r.blocks.length > 3 ? `<details class="bfmore"><summary>More options (${r.blocks.length - 3})</summary>${r.blocks.slice(3).map(b => bfBlockRow(b, false, sel.reg)).join("")}</details>` : ""}
     ${BF_LIMB[sel.reg] ? `<button class="rellink" data-bfnerve="${BF_LIMB[sel.reg]}">See the nerves of this ${BF_LIMB[sel.reg] === "trunk" ? "area" : BF_LIMB[sel.reg]} ›</button>` : ""}
     ${nx ? `<button class="rellink" data-id="${nx.id}" data-open="${esc(nx.label)}" data-g="regional" data-tab="${nx.tab}">Or neuraxial: ${r.nx[1]} → ${esc(bareLabel(nx.label))} ›</button>` : ""}`;
 }
@@ -4091,17 +4120,18 @@ raCards.finder = () => { const can = glAvail() && !BF.st.nogl, on = can && bf3d(
   if (S.bfView === "joints") return `<div class="card"><h2>Block finder</h2>${sw}${jointView()}</div>`;
   if (S.bfView === "myo") return `<div class="card"><h2>Block finder</h2>${sw}${myoView(true)}</div>`;
   return `<div class="card"><h2>Block finder</h2>${finderDraft()}${sw}
+  <div class="bfops"><div class="searchbox">${svg("search")}<input id="bfq" class="search" type="search" placeholder="Operation, e.g. TKA, mastectomy" autocomplete="off" value="${esc(S.bfq || "")}"></div><div id="bfopsr">${bfOpsList()}</div></div>
   <div class="bffig"><div class="bfin"><div class="bfleft">
   ${on ? `<div class="bfstage" id="bfstage"><div class="bfhint${BF.st.touched ? " gone" : ""}" id="bfhint">Drag to turn · tap the body to zoom in</div>
     <button class="bfwhole" data-bfwhole="1"${BF.st.zone || S.bf ? "" : " hidden"}><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>Whole body</button>
     <button class="bfturn" data-bfturn="1" aria-label="Turn the figure: front, side, back" title="Turn"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12a8 8 0 1 1-2.3-5.6"/><path d="M20 4v5h-5"/></svg></button></div>
-  <div class="bfrow"><button class="bflink" data-bflist="1" aria-expanded="${!!S.bfList}">${S.bfList ? "Hide list" : "Pick from a list"} ›</button><button class="bflink bfmute" data-bf3d="off">Hide 3D</button></div>`
+  <div class="bfrow bfquiet"><button class="bflink bfmute" data-bflist="1" aria-expanded="${!!S.bfList}">${S.bfList ? "Hide list" : "List"}</button><span class="bfsep">·</span><button class="bflink bfmute" data-bf3d="off">Hide 3D</button></div>`
     : `${can ? `<div class="bfshowrow"><button class="bfshow" data-bf3d="on">Show 3D figure</button></div>` : ""}${fail ? `<p class="sub bfnote">3D turned off on this device after a problem.</p>` : ""}`}
   </div><div class="bfright">
   <div class="bfchips" id="bfchips"${on && !S.bfList ? " hidden" : ""}>${BF_ORDER.map(k => `<button data-bfreg="${k}" aria-pressed="${!!(S.bf && S.bf.reg === k)}"><span class="bfdot" style="background:${BF.regColor(k)}"></span>${BF_REG[k].t}</button>`).join("")}</div>
   <div class="bfpanel">${bfPanel()}</div>
-  <button class="bfkid" data-id="paeds-blocks-which-block-paeds" data-open="2. Which block" data-g="paeds" data-tab="blocks">Child → Paeds blocks ›</button></div></div></div>
-  ${src("Suggestions point to this app's block cards (" + RSRC + "); 3D body: MakeHuman base mesh (CC0), schematic.")}</div>`; };
+  <button class="rellink bfkid" data-id="paeds-blocks-which-block-paeds" data-open="2. Which block" data-g="paeds" data-tab="blocks">Child? → Paeds blocks (doses by weight) ›</button></div></div></div>
+  ${src("Each block card names the NYSORA page it was checked against. 3D body: MakeHuman base mesh (CC0), schematic.")}</div>`; };
 
 /* the figure: smooth-blended body parts (signed distance field) drawn in a WebGL shader; one canvas reused across redraws */
 const FINDER_ON = true;   // Regional › Finder: last tab; the list works without 3D, the 3D figure starts only on request
@@ -4964,6 +4994,11 @@ VGROUPS.find(g => g[0]==="General")[1].push(["Paeds doses vs local manual & pain
 VGROUPS.find(g => g[0]==="General")[1].push(["Equipment sizes in rows", "23 Nov 2026", [
   "Tube ID and depth, supraglottic sizes, paeds tube / depth / suction / laryngoscope, neonate tube, NPA, bag, DLT size and depth, NG and CVC depth: same numbers, now in rows labelled 'Equipment' (test-checked)",
   "Size chips replaced by 'have X and Y ready'; lookup tables (HMEF, bag weight bands, LMA by weight, Storz, lung isolation by age) and ventilator settings unchanged"]]);
+VGROUPS.find(g => g[0]==="General")[1].push(["Block finder pairs and reminders (v2.125)", "25 Nov 2026", [
+  "Often used together (from NYSORA pages read): knee adductor canal + iPACK; hip PENG + lateral femoral cutaneous (one trial); foot popliteal sciatic + saphenous at the adductor canal; clavicle interscalene + superficial cervical plexus",
+  "'+ Add both' puts both blocks' upper volumes into the LA calculator",
+  "Deep block reminder (thoracic paravertebral, QL, ESP for the back) links to the anticoagulant timing card",
+  "Operation search is a shortcut to the body region; it adds no suggestions of its own"]]);
 VGROUPS.find(g => g[0]==="General")[1].push(["Myotomes (v2.124)", "25 Nov 2026", [
   "Block finder › Myotomes and Dermatomes card › Myotomes: ASIA/ISNCSCI 2019 key muscles — C5 elbow flexors, C6 wrist extensors, C7 elbow extensors, C8 finger flexors (middle finger, last joint), T1 little-finger abductor",
   "L2 hip flexors, L3 knee extensors, L4 ankle dorsiflexors, L5 long toe extensors, S1 ankle plantar flexors",
@@ -5145,6 +5180,7 @@ function vTicks(){
 }
 /* ---------- ABOUT ---------- */
 const CHANGES = [
+  ["2.125","Block finder: operation search (TKA, mastectomy…), side buttons, shorter suggestion rows (tap for details), 'often used together' pairs with one-tap Add both, anticoagulant reminder on deep blocks, clearer paeds link (checked)"],
   ["2.124","Myotomes: Block finder › Myotomes (and Dermatomes card › Myotomes) shows the ASIA key muscle for each level and the diaphragm on the 3D body (checked)"],
   ["2.123","Nerve map: trunk added — tap the chest, abdomen or back for the level and branch (front, side or back) and the blocks that reach it (checked)"],
   ["2.122","Share message and link preview text updated: crisis cards, 3D block finder with nerve map and joints, block-card count (checked)"],
@@ -6176,7 +6212,7 @@ document.addEventListener("click", e => { const t = e.target.closest && e.target
 let vtaps = 0, vtimer = null;
 document.addEventListener("click", e => { if (!e.target.closest || !e.target.closest(".vtap")) return; vtaps++; clearTimeout(vtimer); vtimer = setTimeout(()=>vtaps=0, 1500); if (vtaps >= 5){ vtaps = 0; location.hash = "#values"; window.scrollTo(0,0); } });
 document.addEventListener("change", e => { if (e.target.id==="csNote"){ S.csNote = e.target.value.slice(0,300); render(); } if (e.target.id==="leNote"){ S.leNote = e.target.value.slice(0,300); render(); } if (e.target.id==="pnNote"){ S.pnNote = e.target.value.slice(0,300); render(); } if (e.target.dataset && e.target.dataset.pnf){ const f = e.target.dataset.pnf, v = e.target.value.slice(0,300); (S.pnF = S.pnF || {})[f] = v; if (f === "cr"){ const n = parseFloat(v); if (n >= 30 && n <= 1200){ S.crea = n; S.touched.crea = true; } } render(); } });
-document.addEventListener("input", e => { if (e.target.id==="csNote") S.csNote = e.target.value.slice(0,300); if (e.target.id==="leNote"){ S.leNote = e.target.value.slice(0,300); store.set("consLast","le"); } if (e.target.id==="pnNote") S.pnNote = e.target.value.slice(0,300); if (e.target.dataset && e.target.dataset.pnf) (S.pnF = S.pnF || {})[e.target.dataset.pnf] = e.target.value.slice(0,300); if (e.target.id==="q") runSearch(e.target.value); if (e.target.id==="vq"){ S.vq = e.target.value; const pos = e.target.selectionStart; render(); const el = document.getElementById("vq"); if (el){ el.focus(); try{ el.setSelectionRange(pos,pos); }catch(_){} } } if (e.target.id==="cNick") S.cNick = e.target.value.slice(0,12); if (e.target.id==="dname") S.dname = e.target.value.slice(0,24); });
+document.addEventListener("input", e => { if (e.target.id==="csNote") S.csNote = e.target.value.slice(0,300); if (e.target.id==="leNote"){ S.leNote = e.target.value.slice(0,300); store.set("consLast","le"); } if (e.target.id==="pnNote") S.pnNote = e.target.value.slice(0,300); if (e.target.dataset && e.target.dataset.pnf) (S.pnF = S.pnF || {})[e.target.dataset.pnf] = e.target.value.slice(0,300); if (e.target.id==="q") runSearch(e.target.value); if (e.target.id==="bfq"){ S.bfq = e.target.value; const r = document.getElementById("bfopsr"); if (r) r.innerHTML = bfOpsList(); } if (e.target.id==="vq"){ S.vq = e.target.value; const pos = e.target.selectionStart; render(); const el = document.getElementById("vq"); if (el){ el.focus(); try{ el.setSelectionRange(pos,pos); }catch(_){} } } if (e.target.id==="cNick") S.cNick = e.target.value.slice(0,12); if (e.target.id==="dname") S.dname = e.target.value.slice(0,24); });
 function clamp(v,min,max){ return Math.min(max, Math.max(min, v)); }
 /* hold − / + : repeat, speeding up; the click after a hold is ignored */
 (() => { let tm = null, n = 0, held = false, key = null, dd = 0, mn = 0, mx = 0;
@@ -6214,6 +6250,9 @@ document.addEventListener("click", e => {
   if (d.bfwhole){ if (S.bfView === "nerve"){ S.nerve = 0; S.nerveLvl = -1; BF.nerveZoom(null); render(); return; } S.bf = null; BF.focus(null); render(); return; }
   if (d.bfnerve){ S.bfView = "nerve"; S.nerve = 0; S.nerveZoomReq = {limb: d.bfnerve, s: S.bf && S.bf.side === "Right" ? -1 : 1}; render(); return; }
   if (d.myo){ const k = +d.myo, r = MYO.find(x => x[0] === k); S.myo = S.myo === k ? null : k; if (S.myo != null && BF.st.ok && BF.st.mode === "myo"){ const z = BF.st.nzone; if (!z || z.limb !== r[5]) BF.nerveZoom(r[5], z ? z.s : 1); } render(); return; }
+  if (d.bfop){ const o = BF_OPS[+d.bfop]; S.bfq = ""; S.bf = {reg: o[1], side: ""}; S.bfList = false; BF.focus(S.bf); render(); return; }
+  if (d.bfside){ if (S.bf){ S.bf = {reg: S.bf.reg, side: d.bfside}; BF.focus(S.bf); } render(); return; }
+  if (d.addpair){ const lt = d.lt, k = laKey(lt); S[k] = S[k] || []; JSON.parse(d.addpair).forEach(it => S[k].push(it)); b.textContent = "✓ Added both"; setTimeout(render, 350); return; }
   if (d.nerve){ const k = +d.nerve; S.nerve = S.nerve === k ? 0 : k; S.nerveLvl = -1; if (S.nerve && BF.st.ok && S.bfView === "nerve"){ const lb = k >= 20 ? "trunk" : k >= 10 ? "leg" : "arm", z = BF.st.nzone; if (!z || z.limb !== lb) BF.nerveZoom(lb, z ? z.s : 1); } render(); return; }   // a nerve button also zooms onto its limb
   if (d.bfreg){ S.bf = S.bf && S.bf.reg === d.bfreg && !S.bf.side ? null : {reg: d.bfreg, side: ""}; BF.focus(S.bf); render(); return; }
   if (d.bfturn){ BF.turn(); return; }
