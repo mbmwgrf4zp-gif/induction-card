@@ -825,7 +825,7 @@ if (window.top !== window.self && /\.github\.io$/.test(location.hostname)) {
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.139.1";
+const APP_VERSION = "2.140.1";
 const APP_DATE = "25 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
@@ -2641,19 +2641,21 @@ function preScoreTxt(){
 /* Assess 9 — proceed or postpone */
 gaCards.optpost = () => `<div class="card"><h2>10. Optimise or postpone</h2>${awopDraft()}
   <p class="sub">Elective surgery. Urgent, time-sensitive or cancer surgery: weigh the delay against the risk; senior decision with the surgeon.</p>
-  <h3>Postpone if</h3>
+  <h3>Defer and treat</h3>
   <table><tr><th>Blood pressure</th><td>Clinic <b>≥ 180/120</b> (home / ambulatory ≥ 175/115) without documented normal readings in primary care <span class="sub">(2026 update; was 180/110)</span></td></tr>
-  <tr><th>HbA1c</th><td><b>≥ 69 mmol/mol (8.5%)</b>: refer to optimise first</td></tr>
   <tr><th>Ketones / DKA</th><td>Capillary ketones <b>≥ 3 mmol/L</b>, DKA or HHS: postpone, treat</td></tr>
-  <tr><th>Potassium</th><td>&lt; 3.0 or &gt; 5.5 mmol/L: correct first <span class="sub">(common practice)</span></td></tr>
-  <tr><th>Sodium</th><td>&lt; 130 or &gt; 150 mmol/L: investigate before major surgery <span class="sub">(common practice)</span></td></tr>
-  <tr><th>Anaemia</th><td>Hb <b>&lt; 13 g/dL</b> (men and women) before major surgery with expected blood loss &gt; 500 mL: investigate and treat <span class="sub">(WHO definition uses &lt; 12 g/dL for women; 13 avoids under-treating women)</span></td></tr>
-  <tr><th>Platelets · INR</th><td>Platelets &lt; 50 ×10⁹/L or INR &gt; 1.5 for major surgery: correct / discuss. Neuraxial: Regional › Anticoagulant timing</td></tr>
   <tr><th>Myocardial infarction</th><td>Defer elective surgery <b>≥ 60 days</b></td></tr>
   <tr><th>Coronary stent</th><td>Elective surgery: <b>6 months</b> after elective PCI, <b>12 months</b> after ACS. Time-sensitive surgery: at least <b>1 month</b> after elective PCI, <b>3 months</b> after ACS. Bare-metal stent ≥ 30 days; balloon only ≥ 14 days. Never stop both antiplatelets without cardiology</td></tr>
   <tr><th>Stroke / TIA</th><td>Defer elective surgery <b>≥ 3 months</b></td></tr>
   <tr><th>Active cardiac condition</th><td>Unstable angina, decompensated or new heart failure, significant arrhythmia, symptomatic severe valve disease: postpone, cardiology</td></tr>
   <tr><th>Chest infection / URTI</th><td>Fever, productive cough or chest signs: postpone about <b>2–4 weeks</b>. Mild coryza only: usually proceed</td></tr></table>
+  <h3>Correct or optimise first</h3><p class="sub" style="margin-top:0">Whether to delay depends on how far off the value is, the cause, and how urgent the surgery is.</p>
+  <table>  <tr><th>HbA1c</th><td><b>≥ 69 mmol/mol (8.5%)</b>: refer to optimise first</td></tr>
+  <tr><th>Potassium</th><td>&lt; 3.0 or &gt; 5.5 mmol/L: correct first <span class="sub">(common practice)</span></td></tr>
+  <tr><th>Sodium</th><td>&lt; 130 or &gt; 150 mmol/L: investigate before major surgery <span class="sub">(common practice)</span></td></tr>
+  <tr><th>Anaemia</th><td>Hb <b>&lt; 13 g/dL</b> (men and women) before major surgery with expected blood loss &gt; 500 mL: investigate and treat <span class="sub">(WHO definition uses &lt; 12 g/dL for women; 13 avoids under-treating women)</span></td></tr>
+  <tr><th>Platelets · INR</th><td>Platelets &lt; 50 ×10⁹/L or INR &gt; 1.5 for major surgery: correct / discuss. Neuraxial: Regional › Anticoagulant timing</td></tr></table>
+  <div class="result" style="margin-top:var(--s2)">None of these: proceed with a plan — this is not a fitness certificate.</div>
   <h3>How to optimise</h3>
   <table><tr><td><b>Hypertension</b></td><td>If postponed: refer with the readings for treatment, then relist. Most antihypertensives continue; see Prepare › Regular drugs</td></tr>
   <tr><td><b>Diabetes</b></td><td>First on the list; glucose 6–10 mmol/L (accept 4–12). Day-of-surgery plan: Prepare › Diabetes</td></tr>
@@ -2755,7 +2757,7 @@ gaCards.premeds = () => { const W2 = wts(), old = (S.touched.age && S.age >= 70)
 const PL_X = [["rsi","RSI"],["art","Arterial line"],["cvc","Central line"],["hdu","Post-op HDU / ICU"],["pca","PCA"]];
 const PL_TECH = {ga:"GA", sp:"Spinal", epi:"Epidural / CSE", pnb:"Nerve block", sed:"Monitored anaesthesia care"};
 const planTech = () => csMode() === "le" ? "Labour epidural" : CS_TECH.filter(([k]) => csOn(k, {}) && csChosen(k)).map(([k]) => PL_TECH[k]).join(" + ");
-const plOn = k => { const v = scv("pl", k); return v === 1 || (v == null && k === "rsi" && awAsp()); };
+const plOn = k => scv("pl", k) === 1;   // v2.140: RSI is suggested (label), never pre-ticked
 const plUI = () => PL_X.map(([k,l]) => { const on = plOn(k), sug = k === "rsi" && scv("pl",k) == null && awAsp();
   return `<button class="txci ${on?"on":""}" data-score="pl:${k}:${on?0:1}" aria-pressed="${on}"><span class="box">${on?"✓":""}</span><span>${l}${sug ? ` <span class="sub">(suggested: aspiration risk)</span>` : ""}</span></button>`; }).join("");
 const planLine = () => [planTech(), ...PL_X.filter(([k]) => plOn(k)).map(x => x[1].replace(/^(Arterial|Central|Post-op)/, c => c.toLowerCase()))].filter(Boolean).join("; ");
@@ -2894,7 +2896,7 @@ const AW_HX = [["prev","Previous difficult airway, or alert in the notes","ML"],
 const AW_EX = [["mo","Mouth opening &lt; 3 cm","L"],["tmd","Thyromental distance &lt; 6 cm","L"],["jaw","Poor jaw protrusion (cannot bring lower teeth in front of upper)","ML"],
   ["beard","Beard","M"],["edent","No teeth","M"],["teeth","Prominent, loose or crowned upper teeth","L"],["nc","Neck circumference &gt; 40 cm","MF"]];
 const AW_RX = [["ctm","Cricothyroid membrane hard to feel (laryngeal handshake)","F"]];
-const AW_ASP = [["full","Full stomach / emergency"],["gord","Uncontrolled reflux or hiatus hernia"],["gp","Diabetic gastroparesis"],["glp","GLP-1 agonist (semaglutide, liraglutide, tirzepatide, dulaglutide)"],["preg","Pregnancy &gt; 18 weeks"]];
+const AW_ASP = [["full","Full stomach / emergency"],["gord","Uncontrolled reflux or hiatus hernia"],["gp","Diabetic gastroparesis"],["glp","GLP-1 agonist with GI symptoms, dose escalation or another cause of slow gastric emptying"],["preg","Pregnancy &gt; 18 weeks"]];
 const awOn = k => scv("awc", k) === 1;
 const AW_TAG = {M:"mask", L:"laryngoscopy", F:"front of neck"};
 const awTags = t => t.replace("P","").split("").map(c => `<span class="awtag">${AW_TAG[c]}</span>`).join("");
@@ -2925,7 +2927,7 @@ function awSummary(){ const e = awEval(), p = [];
   if (e.tier === "ati") p.push("consider awake tracheal intubation");
   if (e.tier === "routine") p.push("no predictors of difficulty");
   if (e.tier === "partial") p.push("airway assessment incomplete");
-  if (e.asp.length) p.push("aspiration risk (" + e.asp.map(([, l]) => l.replace(/&gt;/g,">").replace(/ \(.*\)$/,"").replace(/^[A-Z](?=[a-z])/, c => c.toLowerCase())).join(", ") + "): RSI");
+  if (e.asp.length) p.push("aspiration risk (" + e.asp.map(([, l]) => l.replace(/&gt;/g,">").replace(/ \(.*\)$/,"").replace(/^[A-Z](?=[a-z])/, c => c.toLowerCase())).join(", ") + "): RSI suggested");
   return p; }
 gaCards.airway = () => { const e = awEval(), t = AW_TIER[e.tier];
   const auto = [e.bmiHi ? "BMI ≥ 35 (from Patient)" : "", e.old ? "Age &gt; 55 (from Patient)" : ""].filter(Boolean);
@@ -2943,7 +2945,7 @@ gaCards.airway = () => { const e = awEval(), t = AW_TIER[e.tier];
   <div class="psbtns">${scv("awc","none") === 1 || (e.tier && e.tier !== "routine") ? "" : `<button class="linkbtn" data-score="awc:none:1">No predictors found ✓</button>`}${reset("awc")}</div>
   ${t ? `<div class="${t[0]}" style="margin-top:var(--s2)"><b>${t[1]}</b> · mask ventilation flags <b>${e.M}</b> · laryngoscopy flags <b>${e.L}</b><br>${t[2]}${e.F ? `<br><b>Front-of-neck rescue may be hard:</b> mark the cricothyroid membrane (ultrasound if needed) before induction.` : ""}</div>`
       : `<div class="result" style="margin-top:var(--s2)">Tick findings, or tap "No predictors found".</div>`}
-  ${e.asp.length ? `<div class="warn"><b>Aspiration risk:</b> RSI suggested (pre-ticked in Plan &amp; consent).${awOn("glp") ? ` <b>GLP-1 agonist:</b> the stomach may not be empty despite normal fasting. Follow local policy on withholding; consider gastric ultrasound, or treat as a full stomach.` : ""}</div>` : ""}
+  ${e.asp.length ? `<div class="warn"><b>Aspiration risk:</b> RSI suggested — tick it in Plan &amp; consent if you choose it.${awOn("glp") ? ` <b>GLP-1 agonist:</b> the stomach may not be empty despite normal fasting. Follow local policy on withholding; consider gastric ultrasound, or treat as a full stomach.` : ""} <span class="sub">GLP-1 agonist alone, no symptoms: not ticked here — see Prepare › Fasting.</span></div>` : ""}
   <p class="sub">The tier is advice; the plan is yours. "Anticipated difficult" also suggests the Difficult airway risk in the consent note.</p>
   <h3>Plan before induction</h3>
   <ul><li>State plans A → D to the team (DAS)</li><li>Preoxygenate to EtO₂ &gt; 0.9; consider high-flow nasal O₂</li><li>Ramp position if obese</li><li>Awake tracheal intubation: topical lignocaine max <b>9 mg/kg LBW = ${dz(9*wts().lbw,"mg")} mg</b></li></ul>
@@ -3108,7 +3110,7 @@ gaCards.tests = () => { const a = +S.asa || 0, col = a>=3 ? 3 : a===2 ? 2 : a===
   <div class="tlab">ASA</div><div class="seg">${["1", "2", "3", "4"].map(v => `<button aria-pressed="${String(S.asa) === v}" data-seg="asa" data-val="${v}">${v}</button>`).join("")}</div>
   <div class="tlab">Applies to this patient</div><div class="tticks">${TK.map(([k, l]) => `<button class="tck" aria-pressed="${!!tk[k]}" data-tk="${k}">${tk[k] ? "✓ " : ""}${l}</button>`).join("")}</div>
   <p class="sub" style="margin:4px 0 0">Age ${S.age} from the patient box${S.age > 65 ? " (over 65)" : ""}.</p></div>
-  ${pl ? `<div class="tres">${[["yes", "Order"], ["consider", "Consider"], ["no", "Not needed"]].map(([v, l]) => { const rs = pl.filter(r => r[1] === v); return rs.length ? `<div class="trow t-${v}"><b>${l}</b><span>${rs.map(r => v === "consider" ? `${r[0]} <small>(${r[2]})</small>` : r[0]).join(" · ")}</span></div>` : ""; }).join("")}
+  ${pl ? `<div class="tres">${[["yes", "Order"], ["consider", "Consider"], ["no", "Not routinely"]].map(([v, l]) => { const rs = pl.filter(r => r[1] === v); return rs.length ? `<div class="trow t-${v}"><b>${l}</b><span>${rs.map(r => v === "consider" ? `${r[0]} <small>(${r[2]})</small>` : r[0]).join(" · ")}</span></div>` : ""; }).join("")}
     <div class="tbtns"><button class="iconbtn" data-copy="${esc(testText(pl))}">${S.copied ? "Copied ✓" : "Copy"}</button><button class="iconbtn" data-tnote="${esc(testText(pl))}">${S.tNoted ? "✓ Added to pre-op note" : "Add to pre-op note"}</button></div></div>`
     : `<p class="sub"><b>Pick the surgery size${a ? "" : " and ASA"}</b> to see the list.</p>`}
   <ul><li><b>HbA1c:</b> known diabetes if none in the last 3 months; not for non-diabetics</li><li><b>Echo:</b> murmur with cardiac symptoms, or signs of heart failure — not routine</li>
@@ -3118,18 +3120,18 @@ gaCards.tests = () => { const a = +S.asa || 0, col = a>=3 ? 3 : a===2 ? 2 : a===
   <li><b>Children:</b> no routine tests for healthy children (NG45 covers adults). <b>Obstetric:</b> follow the obstetric cards and local policy.</li></ul>
   ${gLink("Echo report: what matters", "Reading an echo report")}${tk.liver ? gLink("Neuraxial & deep blocks: anticoagulant timing", "Anticoagulant timing") : ""}
   <details class="ndet"><summary>Full NG45 table</summary>
-  <p class="sub">${col?`Column for ASA ${S.asa} is highlighted.`:"Choose the ASA grade (card 1) to highlight a column."} "Consider" = only if the reason in brackets applies.</p>
+  <p class="sub">${col?`Column for ASA ${S.asa} is highlighted.`:"Choose the ASA grade (card 1) to highlight a column."} "Consider" = only if the reason in brackets applies. "Not routinely" = not as a screening test; order it if symptoms or findings call for it.</p>
   <div style="overflow-x:auto"><table><tr><th>Surgery</th><th>Test</th><th${h(1)}>ASA 1</th><th${h(2)}>ASA 2</th><th${h(3)}>ASA 3–4</th></tr>
-  <tr><td rowspan="2"><b>Minor</b><div class="sub">skin lesion, breast abscess</div></td><td>ECG</td><td${h(1)}>No</td><td${h(2)}>No</td><td${h(3)}>Consider (none in 12 months)</td></tr>
-  <tr><td>Renal profile</td><td${h(1)}>No</td><td${h(2)}>No</td><td${h(3)}>Consider (AKI risk)</td></tr>
-  <tr><td rowspan="4"><b>Intermediate</b><div class="sub">hernia, tonsils, knee arthroscopy</div></td><td>FBC</td><td${h(1)}>No</td><td${h(2)}>No</td><td${h(3)}>Consider (cardiac / renal disease with new symptoms)</td></tr>
-  <tr><td>Renal profile</td><td${h(1)}>No</td><td${h(2)}>Consider (AKI risk)</td><td${h(3)}><b>Yes</b></td></tr>
-  <tr><td>ECG</td><td${h(1)}>No</td><td${h(2)}>Consider (cardiac, renal, diabetes)</td><td${h(3)}><b>Yes</b></td></tr>
-  <tr><td>Coagulation</td><td${h(1)}>No</td><td${h(2)}>No</td><td${h(3)}>Consider (liver disease, anticoagulant)</td></tr>
+  <tr><td rowspan="2"><b>Minor</b><div class="sub">skin lesion, breast abscess</div></td><td>ECG</td><td${h(1)}>Not routinely</td><td${h(2)}>Not routinely</td><td${h(3)}>Consider (none in 12 months)</td></tr>
+  <tr><td>Renal profile</td><td${h(1)}>Not routinely</td><td${h(2)}>Not routinely</td><td${h(3)}>Consider (AKI risk)</td></tr>
+  <tr><td rowspan="4"><b>Intermediate</b><div class="sub">hernia, tonsils, knee arthroscopy</div></td><td>FBC</td><td${h(1)}>Not routinely</td><td${h(2)}>Not routinely</td><td${h(3)}>Consider (cardiac / renal disease with new symptoms)</td></tr>
+  <tr><td>Renal profile</td><td${h(1)}>Not routinely</td><td${h(2)}>Consider (AKI risk)</td><td${h(3)}><b>Yes</b></td></tr>
+  <tr><td>ECG</td><td${h(1)}>Not routinely</td><td${h(2)}>Consider (cardiac, renal, diabetes)</td><td${h(3)}><b>Yes</b></td></tr>
+  <tr><td>Coagulation</td><td${h(1)}>Not routinely</td><td${h(2)}>Not routinely</td><td${h(3)}>Consider (liver disease, anticoagulant)</td></tr>
   <tr><td rowspan="4"><b>Major</b><div class="sub">hysterectomy, colectomy, joint replacement, thyroid</div></td><td>FBC</td><td${h(1)}><b>Yes</b></td><td${h(2)}><b>Yes</b></td><td${h(3)}><b>Yes</b></td></tr>
   <tr><td>Renal profile</td><td${h(1)}>Consider (AKI risk)</td><td${h(2)}><b>Yes</b></td><td${h(3)}><b>Yes</b></td></tr>
   <tr><td>ECG</td><td${h(1)}>Consider (age &gt; 65, none in 12 months)</td><td${h(2)}><b>Yes</b></td><td${h(3)}><b>Yes</b></td></tr>
-  <tr><td>Coagulation</td><td${h(1)}>No</td><td${h(2)}>No</td><td${h(3)}>Consider (liver disease, anticoagulant)</td></tr></table></div></details>
+  <tr><td>Coagulation</td><td${h(1)}>Not routinely</td><td${h(2)}>Not routinely</td><td${h(3)}>Consider (liver disease, anticoagulant)</td></tr></table></div></details>
   ${src("NICE NG45 Routine preoperative tests for elective surgery (2016, checked 2023). Follow local policy.")}</div>`; };
 /* summary at top of the Pre-op tab */
 function preSummary(){
@@ -5433,6 +5435,11 @@ VGROUPS.find(g => g[0]==="General")[1].push(["Block cards: Misses row (v2.138)",
   "Rectus sheath: Periumbilical only (about T9–T11) · lateral wall and drain sites · no visceral analgesia",
   "TAP: Lateral TAP covers about T10–T12 only — upper abdomen needs the subcostal approach · may miss the lateral cutaneous branches · no visceral analgesia"
   ]]);
+VGROUPS.find(g => g[0]==="General")[1].push(["Pre-op decide (v2.140)", "25 Nov 2026", [
+  "Airway aspiration tick: GLP-1 agonist only with GI symptoms, dose escalation or another cause of slow gastric emptying (matches the Fasting card, multisociety GLP-1 guidance 2024)",
+  "RSI: suggested on the airway card and labelled in Plan & consent, never pre-ticked; note reads \"RSI suggested\"",
+  "Which tests: \"Not routinely\" (NG45 wording) for No / Not needed",
+  "Optimise or postpone: Defer and treat (BP, ketones / DKA, MI, stent, stroke, active cardiac, chest infection) vs Correct or optimise first (HbA1c, K, Na, anaemia, platelets / INR); no threshold changed"]]);
 VGROUPS.find(g => g[0]==="General")[1].push(["Induction drugs & relaxants combined", "22 Nov 2026", [
   "Adult: General › Induction › 1. Induction drugs & relaxants — Opioid · Hypnotic · Muscle relaxant · No IV access (rows moved unchanged)",
   "Paeds: Paediatric › Induction › 3. Induction drugs & relaxants — Anticholinergic · Opioid · Hypnotic · Muscle relaxant · No IV access (rows moved unchanged)",
@@ -5515,6 +5522,7 @@ function vTicks(){
 }
 /* ---------- ABOUT ---------- */
 const CHANGES = [
+  ["2.140","Airway card: GLP-1 counts as an aspiration risk only with GI symptoms, dose escalation or another slow-emptying cause; RSI is suggested, no longer pre-ticked in Plan & consent. Which tests: \"Not routinely\" instead of No / Not needed. Optimise or postpone: two groups — Defer and treat; Correct or optimise first (thresholds unchanged). (checked)"],
   ["2.139","Pre-op scores: RCRI and STOP-BANG show only \"score so far\" until every item is answered (or Rest are No). Airway card: a few normal findings now read \"Partial assessment\"; Routine and \"no predictors\" appear only after you tap No predictors found. (checked)"],
   ["2.138","Femoral, fascia iliaca, PENG, adductor canal, ESP, serratus anterior, rectus sheath and TAP: a Misses row — what each block does not reliably cover. (checked)"],
   ["2.137","Stop Before You Block in three stages: before the block, immediately before the needle (Prep, Stop, Block), after the block. LA calculator: an \"arithmetic only\" line, and the maximum is never shown rounded up. (checked)"],
