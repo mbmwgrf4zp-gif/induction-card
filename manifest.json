@@ -1,7 +1,7 @@
 {
   "name": "Induction Card",
   "short_name": "Induction",
-  "description": "Enter height & weight once — every dose, tube and block volume worked out. Adult, paeds, obstetric, regional & transplant. Works offline. Free.",
+  "description": "Enter height & weight once — every dose, tube and block volume worked out. 3D block finder with nerve map. Crisis cards. Adult, paeds, obstetric, regional & transplant. Works offline. Free.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",

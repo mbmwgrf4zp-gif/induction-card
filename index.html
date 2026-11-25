@@ -8,11 +8,11 @@
 <meta name="robots" content="noindex, nofollow">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data:; connect-src 'self'; manifest-src 'self'; worker-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
 <meta name="referrer" content="no-referrer">
-<meta name="description" content="Enter height & weight once — every dose, tube and block volume worked out. Adult, paeds, obstetric, regional & transplant. Works offline. Free.">
+<meta name="description" content="Enter height & weight once — every dose, tube and block volume worked out. 3D block finder with nerve map. Crisis cards. Adult, paeds, obstetric, regional & transplant. Works offline. Free.">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Induction Card">
 <meta property="og:title" content="Induction Card — offline anaesthesia doses">
-<meta property="og:description" content="Enter height & weight once — every dose, tube and block volume worked out. Adult, paeds, obstetric, regional & transplant. Works offline. Free.">
+<meta property="og:description" content="Enter height & weight once — every dose, tube and block volume worked out. 3D block finder with nerve map. Crisis cards. Adult, paeds, obstetric, regional & transplant. Works offline. Free.">
 <meta property="og:url" content="https://mbmwgrf4zp-gif.github.io/induction-card/">
 <meta property="og:image" content="https://mbmwgrf4zp-gif.github.io/induction-card/og.png">
 <meta property="og:image:width" content="1200">
@@ -802,7 +802,7 @@ if (window.top !== window.self && /\.github\.io$/.test(location.hostname)) {
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.121.1";
+const APP_VERSION = "2.122.1";
 const APP_DATE = "24 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
@@ -5057,6 +5057,7 @@ function vTicks(){
 }
 /* ---------- ABOUT ---------- */
 const CHANGES = [
+  ["2.122","Share message and link preview text updated: crisis cards, 3D block finder with nerve map and joints, block-card count (checked)"],
   ["2.121","Block finder › Nerves: one whole-body view (no Arm / Leg switch) — tap a limb to zoom in, then a nerve; Whole body button; nerve list under Arm and Leg headings; lighter start; leg colours no longer clash with the arm (checked)"],
   ["2.120","About reorganised: story, four features, What's inside in three groups (incl. LA calculator, nerve map, timer), Install, Share, a separate Use with care card, then Details; live facts line; version line at the foot (checked)"],
   ["2.119","Block finder: calmer colours — nerves start pale, the chosen one in full colour with an outline, the rest almost skin; only the limb in view is coloured; tap again to clear; Operation regions fade further once one is chosen (checked)"],
@@ -5100,7 +5101,11 @@ const LOCAL_SRC = ["Departmental obstetric anaesthesia protocol","Main OT depart
 /* ---------- SHARE THIS APP ---------- */
 const APP_URL = "https://mbmwgrf4zp-gif.github.io/induction-card/";
 // what a colleague receives (v2.103): the selling points first, link last
-const SHARE_TEXT = "Induction Card — free offline anaesthesia app for anaesthetists.\nEnter height & weight once: every drug dose, tube size and block volume is worked out for your patient (IBW / LBW / adjusted weight built in).\nAdult · paeds · obstetric · regional with 3D block finder · kidney transplant — adapted to Malaysian practice.\nWorks offline. No login; nothing leaves your phone. Tip: Add to Home Screen.";
+const SHARE_TEXT = `Induction Card — free offline anaesthesia app for anaesthetists.
+Enter height & weight once: every drug dose, tube size and block volume is worked out for your patient (IBW / LBW / adjusted weight built in).
+Crisis cards with the doses already worked out · adult, paeds, obstetric and kidney transplant — adapted to Malaysian practice.
+Regional: 3D block finder (operation site, nerve map, joints), ${Object.keys(BLKS).length} block cards with a running LA total.
+Works offline. No login; nothing leaves your phone. Tip: Add to Home Screen.`;
 const SHARE_MSG = SHARE_TEXT + "\n" + APP_URL;
 const QR_SVG = `<svg class="qr" viewBox="-4 -4 41 41" role="img" aria-label="QR code for the app link" shape-rendering="crispEdges"><rect x="-4" y="-4" width="41" height="41" fill="#fff"/><path fill="#000" d="M0 0h7v1h-7zM9 0h2v1h-2zM12 0h2v1h-2zM17 0h7v1h-7zM26 0h7v1h-7zM0 1h1v1h-1zM6 1h1v1h-1zM10 1h1v1h-1zM12 1h4v1h-4zM17 1h1v1h-1zM20 1h2v1h-2zM26 1h1v1h-1zM32 1h1v1h-1zM0 2h1v1h-1zM2 2h3v1h-3zM6 2h1v1h-1zM8 2h1v1h-1zM10 2h2v1h-2zM13 2h1v1h-1zM17 2h2v1h-2zM21 2h3v1h-3zM26 2h1v1h-1zM28 2h3v1h-3zM32 2h1v1h-1zM0 3h1v1h-1zM2 3h3v1h-3zM6 3h1v1h-1zM8 3h1v1h-1zM14 3h3v1h-3zM19 3h2v1h-2zM22 3h1v1h-1zM24 3h1v1h-1zM26 3h1v1h-1zM28 3h3v1h-3zM32 3h1v1h-1zM0 4h1v1h-1zM2 4h3v1h-3zM6 4h1v1h-1zM8 4h2v1h-2zM11 4h3v1h-3zM15 4h1v1h-1zM18 4h1v1h-1zM21 4h3v1h-3zM26 4h1v1h-1zM28 4h3v1h-3zM32 4h1v1h-1zM0 5h1v1h-1zM6 5h1v1h-1zM8 5h4v1h-4zM13 5h5v1h-5zM20 5h1v1h-1zM26 5h1v1h-1zM32 5h1v1h-1zM0 6h7v1h-7zM8 6h1v1h-1zM10 6h1v1h-1zM12 6h1v1h-1zM14 6h1v1h-1zM16 6h1v1h-1zM18 6h1v1h-1zM20 6h1v1h-1zM22 6h1v1h-1zM24 6h1v1h-1zM26 6h7v1h-7zM8 7h5v1h-5zM15 7h1v1h-1zM18 7h1v1h-1zM21 7h1v1h-1zM23 7h2v1h-2zM0 8h1v1h-1zM2 8h5v1h-5zM9 8h3v1h-3zM13 8h3v1h-3zM17 8h2v1h-2zM22 8h1v1h-1zM24 8h1v1h-1zM26 8h5v1h-5zM2 9h1v1h-1zM5 9h1v1h-1zM8 9h4v1h-4zM16 9h1v1h-1zM18 9h4v1h-4zM23 9h1v1h-1zM26 9h2v1h-2zM29 9h2v1h-2zM32 9h1v1h-1zM0 10h2v1h-2zM4 10h1v1h-1zM6 10h1v1h-1zM11 10h1v1h-1zM15 10h2v1h-2zM18 10h1v1h-1zM20 10h1v1h-1zM25 10h1v1h-1zM28 10h1v1h-1zM30 10h2v1h-2zM1 11h3v1h-3zM8 11h1v1h-1zM10 11h1v1h-1zM14 11h3v1h-3zM19 11h3v1h-3zM23 11h1v1h-1zM28 11h5v1h-5zM1 12h3v1h-3zM6 12h1v1h-1zM8 12h2v1h-2zM11 12h2v1h-2zM15 12h1v1h-1zM18 12h1v1h-1zM22 12h1v1h-1zM24 12h2v1h-2zM28 12h2v1h-2zM31 12h2v1h-2zM0 13h1v1h-1zM3 13h3v1h-3zM9 13h1v1h-1zM11 13h1v1h-1zM14 13h4v1h-4zM20 13h2v1h-2zM23 13h1v1h-1zM26 13h1v1h-1zM31 13h2v1h-2zM5 14h2v1h-2zM8 14h2v1h-2zM11 14h1v1h-1zM17 14h1v1h-1zM19 14h1v1h-1zM22 14h1v1h-1zM25 14h2v1h-2zM28 14h4v1h-4zM1 15h2v1h-2zM4 15h1v1h-1zM11 15h4v1h-4zM16 15h1v1h-1zM18 15h4v1h-4zM25 15h3v1h-3zM29 15h2v1h-2zM1 16h1v1h-1zM3 16h1v1h-1zM5 16h2v1h-2zM9 16h1v1h-1zM11 16h1v1h-1zM16 16h2v1h-2zM19 16h1v1h-1zM23 16h1v1h-1zM25 16h1v1h-1zM27 16h2v1h-2zM32 16h1v1h-1zM1 17h1v1h-1zM5 17h1v1h-1zM10 17h1v1h-1zM12 17h3v1h-3zM16 17h8v1h-8zM26 17h2v1h-2zM29 17h2v1h-2zM32 17h1v1h-1zM0 18h2v1h-2zM4 18h1v1h-1zM6 18h1v1h-1zM8 18h2v1h-2zM13 18h3v1h-3zM17 18h1v1h-1zM20 18h3v1h-3zM26 18h3v1h-3zM30 18h1v1h-1zM1 19h3v1h-3zM5 19h1v1h-1zM7 19h2v1h-2zM10 19h1v1h-1zM14 19h2v1h-2zM17 19h2v1h-2zM20 19h2v1h-2zM25 19h1v1h-1zM27 19h6v1h-6zM2 20h1v1h-1zM5 20h5v1h-5zM14 20h1v1h-1zM16 20h1v1h-1zM19 20h2v1h-2zM23 20h3v1h-3zM27 20h3v1h-3zM31 20h2v1h-2zM0 21h1v1h-1zM3 21h2v1h-2zM7 21h2v1h-2zM12 21h4v1h-4zM18 21h1v1h-1zM21 21h1v1h-1zM23 21h2v1h-2zM26 21h1v1h-1zM29 21h1v1h-1zM32 21h1v1h-1zM0 22h1v1h-1zM5 22h2v1h-2zM8 22h1v1h-1zM10 22h1v1h-1zM15 22h3v1h-3zM20 22h3v1h-3zM24 22h3v1h-3zM31 22h1v1h-1zM0 23h1v1h-1zM5 23h1v1h-1zM9 23h7v1h-7zM21 23h1v1h-1zM23 23h1v1h-1zM25 23h1v1h-1zM29 23h2v1h-2zM0 24h1v1h-1zM2 24h1v1h-1zM4 24h1v1h-1zM6 24h3v1h-3zM11 24h1v1h-1zM13 24h3v1h-3zM17 24h1v1h-1zM22 24h7v1h-7zM8 25h6v1h-6zM16 25h1v1h-1zM18 25h2v1h-2zM22 25h1v1h-1zM24 25h1v1h-1zM28 25h1v1h-1zM30 25h1v1h-1zM32 25h1v1h-1zM0 26h7v1h-7zM9 26h2v1h-2zM15 26h1v1h-1zM18 26h1v1h-1zM22 26h3v1h-3zM26 26h1v1h-1zM28 26h1v1h-1zM30 26h2v1h-2zM0 27h1v1h-1zM6 27h1v1h-1zM8 27h3v1h-3zM12 27h2v1h-2zM15 27h2v1h-2zM21 27h4v1h-4zM28 27h4v1h-4zM0 28h1v1h-1zM2 28h3v1h-3zM6 28h1v1h-1zM8 28h1v1h-1zM13 28h3v1h-3zM18 28h1v1h-1zM21 28h1v1h-1zM24 28h6v1h-6zM32 28h1v1h-1zM0 29h1v1h-1zM2 29h3v1h-3zM6 29h1v1h-1zM8 29h2v1h-2zM11 29h1v1h-1zM13 29h1v1h-1zM15 29h3v1h-3zM20 29h1v1h-1zM25 29h1v1h-1zM28 29h5v1h-5zM0 30h1v1h-1zM2 30h3v1h-3zM6 30h1v1h-1zM8 30h1v1h-1zM11 30h3v1h-3zM18 30h2v1h-2zM24 30h1v1h-1zM26 30h2v1h-2zM30 30h1v1h-1zM0 31h1v1h-1zM6 31h1v1h-1zM11 31h1v1h-1zM13 31h2v1h-2zM16 31h1v1h-1zM19 31h3v1h-3zM25 31h2v1h-2zM28 31h3v1h-3zM0 32h7v1h-7zM8 32h2v1h-2zM11 32h3v1h-3zM16 32h2v1h-2zM19 32h2v1h-2zM22 32h6v1h-6zM29 32h1v1h-1zM31 32h1v1h-1z"/></svg>`;
 const shareCard = () => `<div class="card" id="share"><h2>Share this app</h2>
