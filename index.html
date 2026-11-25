@@ -810,7 +810,7 @@ if (window.top !== window.self && /\.github\.io$/.test(location.hostname)) {
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.125.1";
+const APP_VERSION = "2.126.1";
 const APP_DATE = "25 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
@@ -4198,16 +4198,18 @@ const BF = (() => {
       if (i < 23.5) return a > 0.5 ? vec3(.29,.871,.502) : vec3(.086,.639,.29); return a > 0.5 ? vec3(.957,.447,.714) : vec3(.859,.153,.467); }
     float lev(float y){ if (y > 1.40) return 2.0; for (int k = 0; k < 11; k++){ if (y >= yb[k]) return 8.0 + float(k); } return 19.0; }
     uniform float msel;
-    float myoL(vec3 s, float d){ float u = s.x, a = s.y, b = s.z;   // ASIA key muscles on the limb (same rules as myoAt in JS); returns the dermatome-chart index
-      if (u < 0.0) return -1.0;
+    float myoT(vec3 P){ float th = abs(atan(P.x, P.z - 0.01));   // trunk: diaphragm (only when chosen), intercostals (chest wall), abdominal wall (front and sides)
+      if (msel > 1.5 && msel < 2.5) return (P.y > 1.06 && P.y < 1.22 && th < 2.0) ? 2.0 : -1.0;
+      if (P.y >= 1.22 && P.y < 1.40) return 10.0; if (P.y > max(0.92, 0.875 + max(0.0, abs(P.x) - 0.03)*0.9) && P.y < 1.22 && th < 2.1) return 16.0; return -1.0; }   // abdominal wall down to the inguinal line
+    float myoL(vec3 s, float d, vec3 P){ float u = s.x, a = s.y, b = s.z;   // ASIA key muscles on the limb (same rules as myoAt in JS); returns the dermatome-chart index
+      if (u < 0.0) return myoT(P);   // shoulder / clavicle band: the trunk rule by position
       if (u < 1.0){ if (u > 0.25 && u < 0.92){ if (b > 0.3) return 3.0; if (b < -0.3) return 5.0; } return -1.0; }
       if (u < 2.0){ if (u < 1.65 && b < -0.2 && a > -0.3) return 4.0; if (u > 1.1 && u < 1.75 && b > 0.2 && a < 0.3) return 6.0; return -1.0; }
       if (u < 3.4) return (a < -0.6 && b > -0.5 && u < 2.6) ? 7.0 : -1.0;
-      if (u < 3.9) return -1.0;
+      if (u < 3.9) return myoT(P);   // groin band: the trunk rule by position
       if (u < 5.0){ if (u < 4.35 && b > 0.3 && a < 0.5) return 20.0; if (u > 4.25 && u < 4.95 && b > 0.2 && abs(a) < 0.75) return 21.0; return -1.0; }
       if (u < 6.0){ if (u > 5.08 && u < 5.8 && b > 0.3 && a > -0.25) return 22.0; if (u > 5.05 && u < 5.6 && b < -0.3) return 24.0; return -1.0; }
       return (u > 6.25 && b > 0.3 && a < -0.15) ? 23.0 : -1.0; }
-    float myoT(vec3 P){ float th = abs(atan(P.x, P.z - 0.01)); return (P.y > 1.06 && P.y < 1.22 && th < 2.0) ? 2.0 : -1.0; }   // diaphragm (C3–C5), shown over the lower chest
     void main(){ vec3 n = normalize(vn); vec3 v = normalize(ro - vp); if (dot(n, v) < 0.0) n = -n;
       float on = 0.0; vec3 base;
       if (dm < 0.5){   // block finder: every region in its colour; once one is chosen the others fade
@@ -4217,7 +4219,7 @@ const BF = (() => {
         float edge = band.z > 0.5 && band.x < 3.5 ? min(abs(vp.y - 1.22), abs(vp.y - 1.09)) : 1.0;
         if (vs.z > 0.5 && tOn > 0.5 && edge < 0.003) base = base*0.55; }
       else if (dm < 1.5){ float L = lev(vp.y), cov = (dr.z < 0.5 || (L > dr.x - 0.5 && L < dr.y + 0.5)) ? 1.0 : 0.0; base = mix(vc, mix(skin, pal(L), cov), clamp(vs.z, 0.0, 1.0)); }
-      else if (dm > 3.5){ float w = max(vc.y, 0.0001), m = vc.y > 0.5 ? myoL(vs/w, vc.x/w) : vc.z > 0.5 ? myoT(vp) : -1.0;   // myotomes
+      else if (dm > 3.5){ float w = max(vc.y, 0.0001), m = vc.y > 0.5 ? myoL(vs/w, vc.x/w, vp) : vc.z > 0.5 ? myoT(vp) : -1.0;   // myotomes
         float on = msel < -0.5 || abs(m - msel) < 0.5 ? 1.0 : 0.0; base = m < -0.5 ? skin : mix(skin, pal(m), on > 0.5 ? (msel < -0.5 ? 0.55 : 1.0) : 0.12);
         #ifdef GL_OES_standard_derivatives
         if (fwidth(m) > 0.01 && (msel < -0.5 || on > 0.5)) base = base*0.6;
@@ -4354,8 +4356,9 @@ const BF = (() => {
       const t = (e2x*qx + e2y*qy + e2z*qz)*inv; if (t > .01 && t < best){ best = t; hit = (u + v < .5 ? T[i] : u > v ? T[i+1] : T[i+2]); bt = i; bu = u; bv = v; } }
     if (hit < 0) return null;
     if (st.mode === "myo"){ const g = nDec(m), A = g(T[bt]), B = g(T[bt+1]), C = g(T[bt+2]), w = [1 - bu - bv, bu, bv], x = k => A[k]*w[0] + B[k]*w[1] + C[k]*w[2], fl = x(4), H = [o[0] + d[0]*best, o[1] + d[1]*best, o[2] + d[2]*best];
-      if (fl > .5){ const u = x(0)/fl; return {myo: myoAt(u, x(1)/fl, x(2)/fl), limb: u < 3.4 ? "arm" : u >= 3.9 ? "leg" : null, s: H[0] < 0 ? -1 : 1}; }
-      if (x(5) > .5){ const th = Math.abs(Math.atan2(H[0], H[2] - .01)); return {myo: H[1] > 1.06 && H[1] < 1.22 && th < 2 ? 2 : -1, limb: "trunk", s: 1}; }
+      if (fl > .5){ const u = x(0)/fl; if (u < 0 || (u >= 3.4 && u < 3.9)){ const th = Math.abs(Math.atan2(H[0], H[2] - .01)), y = H[1]; return {myo: S.myo === 2 ? (y > 1.06 && y < 1.22 && th < 2 ? 2 : -1) : y >= 1.22 && y < 1.40 ? 10 : y > Math.max(.92, .875 + Math.max(0, Math.abs(H[0]) - .03)*.9) && y < 1.22 && th < 2.1 ? 16 : -1, limb: "trunk", s: 1}; }
+        return {myo: myoAt(u, x(1)/fl, x(2)/fl), limb: u < 3.4 ? "arm" : u >= 3.9 ? "leg" : null, s: H[0] < 0 ? -1 : 1}; }
+      if (x(5) > .5){ const th = Math.abs(Math.atan2(H[0], H[2] - .01)), y = H[1]; return {myo: S.myo === 2 ? (y > 1.06 && y < 1.22 && th < 2 ? 2 : -1) : y >= 1.22 && y < 1.40 ? 10 : y > Math.max(.92, .875 + Math.max(0, Math.abs(H[0]) - .03)*.9) && y < 1.22 && th < 2.1 ? 16 : -1, limb: "trunk", s: 1}; }
       return {myo: -1, limb: null, s: 1}; }
     if (st.mode === "nerve"){ const g = nDec(m), A = g(T[bt]), B = g(T[bt+1]), C = g(T[bt+2]), w = [1 - bu - bv, bu, bv], x = k => A[k]*w[0] + B[k]*w[1] + C[k]*w[2];
       const H = [o[0] + d[0]*best, o[1] + d[1]*best, o[2] + d[2]*best]; const fl = x(4); const nv = fl > .5 ? nerveAt(x(0)/fl, x(1)/fl, x(2)/fl, x(3)/fl, H) : x(5) > .5 ? trunkAt(H) : 0; return {nerve: nv, lvl: dLev(H[1]), s: H[0] < 0 ? -1 : 1}; }
@@ -4664,14 +4667,17 @@ function jointView(){ const nm = ids => ids.map(i => `<span class="bfdot" style=
   <p class="sub">Knee: femoral to the front, sciatic branches (tibial, common peroneal) to the back, obturator may add to the inner side. Hip: femoral (nerve to rectus femoris), anterior obturator and the nerve to quadratus femoris.</p>
   ${src("NYSORA (nysora.com, read 24 Nov 2026): Functional regional anesthesia anatomy — Tables 5 and 6 (innervation of joints), knee and hip joint paragraphs.")}`; }
 // v2.124 myotomes: ASIA/ISNCSCI 2019 key muscles (+ diaphragm C3–C5), shown on the 3D body; index = dermatome chart index
+const MYO2_CHECKED = true;   // checked by author 25 Nov 2026;   // v2.126 trunk muscle groups
 const MYO_CHECKED = true;   // checked by author 25 Nov 2026;
 const MYO = [[2, "C3–C5", "Diaphragm", "Breathing", "Not an ASIA key muscle. Phrenic nerve: an interscalene block often weakens it; a high spinal or epidural reaching C3–C5 can too.", "trunk"],
+  [10, "T2–T11", "Intercostal muscles", "Deep breath, cough", "Not an ASIA key muscle. Intercostal nerves (NYSORA names T3–T9 for the intercostal muscles). A high block weakens them: a weaker cough and deep breath, while the diaphragm (C3–C5) keeps breathing going.", "trunk"],
+  [16, "T7–L1", "Abdominal wall (rectus, obliques, transversus)", "Sit up, cough", "Not an ASIA key muscle. Anterior rami of T7–T12 and L1 (NYSORA). A high spinal or epidural relaxes the abdominal wall and weakens the cough.", "trunk"],
   [3, "C5", "Elbow flexors (biceps, brachialis)", "Bend the elbow", "", "arm"], [4, "C6", "Wrist extensors", "Cock the wrist back", "", "arm"], [5, "C7", "Elbow extensors (triceps)", "Straighten the elbow", "", "arm"],
   [6, "C8", "Finger flexors (middle finger, last joint)", "Bend the fingertip", "", "arm"], [7, "T1", "Little-finger abductor", "Spread the little finger", "", "arm"],
   [20, "L2", "Hip flexors (iliopsoas)", "Lift the knee towards the chest", "", "leg"], [21, "L3", "Knee extensors (quadriceps)", "Straighten the knee", "", "leg"], [22, "L4", "Ankle dorsiflexors (tibialis anterior)", "Pull the foot up", "", "leg"],
   [23, "L5", "Long toe extensors (extensor hallucis longus)", "Lift the big toe", "", "leg"], [24, "S1", "Ankle plantar flexors (gastrocnemius, soleus)", "Point the foot down", "", "leg"]];
 function myoView(fin){ const on3 = glAvail() && !BF.st.nogl && bf3d(), can = glAvail() && !BF.st.nogl, sel = MYO.find(r => r[0] === S.myo), zl = BF.st.nzone && BF.st.nzone.limb;
-  return `${MYO_CHECKED ? "" : `<div class="warn" style="margin-top:0">DRAFT — myotomes (v2.124). Compare with your references before use.</div>`}
+  return `${MYO_CHECKED ? "" : `<div class="warn" style="margin-top:0">DRAFT — myotomes (v2.124). Compare with your references before use.</div>`}${MYO2_CHECKED ? "" : `<div class="warn" style="margin-top:0">DRAFT — trunk muscles (v2.126). Compare with your references before use.</div>`}
   ${fin ? "" : seg("dmView", [["derm", "Dermatomes"], ["myo", "Myotomes"]])}
   <div class="dsel">${sel ? `<b>${sel[1]}</b> — ${sel[2]}: <b>${sel[3].toLowerCase()}</b>` : zl ? "Tap a coloured muscle group, or a level below." : "Tap an arm, a leg or the chest to zoom in, or pick a level below."}</div>
   ${fin ? `<div class="bffig"><div class="bfin"><div class="bfleft">` : ""}
@@ -4683,10 +4689,10 @@ function myoView(fin){ const on3 = glAvail() && !BF.st.nogl && bf3d(), can = glA
   ${fin ? `</div><div class="bfright">` : ""}
   <div class="dchips">${MYO.map(r => `<button class="dchip r-${dermRegion(DERM_LEVELS[r[0]] || "C4")} ${S.myo === r[0] ? "on" : ""}" data-myo="${r[0]}">${r[1]}</button>`).join("")}</div>
   ${sel && sel[4] ? `<p class="sub">${sel[4]}${sel[0] === 2 ? ` ${raLink("Interscalene")}` : ""}</p>` : ""}
-  <h3>Key muscles (ASIA)</h3><table>${MYO.map(r => `<tr class="${S.myo === r[0] ? "hl" : ""}"><td><button class="linkish" data-myo="${r[0]}">${r[1]}</button></td><td>${r[2]}<div class="sub">${r[3]}</div></td></tr>`).join("")}</table>
-  <p class="sub">A myotome is the group of muscles supplied by one spinal level's ventral (motor) root. Most muscles get more than one level; these are the standard test muscles. The <b>Bromage score</b> (Dermatomes view) grades motor block of the legs.</p>
+  <h3>Key muscles (ASIA) and trunk</h3><table>${MYO.map(r => `<tr class="${S.myo === r[0] ? "hl" : ""}"><td><button class="linkish" data-myo="${r[0]}">${r[1]}</button></td><td>${r[2]}<div class="sub">${r[3]}</div></td></tr>`).join("")}</table>
+  <p class="sub">ASIA has no key muscles from T2 to L1 (the trunk can't be tested level by level at the bedside), so those levels are shown as two trunk groups. A myotome is the group of muscles supplied by one spinal level's ventral (motor) root. Most muscles get more than one level; these are the standard test muscles. The <b>Bromage score</b> (Dermatomes view) grades motor block of the legs.</p>
   ${fin ? `</div></div></div>` : ""}
-  ${src("ASIA/ISNCSCI 2019 key muscles. NYSORA (nysora.com, read 25 Nov 2026): Functional regional anesthesia anatomy (myotome definition); Ultrasound-guided interscalene block (phrenic nerve block common).")}`; }
+  ${src("ASIA/ISNCSCI 2019 key muscles (C5–T1, L2–S1; none for T2–L1). NYSORA (nysora.com, read 25 Nov 2026): Functional regional anesthesia anatomy (myotome definition); Ultrasound-guided interscalene block (phrenic nerve block common); Pectoralis and serratus plane blocks (intercostal nerves T3–T9 supply the intercostal muscles); Truncal and cutaneous blocks (abdominal wall from the anterior rami of T7–T12 and L1).")}`; }
 function dermCard(){
   if (S.dmView === "myo") return myoView();
   const st = dermState(), {mode, sel, top} = st;
@@ -4994,6 +5000,10 @@ VGROUPS.find(g => g[0]==="General")[1].push(["Paeds doses vs local manual & pain
 VGROUPS.find(g => g[0]==="General")[1].push(["Equipment sizes in rows", "23 Nov 2026", [
   "Tube ID and depth, supraglottic sizes, paeds tube / depth / suction / laryngoscope, neonate tube, NPA, bag, DLT size and depth, NG and CVC depth: same numbers, now in rows labelled 'Equipment' (test-checked)",
   "Size chips replaced by 'have X and Y ready'; lookup tables (HMEF, bag weight bands, LMA by weight, Storz, lung isolation by age) and ventilator settings unchanged"]]);
+VGROUPS.find(g => g[0]==="General")[1].push(["Myotomes: trunk (v2.126)", "25 Nov 2026", [
+  "T2–T11 intercostal muscles (deep breath, cough) — chest wall; NYSORA names T3–T9 for the intercostal muscles; a high block weakens cough and deep breath, the diaphragm keeps breathing going",
+  "T7–L1 abdominal wall (sit up, cough) — anterior rami T7–T12 and L1 (NYSORA); a high spinal or epidural relaxes it and weakens the cough",
+  "Both marked 'not an ASIA key muscle'; ASIA has none from T2 to L1. The diaphragm band now shows only when the diaphragm is chosen"]]);
 VGROUPS.find(g => g[0]==="General")[1].push(["Block finder pairs and reminders (v2.125)", "25 Nov 2026", [
   "Often used together (from NYSORA pages read): knee adductor canal + iPACK; hip PENG + lateral femoral cutaneous (one trial); foot popliteal sciatic + saphenous at the adductor canal; clavicle interscalene + superficial cervical plexus",
   "'+ Add both' puts both blocks' upper volumes into the LA calculator",
@@ -5180,6 +5190,7 @@ function vTicks(){
 }
 /* ---------- ABOUT ---------- */
 const CHANGES = [
+  ["2.126","Myotomes: thoracic levels added as two trunk groups — intercostals (T2–T11) and abdominal wall (T7–L1), marked not ASIA key muscles (checked)"],
   ["2.125","Block finder: operation search (TKA, mastectomy…), side buttons, shorter suggestion rows (tap for details), 'often used together' pairs with one-tap Add both, anticoagulant reminder on deep blocks, clearer paeds link (checked)"],
   ["2.124","Myotomes: Block finder › Myotomes (and Dermatomes card › Myotomes) shows the ASIA key muscle for each level and the diaphragm on the 3D body (checked)"],
   ["2.123","Nerve map: trunk added — tap the chest, abdomen or back for the level and branch (front, side or back) and the blocks that reach it (checked)"],
