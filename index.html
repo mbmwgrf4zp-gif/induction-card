@@ -825,7 +825,7 @@ if (window.top !== window.self && /\.github\.io$/.test(location.hostname)) {
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.146.1";
+const APP_VERSION = "2.147.1";
 const APP_DATE = "25 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
@@ -843,7 +843,7 @@ const store = {
 // Inputs are not remembered between uses (per plan): state lives in memory only.
 window.addEventListener("hashchange", () => { if (typeof S !== "undefined"){ S.tmrOpen = false; S.tmrArm = null; } });
 const S = { ettMode:"adult", sex:"F", height:158, ageY:4, ageM:0, wt:3.0,
-            touched:{}, sc:{}, abg:{}, fbal:{}, blIn:{}, hbU:"gdl", fastH:6, leLen:"brief", leNote:"", csDec:"", pnNote:"", pnF:{}, pnLay:"mine", pnMP:"", pnNeck:"", pnPonv:"", pnUrg:"", crea:80, hbNow:12, hbLow:8, hbTarget:10, derm:"", abxSp:"general", spOp:"lscs", spHt:155, morWt:60, pw:10, pY:1, pM:0, pHt:75, pBE:-5, aw:70, emTab:"adult", obTab:"labour", pTab:"pre", gaTab:"ind", pmTab:"assess", raTab:"safety", laA:[], laP:[], cSex:"F", cY:40, cM:0, cH:160, cW:60, cD:7, cGA:40, cBW:3, cNick:"", laD:"bupi", laC:"0.5", laMl:15, laBi:"1", age:45, apfel:0, pump:"pcea_cse", topup:"lig", ventSc:"std", vfio:"", txTab:"pre", txck:{}, gaB:40, chW:6, pD:7, bw:3, dermMode:"block", asa:"", met:"", csWho:"patient", csOut:"full", csLen:"brief", csLang:"English", csNote:"", k:4.5, hb:10, todayWt:70, hdH:12 };
+            touched:{}, sc:{}, abg:{}, fbal:{}, blIn:{}, hbU:"gdl", gz:{}, fastH:6, leLen:"brief", leNote:"", csDec:"", pnNote:"", pnF:{}, pnLay:"mine", pnMP:"", pnNeck:"", pnPonv:"", pnUrg:"", crea:80, hbNow:12, hbLow:8, hbTarget:10, derm:"", abxSp:"general", spOp:"lscs", spHt:155, morWt:60, pw:10, pY:1, pM:0, pHt:75, pBE:-5, aw:70, emTab:"adult", obTab:"labour", pTab:"pre", gaTab:"ind", pmTab:"assess", raTab:"safety", laA:[], laP:[], cSex:"F", cY:40, cM:0, cH:160, cW:60, cD:7, cGA:40, cBW:3, cNick:"", laD:"bupi", laC:"0.5", laMl:15, laBi:"1", age:45, apfel:0, pump:"pcea_cse", topup:"lig", ventSc:"std", vfio:"", txTab:"pre", txck:{}, gaB:40, chW:6, pD:7, bw:3, dermMode:"block", asa:"", met:"", csWho:"patient", csOut:"full", csLen:"brief", csLang:"English", csNote:"", k:4.5, hb:10, todayWt:70, hdH:12 };
 
 function src(text){ return `<div class="src">Source: ${text}</div>`; }
 function protoSrc(){
@@ -2212,6 +2212,7 @@ pCards.ptx = () => { const w = W(), mo = AGEM(), neo = mo < 1, rise = Math.max(0
   <tr><td>FFP</td><td colspan="2">Not to correct numbers without bleeding. Bleeding or invasive procedure with coagulopathy: 10–20 mL/kg = <b>${pk([10,20],"mL")}</b> <span class="sub">(local manual; BSH 15–20 mL/kg)</span></td></tr>
   <tr><td>Cryo</td><td colspan="2">Fibrinogen &lt; 1.0 g/L (&lt; 1.5 if bleeding): 5–10 mL/kg = <b>${pk([5,10],"mL")}</b></td></tr></table>
   <h3>Which product</h3><ul>
+  <li class="medadd"><b>MOH PBM 2024:</b> stable children (not neonates) — Hb 70–90 g/L: transfuse only for signs and symptoms; Hb &gt; 90 g/L: usually unnecessary. Platelets ≥ 50 ×10⁹/L usually allow invasive procedures. FFP in surgery only for active bleeding with coagulopathy. Volume = weight × (target − current Hb, g/L) × 4 ÷ 10 for packed cells</li>
   <li><b>CMV-negative</b> (or leucodepleted) for neonates up to 28 days after expected date of delivery</li>
   <li><b>Irradiated</b>: after intrauterine transfusion (up to 6 months), exchange transfusion, severe T-cell immunodeficiency, donations from relatives</li>
   <li><b>Fresh (≤ 5 days)</b> for exchange, large-volume (≥ 25 mL/kg) or bypass transfusion — less potassium</li>
@@ -2461,8 +2462,9 @@ eCards.adult = () => {
     B("Carboprost 250 mcg IM")+" every 15 min, max 8 doses (avoid in asthma).",
     B("Misoprostol 800 mcg")+" sublingual / PR.",
     B("Tranexamic acid 1 g IV")+" over 10 min; repeat 1 g after 30 min if still bleeding.",
-    "Warm everything. Blood products early (1:1 RBC:FFP). Keep fibrinogen &gt; 2 g/L. Give calcium."],
-    "RCOG Green-top 52 (2016) / MOH Malaysia PPH guidance · latest available, checked Nov 2026.")
+    "Warm everything. Blood products early (1:1 RBC:FFP). Keep fibrinogen &gt; 2 g/L. Give calcium.",
+    "Products when platelets &lt; 50, PT or APTT &gt; 1.5 × normal, or fibrinogen &lt; 2 g/L: "+B("FFP 15 mL/kg")+" · "+B("platelets 1 adult dose")+" · "+B("cryo 1 unit per 10 kg")+" (3–4 g). TXA alternative (MOH): 1 g over 10 min, then 1 g over 8 h. Tell the blood bank when MTP is no longer needed."],
+    "RCOG Green-top 52 (2016) / MOH Malaysia PPH guidance; MOH Patient Blood Management consensus 2024 (obstetric module) · latest available, checked Nov 2026.")
   + crisis("Eclampsia", [
     "Call for help. Left lateral, airway, O₂. Protect from injury.",
     "MgSO₄ loading "+B("4 g IV over 10–15 min")+", then "+B("1 g/h")+" for 24 h.",
@@ -2657,7 +2659,8 @@ gaCards.optpost = () => `<div class="card"><h2>10. Optimise or postpone</h2>${aw
   <table>  <tr><th>HbA1c</th><td><b>≥ 69 mmol/mol (8.5%)</b>: refer to optimise first</td></tr>
   <tr><th>Potassium</th><td>&lt; 3.0 or &gt; 5.5 mmol/L: correct first <span class="sub">(common practice)</span></td></tr>
   <tr><th>Sodium</th><td>&lt; 130 or &gt; 150 mmol/L: investigate before major surgery <span class="sub">(common practice)</span></td></tr>
-  <tr><th>Anaemia</th><td>Hb <b>&lt; 13 g/dL</b> (men and women) before major surgery with expected blood loss &gt; 500 mL: investigate and treat <span class="sub">(WHO definition uses &lt; 12 g/dL for women; 13 avoids under-treating women)</span><div class="medadd sub"><b>MOH PBM 2024:</b> postpone non-urgent elective surgery at least 4 weeks to investigate and treat; ferritin &lt; 100 µg/L with large expected loss → iron; cancer surgery: individualise the timing</div></td></tr>
+  <tr><th>Anaemia</th><td>Hb <b>&lt; 13 g/dL</b> (men and women) before major surgery with expected blood loss &gt; 500 mL: investigate and treat <span class="sub">(WHO definition uses &lt; 12 g/dL for women; 13 avoids under-treating women)</span><div class="medadd sub"><b>MOH PBM 2024:</b> postpone non-urgent elective surgery at least 4 weeks to investigate and treat; ferritin &lt; 100 µg/L with large expected loss → iron; cancer surgery: individualise the timing</div>
+  <details class="ndet medadd"><summary>IV iron dose (Ganzoni)</summary><div class="fbgrid">${numIn("gz", "now", "Hb now", "g/dL")}${numIn("gz", "tgt", "Target Hb", "g/dL")}</div><div id="gzres">${gzText()}</div></details></td></tr>
   <tr><th>Platelets · INR</th><td>Platelets &lt; 50 ×10⁹/L or INR &gt; 1.5 for major surgery: correct / discuss. Neuraxial: Regional › Anticoagulant timing</td></tr></table>
   <div class="result" style="margin-top:var(--s2)">None of these: proceed with a plan — this is not a fitness certificate.</div>
   <h3>How to optimise</h3>
@@ -2677,13 +2680,21 @@ gaCards.optpost = () => `<div class="card"><h2>10. Optimise or postpone</h2>${aw
 
 /* ---------- v2.145 INTRA-OP: FLUIDS, BLOOD, ABG (adult) ---------- */
 const FBG_CHECKED = true;   // checked by author 25 Nov 2026 (author asked for these to go live without a draft step)
-const numIn = (grp, k, lab, unit, ph) => `<label class="fbin"><span>${lab}${unit ? ` <small>${unit}</small>` : ""}</span><input inputmode="decimal" autocomplete="off" data-${grp}="${k}" value="${esc(((S[grp === "abg" ? "abg" : grp === "fb" ? "fbal" : "blIn"] || {})[k]) ?? "")}" placeholder="${ph || ""}"></label>`;
+const numIn = (grp, k, lab, unit, ph) => `<label class="fbin"><span>${lab}${unit ? ` <small>${unit}</small>` : ""}</span><input inputmode="decimal" autocomplete="off" data-${grp}="${k}" value="${esc(((S[grp === "abg" ? "abg" : grp === "fb" ? "fbal" : grp === "gz" ? "gz" : "blIn"] || {})[k]) ?? "")}" placeholder="${ph || ""}"></label>`;
 const numV = (o, k) => { const v = (o || {})[k]; if (v == null || String(v).trim() === "") return null; const n = parseFloat(String(v).replace(",", ".")); return isFinite(n) ? n : NaN; };
 const hbU = () => S.hbU === "gl" ? "gl" : "gdl";
 const hbToGdl = v => v == null || isNaN(v) ? v : hbU() === "gl" ? v / 10 : v;   // g/L → g/dL
 const hbSeg = () => `<div class="pnf"><span class="sub">Hb unit</span>${seg("hbU", [["gdl", "g/dL"], ["gl", "g/L"]])}</div>`;
 const gLinkId = (id, txt) => { const e = findEntry(id); return e ? `<button class="rellink" data-id="${e.id}" data-open="${esc(e.label)}" data-g="${e.g}" data-tab="${e.tab}">${txt} ›</button>` : ""; };
 
+// Ganzoni iron dose (MOH PBM 2024, obstetric module Table 1.5)
+function gzText(){ const g = S.gz || {}, a = numV(g, "now"), t = numV(g, "tgt"), w = S.aw, sm = isSample("aw");
+  if (a == null || t == null) return `<p class="sub">Iron (mg) = (target − Hb now, g/dL) × 2.4 × weight + 500 mg for stores. Enter both Hb values.</p>`;
+  if (isNaN(a) || isNaN(t) || a < 3 || a > 20 || t < 3 || t > 20) return `<div class="danger">Hb must be 3–20 g/dL.</div>`;
+  if (t <= a) return `<div class="warn">Target is at or below Hb now.</div>`;
+  if (sm) return `<p class="sub">Enter the weight in the patient box first.</p>`;
+  const mg = (t - a)*2.4*w + 500;
+  return `<div class="result"><b>Total iron ≈ ${dz(mg, "mg")} mg</b> <span class="sub">= (${t} − ${a}) × 2.4 × ${sig(w)} kg + 500</span><div class="sub">Maximum single infusion 20 mg/kg = ${dz(20*w, "mg")} mg (iron sucrose 7 mg/kg = ${dz(7*w, "mg")} mg) — split if needed. Check the product's own label.</div></div>`; }
 // 8. Fluid management
 function fbBalance(){ const f = S.fbal || {}, v = k => numV(f, k), ins = ["crys", "coll", "bld"], outs = ["ebl", "uo", "oth"];
   const bad = [...ins, ...outs].filter(k => v(k) != null && (isNaN(v(k)) || v(k) < 0 || v(k) > 50000));
@@ -2752,11 +2763,12 @@ gaCards.blood = () => { const x = wts(), sm = isSample("aw"), ebv = 70 * x.tbw, 
   <h3>Red cells</h3><ul><li><b>Stable adults:</b> transfuse at Hb <b>&lt; 7 g/dL</b>; <b>&lt; 7.5</b> in cardiac surgery; <b>&lt; 8</b> in orthopaedic surgery or known cardiovascular disease (AABB 2023)</li>
     <li><b>Acute myocardial infarction:</b> a higher threshold may be safer (MINT 2023) — discuss</li>
     <li>Hb alone is not the trigger: weigh ongoing loss, haemodynamics, signs of poor oxygen delivery and reserve. Stable patient: one unit, then reassess (≈ +1 g/dL in an average adult)</li>
+    <li><b>Special groups (MOH critical care):</b> acute coronary syndrome Hb &gt; 8 · stable angina &gt; 7 · sepsis 7 · traumatic brain injury 7–9 (&gt; 9 with cerebral ischaemia) · subarachnoid haemorrhage 8–10 · acute ischaemic stroke &gt; 9 g/dL</li>
     <li><b>MOH PBM 2024:</b> restrictive during surgery unless unstable; no transfusion at Hb ≥ 10; after surgery, Hb &gt; 8 usually needs none unless acute myocardial or cerebral ischaemia — then at Hb 7–10 give <b>one unit and reassess</b></li></ul>
   <h3>Products</h3><table>
     <tr><th>FFP</th><td>Bleeding with prolonged PT / INR (&gt; 1.5×): 15 mL/kg${sm ? "" : ` ≈ <b>${dz(15*w, "mL")} mL</b>`}</td></tr>
     <tr><th>Platelets</th><td>One adult dose. Keep &gt; 50 ×10⁹/L when bleeding or for most surgery; &gt; 100 for neurosurgery, posterior eye surgery, or major trauma with head injury. MOH: platelets ≥ 50 or INR ≤ 2 usually allow invasive procedures; ask haematology for intracranial, eye or neuraxial procedures, platelets &lt; 100 or coagulopathy</td></tr>
-    <tr><th>Cryoprecipitate / fibrinogen</th><td>Fibrinogen &lt; 1.5 g/L with bleeding (obstetric targets: the obstetric card). 4 units per MTP pack; aim fibrinogen &gt; 1.5 g/L. Fibrinogen concentrate where available</td></tr>
+    <tr><th>Cryoprecipitate / fibrinogen</th><td>Fibrinogen &lt; 1.5 g/L with bleeding (obstetric targets: the obstetric card). 4 units per MTP pack; aim fibrinogen &gt; 1.5 g/L. Dose about <b>1 unit per 10 kg</b>${sm ? "" : ` ≈ ${Math.round(w/10)} units`} (MOH obstetric module). Fibrinogen concentrate where available</td></tr>
     <tr><th>Tranexamic acid</th><td>Before incision if expected loss &gt; 500 mL — see the Tranexamic acid card</td></tr>
     <tr><th>Cell salvage</th><td>Where available, for expected large loss</td></tr>
     <tr><th>Viscoelastic tests</th><td>ROTEM / TEG where available, to target products</td></tr></table>
@@ -2860,7 +2872,7 @@ gaCards.pmAnticoag = () => { const c = crcl(), cr = c == null ? "" : ` · CrCl �
   <li><b>Bridge with LMWH only if high thrombotic risk</b>: mechanical mitral valve, older mechanical aortic valve, VTE within 3 months, AF with stroke / TIA within 3 months. Last treatment-dose LMWH 24 h before</li>
   <li>Restart the evening of surgery if haemostasis is secure</li></ul>
   <h3>Antiplatelets</h3><table>
-  <tr><th>Aspirin</th><td>Usually <b>continue</b>. Discuss stopping (7 days) for closed-space surgery: intracranial, spinal canal, posterior eye</td></tr>
+  <tr><th>Aspirin</th><td>Usually <b>continue</b>. Discuss stopping (7 days) for closed-space surgery: intracranial, spinal canal, posterior eye<div class="medadd sub">MOH PBM 2024 agrees on continuing aspirin for most surgery (and neuraxial); when stopped it suggests day −3 to +7. DOAC, warfarin and heparin timings here match MOH.</div></td></tr>
   <tr><th>Clopidogrel</th><td>Stop <b>5 days</b> before</td></tr>
   <tr><th>Ticagrelor</th><td>Stop <b>3–5 days</b> before <span class="sub">(ESC 3–5; many UK units 5)</span></td></tr>
   <tr><th>Prasugrel</th><td>Stop <b>7 days</b> before</td></tr></table>
@@ -5669,6 +5681,12 @@ VGROUPS.find(g => g[0]==="General")[1].push(["MOH Patient Blood Management 2024 
   "EBV 70 mL/kg (all adults). No transfusion at Hb ≥ 10; post-op > 8 usually none unless ischaemia (then 1 unit at 7–10 and reassess). Platelets ≥ 50 or INR ≤ 2 for invasive procedures",
   "TXA before incision if expected loss > 500 mL; trauma 1 g + 1 g over 8 h within 3 h. Desmopressin 0.3 mcg/kg; warfarin reversal; Xa / dabigatran reversal agents",
   "Major surgery: FBC, ferritin, GSH; anaemia: postpone non-urgent elective surgery ≥ 4 weeks; ferritin < 100 → iron. Author asked for this to go live without a draft step"]]);
+VGROUPS.find(g => g[0]==="General")[1].push(["MOH PBM 2024, other modules (v2.147)", "25 Nov 2026", [
+  "Obstetric MOH: products at platelets < 50, PT/APTT > 1.5×, fibrinogen < 2 g/L; FFP 15 mL/kg, platelets 1 adult dose, cryo 1 unit/10 kg (3–4 g); TXA alternative 1 g + 1 g over 8 h (existing 30-min repeat kept)",
+  "Critical care MOH: ACS > 8, stable angina > 7, sepsis 7, TBI 7–9 (> 9 with ischaemia), SAH 8–10, ischaemic stroke > 9 g/dL",
+  "Paeds MOH: Hb 70–90 g/L symptom-based, > 90 usually unnecessary; platelets ≥ 50 for invasive procedures; FFP only for bleeding with coagulopathy; volume factor 4 (existing card agrees)",
+  "Aspirin: kept at 7 days for closed-space surgery (author's choice); MOH day −3 to +7 noted. Ganzoni: (target − Hb) × 2.4 × kg + 500; max 20 mg/kg per infusion (iron sucrose 7 mg/kg)",
+  "Author asked for this to go live without a draft step"]]);
 VGROUPS.find(g => g[0]==="General")[1].push(["Induction drugs & relaxants combined", "22 Nov 2026", [
   "Adult: General › Induction › 1. Induction drugs & relaxants — Opioid · Hypnotic · Muscle relaxant · No IV access (rows moved unchanged)",
   "Paeds: Paediatric › Induction › 3. Induction drugs & relaxants — Anticholinergic · Opioid · Hypnotic · Muscle relaxant · No IV access (rows moved unchanged)",
@@ -5710,7 +5728,7 @@ function sampleWarn(keys){ const k = keys.filter(isSample); if (!k.length) retur
   const names = {k:"K⁺", hb:"Hb", height:"height", aw:"weight", pw:"weight", pY:"age", spHt:"height", morWt:"weight", sex:"sex", age:"age"};
   return `<div class="samplewarn"><b>Sample values</b> — ${(a => a.length > 1 ? a.slice(0,-1).join(", ") + " and " + a[a.length-1] : a[0])([...new Set(k.map(x=>names[x]))])} not entered. Enter the patient or tap a case.</div>`; }
 /* Each case keeps its own clinical entries, in memory only (never saved). */
-const CLIN = ["csDec","sc","asa","met","pnF","pnMP","pnNeck","pnPonv","pnUrg","pnLay","csNote","leNote","pnNote","csWho","csLang","csOut","csLen","leLen","csMode","crea","k","hb","todayWt","hdH","hbNow","hbLow","hbTarget","fastH","pBE","laA","txck","derm","abg","fbal","blIn","hbU"];
+const CLIN = ["csDec","sc","asa","met","pnF","pnMP","pnNeck","pnPonv","pnUrg","pnLay","csNote","leNote","pnNote","csWho","csLang","csOut","csLen","leLen","csMode","crea","k","hb","todayWt","hdH","hbNow","hbLow","hbTarget","fastH","pBE","laA","txck","derm","abg","fbal","blIn","hbU","gz"];
 const CLIN_T = ["crea","k","hb","todayWt","hdH"];
 const CLIN_OBJ = {sc:{}, pnF:{}, txck:{}, laA:[]};
 const clone = v => v === undefined ? undefined : JSON.parse(JSON.stringify(v));
@@ -5751,6 +5769,7 @@ function vTicks(){
 }
 /* ---------- ABOUT ---------- */
 const CHANGES = [
+  ["2.147","More from the MOH Patient Blood Management consensus 2024: Massive obstetric haemorrhage gets product triggers and doses (FFP 15 mL/kg, platelets 1 adult dose, cryo 1 unit/10 kg); Blood management — cryo 1 unit/10 kg and Hb targets for special groups (ACS, TBI, SAH, stroke, sepsis); Paeds transfusion — MOH points; Anticoagulants — MOH agreement noted (aspirin stays 7 days); Optimise or postpone — IV iron (Ganzoni) calculator. (checked)"],
   ["2.146","Blood management now follows the MOH Malaysia Patient Blood Management consensus (March 2024): major haemorrhage definition, MTP / T-MTP pack and targets, blood loss visual guide, red cell and platelet points, adjuncts and reversal; EBV 70 mL/kg. Tranexamic acid: before incision if expected loss > 500 mL. Which tests: ferritin and group, screen & hold for major surgery. Optimise or postpone: anaemia — wait 4 weeks to treat. (checked)"],
   ["2.145","General › Intra-op: three new adult cards under Circulation & physiology — 8. Fluid management (maintenance estimate, fluid challenge, which fluid, running balance), 10. Blood management (major haemorrhage box, EBV, allowable blood loss, thresholds, products), 11. ABG analysis (step-by-step acid–base, anion gap, compensation, P/F and A–a). Vasopressors now 9, one-lung ventilation 12. (checked)"],
   ["2.144","General reordered for theatre: Induction — tube & airway kit, drugs & relaxants, RSI. Intra-op — Before incision (antibiotics, TXA, PONV), Maintenance (ventilation, TIVA, volatile), Analgesia & BP, Specialist (one-lung ventilation). Post-op — Emergence, Recovery, Day case & ward. PONV now sits in Intra-op with a link from Post-op. No clinical content changed. (checked)"],
@@ -6818,7 +6837,7 @@ document.addEventListener("click", e => { const t = e.target.closest && e.target
 let vtaps = 0, vtimer = null;
 document.addEventListener("click", e => { if (!e.target.closest || !e.target.closest(".vtap")) return; vtaps++; clearTimeout(vtimer); vtimer = setTimeout(()=>vtaps=0, 1500); if (vtaps >= 5){ vtaps = 0; location.hash = "#values"; window.scrollTo(0,0); } });
 document.addEventListener("change", e => { if (e.target.id==="csNote"){ S.csNote = e.target.value.slice(0,300); render(); } if (e.target.id==="leNote"){ S.leNote = e.target.value.slice(0,300); render(); } if (e.target.id==="pnNote"){ S.pnNote = e.target.value.slice(0,300); render(); } if (e.target.dataset && e.target.dataset.pnf){ const f = e.target.dataset.pnf, v = e.target.value.slice(0,300); (S.pnF = S.pnF || {})[f] = v; if (f === "cr"){ const n = parseFloat(v); if (n >= 30 && n <= 1200){ S.crea = n; S.touched.crea = true; } } render(); } });
-document.addEventListener("input", e => { if (e.target.id==="csNote") S.csNote = e.target.value.slice(0,300); if (e.target.id==="leNote"){ S.leNote = e.target.value.slice(0,300); store.set("consLast","le"); } if (e.target.id==="pnNote") S.pnNote = e.target.value.slice(0,300); if (e.target.dataset && e.target.dataset.pnf) (S.pnF = S.pnF || {})[e.target.dataset.pnf] = e.target.value.slice(0,300); if (e.target.id==="q") runSearch(e.target.value); if (e.target.id==="nagq" || e.target.id==="nagpq"){ const pd = e.target.id === "nagpq"; S[(pd ? "nagp" : "nag") + "Q"] = e.target.value; S[(pd ? "nagp" : "nag") + "Open"] = null; const l = document.getElementById(pd ? "nagplist" : "naglist"); if (l) l.innerHTML = nagList(pd); document.querySelectorAll(`[data-nagtab^="${pd ? "p" : "a"}|"]`).forEach(b => b.setAttribute("aria-selected", "false")); } const fbg = e.target.dataset && (e.target.dataset.abg ? ["abg", "abg", "abgres", abgResult] : e.target.dataset.fb ? ["fbal", "fb", "fbres", fbBalance] : e.target.dataset.bl ? ["blIn", "bl", "blres", ablText] : null); if (fbg){ (S[fbg[0]] = S[fbg[0]] || {})[e.target.dataset[fbg[1]]] = e.target.value.slice(0, 12); const r = document.getElementById(fbg[2]); if (r) r.innerHTML = fbg[3](); } if (e.target.id==="bfq"){ S.bfq = e.target.value; const r = document.getElementById("bfopsr"); if (r) r.innerHTML = bfOpsList(); } if (e.target.id==="vq"){ S.vq = e.target.value; const pos = e.target.selectionStart; render(); const el = document.getElementById("vq"); if (el){ el.focus(); try{ el.setSelectionRange(pos,pos); }catch(_){} } } if (e.target.id==="cNick") S.cNick = e.target.value.slice(0,12); if (e.target.id==="dname") S.dname = e.target.value.slice(0,24); });
+document.addEventListener("input", e => { if (e.target.id==="csNote") S.csNote = e.target.value.slice(0,300); if (e.target.id==="leNote"){ S.leNote = e.target.value.slice(0,300); store.set("consLast","le"); } if (e.target.id==="pnNote") S.pnNote = e.target.value.slice(0,300); if (e.target.dataset && e.target.dataset.pnf) (S.pnF = S.pnF || {})[e.target.dataset.pnf] = e.target.value.slice(0,300); if (e.target.id==="q") runSearch(e.target.value); if (e.target.id==="nagq" || e.target.id==="nagpq"){ const pd = e.target.id === "nagpq"; S[(pd ? "nagp" : "nag") + "Q"] = e.target.value; S[(pd ? "nagp" : "nag") + "Open"] = null; const l = document.getElementById(pd ? "nagplist" : "naglist"); if (l) l.innerHTML = nagList(pd); document.querySelectorAll(`[data-nagtab^="${pd ? "p" : "a"}|"]`).forEach(b => b.setAttribute("aria-selected", "false")); } const fbg = e.target.dataset && (e.target.dataset.abg ? ["abg", "abg", "abgres", abgResult] : e.target.dataset.fb ? ["fbal", "fb", "fbres", fbBalance] : e.target.dataset.bl ? ["blIn", "bl", "blres", ablText] : e.target.dataset.gz ? ["gz", "gz", "gzres", gzText] : null); if (fbg){ (S[fbg[0]] = S[fbg[0]] || {})[e.target.dataset[fbg[1]]] = e.target.value.slice(0, 12); const r = document.getElementById(fbg[2]); if (r) r.innerHTML = fbg[3](); } if (e.target.id==="bfq"){ S.bfq = e.target.value; const r = document.getElementById("bfopsr"); if (r) r.innerHTML = bfOpsList(); } if (e.target.id==="vq"){ S.vq = e.target.value; const pos = e.target.selectionStart; render(); const el = document.getElementById("vq"); if (el){ el.focus(); try{ el.setSelectionRange(pos,pos); }catch(_){} } } if (e.target.id==="cNick") S.cNick = e.target.value.slice(0,12); if (e.target.id==="dname") S.dname = e.target.value.slice(0,24); });
 function clamp(v,min,max){ return Math.min(max, Math.max(min, v)); }
 /* hold − / + : repeat, speeding up; the click after a hold is ignored */
 (() => { let tm = null, n = 0, held = false, key = null, dd = 0, mn = 0, mx = 0;
