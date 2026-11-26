@@ -856,6 +856,29 @@ select[data-stc]{font-size:15px;display:block;width:100%;max-width:100%;min-heig
   .sidenav.haspt{gap:2px;padding-top:var(--s2)}.sidenav.haspt .snitem{padding:6px var(--s3)}.sidenav.haspt .snbrand{padding-bottom:var(--s2)}.sidenav.haspt .snkeys{margin-top:var(--s3)}
 }
 @media (min-width:1100px) and (pointer:fine){ .gside.innav .ptile .pm{display:none} }
+/* v2.161 LSCS spinal: height ruler + syringe */
+:root{--sy-bupi:#db2777;--sy-mor:#d97706;--sy-fen:#2563eb}
+.lruler{border:1px solid var(--line);border-radius:var(--r-sm);padding:var(--s2) var(--s3);margin-bottom:var(--s2);background:var(--card)}
+.lruler.sample{border-style:dashed;border-color:var(--warn-line)}
+.lrh{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.lrh input{width:4.2em;text-align:center;font:700 20px var(--font-sans);font-variant-numeric:tabular-nums;border:1px solid var(--line);border-radius:8px;padding:4px;background:var(--field);color:var(--ink)}
+.lruler.sample .lrh input{color:var(--muted)}
+.lrh button{width:40px;height:36px;border:1px solid var(--line);background:var(--field);color:var(--ink);border-radius:8px;font-size:17px;cursor:pointer}
+.lrh .u{font-size:13px;color:var(--muted)}
+.lrk{display:flex;gap:8px;font-size:13px;color:var(--muted);margin:8px 0 2px}.lrk span+span::before{content:"· "}
+.lrb{position:relative;display:grid;grid-template-columns:repeat(4,1fr);gap:3px;padding-top:22px;touch-action:none;cursor:pointer;user-select:none}
+.lband{border:1px solid var(--line);border-radius:8px;padding:6px 4px;text-align:center;display:grid;gap:1px;background:var(--bg)}
+.lband b{font-size:13px;color:var(--muted);font-weight:600;white-space:nowrap}
+.lband .bv{font:700 16px var(--font-sans);font-variant-numeric:tabular-nums;white-space:nowrap}
+.lband small{font-size:13px;color:var(--muted)}
+.lband.on{background:var(--gc-soft,var(--accent-soft));border-color:var(--gc,var(--accent));box-shadow:inset 0 0 0 1px var(--gc,var(--accent))}
+.lband.on b,.lband.on small{color:var(--ink)}
+.lmark{position:absolute;top:0;height:22px;width:0;border-left:2px solid var(--gc,var(--accent));pointer-events:none}
+.lmark span{position:absolute;top:0;transform:translateX(-50%);background:var(--gc,var(--accent));color:var(--on);font:700 13px var(--font-sans);padding:1px 6px;border-radius:6px;white-space:nowrap}
+.lruler.sample .lmark{border-left-style:dashed;border-color:var(--muted)}.lruler.sample .lmark span{background:var(--muted)}
+.lsy{display:block;width:100%;max-width:440px;height:auto;margin:6px 0 2px}
+.sw{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:6px;vertical-align:0}
+.lsyk{margin:4px 0}
 </style>
 </head>
 <body>
@@ -870,7 +893,7 @@ if (window.top !== window.self && /\.github\.io$/.test(location.hostname)) {
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.160.4";
+const APP_VERSION = "2.161.0";
 const APP_DATE = "26 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
@@ -1321,24 +1344,45 @@ const OPS = { // DRAFT textbook ranges, heavy bupivacaine 0.5% mL
 const rng = (a,b,u="") => a===b ? `${fmt(a)}${u}` : `${fmt(a)} – ${fmt(b)}${u}`;
 
 /* ---------- SPINAL: LSCS dose (used inside Caesarean tab) ---------- */
+const LSCS_SPAN = [[140,150],[151,155],[156,160],[161,180]];   // ruler: each band drawn equal width over its own cm range
+const lscsSyringe = (row, smp) => {   // 3 mL syringe: bupivacaine (range shaded), then morphine 0.1 mL, fentanyl 0.2 mL
+  const X0 = 28, W = 260, x = v => X0 + v/3*W, y = 24, H = 30;
+  const seg = (a, b, c, op) => `<rect x="${x(a)}" y="${y}" width="${Math.max(0, x(b) - x(a))}" height="${H}" fill="${c}" opacity="${op || 1}"/>`;
+  const lo = row[1], hi = row[2];
+  const fill = smp ? seg(0, hi + 0.3, "var(--muted)", .35) :
+    seg(0, lo, "var(--sy-bupi)") + (hi > lo ? seg(lo, hi, "var(--sy-bupi)", .45) : "") + seg(hi, hi + 0.1, "var(--sy-mor)") + seg(hi + 0.1, hi + 0.3, "var(--sy-fen)");
+  const ticks = [0,0.5,1,1.5,2,2.5,3].map(v => `<line x1="${x(v)}" y1="${y + H}" x2="${x(v)}" y2="${y + H - (v % 1 ? 7 : 12)}" stroke="var(--ink)" stroke-width="1"/>${v % 1 ? "" : `<text x="${x(v)}" y="${y + H + 13}" text-anchor="middle" font-size="11" fill="var(--muted)">${v}</text>`}`).join("");
+  const tot = smp ? "" : `<line x1="${x(row[4])}" y1="${y - 6}" x2="${x(row[4])}" y2="${y + H + 2}" stroke="var(--ink)" stroke-width="1.5" stroke-dasharray="3 2"/><text x="${x(row[4])}" y="${y - 8}" text-anchor="end" font-size="11" font-weight="700" fill="var(--ink)">total ${rng(row[3], row[4])} mL</text>`;
+  return `<svg class="lsy" viewBox="0 0 330 76" role="img" aria-label="${smp ? "Enter height" : `Syringe: bupivacaine ${rng(lo, hi)} mL, morphine 0.1 mL, fentanyl 0.2 mL, total ${rng(row[3], row[4])} mL`}">
+    <rect x="${X0 - 12}" y="${y + 9}" width="12" height="12" rx="2" fill="var(--line)"/>${fill}
+    <rect x="${X0}" y="${y}" width="${W}" height="${H}" rx="4" fill="none" stroke="var(--ink)" stroke-width="1.5"/>
+    <rect x="${X0 + W}" y="${y - 4}" width="5" height="${H + 8}" rx="1" fill="var(--ink)"/><rect x="${X0 + W + 5}" y="${y + 12}" width="30" height="6" fill="var(--ink)" opacity=".6"/>${ticks}${tot}
+    ${smp ? `<text x="${X0 + W/2}" y="${y + 20}" text-anchor="middle" font-size="12" font-weight="700" fill="var(--muted)">enter height</text>` : ""}</svg>`;
+};
 const lscsBody = () => {
-  const h = Math.round(S.spHt), row = LSCS.find(r => h <= r[0]);
-  return ptiles([ptile("spHt","Height","cm",140,200,1)]) + `<div class="result">
+  const h = Math.round(S.spHt), row = LSCS.find(r => h <= r[0]), i = LSCS.indexOf(row), smp = isSample("spHt");
+  const [a, z] = LSCS_SPAN[i], frac = Math.max(0, Math.min(1, (Math.min(h, z) - a) / Math.max(1, z - a)));
+  const ruler = `<div class="lruler${smp ? " sample" : ""}">
+    <div class="lrh"><span class="tlab" style="margin:0">Height</span><button aria-label="Height down" data-step="spHt" data-d="-1" data-min="140" data-max="200">−</button><input id="in-spHt" inputmode="decimal" aria-label="Height (cm)${smp ? ", sample value" : ""}" data-in="spHt" data-min="140" data-max="200" value="${h}"><span class="u">cm</span><button aria-label="Height up" data-step="spHt" data-d="1" data-min="140" data-max="200">+</button>${smp ? `<span class="stag">sample</span>` : ""}</div>
+    <div class="lrk"><span>Height</span><span>Bupi mL</span><span>Total mL</span></div>
+    <div class="lrb" data-lruler="1">${LSCS.map((r, j) => `<div class="lband${j === i ? " on" : ""}"><b>${r[5]}</b><span class="bv">${rng(r[1], r[2])}</span><small>${rng(r[3], r[4])}</small></div>`).join("")}
+      <div class="lmark" style="left:${((i + frac)/4*100).toFixed(1)}%"><span>${h}</span></div></div>
+    <div class="sub" style="margin-top:2px">Drag or tap along the bands to set height.</div></div>`;
+  return ruler + `<div class="result">
     <div class="sub">Heavy bupivacaine 0.5% (height ${row[5]} cm)</div>
     <div class="big">${rng(row[1],row[2])} mL</div>
     <div class="sub">= ${rng(row[1]*5,row[2]*5)} mg</div>
+    ${lscsSyringe(row, smp)}
     <h3>+ IT opioids (0.3 mL)</h3>
-    <ul><li><b>Morphine 0.1 mg (0.1 mL)</b> — <span class="danger" style="display:inline;padding:1px 6px;font-weight:700">1 mg/mL DILUTED, not 10 mg/mL</span></li>
-    <li><b>Fentanyl 10 mcg (0.2 mL</b> of 50 mcg/mL)</li></ul>
-    <div class="sub">Total volume: <b>${rng(row[3],row[4])} mL</b></div>
-    <table style="margin-top:10px"><tr><th>Height</th><th>Bupi mL</th><th>Total mL</th></tr>
-    ${LSCS.map(r=>`<tr class="${r===row?"hl":""}"><td>${r[5]}</td><td>${rng(r[1],r[2])}</td><td>${rng(r[3],r[4])}</td></tr>`).join("")}</table>
-    <div class="warn">Obese / big abdomen (polyhydramnios, twins): <b>REDUCE</b> heavy bupivacaine dose (amount: your judgement).<br>Preload unless contraindicated. Left lateral tilt (right side up).</div>
-    <div class="sub">Easier to manage hypotension than an inadequate block.</div>
+    <ul class="lsyk"><li><i class="sw" style="background:var(--sy-mor)"></i><b>Morphine 0.1 mg (0.1 mL)</b> — <span class="danger" style="display:inline;padding:1px 6px;font-weight:700">1 mg/mL DILUTED, not 10 mg/mL</span></li>
+    <li><i class="sw" style="background:var(--sy-fen)"></i><b>Fentanyl 10 mcg (0.2 mL</b> of 50 mcg/mL)</li></ul>
+    <div class="sub"><i class="sw" style="background:var(--sy-bupi)"></i>Total volume: <b>${rng(row[3],row[4])} mL</b></div>
+    <div class="warn">Obese / big abdomen (polyhydramnios, twins): <b>REDUCE</b> heavy bupivacaine dose (amount: your judgement).</div>
+    <details class="ndet"><summary>Notes</summary><p>Preload unless contraindicated. Left lateral tilt (right side up).</p>
+    <div class="sub">Easier to manage hypotension than an inadequate block.</div></details>
     ${dermLink("T4")}
     ${protoSrc()}</div>`;
 };
-
 /* ---------- SPINAL: non-obstetric (own home button) ---------- */
 const nonObsCalc = () => {
   if (!OPS[S.spOp]) S.spOp = "saddle";
@@ -6295,6 +6339,7 @@ function vTicks(){
 }
 /* ---------- ABOUT ---------- */
 const CHANGES = [
+  ["2.161","Obstetric › LSCS › A1 Spinal: dose by height redesigned — height ruler with the four bands (drag or tap to set height) and a syringe showing bupivacaine, morphine and fentanyl layers with the total. Same doses and wording."],
   ["2.160.4","Done ✓ moved up to the patient header, next to the sex switch; always shown, greyed until the patient is entered. The box is shorter."],
   ["2.160.3","Number sizes made consistent: calculated doses 20 px everywhere; volume lines and small dose notes 16 px; adrenaline infusion rates in Anaphylaxis bold. Drop-down lists use the app font and style; single patient fields inside cards no longer stretch across the card on desktop."],
   ["2.160.2","Result numbers now bold as intended."],
@@ -7439,6 +7484,15 @@ document.addEventListener("toggle", e => {
 }, true);
 document.addEventListener("toggle", e => { const d = e.target; if (!d.matches || !d.matches("details.catgrp")) return; S.catOpen = S.catOpen || new Set();
   if (d.open) S.catOpen.add(d.dataset.cat); else { S.catOpen.delete(d.dataset.cat); if (d.querySelector("details.acc[open]")) S.open = null; } }, true);
+(() => { let drag = null;   // v2.161 LSCS height ruler: drag / tap along the bands, commit on release
+  const hAt = (el, cx) => { const r = el.getBoundingClientRect(), f = Math.max(0, Math.min(0.9999, (cx - r.left) / r.width)), i = Math.floor(f*4), fr = f*4 - i, [a, z] = LSCS_SPAN[i]; return Math.round(a + fr*(z - a)); };
+  const show = (el, h) => { const m = el.querySelector(".lmark"), i = LSCS.findIndex(r => h <= r[0]), [a, z] = LSCS_SPAN[i]; if (m){ m.style.left = ((i + (Math.min(h, z) - a)/Math.max(1, z - a))/4*100) + "%"; m.firstChild.textContent = h; }
+    el.querySelectorAll(".lband").forEach((b, j) => b.classList.toggle("on", j === i)); };
+  document.addEventListener("pointerdown", e => { const el = e.target.closest && e.target.closest("[data-lruler]"); if (!el) return; e.preventDefault(); drag = {el, h: hAt(el, e.clientX)}; show(el, drag.h); try { el.setPointerCapture(e.pointerId); } catch(_){} });
+  document.addEventListener("pointermove", e => { if (!drag) return; drag.h = hAt(drag.el, e.clientX); show(drag.el, drag.h); });
+  const end = () => { if (!drag) return; const h = drag.h; drag = null; S.spHt = h; S.touched.spHt = true; S.ptEditing = true; render(); };
+  document.addEventListener("pointerup", end); document.addEventListener("pointercancel", () => { drag = null; render(); });
+})();
 document.addEventListener("keydown", e => { const t = e.target; if (!t.dataset || !t.dataset.in || (e.key !== "ArrowUp" && e.key !== "ArrowDown")) return; const tile = t.closest(".ptile"); if (!tile) return;
   const b = [...tile.querySelectorAll("[data-step]")].find(x => (+x.dataset.d > 0) === (e.key === "ArrowUp")); if (!b) return; e.preventDefault(); const id = t.id; b.click();
   requestAnimationFrame(() => { const n = document.getElementById(id); if (n){ n.focus(); try { n.select(); } catch(_){} } }); });
