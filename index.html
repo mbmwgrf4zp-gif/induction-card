@@ -201,7 +201,7 @@ header h1{font-size:var(--fs-lg);font-weight:700;margin:0;flex:1;display:flex;al
 .ptile.sample{border-style:dashed;border-color:var(--warn-line)}
 .ptile small{font:600 10.5px var(--font-sans);letter-spacing:.04em;text-transform:uppercase;color:var(--muted);display:flex;align-items:center;gap:4px;white-space:nowrap}
 .ptile small .stag{margin:0;font-size:10px;text-transform:none;letter-spacing:0}
-.ptile input{width:100%;min-width:0;text-align:center;border:0;background:transparent;font-family:var(--font-sans);font-weight:800;font-variant-numeric:tabular-nums;font-size:22px;line-height:1.15;color:var(--gc,var(--accent));padding:2px 0;border-radius:8px}
+.ptile input{width:100%;min-width:0;text-align:center;border:0;background:transparent;font-family:var(--font-sans);font-weight:700;font-variant-numeric:tabular-nums;font-size:22px;line-height:1.15;color:var(--gc,var(--accent));padding:2px 0;border-radius:8px}
 .ptile.sample input{color:var(--muted);opacity:.75}
 .ptile input:focus{outline:2px solid var(--gc,var(--accent));background:var(--field)}
 .ptile .u{font-size:11px;color:var(--muted);text-transform:none;letter-spacing:0;font-weight:400}
@@ -210,7 +210,7 @@ header h1{font-size:var(--fs-lg);font-weight:700;margin:0;flex:1;display:flex;al
 .dline{font-size:var(--fs-xs);color:var(--muted);margin-top:var(--s2);font-variant-numeric:tabular-nums}
 .dline b{color:var(--ink)}
 .ptbar .pbm{display:block;font-weight:700}
-.ptbar .pbm .n7{font-family:var(--font-sans);font-weight:800;font-variant-numeric:tabular-nums;color:var(--gc,var(--accent));font-size:1.05em;letter-spacing:.02em}
+.ptbar .pbm .n7{font-family:var(--font-sans);font-weight:700;font-variant-numeric:tabular-nums;color:var(--gc,var(--accent));font-size:1.05em;letter-spacing:.02em}
 .ptbar .pbs{display:block;font-size:var(--fs-xs);color:var(--muted);font-weight:400}
 .ptbar .pbc{display:block;font-size:var(--fs-xs);color:var(--gc,var(--accent));font-weight:700;text-transform:uppercase;letter-spacing:.04em}
 .step{display:flex;align-items:center;gap:var(--s2);margin:var(--s2) 0}
@@ -221,7 +221,7 @@ header h1{font-size:var(--fs-lg);font-weight:700;margin:0;flex:1;display:flex;al
 
 /* results */
 .result{background:var(--gc-soft);border-radius:var(--r);padding:var(--s4);margin:var(--s3) 0}
-.big{font-family:var(--font-sans);font-size:calc(var(--big)*.92);font-weight:800;line-height:1.15;font-variant-numeric:tabular-nums;letter-spacing:-.01em;margin:2px 0 6px}
+.big{font-family:var(--font-sans);font-size:calc(var(--big)*.92);font-weight:700;line-height:1.15;font-variant-numeric:tabular-nums;letter-spacing:-.01em;margin:2px 0 6px}
 .big .rgd{font-family:var(--font-sans);font-weight:500;font-size:.78em;letter-spacing:0;margin:0 .28em 0 .22em;vertical-align:.08em}
 .sub{color:var(--muted);font-size:var(--fs-sm);line-height:1.4}
 .row{display:flex;gap:var(--s4);flex-wrap:wrap}
@@ -301,7 +301,7 @@ b.dose{font-weight:700;background:var(--gc-soft);padding:0 .28em;border-radius:5
 .sx{width:1em;height:1em;vertical-align:-.14em;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;flex:none}
 .bu{font-size:.5em;font-weight:600;letter-spacing:0;font-family:var(--font-sans)}
 .qans small{font-family:var(--font-sans);letter-spacing:0}
-.seg1{display:inline-block;margin-left:-.42em}.big,.qans{font-weight:400}
+.seg1{display:inline-block;margin-left:-.42em}.qans{font-weight:400}
 .emlinks{display:grid;grid-template-columns:1fr 1fr;gap:var(--s2)}.emlinks .sub{grid-column:1/-1}.emlinks .emlink{margin:0;display:flex;align-items:center}
 @media (max-width:359px){.emlinks{grid-template-columns:1fr}}
 .pbsamp{display:inline-block;background:var(--warn-bg,#fef3c7);color:var(--warn-ink,#92400e);border:1px solid #f59e0b;border-radius:6px;padding:0 6px;font-size:12px;font-weight:700;vertical-align:2px;margin-right:4px}
@@ -864,7 +864,7 @@ if (window.top !== window.self && /\.github\.io$/.test(location.hostname)) {
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.160.1";
+const APP_VERSION = "2.160.2";
 const APP_DATE = "26 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
@@ -6281,6 +6281,7 @@ function vTicks(){
 }
 /* ---------- ABOUT ---------- */
 const CHANGES = [
+  ["2.160.2","Result numbers now bold as intended."],
   ["2.160.1","Easier-to-read numbers: patient fields, the patient summary bar and the big result numbers in cards now use the normal font in bold (same-width digits). Home monitor tiles, quick answers, clock and timer keep the monitor style."],
   ["2.160","Desktop: the patient box sits under the menu on the left as a vertical list (fields, then BMI, IBW, LBW, AdjBW one per line) and stays in view; cards use the freed width. Phones and tablets unchanged."],
   ["2.159.2","Desktop: patient fields are compact one-line boxes (no − / + buttons; ↑ ↓ keys step the value); sample values shown dashed with one short note, replacing the yellow banner. Phones unchanged."],
