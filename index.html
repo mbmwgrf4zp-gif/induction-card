@@ -827,7 +827,7 @@ if (window.top !== window.self && /\.github\.io$/.test(location.hostname)) {
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.149.3";
+const APP_VERSION = "2.150.1";
 const APP_DATE = "25 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
@@ -2384,11 +2384,13 @@ const newerFlag = (name, yr, cur) => `<div class="newer"><b>⟳ Newer guideline 
 const LAST_CHECKED = true;
 const lastDraft = () => LAST_CHECKED ? "" : `<div class="warn">DRAFT — updated to Association of Anaesthetists QRH 3-10 v.2 (2023): slower bolus, arrest changes. Not yet ticked by you.</div>`;
 let WKS = false, CRISIS_W = null;   // emergency cards: sample weight → no totals
+const QRH1_CHECKED = true;   // checked by author 26 Nov 2026;   // v2.150 QRH key basic plan + common intra-op problems
+const qrh1Draft = () => QRH1_CHECKED ? "" : `<div class="warn" style="margin-top:0">DRAFT — Association of Anaesthetists QRH (2023), adapted wording (v2.150). Check before use.</div>`;
 const crisisDraft = () => CRISIS_CHECKED ? "" : `<div class="warn" style="margin-top:0">DRAFT — from published guidelines, not yet ticked by you.</div>`;
 const wk = (w, per, unit, max) => { if (WKS) return "— (enter weight)"; let v = per*w, c = false; if (max!=null && v>max){ v=max; c=true; } return `${dz(v, unit, max)} ${unit}${c?` (max ${max} ${unit})`:""}`; };
 const B = x => `<b class="dose">${x}</b>`;
-const crisis = (title, steps, srcTxt, extra="") =>
-  `<div class="card"><h2>${title}</h2>${crisisDraft()}${CRISIS_W === null ? "" : WKS ? `<p class="cwt">Enter the weight above to see doses.</p>` : `<p class="cwt">Doses for <b>${sig(CRISIS_W)} kg</b></p>`}<ol class="crisis">${steps.map(s=>`<li>${s}</li>`).join("")}</ol>${extra}${src(srcTxt)}</div>`;
+const crisis = (title, steps, srcTxt, extra="", top="") =>
+  `<div class="card"><h2>${title}</h2>${top}${crisisDraft()}${CRISIS_W === null ? "" : WKS ? `<p class="cwt">Enter the weight above to see doses.</p>` : `<p class="cwt">Doses for <b>${sig(CRISIS_W)} kg</b></p>`}<ol class="crisis">${steps.map(s=>`<li>${s}</li>`).join("")}</ol>${extra}${src(srcTxt)}</div>`;
 
 const HK_CARD = () => `<div class="card"><h2>Hyperkalaemia</h2>${TX_CHECKED ? "" : `<div class="warn" style="margin-top:0">DRAFT — UK Kidney Association hyperkalaemia guideline, checked against two sources. Not yet ticked by you.</div>`}<ol class="crisis">
   <li>Severity (UKKA): mild 5.5–5.9 · moderate 6.0–6.4 · <b>severe ≥ 6.5</b> mmol/L. Stop K⁺-containing fluids; 12-lead ECG / monitor.</li>
@@ -2403,7 +2405,82 @@ const HK_CARD = () => `<div class="card"><h2>Hyperkalaemia</h2>${TX_CHECKED ? ""
 const eCards = {};
 eCards.adult = () => {
   const w = S.aw; WKS = isSample("aw"); CRISIS_W = w;
-  return crisis("High / total spinal", [
+  return ""
+  + crisis("Key basic plan", [
+    "Use the same sweep for any unexpected problem — it finds almost all causes. Don't fix on one thing until you have run through it.",
+    "<b>❶ Oxygen delivery:</b> pause surgery if possible · check fresh gas flow for the circuit AND measured FiO₂ · look over the whole breathing system, valves and connections · reservoir bag OR ventilator bellows moving?",
+    "<b>❷ Airway:</b> device position; listen (larynx, stomach) · capnogram shape fits a patent airway? · device patent (pass a suction catheter) · isolate the equipment if needed: self-inflating bag straight onto the tube connector, no HME, angle piece or catheter mount.",
+    "<b>❸ Breathing:</b> chest symmetry, rate, breath sounds, SpO₂, expired tidal volume, EtCO₂ · feel the airway pressure with the bag and APL valve (&lt; 3 breaths) — you can only feel up to the APL setting.",
+    "<b>❹ Circulation:</b> rate, rhythm, perfusion; recheck BP.",
+    "<b>❺ Depth:</b> right depth of anaesthesia, analgesia and neuromuscular block?",
+    "<b>❻ Surgical problem?</b> Ask the surgeon.",
+    "<b>❼ Call for help</b> if not resolving quickly. If it worsens or a new problem appears: call for help and start again at ❶."],
+    "Association of Anaesthetists QRH 1-1 Key basic plan v.1, CC BY-NC-SA 4.0.", "", qrh1Draft())
+  + crisis("Hypoxia / desaturation", [
+    "Run the whole drill before fixing on one cause. Worse or new problem: call for help, back to Key basic plan.",
+    "<b>❶ Oxygen:</b> pause surgery · increase fresh gas flow AND 100% O₂; check measured FiO₂ · inspect the breathing system · bag or bellows moving? · SpO₂ low — is it real? Poor perfusion?",
+    "<b>❷ Airway:</b> device position, listen; capnogram shape; pass a suction catheter · isolate the equipment (self-inflating bag straight onto the tube; if it resolves, the fault is the machine, circuit, HME, filter, angle piece or mount — replace) · then consider changing the airway device.",
+    "<b>❸ Breathing:</b> chest symmetry, breath sounds, SpO₂, expired volume, EtCO₂ · poor movement → assist or increase ventilation · feel the pressure (&lt; 3 breaths) · asymmetry → bronchial intubation, foreign body, pneumothorax · consider relaxant · options: suction, bronchodilator, PEEP, diuretic, bronchoscopy.",
+    "<b>❹ Circulation:</b> rate, rhythm, perfusion, BP — is instability secondary to hypoxia?",
+    "<b>❺ Depth:</b> adequate anaesthesia and analgesia.",
+    "<b>❻ Not resolving:</b> call for help · arterial blood gas, 12-lead ECG, chest X-ray.",
+    "Causes to consider: high airway pressure, laryngospasm, bronchospasm, anaphylaxis, circulatory embolus, cardiac ischaemia, tamponade, sepsis, malignant hyperthermia, aspiration, pulmonary oedema, congenital heart disease."],
+    "Association of Anaesthetists QRH 2-2 Hypoxia / desaturation / cyanosis v.1, CC BY-NC-SA 4.0.", "", qrh1Draft())
+  + crisis("Increased airway pressure", [
+    "Run the whole drill. Worse or new problem: call for help, back to Key basic plan.",
+    "<b>❶ Oxygen:</b> pause surgery; surgical cause? · 100% O₂, check FiO₂ · inspect the breathing system · confirm high pressure by hand ventilation (&lt; 3 breaths; feel depends on the APL setting).",
+    "<b>❷ Airway:</b> device position, listen; capnogram; suction catheter · isolate the equipment (self-inflating bag straight onto the tube): still high by hand → reconnect; resolved → machine, circuit, HME, filter or mount fault — replace · then consider changing the device.",
+    "<b>❸ Breathing:</b> chest symmetry, breath sounds, SpO₂, expired volume, EtCO₂; feel the pressure.",
+    "<b>❹ Circulation:</b> rate, rhythm, perfusion, BP — unstable from gas trapping?",
+    "<b>❺ Depth:</b> adequate anaesthesia and analgesia; enough neuromuscular block?",
+    "Laparoscopy: release the pneumoperitoneum and level the table.",
+    "<b>❻ Not resolving:</b> call for help · blood gas, 12-lead ECG, chest X-ray.",
+    "Causes: laryngospasm, bronchospasm, anaphylaxis, circulatory embolus, aspiration, pulmonary oedema, bronchial intubation, foreign body, pneumothorax. Actions: suction, bronchodilator, PEEP, diuretic, bronchoscopy."],
+    "Association of Anaesthetists QRH 2-3 Increased airway pressure v.1, CC BY-NC-SA 4.0.", "", qrh1Draft())
+  + crisis("Hypotension", [
+    "Usually too-deep anaesthesia, neuraxial block, hypovolaemia, or a mix. First rule out oxygen, airway and breathing problems (Key basic plan ❶–❸; high intrathoracic pressure).",
+    "<b>Circulation:</b> rate, rhythm, perfusion, recheck BP · HR &lt; 60: anticholinergic · vasopressor and position (head down) · fluid "+B("250 mL")+" bolus · HR &gt; 100 sinus: treat as hypovolaemia (fluid) · HR &gt; 100 not sinus: see Tachycardia.",
+    "<b>Anticholinergic:</b> "+B("glycopyrrolate 5 mcg/kg = "+wk(w,5,"mcg",400))+" (adult 200–400 mcg) · "+B("atropine 5 mcg/kg = "+wk(w,5,"mcg",600))+" (adult 300–600 mcg).",
+    "<b>Vasopressor:</b> "+B("ephedrine 100 mcg/kg = "+wk(w,0.1,"mg",12))+" (adult 3–12 mg) · "+B("phenylephrine 5 mcg/kg = "+wk(w,5,"mcg",100))+" (adult 100 mcg) · "+B("metaraminol 5 mcg/kg = "+wk(w,5,"mcg",500))+" (adult 500 mcg) · "+B("adrenaline 1 mcg/kg = "+wk(w,1,"mcg",100))+" (adult 10–100 mcg) — emergency only.",
+    "<b>Depth:</b> correct anaesthesia AND analgesia (awareness risk).",
+    "<b>Surgical causes</b> — talk to the surgeon: reduced venous return (caval compression, pneumoperitoneum), hidden blood loss, vagal reflex, embolism (gas, fat, blood, cement).",
+    "<b>Don't forget:</b> drug error · pneumothorax / high intrathoracic pressure · cardiac ischaemia · anaphylaxis · tamponade · LA toxicity · sepsis · valve disease · steroid dependency. Call for help if not resolving quickly."],
+    "Association of Anaesthetists QRH 2-4 Hypotension v.1, CC BY-NC-SA 4.0.", "", qrh1Draft())
+  + crisis("Hypertension", [
+    "Usually inadequate depth or analgesia. Rule out oxygen, airway and breathing problems first (hypoxia, hypercarbia).",
+    "<b>❶ Now:</b> recheck BP AND deepen anaesthesia AND reduce the stimulus.",
+    "<b>Circulation:</b> rate, rhythm, perfusion; check BP more often · check cuff size and position; consider an arterial line.",
+    "<b>Underlying causes:</b> inadequate anaesthesia or analgesia (alfentanil can be diagnostic) · inadequate relaxation · drug error · missed antihypertensives · full bladder · surgeon's vasopressor · tourniquet · fluid overload or TURP syndrome · drug interaction, kidney failure, raised ICP, seizure, thyrotoxicosis, phaeochromocytoma.",
+    "<b>Not resolving — call for help; temporising drugs:</b> "+B("alfentanil 10 mcg/kg = "+wk(w,10,"mcg",1000))+" (adult 0.5–1 mg) · "+B("propofol 1 mg/kg = "+wk(w,1,"mg",100))+" (adult 50–100 mg) · "+B("labetalol 0.5 mg/kg = "+wk(w,0.5,"mg",50))+" (adult 25–50 mg), repeat as needed · "+B("esmolol 0.5 mg/kg = "+wk(w,0.5,"mg",50))+" (adult 25–50 mg), then infusion · "+B("hydralazine 0.1 mg/kg = "+wk(w,0.1,"mg",10))+" (adult 5–10 mg) · "+B("GTN 0.5–5 mcg/kg/min")+" (adult 2–20 mL/h of 1 mg/mL)."],
+    "Association of Anaesthetists QRH 2-5 Hypertension v.1, CC BY-NC-SA 4.0.", "", qrh1Draft())
+  + crisis("Bradycardia", [
+    "Don't treat the number alone — fit treatment to the patient and the situation; run the full steps.",
+    "<b>❶ Now:</b> stop the stimulus; check pulse, rhythm, BP. <b>No pulse, not sinus, or severe hypotension:</b> "+B("atropine 20 mcg/kg = "+wk(w,20,"mcg",1000))+" (adult 0.5–1 mg) with a flush; no pulse → one person on chest compressions → Cardiac arrest.",
+    "<b>Pulse present and sinus:</b> "+B("glycopyrrolate 5 mcg/kg = "+wk(w,5,"mcg",400))+" (adult 200–400 mcg) · "+B("ephedrine 100 mcg/kg = "+wk(w,0.1,"mg",12))+" (adult 3–12 mg) · "+B("atropine 10 mcg/kg = "+wk(w,10,"mcg",600))+" (adult 300–600 mcg) · "+B("isoprenaline 0.5 mcg/kg/min")+" (adult 5 mcg/min) · "+B("adrenaline 1 mcg/kg = "+wk(w,1,"mcg",100))+" (adult 10–100 mcg) — emergency only.",
+    "Then Key basic plan ❷–❺: oxygen, airway, breathing, circulation, depth.",
+    "<b>Causes:</b> drug error · remifentanil, digoxin, beta-blocker, calcium-channel blocker · surgical stimulation with inadequate depth · high intrathoracic pressure, pneumoperitoneum · LA toxicity · myocardial infarction · hyperkalaemia · hypothermia · raised ICP.",
+    "Call for help if not resolving.",
+    "<b>Transcutaneous pacing:</b> pads and ECG leads from the pacing defibrillator · PACING mode · set the rate · output up from 60 mA until capture (spikes align with QRS) · confirm electrical AND mechanical capture (femoral pulse) · set output 10 mA above capture."],
+    "Association of Anaesthetists QRH 2-6 Bradycardia v.1, CC BY-NC-SA 4.0.", "", qrh1Draft())
+  + crisis("Tachycardia", [
+    "Often inadequate depth or analgesia, or a reflex to hypotension. Don't treat the number alone.",
+    "<b>❶ Now:</b> stop the stimulus; pulse, rhythm, BP. <b>No pulse:</b> one person on compressions → Cardiac arrest. Worsening hypotension or impending arrest → synchronised cardioversion. Narrow complex and not hypotensive: first deepen anaesthesia and analgesia.",
+    "Then Key basic plan ❷–❺; 12-lead ECG if possible.",
+    "<b>Causes:</b> stimulation with inadequate depth · drug error · central line or wire in the heart · hypovolaemia · primary arrhythmia · myocardial infarction · electrolytes · LA toxicity · sepsis · embolus (gas, fat, amniotic) · anaphylaxis · malignant hyperthermia.",
+    "<b>Rate control:</b> fluid "+B("10 mL/kg = "+wk(w,10,"mL",250))+" (adult 250 mL) · "+B("magnesium 50 mg/kg = "+wk(w,50,"mg",2000))+" (adult 2 g) over &gt; 10 min, max 200 mg/mL · "+B("amiodarone 5 mg/kg = "+wk(w,5,"mg",300))+" (adult 300 mg) over &gt; 3 min, NOT in polymorphic VT · "+B("labetalol 0.5 mg/kg = "+wk(w,0.5,"mg",50))+" (adult 25–50 mg) · "+B("esmolol 0.5 mg/kg = "+wk(w,0.5,"mg",50))+" (adult 25–50 mg) · "+B("adenosine 0.1–0.5 mg/kg")+" (adult 3–18 mg) for SVT.",
+    "<b>Synchronised cardioversion:</b> pads and ECG · adequate depth or sedation · SYNC on, check sync spikes on R waves · start "+B("1 J/kg")+" (adult 50–100 J) biphasic · hold the shock button until the shock is delivered.",
+    "Call for help if not resolving quickly."],
+    "Association of Anaesthetists QRH 2-7 Tachycardia v.1, CC BY-NC-SA 4.0.", "", qrh1Draft())
+  + crisis("Peri-operative hyperthermia", [
+    "<b>≥ 39 °C or prolonged = emergency</b> (organ damage, death). Decide early: too much heating · too much heat production · heat not lost · actively maintained fever.",
+    "❶ Call for help; tell the team; measure core temperature. ❷ Remove insulation and heating devices.",
+    "❸ <b>Which kind?</b> Fever (cold, vasoconstricted peripheries) or non-febrile hyperthermia (warm, vasodilated) · suspect malignant hyperthermia or neuroleptic malignant syndrome → Malignant hyperthermia card.",
+    "❹ <b>Core ≥ 39 °C — cool, with caution</b> (stop once below): cool the room · cooling blanket · ice packs to groin, axillae, front of neck · bladder, gastric or peritoneal lavage with iced water "+B("10 mL/kg = "+wk(w,10,"mL"))+" boluses.",
+    "❺ Benzodiazepine for shivering; ≥ 40 °C: consider intubation and paralysis. ❻ Fever: paracetamol, treat the cause. ❼ Serotonin syndrome suspected: "+B("chlorpromazine 25–50 mg IM")+" 6–8-hourly (caution in the elderly).",
+    "❽ Watch for: hyperkalaemia, hypoglycaemia, acidosis · hypotension, malignant hypertension · altered consciousness, seizures · coagulopathy, DIC.",
+    "<b>Causes:</b> over-warming (most common) · surgical devices (HIFU, diathermy) · long epidurals · sepsis (urological manipulation) · transfusion · anaphylaxis · drugs: neuroleptic malignant, malignant hyperthermia (late sign), serotonin (cocaine, MDMA, amphetamine), anticholinergic, sympathomimetic · contrast neurotoxicity, alcohol withdrawal · thyrotoxicosis, phaeochromocytoma · meningitis, intracranial blood, hypoxic or traumatic brain injury."],
+    "Association of Anaesthetists QRH 2-8 Peri-operative hyperthermia v.1, CC BY-NC-SA 4.0.", "", qrh1Draft())
+  + crisis("High / total spinal", [
     "Call for help. Tell the surgeon.",
     "Keep left uterine displacement. <b>Do not</b> tip head-down.",
     "100% O₂. Support breathing with bag-mask.",
@@ -2440,9 +2517,8 @@ eCards.adult = () => {
     "Low BP with HR &lt; 60: "+B("ephedrine 6–9 mg")+" or "+B("glycopyrrolate 200 mcg")+".",
     "Nausea often = low BP. Check BP first."],
     "International consensus on vasopressors at Caesarean.")
-  + crisis("Bradycardia &amp; cardiac arrest", [
-    "Bradycardia with low BP: "+B("atropine 500 mcg")+", repeat to max 3 mg. Or "+B("glycopyrrolate 200–400 mcg")+".",
-    "Not responding: "+B("isoprenaline 5 mcg/min")+" or "+B("adrenaline 2–10 mcg/min")+", or pacing.",
+  + crisis("Cardiac arrest", [
+    "Bradycardia with a pulse: see the Bradycardia card.",
     "Arrest: CPR 30:2, call arrest team, attach defibrillator.",
     "Shockable (VF/pVT): first shock "+B("≥ 150 J")+" biphasic (pulsed biphasic 130–150 J); increase energy for later shocks if possible. Adrenaline "+B("1 mg")+" and "+B("amiodarone 300 mg")+" after 3rd shock; amiodarone "+B("150 mg")+" after 5th. Alternative: "+B("lignocaine 100 mg")+" (+ 50 mg after 5th).",
     "Non-shockable: "+B("adrenaline 1 mg")+" ASAP, then every 3–5 min.",
@@ -5719,6 +5795,12 @@ VGROUPS.find(g => g[0]==="General")[1].push(["IV iron products (v2.148)", "25 No
   "Ferric carboxymaltose (Ferinject) 500 mg/10 mL: 20 mg/kg, max 1000 mg a week (injection 15 mg/kg); dilution volumes by dose",
   "Ferric derisomaltose (Monofer) 100 mg/mL: 20 mg/kg per infusion; > 1000 mg over ≥ 30 min; split ≥ 1 week if more",
   "LMW iron dextran (Cosmofer) 50 mg/mL: 20 mg/kg; first 25 mg over 15 min, rest over 4–6 h; split ≥ 1 week if more. Source: MOH PBM 2024 Appendix 1 Table 1.4. Author asked for this to go live without a draft step"]]);
+VGROUPS.find(g => g[0]==="General")[1].push(["QRH common problems (v2.150)", "26 Nov 2026", [
+  "Key basic plan (1-1); Hypoxia (2-2); Increased airway pressure (2-3); Hypotension (2-4); Hypertension (2-5); Bradycardia (2-6); Tachycardia (2-7); Peri-operative hyperthermia (2-8) — QRH June 2023, CC BY-NC-SA 4.0, wording shortened",
+  "Doses from QRH per kg with adult ranges (calculated dose capped at the QRH adult maximum): glyco 5 mcg/kg; atropine 5 (hypotension), 10 (brady), 20 mcg/kg (critical brady); ephedrine 100 mcg/kg; phenylephrine 5; metaraminol 5; adrenaline 1 mcg/kg (emergency only); alfentanil 10 mcg/kg; propofol 1 mg/kg; labetalol / esmolol 0.5 mg/kg; hydralazine 0.1 mg/kg; GTN 0.5–5 mcg/kg/min; isoprenaline 0.5 mcg/kg/min",
+  "Tachycardia: fluid 10 mL/kg; magnesium 50 mg/kg (adult 2 g) > 10 min; amiodarone 5 mg/kg > 3 min (not polymorphic VT); adenosine 0.1–0.5 mg/kg; cardioversion 1 J/kg sync",
+  "Hyperthermia: cool if ≥ 39 °C; iced lavage 10 mL/kg; chlorpromazine 25–50 mg IM 6–8-hourly for serotonin syndrome",
+  "Bradycardia lines moved from the arrest card; arrest card renamed Cardiac arrest (same id)"]]);
 VGROUPS.find(g => g[0]==="General")[1].push(["Induction drugs & relaxants combined", "22 Nov 2026", [
   "Adult: General › Induction › 1. Induction drugs & relaxants — Opioid · Hypnotic · Muscle relaxant · No IV access (rows moved unchanged)",
   "Paeds: Paediatric › Induction › 3. Induction drugs & relaxants — Anticholinergic · Opioid · Hypnotic · Muscle relaxant · No IV access (rows moved unchanged)",
@@ -5801,6 +5883,7 @@ function vTicks(){
 }
 /* ---------- ABOUT ---------- */
 const CHANGES = [
+  ["2.150","Emergencies › Adult: Key basic plan first, then Common intra-op problems — hypoxia, high airway pressure, hypotension, hypertension, bradycardia, tachycardia, hyperthermia (Association of Anaesthetists QRH 2023), doses per kg for the weight. Bradycardia now has its own card; the arrest card is Cardiac arrest. (checked)"],
   ["2.149","Favourites: tap ☆ on any card, or on any antibiotic procedure, then ★ on the home screen opens your list (kept on this phone; Reset all clears it). Antibiotic tabs no longer scroll the chosen tab out of view. (checked) Home ★ is now gold so it stands out. Fold-out sections (IV iron, formulas, fluid balance and others) now look like buttons with Show / Hide."],
   ["2.148","IV iron calculator: the four IV irons available in Malaysia (iron sucrose, ferric carboxymaltose, ferric derisomaltose, LMW iron dextran — generic and brand) with the maximum per dose for this patient, how many doses the total needs, and how to give each (MOH PBM 2024 Appendix 1). (checked)"],
   ["2.147","More from the MOH Patient Blood Management consensus 2024: Massive obstetric haemorrhage gets product triggers and doses (FFP 15 mL/kg, platelets 1 adult dose, cryo 1 unit/10 kg); Blood management — cryo 1 unit/10 kg and Hb targets for special groups (ACS, TBI, SAH, stroke, sepsis); Paeds transfusion — MOH points; Anticoagulants — MOH agreement noted (aspirin stays 7 days); Optimise or postpone — IV iron (Ganzoni) calculator. (checked)"],
@@ -5983,7 +6066,7 @@ screens.values = () => {
 
 /* ================= ROUTER & EVENTS ================= */
 /* ================= GROUPS (by situation) ================= */
-const EMERG_ADULT = ["§Airway & oxygenation","Failed intubation / CICO","Bronchospasm","Anaphylaxis","§Circulation & cardiac arrest","Bradycardia & cardiac arrest","§Drug-related & metabolic","LA toxicity (LAST)","Malignant hyperthermia","Hyperkalaemia","Latex allergy","§Neuraxial & obstetric","High / total spinal","Hypotension after spinal","Massive obstetric haemorrhage","Eclampsia"];
+const EMERG_ADULT = ["§Start here","Key basic plan","§Common intra-op problems","Hypoxia / desaturation","Increased airway pressure","Hypotension","Hypertension","Bradycardia","Tachycardia","Peri-operative hyperthermia","§Airway & oxygenation","Failed intubation / CICO","Bronchospasm","Anaphylaxis","§Circulation & cardiac arrest","Cardiac arrest","§Drug-related & metabolic","LA toxicity (LAST)","Malignant hyperthermia","Hyperkalaemia","Latex allergy","§Neuraxial & obstetric","High / total spinal","Hypotension after spinal","Massive obstetric haemorrhage","Eclampsia"];
 const EMERG_PAEDS = ["§Airway & breathing","Paeds hypoxia / desaturation","Laryngospasm","Paeds bronchospasm","Paeds difficult airway / CICO","Post-tonsillectomy bleed","§Circulation","Paeds cardiac arrest","Paeds anaphylaxis","Cyanotic heart disease / Fallot spell","Paeds massive transfusion","§Drug-related","Paeds LA toxicity (LAST)","Paeds malignant hyperthermia","Latex allergy","§Recovery","Paeds PACU crises"];
 /* ---------- PRINT PLAN SHEETS (paper copy for theatre) ---------- */
 const PRINT_CHECKED = true;
@@ -6163,7 +6246,7 @@ const GROUPS = [
       "§Analgesia","7. Intra-op analgesia",
       "§Circulation & physiology","8. Fluid management","9. Vasopressors & inotropes","10. Blood management","11. ABG analysis",
       "§Specialist","12. One-lung ventilation"], see:[["ga-post-im-doses-no-iv-access-or-ward","No IV access: IM doses"]], seeLabel:"Also",
-    links:[["Bronchospasm","adult","Bronchospasm"],["Anaphylaxis","adult","Anaphylaxis"],["Malignant hyperthermia","adult","Malignant hyperthermia"],["LA toxicity (LAST)","adult","LA toxicity"],["Bradycardia & cardiac arrest","adult","Bradycardia / arrest"]]},
+    links:[["Bronchospasm","adult","Bronchospasm"],["Anaphylaxis","adult","Anaphylaxis"],["Malignant hyperthermia","adult","Malignant hyperthermia"],["LA toxicity (LAST)","adult","LA toxicity"],["Bradycardia","adult","Bradycardia"],["Cardiac arrest","adult","Cardiac arrest"]]},
    {id:"post", label:"Post-op", input:()=>gaInputs(), hint:"Reverse → extubate → analgesia → discharge → IM doses. PONV prevention: Intra-op.",
     cards:["§Emergence","1. Reversal",["Extubation criteria","2. Extubation criteria"],
       "§Recovery","3. Analgesia ladder & PCA",["Discharge from recovery","4. Discharge from recovery"],
@@ -6241,7 +6324,7 @@ const GROUPS = [
     links:[["Failed intubation / CICO","adult","Failed intubation / CICO"],["Hyperkalaemia","adult","Hyperkalaemia"],["Anaphylaxis","adult","Anaphylaxis"]]},
    {id:"intra", label:"Intra-op", input:()=>txInputs(false), see:[["tx-post-theatre-checklist","Theatre checklist"]], seeLabel:"During", hint:"Maintain → infusions → BP → fluids → reperfusion.",
     cards:[["Kidney: maintenance","1. Maintenance: volatile or TIVA"],["Kidney: syringes & infusions","2. Syringes & infusions"],["Kidney: BP target & pressors","3. BP target & pressors"],["Kidney: fluids & blood","4. Fluids & blood"],["5. Anastomosis & reperfusion","5. Anastomosis & reperfusion"]],
-    links:[["Hyperkalaemia","adult","Hyperkalaemia"],["Anaphylaxis","adult","Anaphylaxis"],["Bradycardia & cardiac arrest","adult","Bradycardia / arrest"]]},
+    links:[["Hyperkalaemia","adult","Hyperkalaemia"],["Anaphylaxis","adult","Anaphylaxis"],["Bradycardia","adult","Bradycardia"],["Cardiac arrest","adult","Cardiac arrest"]]},
    {id:"post", label:"Post-op", input:()=>txInputs(false), hint:"Reverse → analgesia → PACU → checklist.",
     cards:[["Kidney: reversal","1. Reversal (atracurium)"],["Kidney: analgesia & PONV","2. Analgesia & PONV, renal"],["Kidney: PACU & urine output","3. PACU & urine output"],["Kidney: theatre checklist","4. Theatre checklist"]],
     links:[["Hyperkalaemia","adult","Hyperkalaemia"]]},
@@ -6346,6 +6429,14 @@ const SEARCH_EXTRA = {   // keyed by stable card id
   "regional-neuraxial-dermatomes-and-block-height":"myotome myotomes key muscles motor level motor block power dermatome dermatomes block height level t4 t10 nipple umbilicus xiphoid bromage sensory testing cold pinprick",
   "ga-intra-ventilation-strategies":"ventilation ventilator ventilate lung protective tidal volume tv peep recruitment recruit driving pressure plateau pcv vcv pcv-vg prvc ards asthma copd auto-peep laparoscopy trendelenburg obese neuro icp hyperventilation pregnancy lscs dopes desaturation hypoxia high airway pressure",
   "ga-intra-one-lung-ventilation":"one-lung ventilation olv dlt double-lumen double lumen tube bronchial blocker arndt thoracic vats lung isolation thoracotomy cpap",
+  "emerg-adult-key-basic-plan":"key basic plan abcde sweep unexpected problem qrh 1-1 oxygen delivery airway breathing circulation depth",
+  "emerg-adult-hypoxia-desaturation":"hypoxia desaturation desat cyanosis low spo2 qrh 2-2",
+  "emerg-adult-increased-airway-pressure":"high airway pressure peak pressure increased airway pressure qrh 2-3 kinked tube",
+  "emerg-adult-hypotension":"hypotension low bp low blood pressure intraop vasopressor ephedrine phenylephrine metaraminol qrh 2-4",
+  "emerg-adult-hypertension":"hypertension high bp intraop labetalol esmolol hydralazine gtn qrh 2-5",
+  "emerg-adult-bradycardia":"bradycardia slow heart rate atropine glycopyrrolate isoprenaline pacing qrh 2-6",
+  "emerg-adult-tachycardia":"tachycardia fast heart rate svt af cardioversion adenosine amiodarone magnesium qrh 2-7",
+  "emerg-adult-perioperative-hyperthermia":"hyperthermia fever high temperature cooling serotonin syndrome neuroleptic malignant qrh 2-8",
   "ga-intra-fluid-management":"fluids fluid crystalloid hartmann plasma-lyte saline maintenance bolus fluid challenge ppv svv fluid balance colloid albumin starch",
   "ga-intra-blood-management":"blood transfusion haemorrhage hemorrhage bleeding major haemorrhage massive transfusion ebv allowable blood loss abl ffp platelets cryo fibrinogen prbc cell salvage rotem teg",
   "ga-intra-abg-analysis":"abg blood gas arterial acid base acidosis alkalosis anion gap winter lactate base excess pf ratio a-a gradient",
@@ -6380,7 +6471,15 @@ const CARD_IDS = {
   "Bronchospasm":"emerg-adult-bronchospasm",
   "Anaphylaxis":"emerg-adult-anaphylaxis",
   "Latex allergy":"emerg-latex-allergy",
-  "Bradycardia & cardiac arrest":"emerg-adult-bradycardia-and-cardiac-arrest",
+  "Cardiac arrest":"emerg-adult-bradycardia-and-cardiac-arrest",
+  "Key basic plan":"emerg-adult-key-basic-plan",
+  "Hypoxia / desaturation":"emerg-adult-hypoxia-desaturation",
+  "Increased airway pressure":"emerg-adult-increased-airway-pressure",
+  "Hypotension":"emerg-adult-hypotension",
+  "Hypertension":"emerg-adult-hypertension",
+  "Bradycardia":"emerg-adult-bradycardia",
+  "Tachycardia":"emerg-adult-tachycardia",
+  "Peri-operative hyperthermia":"emerg-adult-perioperative-hyperthermia",
   "High / total spinal":"emerg-adult-high-total-spinal",
   "Hypotension after spinal":"emerg-adult-hypotension-after-spinal",
   "LA toxicity (LAST)":"emerg-adult-la-toxicity-last",
