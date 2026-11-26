@@ -866,7 +866,7 @@ select[data-stc]{font-size:15px;display:block;width:100%;max-width:100%;min-heig
 .lrh button{width:40px;height:36px;border:1px solid var(--line);background:var(--field);color:var(--ink);border-radius:8px;font-size:17px;cursor:pointer}
 .lrh .u{font-size:13px;color:var(--muted)}
 .lrk{display:flex;gap:8px;font-size:13px;color:var(--muted);margin:8px 0 2px}.lrk span+span::before{content:"· "}
-.lrb{position:relative;display:grid;grid-template-columns:repeat(4,1fr);gap:3px;padding-top:22px;touch-action:none;cursor:pointer;user-select:none}
+.lrb.nodrag{cursor:default}.lrb{position:relative;display:grid;grid-template-columns:repeat(4,1fr);gap:3px;padding-top:22px;touch-action:none;cursor:pointer;user-select:none}
 .lband{border:1px solid var(--line);border-radius:8px;padding:6px 4px;text-align:center;display:grid;gap:1px;background:var(--bg)}
 .lband b{font-size:13px;color:var(--muted);font-weight:600;white-space:nowrap}
 .lband .bv{font:700 16px var(--font-sans);font-variant-numeric:tabular-nums;white-space:nowrap}
@@ -893,7 +893,7 @@ if (window.top !== window.self && /\.github\.io$/.test(location.hostname)) {
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.161.3";
+const APP_VERSION = "2.162.0";
 const APP_DATE = "26 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
@@ -1348,18 +1348,18 @@ const rng = (a,b,u="") => a===b ? `${fmt(a)}${u}` : `${fmt(a)} – ${fmt(b)}${u}
 const LSCS_SPAN = [[140,150],[151,155],[156,160],[161,180]];   // ruler: each band drawn equal width over its own cm range
 // v2.161.2: layers slide from the previous height's level (option 1); sample height = sample dose faded, never empty
 const LSY = {X0: 28, W: 260, y: 24, H: 30, prev: null};
-const lsyGeo = (row, smp) => { const x = v => LSY.X0 + v/3*LSY.W, lo = row[1], hi = row[2];
-  return {bupi: [x(0), x(lo)], bupiR: [x(lo), x(hi)], mor: [x(hi), x(hi + 0.1)], fen: [x(hi + 0.1), x(hi + 0.3)], tot: x(row[4]), op: smp ? 0.4 : 1}; };
-const lscsSyringe = (row, smp) => {
-  const {X0, W, y, H} = LSY, x = v => X0 + v/3*W, g = lsyGeo(row, smp);
+const lsyGeo = (row, smp, noAdd) => { const x = v => LSY.X0 + v/3*LSY.W, lo = row[1], hi = row[2], a = noAdd ? 0 : 1;
+  return {bupi: [x(0), x(lo)], bupiR: [x(lo), x(hi)], mor: [x(hi), x(hi + 0.1*a)], fen: [x(hi + 0.1*a), x(hi + 0.3*a)], tot: x(row[4]), op: smp ? 0.4 : 1}; };
+const lscsSyringe = (row, smp, opt) => { opt = opt || {};
+  const {X0, W, y, H} = LSY, x = v => X0 + v/3*W, g = lsyGeo(row, smp, opt.noAdd);
   const r = (k, c, op) => `<rect data-k="${k}" x="${g[k][0]}" y="${y}" width="${Math.max(0, g[k][1] - g[k][0])}" height="${H}" fill="${c}"${op ? ` opacity="${op}"` : ""}/>`;
   const ticks = [0,0.5,1,1.5,2,2.5,3].map(v => `<line x1="${x(v)}" y1="${y + H}" x2="${x(v)}" y2="${y + H - (v % 1 ? 7 : 12)}" stroke="var(--ink)" stroke-width="1"/>${v % 1 ? "" : `<text x="${x(v)}" y="${y + H + 13}" text-anchor="middle" font-size="11" fill="var(--muted)">${v}</text>`}`).join("");
-  return `<svg class="lsy" viewBox="0 0 330 76" data-geo='${JSON.stringify(g)}' role="img" aria-label="Syringe: bupivacaine ${rng(row[1], row[2])} mL, morphine 0.1 mL, fentanyl 0.2 mL, total ${rng(row[3], row[4])} mL${smp ? " (sample height)" : ""}">
+  return `<svg class="lsy" viewBox="0 0 330 76" data-geo='${JSON.stringify(g)}' role="img" aria-label="${opt.aria || `Syringe: bupivacaine ${rng(row[1], row[2])} mL, morphine 0.1 mL, fentanyl 0.2 mL, total ${rng(row[3], row[4])} mL`}${smp ? " (sample height)" : ""}">
     <rect x="${X0 - 12}" y="${y + 9}" width="12" height="12" rx="2" fill="var(--line)"/>
     <g data-k="liq" opacity="${g.op}">${r("bupi", "var(--sy-bupi)")}${r("bupiR", "var(--sy-bupi)", .45)}${r("mor", "var(--sy-mor)")}${r("fen", "var(--sy-fen)")}</g>
     <rect x="${X0}" y="${y}" width="${W}" height="${H}" rx="4" fill="none" stroke="var(--ink)" stroke-width="1.5"${smp ? ` stroke-dasharray="4 3"` : ""}/>
     <rect x="${X0 + W}" y="${y - 4}" width="5" height="${H + 8}" rx="1" fill="var(--ink)"/><rect x="${X0 + W + 5}" y="${y + 12}" width="30" height="6" fill="var(--ink)" opacity=".6"/>${ticks}
-    <g data-k="tot" transform="translate(${g.tot} 0)"><line x1="0" y1="${y - 6}" x2="0" y2="${y + H + 2}" stroke="var(--ink)" stroke-width="1.5" stroke-dasharray="3 2"/><text x="0" y="${y - 8}" text-anchor="end" font-size="11" font-weight="700" fill="var(--ink)">${smp ? "sample · " : ""}total ${rng(row[3], row[4])} mL</text></g></svg>`;
+    <g data-k="tot" transform="translate(${g.tot} 0)"><line x1="0" y1="${y - 6}" x2="0" y2="${y + H + 2}" stroke="var(--ink)" stroke-width="1.5" stroke-dasharray="3 2"/><text x="0" y="${y - 8}" text-anchor="end" font-size="11" font-weight="700" fill="var(--ink)">${smp ? "sample · " : ""}${opt.label || `total ${rng(row[3], row[4])} mL`}</text></g></svg>`;
 };
 function lsyAnimate(root){ const sv = (root || document).querySelector("svg.lsy"); if (!sv){ LSY.prev = null; return; }
   const to = JSON.parse(sv.dataset.geo), from = LSY.prev; LSY.prev = to;
@@ -1396,20 +1396,27 @@ const lscsBody = () => {
     ${src(esc(PROTO.name)+" · review due 1 Sep 2026")}</div>`;
 };
 /* ---------- SPINAL: non-obstetric (own home button) ---------- */
-const nonObsCalc = () => {
+const NOB_BANDS = [[130,150,"≤ 150","lower end"],[151,165,"151 – 165","middle"],[166,190,"> 165","upper end"]];
+const nonObsCalc = () => {   // v2.162: height ruler (from the patient box) + syringe; same doses and wording
   if (!OPS[S.spOp]) S.spOp = "saddle";
-  const h = Math.round(S.height);
+  const h = Math.round(S.height), smp = isSample("height");
   const o = OPS[S.spOp], [lo,hi] = o.r, mid = Math.round((lo+hi)/2*10)/10;
-  const pick = h<=150 ? lo : h<=165 ? mid : hi;
-  const band = h<=150 ? "≤150 cm → lower end" : h<=165 ? "151–165 cm → middle" : ">165 cm → upper end";
-  return `<div class="card"><div class="sub">1. Operation</div>${seg("spOp",[["saddle","Perineal"],["turp","TURP / uro"],["hernia","Hernia"],["limb","Lower limb"]])}
-    <div class="sub">2. Height: ${h} cm (patient box)</div></div>
+  const vals = [lo, mid, hi], i = h<=150 ? 0 : h<=165 ? 1 : 2, pick = vals[i];
+  const [a, z] = NOB_BANDS[i], frac = Math.max(0, Math.min(1, (Math.min(Math.max(h, a), z) - a) / (z - a)));
+  const ruler = `<div class="lruler${smp ? " sample" : ""}"><div class="lrk"><span>Height from patient box</span></div>
+    <div class="lrb nodrag" style="grid-template-columns:repeat(3,1fr)">${NOB_BANDS.map((bd, j) => `<div class="lband${j === i ? " on" : ""}"><b>${bd[2]}</b><span class="bv">${fmt(vals[j])}</span><small>${bd[3]}</small></div>`).join("")}
+      <div class="lmark" style="left:${((i + frac)/3*100).toFixed(1)}%"><span>${h}</span></div></div>
+    ${smp ? `<div class="sub" style="margin-top:2px"><span class="stag">sample</span> Enter height in the patient box.</div>` : ""}</div>`;
+  return `<div class="card">${seg("spOp",[["saddle","Perineal"],["turp","TURP / uro"],["hernia","Hernia"],["limb","Lower limb"]])}
+    ${ruler}</div>
     <div class="result">
-    <div class="sub">3. Heavy bupivacaine 0.5% · ${o.name} · target ${o.level}</div>${dermLink(({saddle:"S1–S4-5",turp:"T10",hernia:"T10",limb:"T10–T12"})[S.spOp], "Target "+o.level.split(" ")[0])}
+    <div class="sub">Heavy bupivacaine 0.5% · target ${o.level}</div>
     <div class="big">${fmt(pick)} mL</div>
-    <div class="sub">= ${fmt(pick*5)} mg · range ${rng(lo,hi)} mL (${rng(lo*5,hi*5)} mg) · ${band}</div>
-    <h3>4. Optional additives</h3>
-    <ul><li>Fentanyl 10–25 mcg</li><li>Morphine 0.1 mg (preservative-free, <b>1 mg/mL diluted</b>) — e.g. hip/knee arthroplasty</li></ul>
+    <div class="sub">= ${fmt(pick*5)} mg · range ${rng(lo,hi)} mL</div>
+    ${lscsSyringe([0, pick, hi, pick, pick], smp, {noAdd: true, label: `${fmt(pick)} mL for ${h} cm`, aria: `Syringe: range ${rng(lo, hi)} mL shaded, ${fmt(pick)} mL for this height`})}
+    <p class="dlp">${dermLink(({saddle:"S1–S4-5",turp:"T10",hernia:"T10",limb:"T10–T12"})[S.spOp], "Target "+o.level.split(" ")[0])}</p>
+    <details class="ndet"><summary>4. Optional additives</summary>
+    <ul><li>Fentanyl 10–25 mcg</li><li>Morphine 0.1 mg (preservative-free, <b>1 mg/mL diluted</b>) — e.g. hip/knee arthroplasty</li></ul></details>
     ${src("Standard textbook ranges for 0.5% hyperbaric bupivacaine.")}</div>
     <div class="card"><h2>5. Cautions</h2><ul>
     <li>Elderly, very short or obese: consider reducing dose.</li>
@@ -6351,6 +6358,7 @@ function vTicks(){
 }
 /* ---------- ABOUT ---------- */
 const CHANGES = [
+  ["2.162","Regional › Spinal dose: non-obstetric — height bands with this patient's band highlighted and a syringe showing the range and this patient's dose; additives tucked into a collapsible line. Same doses."],
   ["2.161.3","No more jumping: the card you are working in stays put on screen when the sample banner disappears or text above it changes; LSCS syringe stays at a fixed height between bands."],
   ["2.161.2","LSCS spinal syringe: layers slide smoothly to the new level when height changes; before a height is entered it shows the sample dose faded instead of an empty grey syringe."],
   ["2.161.1","LSCS spinal card: protocol review reminder moved into Notes; \"see dermatomes\" links are plain text links everywhere."],
