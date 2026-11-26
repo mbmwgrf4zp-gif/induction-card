@@ -919,6 +919,20 @@ select[data-stc]{font-size:15px;display:block;width:100%;max-width:100%;min-heig
 .ftb{display:flex;height:12px;border-radius:6px;overflow:hidden;margin:5px 0 3px;border-right:3px solid var(--ink)}
 .ftok{background:var(--g-paeds,#16a34a);opacity:.75}.ftno{background:repeating-linear-gradient(135deg,var(--line) 0 5px,color-mix(in srgb,var(--muted) 35%,var(--card)) 5px 10px)}
 .ftv{display:flex;justify-content:flex-end;align-items:baseline;gap:8px}.ftv .hl{font-weight:700}
+/* v2.168 drug × patient matrix */
+.mxw{overflow-x:auto;margin:4px -4px 0}.mx{border-collapse:separate;border-spacing:2px;width:100%;table-layout:fixed}
+.mx th,.mx td{padding:0;text-align:center;border:0}.mx .mxd{vertical-align:middle;text-align:left;font-size:13px;font-weight:600;width:34%;padding-right:4px;line-height:1.15;overflow-wrap:anywhere;hyphens:manual}.mx td,.mx .mxh{width:9.4%}
+.mxh{vertical-align:bottom;height:78px}.mxh span{display:inline-block;writing-mode:vertical-rl;transform:rotate(180deg);font-size:13px;font-weight:600;color:var(--muted);white-space:nowrap}
+.mxh button{border:0;background:none;padding:2px 0;cursor:pointer;width:100%}.mxh.on span{color:var(--gc,var(--accent));font-weight:700}
+.mx td{height:32px;border-radius:6px}.mx td.on,.mxh.on{background:color-mix(in srgb,var(--gc,var(--accent)) 12%,transparent)}
+.mxc{width:100%;height:30px;border:0;border-radius:6px;font:700 15px var(--font-sans);cursor:pointer}
+.mx-u{background:color-mix(in srgb,#16a34a 28%,var(--card));color:#15803d}.mx-c{background:color-mix(in srgb,#f59e0b 32%,var(--card));color:#92400e}.mx-a{background:color-mix(in srgb,#dc2626 28%,var(--card));color:#b91c1c}
+.mx td:not(.on) .mxc{opacity:.5}.mxc.sel{outline:2px solid var(--ink);opacity:1!important}
+.mxn{color:var(--muted);font-size:15px}
+.mxr{font-size:14px;min-height:2.6em;margin:6px 0 2px;padding:6px 8px;border-radius:8px;background:var(--field)}
+.mx-ut{color:#15803d;font-weight:700}.mx-ct{color:#b45309;font-weight:700}.mx-at{color:#b91c1c;font-weight:700}
+:root[data-theme="dark"] .mx-u,:root[data-theme="dark"] .mx-ut{color:#4ade80}:root[data-theme="dark"] .mx-c,:root[data-theme="dark"] .mx-ct{color:#fbbf24}:root[data-theme="dark"] .mx-a,:root[data-theme="dark"] .mx-at{color:#f87171}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .mx-u,:root:not([data-theme="light"]) .mx-ut{color:#4ade80}:root:not([data-theme="light"]) .mx-c,:root:not([data-theme="light"]) .mx-ct{color:#fbbf24}:root:not([data-theme="light"]) .mx-a,:root:not([data-theme="light"]) .mx-at{color:#f87171}}
 </style>
 </head>
 <body>
@@ -933,7 +947,7 @@ if (window.top !== window.self && /\.github\.io$/.test(location.hostname)) {
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.167.0";
+const APP_VERSION = "2.168.0";
 const APP_DATE = "26 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
@@ -4523,6 +4537,33 @@ function tolBox(){
   <li>Immediate-release opioids only; usually 5, at most 7 days; state dose and duration in the discharge letter; wean opioids first, then NSAID, then paracetamol</li></ul></details>
   ${src("Faculty of Pain Medicine, Surgery and Opioids: Best Practice Guidelines 2021; Kohan et al. Reg Anesth Pain Med 2021 (multisociety buprenorphine recommendations, quoting ASAM 2020 on methadone); MOH Pain Management Handbook, 3rd edition.")}</div>`;
 }
+/* v2.168 drug × patient matrix — every cell taken from a sentence already on this card or its checked boxes; "·" = no specific note here (NOT "safe") */
+const MX_CHECKED = false;
+const mxDraft = () => MX_CHECKED ? "" : `<div class="warn" style="margin-top:0">DRAFT — drug × patient matrix: cells taken from this card's existing notes and the checked pregnancy / opioid-tolerant boxes. Not yet ticked by you.</div>`;
+const MX_COLS = [["old","Elderly","≥ 65 y (auto)"],["obese","Obese","BMI ≥ 30 (auto)"],["renal","Kidney"],["liver","Liver"],["osa","OSA"],["tol","Opioid-tol."],["preg","Pregnant"]];
+const MX_ROWS = (nsaidPreg) => [
+  ["Paraceta&shy;mol", {obese:["c","Dose on AdjBW"], liver:["c","Max 2–3 g/day"], preg:["u","First-line (MOH O&G 2023)"]}],
+  ["NSAID", {old:["c","Parecoxib 20 mg if elderly / < 50 kg"], renal:["a","No NSAID (kidney impairment / AKI risk)"], preg:nsaidPreg}],
+  ["Dexametha&shy;sone", {preg:["c","No specific guidance in the pregnancy sources — individual decision"]}],
+  ["Fentanyl", {old:["c","Opioid doses halved for age"], obese:["c","Dose on LBW"], renal:["u","Use fentanyl instead of morphine"], liver:["c","Titrate opioids slowly"], osa:["c","Opioid-sparing plan advised; monitored bed if opioids needed"], tol:["c","Continue usual opioid; expect higher needs"], preg:["u","\"All opioids have been used safely\" (BJA); neonatal respiratory depression near delivery (MOH)"]}],
+  ["Morphine", {old:["c","Opioid doses halved for age"], obese:["c","Dose on IBW"], renal:["a","Avoid (kidney) — use fentanyl"], liver:["c","Titrate opioids slowly"], osa:["c","Opioid-sparing plan advised; monitored bed if opioids needed"], tol:["c","Continue usual opioid; expect higher needs"], preg:["u","\"All opioids have been used safely\" (BJA); neonatal respiratory depression near delivery (MOH)"]}],
+  ["Tramadol", {obese:["c","Dose on IBW"], liver:["c","Titrate opioids slowly"], osa:["c","Opioid-sparing plan advised"], tol:["c","Expect higher needs"], preg:["c","Used for labour (MOH); not with SSRIs, tricyclics, MAOIs, seizures"]}],
+  ["Ketamine", {obese:["c","Dose on IBW"], osa:["u","Part of the opioid-sparing plan"], tol:["u","Add ketamine"], preg:["a","Avoid — increases uterine tone (BJA)"]}],
+  ["IV lignocaine", {obese:["c","Dose on IBW"], liver:["c","Infusion reduced or avoided"], osa:["u","Part of the opioid-sparing plan (±)"], preg:["c","No specific guidance in the pregnancy sources — individual decision"]}],
+  ["Magnesium", {obese:["c","Dose on IBW"], renal:["c","Only with levels / reduced"], osa:["u","Part of the opioid-sparing plan (not if kidney impairment)"], preg:["c","No specific guidance in the pregnancy sources — individual decision"]}],
+  ["Dexmedeto&shy;midine", {old:["c","Watch bradycardia"], obese:["c","Dose on IBW"], osa:["u","Part of the opioid-sparing plan"], preg:["c","No specific guidance in the pregnancy sources — individual decision"]}],
+  ["Clonidine", {obese:["c","Dose on IBW"]}],
+  ["Regional / LA", {obese:["c","LA maximum on LBW when BMI ≥ 30"], osa:["u","Part of the opioid-sparing plan"], tol:["u","Multimodal + regional (FPM 2021)"], preg:["u","Preferred; LA toxicity risk higher — watch the total dose (BJA)"]}]];
+const MX_SYM = {u:"✓", c:"⚠", a:"✗"}, MX_WORD = {u:"Use", c:"Caution / adjust", a:"Avoid"};
+function ioaMatrix(act){
+  const ga = numV(S.preg, "ga"), np = ga != null && !isNaN(ga) && ga >= 28 ? ["a","NSAIDs contraindicated ≥ 28 weeks (MHRA); FDA avoid ≥ 30 weeks"] : ["c", ga != null && !isNaN(ga) && ga < 20 ? "Not routine < 20 weeks (BJA)" : "Avoid from 20 weeks unless essential; ≥ 28 weeks contraindicated — see weeks"];
+  const rows = MX_ROWS(np), sel = S.mxSel || "", [sr, sc] = sel.split(":"), cell = rows[+sr] && rows[+sr][1][sc];
+  const head = MX_COLS.map(([k, l, auto]) => auto ? `<th class="mxh${act[k] ? " on" : ""}" title="${auto}"><span>${l}</span></th>` : `<th class="mxh${act[k] ? " on" : ""}"><button data-score="ioa:${k}:${act[k] ? 0 : 1}" aria-pressed="${!!act[k]}"><span>${l}</span></button></th>`).join("");
+  const body = rows.map(([d, c], i) => `<tr><th class="mxd">${d}</th>${MX_COLS.map(([k]) => { const v = c[k]; return `<td class="${act[k] ? "on" : ""}">${v ? `<button class="mxc mx-${v[0]}${sel === i + ":" + k ? " sel" : ""}" data-mx="${i}:${k}" aria-label="${d}, ${k}: ${MX_WORD[v[0]]}">${MX_SYM[v[0]]}</button>` : `<span class="mxn" title="No specific note here — not the same as safe">·</span>`}</td>`; }).join("")}</tr>`).join("\n");
+  return `${mxDraft()}<div class="mxw"><table class="mx"><tr><th></th>${head}</tr>${body}</table></div>
+  <div class="mxr">${cell ? `<b>${rows[+sr][0]} · ${MX_COLS.find(x => x[0] === sc)[1]}:</b> <span class="mx-${cell[0]}t">${MX_WORD[cell[0]]}</span> — ${cell[1]}` : `Tap a column to set the patient (Elderly and Obese come from the patient box). Tap a symbol for the reason.`}</div>
+  <p class="sub mxk"><span class="mx-ut">✓ use</span> · <span class="mx-ct">⚠ caution / adjust</span> · <span class="mx-at">✗ avoid</span> · <b>·</b> no specific note here (not the same as safe)</p>`;
+}
 const IOA_MOD = [["preg","Pregnant"],["renal","Kidney impairment"],["liver","Liver impairment"],["osa","OSA"],["tol","Opioid-tolerant"]];
 gaCards.opioid = () => {
   const W2 = wts(), x = (S.sc.ioa = S.sc.ioa || {}), on = k => x[k] === 1, old = S.age >= 65, obese = W2.bmi >= 30;
@@ -4540,8 +4581,8 @@ gaCards.opioid = () => {
     preg && "<b>Pregnant:</b> see the pregnancy box — NSAIDs by gestation, avoid ketamine"].filter(Boolean);
   return `<div class="card"><h2>7. Intra-op analgesia</h2>${ioaDraft()}
   <div class="txck">${t("ofa","<b>Opioid-sparing / opioid-free plan</b> (OSA, obese, PONV-prone, opioid-intolerant)")}</div>
-  <h3>Patient factors</h3><div class="txck">${IOA_MOD.map(([k,l])=>t(k,l)).join("")}</div>
-  ${mods.length ? `<div class="warn">${mods.join("<br>")}</div>` : `<p class="sub">Elderly (≥ 65) and obese (BMI ≥ 30) are set from the patient box.</p>`}
+  <h3>Patient factors</h3>${ioaMatrix({old, obese, renal, liver, osa, tol, preg})}
+  ${mods.length ? `<details class="ndet"><summary>Patient notes in words</summary><div class="sub">${mods.join("<br>")}</div></details>` : ""}
   ${preg ? pregBox() : ""}${tol ? tolBox() : ""}
   ${ofa ? `<div class="result"><b>Opioid-sparing plan</b><ol style="margin:6px 0 0"><li>Base: paracetamol + ${renal?"(no NSAID)":"NSAID"} + dexamethasone</li><li>Regional block or wound infiltration</li><li>Dexmedetomidine + ketamine${renal?"":" + magnesium"} ± lignocaine (not within 4 h of a block)</li><li>Rescue: fentanyl 0.25–0.5 mcg/kg only</li></ol></div>` : ""}
   <h3>1. Base — every case unless contraindicated</h3>
@@ -5943,6 +5984,7 @@ const VGROUPS = [["Emergencies",[["Crisis cards","",["High spinal: phenylephrine
  ["Opioid tolerance, buprenorphine, methadone","26 Nov 2026",["Continue usual opioids through admission; don't escalate pre-op; tolerance likely ≥ 60 mg OME/day ≥ 7 days; no oral route → parenteral morphine; pain specialist if high dose (FPM 2021)","Buprenorphine: don't stop or taper routinely; ≥ 16 mg + high pain → taper to 16 mg only with expertise; inadequate → high-affinity full agonist (grade B) or increased / divided buprenorphine (grade C); discharge taper, liaise with prescriber (RAPM 2021)","Methadone: continue, stopping not required, IV full agonists can be added (ASAM 2020 via RAPM); QT / torsades; respiratory depression outlasts analgesia; t½ 8–29 h; conversions only with specialist (FPM)","PACU: functional pain assessment; sedation score + RR; pain service; IR opioids 5–7 days; reverse ladder"]],
  ["Opioid conversion","26 Nov 2026",["MOH Table 8.4 / 8.6: oral morphine 1, oxycodone 1.5, codeine ÷ 8 (0.125), tramadol 0.2 (40 = 200), SC / IV morphine × 2.5, fentanyl patch × 3; start new opioid at ½–⅔; PRN ⅙ of 24 h","MOH Table 8.5 buprenorphine patch: 5 = 10, 10 = 15, 20 = 30, 35 = 60, 52.5 = 90, 70 = 120 mg oral morphine; other strengths not converted","ANZCA 2025 for the rest: hydromorphone 5, tapentadol 0.3; SL buprenorphine 40; rectal oxycodone 1.5","Parenteral (ANZCA): oxycodone 3, hydromorphone 15, codeine 0.25, pethidine 0.4 (mg/day); fentanyl 0.2, sufentanil 2 (mcg/day)","Methadone (MOH ratios shown, not calculated), fentanyl lozenges, neuraxial: not converted; buprenorphine MOH: continue + 25% or stop 72 h pre-op; equivalent of new opioid = oMEDD ÷ its factor; caution overdose","oMEDD > 40 ~4×, > 100 ~11× cardiorespiratory risk; ≥ 60 mg ≥ 7 days tolerance (FPM 2021)"]],
  ["Steroid equivalence","26 Nov 2026",["10 mg hydrocortisone ≈ 2 mg prednisolone ≈ 0.1 mg dexamethasone (Woodcock 2020); factors to prednisolone: hydrocortisone 0.2, dexamethasone 20","≥ 5 mg prednisolone equivalent ≥ 4 weeks → cover; other routes count but not converted; methylprednisolone not in source","Dexamethasone: no mineralocorticoid effect, not adequate in primary adrenal insufficiency; 8 mg ≈ 800 mg hydrocortisone"]],
+ ["Analgesia matrix","",["Drug × patient matrix on Intra-op analgesia: ✓ / ⚠ / ✗ taken from the card's own notes (elderly halve opioids, dexmedetomidine bradycardia; obese IBW / LBW / AdjBW scalars; kidney no NSAID, fentanyl not morphine, magnesium with levels; liver paracetamol 2–3 g/day, lignocaine reduced, opioids titrated; OSA opioid-sparing plan; opioid-tolerant continue + ketamine + regional) and the checked pregnancy box (NSAIDs by weeks, ketamine avoid)","\"·\" = no specific note on the card — not the same as safe"]],
  ["Intra-op analgesia","15 Nov 2026",["Base: paracetamol 1 g (15 mg/kg < 50 kg, AdjBW if obese); parecoxib 40 mg (20 mg elderly / < 50 kg) or diclofenac PR 1 mg/kg max 100 mg; dexamethasone 0.1 mg/kg IBW max 8 mg","Opioids: fentanyl 1–2 mcg/kg LBW then 0.5–1; morphine 0.1–0.15 mg/kg IBW; tramadol 1–2 mg/kg max 100 mg; halve if ≥ 65; remi → morphine 0.1 mg/kg or fentanyl 1–2 mcg/kg 30 min before stopping","Ketamine 0.15–0.35 mg/kg then 0.1–0.5 mg/kg/h (max 1); 2 mg/mL","Lignocaine 1.5 mg/kg IBW over 10 min then ≤ 1.5 mg/kg/h ≤ 24 h; not within 4 h of a nerve block","Magnesium 30–50 mg/kg then 10–15 mg/kg/h; dexmedetomidine 0.5–1 mcg/kg then 0.2–0.7 mcg/kg/h; clonidine 1–2 mcg/kg max 150 mcg","Modifiers: kidney → no NSAID, fentanyl not morphine; liver → paracetamol ≤ 2–3 g/day, reduce lignocaine; OSA → opioid-sparing; tolerant → continue baseline + ketamine","PROSPECT table: lap chole port-site; laparotomy epidural / rectus sheath / TAP; hernia II-IH block; TKA adductor canal + LIA; THA LIA or fascia iliaca / PENG; spine infiltration / ESP; breast PECS II / paravertebral"]],
  ["Guideline updates Nov 2026","14 Nov 2026",["GLP-1: most continue; high risk → 24 h clear-liquid diet, adjust plan, consider holding; symptomatic → full stomach","PONV: 0 factors risk reduction ± 1 agent; 1–2 factors 2 agents; ≥ 3 factors 3–4 agents + TIVA; PDNV long-acting antiemetic"]]]],
  ["Regional",[["Spinal – non-obstetric (0.5% heavy)","",["Perineal/saddle S1–S5: 1.0–1.5 mL","TURP/urology T10: 2.0–2.5 mL","Inguinal hernia/lower abdo T10: 2.5–3.0 mL","Lower limb/hip/knee T10–T12: 2.5–3.0 mL","Height ≤150 → lower end; 151–165 → middle; >165 → upper end","Optional: fentanyl 10–25 mcg; morphine 0.1 mg (1 mg/mL) for hip/knee"]],
@@ -6398,7 +6440,7 @@ function sampleWarn(keys){ const k = keys.filter(isSample); if (!k.length) retur
   const names = {k:"K⁺", hb:"Hb", height:"height", aw:"weight", pw:"weight", pY:"age", spHt:"height", morWt:"weight", sex:"sex", age:"age"};
   return `<div class="samplewarn"><b>Sample values</b> — ${(a => a.length > 1 ? a.slice(0,-1).join(", ") + " and " + a[a.length-1] : a[0])([...new Set(k.map(x=>names[x]))])} not entered. Enter the patient or tap a case.</div>`; }
 /* Each case keeps its own clinical entries, in memory only (never saved). */
-const CLIN = ["csDec","sc","asa","met","pnF","pnMP","pnNeck","pnPonv","pnUrg","pnLay","csNote","leNote","pnNote","csWho","csLang","csOut","csLen","leLen","csMode","crea","k","hb","todayWt","hdH","hbNow","hbLow","hbTarget","fastH","pBE","laA","txck","derm","abg","fbal","blIn","hbU","gz","tv","preg","oc","stc","indT"];
+const CLIN = ["csDec","sc","asa","met","pnF","pnMP","pnNeck","pnPonv","pnUrg","pnLay","csNote","leNote","pnNote","csWho","csLang","csOut","csLen","leLen","csMode","crea","k","hb","todayWt","hdH","hbNow","hbLow","hbTarget","fastH","pBE","laA","txck","derm","abg","fbal","blIn","hbU","gz","tv","preg","oc","stc","indT","mxSel"];
 const CLIN_T = ["crea","k","hb","todayWt","hdH"];
 const CLIN_OBJ = {sc:{}, pnF:{}, txck:{}, laA:[]};
 const clone = v => v === undefined ? undefined : JSON.parse(JSON.stringify(v));
@@ -6439,6 +6481,7 @@ function vTicks(){
 }
 /* ---------- ABOUT ---------- */
 const CHANGES = [
+  ["2.168","General › Intra-op › 7. Intra-op analgesia: patient factors become a drug × patient matrix (✓ use · ⚠ caution / adjust · ✗ avoid · \"·\" no specific note); tap a column to set the patient, tap a symbol for the reason. Cells taken from the card's existing notes. (draft)"],
   ["2.167","Volatile: MAC by age — small curve of MAC against age (Mapleson) with a dot at the patient's age."],
   ["2.166","Fasting (adult and paeds) as a timeline to induction: green while allowed, hatched while fasting; optional induction time shows the clock time for each. Same times and wording."],
   ["2.165","Risk gauges: Apfel (PONV) and STOP-BANG show a row of score steps coloured low → high with the patient's step raised; opioid conversion total shows a bar with lines at 40, 60 and 100 mg/day. Same scores and wording."],
@@ -7617,6 +7660,7 @@ document.addEventListener("change", e => { const t = e.target; if (!t.dataset ||
 document.addEventListener("click", e => { const t = e.target.closest && e.target.closest("[data-indtclr]"); if (!t) return; S.indT = ""; render(); });
 document.addEventListener("change", e => { const t = e.target; if (t.tagName !== "SELECT" || !t.dataset.stc) return; (S.stc = S.stc || {}).d = t.value; const r = document.getElementById("stcres"); if (r){ r.innerHTML = stcRes(); seg1(r); } });
 document.addEventListener("click", e => { const t = e.target.closest && e.target.closest("[data-ocreset]"); if (!t) return; S.oc = {}; render(); });
+document.addEventListener("click", e => { const t = e.target.closest && e.target.closest("[data-mx]"); if (!t) return; S.mxSel = S.mxSel === t.dataset.mx ? "" : t.dataset.mx; render(); });
 document.addEventListener("click", e => { const t = e.target.closest && e.target.closest("[data-tvb]"); if (!t) return; const [k, v] = t.getAttribute("data-tvb").split(":"); tvS()[k] = v; render(); });
 document.addEventListener("click", e => { const t = e.target.closest && e.target.closest("[data-dl]"); if (!t) return; S.dermAnim = {prev: dermState().top}; S.derm = t.getAttribute("data-dl"); render(); });
 let vtaps = 0, vtimer = null;
