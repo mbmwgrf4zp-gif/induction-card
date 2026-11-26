@@ -816,7 +816,7 @@ details.bfb[open]>summary{margin-bottom:4px}details.bfb .bfo{margin-top:4px}deta
 .bfo{display:flex;justify-content:space-between;align-items:baseline;gap:8px;background:none;border:0;padding:0;color:var(--ink);font:inherit;text-align:left;cursor:pointer}
 .bfn{font-weight:700;font-size:16px;color:var(--gc);text-decoration:underline;text-decoration-thickness:1.5px;text-underline-offset:3px}.bfempty{margin:0;font-size:15px}.bfd{font-weight:700;font-size:20px;white-space:nowrap}.bfw{font-size:14px;color:var(--muted)}.bfw.bfc{color:var(--ink)}
 /* v2.159.2 desktop: compact patient fields (wide screen + mouse / trackpad) */
-.ptile .stag.dsk{display:none}.smpnote{display:none;font-size:var(--fs-xs);color:var(--warn-ink);margin-top:4px}
+.ptile .stag.dsk{display:none}.smpnote{display:none;font-size:var(--fs-xs);color:var(--warn-ink);margin-top:4px}.smpnote::before{content:"Dashed = sample value \2014  type the patient\2019s own."}
 @media (min-width:900px) and (pointer:fine){
   .ptiles{grid-template-columns:repeat(auto-fit,minmax(84px,1fr));gap:6px}
   .ptile{padding:3px 6px 2px;gap:0;border-radius:10px}
@@ -831,6 +831,25 @@ details.bfb[open]>summary{margin-bottom:4px}details.bfb .bfo{margin-top:4px}deta
   .dline{margin-top:6px}
   .samplewarn{display:none}
 }
+/* v2.160 desktop: patient panel under the menu, vertical */
+.dline .sep{font-style:normal}
+@media (min-width:1100px){
+  .gwrap.noside{grid-template-columns:minmax(0,1fr)}
+  .gwrap.noside .gmain{max-width:980px}
+  .sidenav .gside.innav{order:0;position:static;margin:var(--s3) 0 0;display:grid;gap:var(--s2)}
+  .gside.innav .card{margin:0;padding:var(--s3)}
+  .gside.innav .ptiles{grid-template-columns:1fr;gap:4px}
+  .gside.innav .ptile{flex-direction:row;flex-wrap:wrap;justify-content:space-between;align-items:center;padding:4px 10px;border-radius:10px}
+  .gside.innav .ptile small{font-size:11px}
+  .gside.innav .ptile input{width:4.5em;flex:none;text-align:right;font-family:var(--font-sans);font-size:16px;font-weight:700;color:var(--ink)}
+  .gside.innav .ptile.sample input{color:var(--muted)}
+  .gside.innav .ptile .pm{width:100%}
+  .gside.innav .dline span{display:block;padding:1px 0}.gside.innav .dline .sep{display:none}
+  .gside.innav .samplewarn,.gside.innav .warn,.gside.innav .danger{font-size:var(--fs-xs)}
+  .sidenav{max-height:100vh;overflow:auto}
+  .sidenav.haspt{gap:2px;padding-top:var(--s2)}.sidenav.haspt .snitem{padding:6px var(--s3)}.sidenav.haspt .snbrand{padding-bottom:var(--s2)}.sidenav.haspt .snkeys{margin-top:var(--s3)}
+}
+@media (min-width:1100px) and (pointer:fine){ .gside.innav .ptile .pm{display:none} }
 </style>
 </head>
 <body>
@@ -845,7 +864,7 @@ if (window.top !== window.self && /\.github\.io$/.test(location.hostname)) {
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.159.2";
+const APP_VERSION = "2.160.0";
 const APP_DATE = "26 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
@@ -2830,9 +2849,9 @@ function ptile(key, label, unit, min, max, stp){
     <input id="in-${key}" inputmode="decimal" aria-label="${label} (${unit})${smp?", sample value":""}" data-in="${key}" data-min="${min}" data-max="${max}" value="${S[key]}">
     <div class="pm"><button aria-label="${label} down" data-step="${key}" data-d="${-stp}" data-min="${min}" data-max="${max}">−</button><button aria-label="${label} up" data-step="${key}" data-d="${stp}" data-min="${min}" data-max="${max}">+</button></div></div>`;
 }
-const ptiles = list => `<div class="ptiles">${list.join("")}</div>${list.some(t => t.includes('class="ptile sample"')) ? `<div class="smpnote">Dashed = sample value — type the patient's own.</div>` : ""}`;
+const ptiles = list => `<div class="ptiles">${list.join("")}</div>${list.some(t => t.includes('class="ptile sample"')) ? `<div class="smpnote"></div>` : ""}`;
 const sexMini = (title="Patient") => `<div class="pthead"><span class="t">${title}</span><div class="segmini ${isSample("sex")?"sample":""}" role="group" aria-label="Sex">${[["F","Female"],["M","Male"]].map(([v,l])=>`<button data-seg="sex" data-val="${v}" aria-label="${l}" title="${l}" aria-pressed="${!isSample("sex") && S.sex===v}">${sxi(v)}</button>`).join("")}</div></div>`;
-const dLine = W2 => `<div class="dline">BMI <b>${sig(W2.bmi)}</b> · IBW/PBW <b>${sig(W2.ibwRaw)}</b> · LBW <b>${sig(W2.lbw)}</b> · AdjBW <b>${sig(W2.adj)}</b> kg</div>`;
+const dLine = W2 => `<div class="dline"><span>BMI <b>${sig(W2.bmi)}</b></span><i class="sep"> · </i><span>IBW/PBW <b>${sig(W2.ibwRaw)}</b></span><i class="sep"> · </i><span>LBW <b>${sig(W2.lbw)}</b></span><i class="sep"> · </i><span>AdjBW <b>${sig(W2.adj)}</b> kg</span></div>`;
 const awStep = () => S.aw < 40 ? 0.5 : 1;
 function gaInputs(){
   const W2 = wts();
@@ -6262,6 +6281,7 @@ function vTicks(){
 }
 /* ---------- ABOUT ---------- */
 const CHANGES = [
+  ["2.160","Desktop: the patient box sits under the menu on the left as a vertical list (fields, then BMI, IBW, LBW, AdjBW one per line) and stays in view; cards use the freed width. Phones and tablets unchanged."],
   ["2.159.2","Desktop: patient fields are compact one-line boxes (no − / + buttons; ↑ ↓ keys step the value); sample values shown dashed with one short note, replacing the yellow banner. Phones unchanged."],
   ["2.159","Pre-op › Prepare › 4. Steroid cover: steroid equivalence — prednisolone, hydrocortisone or dexamethasone daily dose → prednisolone and hydrocortisone equivalent, with the ≥ 5 mg prednisolone threshold (Woodcock et al. Anaesthesia 2020: 10 mg hydrocortisone ≈ 2 mg prednisolone ≈ 0.1 mg dexamethasone). (checked)"],
   ["2.158","General › Post-op › 7. Opioid conversion: add up current opioids (oral, sublingual, rectal, patch, IV / SC) as oral morphine equivalent and see the equivalent of another opioid, with the MOH ½–⅔ starting range; methadone not calculated (MOH ratios shown for reference); MOH Pain Management Handbook factors first, ANZCA 2025 for the rest. Linked from the opioid-tolerant box, which also gains the MOH buprenorphine option and parenteral conversion. (checked)"],
@@ -7319,6 +7339,8 @@ function renderNow(){
   const nav = `<nav class="sidenav" aria-label="Sections"><div class="snbrand">${svg("capno")} Induction Card</div>${navItems.map(([hh,l,ic,cls])=>`<button class="snitem sn-${cls} ${h===hh||(hh==="home"&&!h.startsWith("g-")&&h!=="values"&&h!=="about")?"on":""}" data-go="${hh}"><span class="snico">${svg(ic)}</span>${l}</button>`).join("")}
     <div class="snkeys">Keys: <b>/</b> search · <b>Esc</b> back · <b>1–6</b> tabs</div></nav>`;
   app.innerHTML = `<div class="shell">${nav}<div class="content">${html}</div></div>`;
+  if (isWide()){ const gs = app.querySelector(".gwrap:not(.fw) > .gside"), sn = app.querySelector(".sidenav");   // v2.160: desktop — patient panel moves under the menu
+    if (gs && sn && gs.innerHTML.trim()){ gs.classList.add("innav"); sn.classList.add("haspt"); const last = [...sn.querySelectorAll(".snitem")].pop(); last.after(gs); gs.parentElement && app.querySelector(".gwrap:not(.fw)").classList.add("noside"); } }
   app.querySelectorAll('.big').forEach(el => { el.innerHTML = el.innerHTML.replace(/(\d)\s+(mg|mcg|mL\/h|mL|g|kg|mmHg|wk|cm|mmol|units?|J)(?=\s|<|$)/g, '$1<span class="bu"> $2</span>').replace(/(\d)\s*[–-]\s*(?=\d)/g, '$1<span class="rgd">–</span>'); });
   seg1(app);
   tickerInit();
