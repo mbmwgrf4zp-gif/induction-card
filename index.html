@@ -828,7 +828,7 @@ if (window.top !== window.self && /\.github\.io$/.test(location.hostname)) {
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.154.0";
+const APP_VERSION = "2.154.1";
 const APP_DATE = "26 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
@@ -4208,7 +4208,7 @@ gaCards.pressors = () => { const w = S.aw, rate = (lo,hi,conc) => `${dz(lo*w*60/
 gaCards.txa = () => `<div class="card"><h2>2. Tranexamic acid</h2>${gaDraft()}
   ${f1Draft()}${GT([
     R("Tranexamic acid",`over 10 min at induction (or 15 mg/kg = ${dz(15*S.aw,"mg")} mg)`,"1 g","Repeat 1 g if bleeding continues or long case.","IV")])}
-  <p class="sub">Caution: recent VTE, seizure history, severe renal impairment.<p class="medadd"><b>MOH PBM 2024:</b> give IV tranexamic acid before incision for any surgery with expected blood loss &gt; 500 mL. Trauma: 1 g over 10 min within 3 h of injury, then 1 g over 8 h.</p></p>${src("Common practice.")}</div>`;
+  <p class="sub">Caution: recent VTE, seizure history, severe renal impairment.<p class="medadd"><b>MOH PBM 2024:</b> give IV tranexamic acid before incision for any surgery with expected blood loss &gt; 500 mL. Trauma: 1 g over 10 min within 3 h of injury, then 1 g over 8 h.</p></p>${src("Local blood bank guideline; MOH Patient Blood Management consensus 2024.")}</div>`;
 
 /* WAKE & POST-OP */
 gaCards.reversal = () => { const W2 = wts(); const neo = Math.min(0.05*W2.ibw, 5);
@@ -4264,7 +4264,7 @@ gaCards.analgesia = () => { const W2 = wts(), w = S.aw;
   <h3>Adult PCA</h3>
   <table><tr><th>Morphine 1 mg/mL</th><td>Bolus 1 mg, lockout 5 min, no background</td></tr>
   <tr><th>Fentanyl 10 mcg/mL</th><td>Bolus 10–20 mcg, lockout 5 min, no background</td></tr></table>
-  <p class="sub">Monitor sedation score and RR. Naloxone 100–200 mcg IV for respiratory depression.</p>${src("Common acute pain service protocols.")}</div>`; };
+  <p class="sub">Monitor sedation score and RR. Naloxone 100–200 mcg IV for respiratory depression.</p>${src("Local OAS guideline.")}</div>`; };
 
 /* REGIONAL: anticoagulant timing */
 gaCards.anticoag = () => `<div class="card"><h2>Neuraxial &amp; deep blocks: anticoagulant timing</h2>${gaDraft()}
@@ -4398,7 +4398,7 @@ raCards.epidural = () => `<div class="card"><h2>Epidural (adult)</h2>${raDraft()
     R("Loading — levobupi 0.25%","3–5 mL increments","~1–1.5 mL per segment thoracic, 1.5–2 mL lumbar",null,"epidural"),
     R("Surgical top-up — levobupi 0.5% or lignocaine 2% + adrenaline","","5 mL increments",null,"epidural"),
     R("Infusion — bupi/levobupi 0.1% + fentanyl 2 mcg/mL","","thoracic 4–10 mL/h · lumbar 6–14 mL/h",null,"epidural"),
-    R("Breakthrough","check block and BP","3–5 mL bolus",null,"epidural")])}${src("Common acute pain service practice.")}${neuraxEsc()}</div>`;
+    R("Breakthrough","check block and BP","3–5 mL bolus",null,"epidural")])}${src("Local OAS guideline.")}${neuraxEsc()}</div>`;
 raCards.cse = () => `<div class="card"><h2>CSE (combined spinal–epidural)</h2>${raDraft()}
   <ul><li>When: long or uncertain duration, high-risk patient needing slow titration, post-op epidural analgesia</li>
   <li>Needle-through-needle at L3–4 or below; spinal first, then thread epidural catheter</li>
@@ -6019,7 +6019,7 @@ function vTicks(){
 }
 /* ---------- ABOUT ---------- */
 const CHANGES = [
-  ["2.154","About redesigned: offline · private · free; 6 feature tiles; Clinical foundations (sources grouped by topic), How calculations work, Clinical governance (honest validation status); Privacy and data (what is stored, how to clear); What's new shows the latest 3."],
+  ["2.154","About redesigned: offline · private · free; 6 feature tiles; Clinical foundations (sources grouped by topic), How calculations work, Clinical governance (honest validation status); Privacy and data (what is stored, how to clear); What's new shows the latest 3. Sources: tranexamic acid now cites the local blood bank guideline; analgesia ladder & PCA and epidural cite the local OAS guideline."],
   ["2.153","Emergencies › Adult re-checked against the QRH 2023: Cardiac arrest (theatre-specific steps), Anaphylaxis (CPR if SBP < 50, glucagon, vasopressin, infusion recipe), Bronchospasm (QRH drugs; ketamine 20 mg), Malignant hyperthermia (complications), CICO (impalpable membrane technique), High spinal (metaraminol, wider ephedrine and atropine ranges, reduced induction dose). (checked) QRH cards now show only the QRH step numbers (❶ ❷ …), one step per line. Fix: Blood management showed only the major haemorrhage box — the rest of the card (blood volume, allowable loss, transfusion thresholds, products, adjuncts) is back."],
   ["2.152","Emergencies › Adult › Theatre & equipment: Patient fire, Mains oxygen failure (with cylinder contents), Mains electricity failure, Emergency evacuation (Association of Anaesthetists QRH 2023; reporting to Malaysia's Medical Device Authority). (checked)"],
   ["2.151","Emergencies › Adult: Laryngospasm & stridor, Massive blood loss (with MOH targets), Circulatory embolus, Cardiac tamponade, Cardiac ischaemia, After cardiac arrest: neuroprotection, Sepsis (Association of Anaesthetists QRH 2023). (checked)"],
@@ -6093,7 +6093,7 @@ const SRC_LINKS = [   // v2.154: grouped by topic; "" = no public link (summaris
   ["Paediatric", [["Association of Paediatric Anaesthetists of GB & Ireland","https://www.apagbi.org.uk/guidelines"]]],
   ["Obstetric", [["Obstetric Anaesthetists' Association","https://www.oaa-anaes.ac.uk"]]],
   ["Transplant", [["Local renal transplant protocol (see Local sources)",""]]]];
-const LOCAL_SRC = ["Departmental obstetric anaesthesia protocol","Main OT departmental protocol","Local paediatric anaesthesia manual & pain / regional protocol (Nov 2025)","Local renal transplant protocol (1st ed.)","Author's own practice notes"];
+const LOCAL_SRC = ["Local blood bank guideline","Local OAS (pain service) guideline","Departmental obstetric anaesthesia protocol","Main OT departmental protocol","Local paediatric anaesthesia manual & pain / regional protocol (Nov 2025)","Local renal transplant protocol (1st ed.)","Author's own practice notes"];
 /* ---------- SHARE THIS APP ---------- */
 const APP_URL = "https://mbmwgrf4zp-gif.github.io/induction-card/";
 // what a colleague receives (v2.103): the selling points first, link last
