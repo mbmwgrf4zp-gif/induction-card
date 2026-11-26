@@ -506,7 +506,7 @@ details.endo summary{cursor:pointer;font-weight:600;font-size:var(--fs-sm)}
 .toprow .t-emerg{margin-top:0}
 @media (min-width:700px){
   main{max-width:1000px}
-  .gwrap{grid-template-columns:minmax(0,1fr) 260px;gap:var(--s4);align-items:start}
+  .gwrap{grid-template-columns:minmax(0,1fr) 220px;gap:var(--s4);align-items:start}
   .gwrap.noside{grid-template-columns:1fr}
   .gwrap.fw{grid-template-columns:minmax(0,1fr)}.gwrap.fw .gside{order:0;position:static}.gwrap.fw .gside .ptbar{margin-top:var(--s2)}
   .gwrap.fw .bfin{grid-template-columns:minmax(0,1.5fr) minmax(0,1fr)}.gwrap.fw .bfin .bfstage{height:80vh;height:80svh}
@@ -953,6 +953,8 @@ details.ptx .pbs{margin-top:2px}
   .gside .ptile.sample input{color:var(--muted)}
   .gside .ptile .pm{display:flex;width:auto;gap:3px;margin:0}.gside .ptile .pm button{width:36px;height:36px;font-size:1rem}
   .gside .samplewarn{display:none}.gside .smpnote{display:block}
+  .gside .ptdone{padding:0 10px}.gside .ptdone .lbl{display:none}.gside .pthead{gap:6px}.gside .pthead{flex-wrap:wrap;row-gap:6px;column-gap:4px}.gside .segmini button{width:36px;height:36px}.gside .ptdone{width:36px;padding:0!important;height:36px}.gside .pthead .segmini,.gside .pthead .ptdone{flex:none}.gside .pthead .segmini{margin-left:auto}.gside .pthead .t{flex:1 1 auto;white-space:nowrap}
+  .gside .dline span{display:block;padding:1px 0}.gside .dline .sep{display:none}
 }
 @media (min-width:700px) and (pointer:fine){ .gside .ptile .pm{display:none} }
 @media (min-width:1100px){ .gside.innav .ptile{flex-wrap:nowrap;padding:3px 4px 3px 8px;gap:4px} .gside.innav .ptile .pm{width:auto} .gside.innav .ptile .pm button{width:32px;height:34px} .gside.innav .ptile input{width:3.2em;font-size:17px} }
@@ -970,7 +972,7 @@ if (window.top !== window.self && /\.github\.io$/.test(location.hostname)) {
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.170.0";
+const APP_VERSION = "2.170.1";
 const APP_DATE = "26 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
@@ -6504,6 +6506,7 @@ function vTicks(){
 }
 /* ---------- ABOUT ---------- */
 const CHANGES = [
+  ["2.170.1","iPad: patient column narrowed to 220 px (Done as ✓, weights one per line) — more width for cards."],
   ["2.170","iPad and other wide screens: the patient box is a narrow vertical list (one row per field, − / + kept on touch screens), the sample note sits inside it, and cards get the extra width. Phones unchanged."],
   ["2.169","Patient bar: one line (sex · age · height · weight) with a BMI badge; tap it to open a weight scale showing LBW, IBW, AdjBW and actual weight on one bar; ✎ to edit."],
   ["2.168","General › Intra-op › 7. Intra-op analgesia: patient factors become a drug × patient matrix (✓ use · ⚠ caution / adjust · ✗ avoid · \"·\" no specific note); tap a column to set the patient, tap a symbol for the reason. Cells taken from the card's existing notes. (checked)"],
