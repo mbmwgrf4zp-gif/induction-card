@@ -246,10 +246,11 @@ td.hl{font-weight:700}
 tr.hl td{background:var(--gc-soft);font-weight:700}
 /* dose tables (v2.71): large dose that never breaks; on a phone each drug is two lines — name + dose, then rule · note */
 .nw{white-space:nowrap}
-.dzb{font-size:1.2rem;font-weight:700;line-height:1}
-table.dt tr[data-dr]>td.hl{font-size:1.2rem;line-height:1.25}
+.dzb{font-size:1.25rem;font-weight:700;line-height:1}
+table.dt tr[data-dr]>td.hl{font-size:1.25rem;line-height:1.25}
 table.dt tr[data-dr]>td.hl .sub,table.dt tr[data-dr]>td.hl .rt{font-size:var(--fs-xs)}
 table.dt tr[data-dr]>td.hl .gml{font-size:1.05rem;font-weight:700;color:inherit}
+td.hl .gml,td.hl .gml .nw{font-size:1rem}td.hl .sub .nw{font-size:1rem}   /* v2.160.3 dose levels: answer 20 px · in-step 17 px · reference / secondary 16 px */
 .dfor{display:none}
 @media screen and (max-width:699px){
   .dfor{display:block;margin:var(--s2) 2px 0;font-size:var(--fs-xs);font-weight:600;color:var(--muted)}
@@ -270,7 +271,7 @@ table.dt tr[data-dr]>td.hl .gml{font-size:1.05rem;font-weight:700;color:inherit}
   table.dt.gt tr[data-dr]>td:nth-child(2) br+b::before{content:" · "}
   table.dt tr.utr{grid-template-columns:minmax(0,1fr);grid-template-areas:"name" "dose" "note"}
   table.dt tr.utr>td:first-child{display:block;grid-area:name}
-  table.dt tr.utr>td:nth-child(2){grid-area:dose;text-align:left;margin-top:var(--s1);font-size:1.2rem;font-weight:700}
+  table.dt tr.utr>td:nth-child(2){grid-area:dose;text-align:left;margin-top:var(--s1);font-size:1.25rem;font-weight:700}
   table.dt tr.utr>td:nth-child(3){grid-area:note;margin-top:var(--s1);font-size:var(--fs-sm);font-weight:400}
 }
 tr.hl[data-dr]{background:var(--gc-soft)}
@@ -796,7 +797,8 @@ details.bfb[open]>summary{margin-bottom:4px}details.bfb .bfo{margin-top:4px}deta
 .bfsidepick{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.bfsidepick span{font-weight:600}.bfsidepick button{min-height:40px;padding:0 16px;border-radius:999px;border:1px solid var(--line);background:var(--card);color:var(--ink);font-weight:600}
 .bfops{margin:0 0 var(--s2)}.bfops .searchbox{margin:0}#bfopsr{display:grid;gap:4px;margin-top:4px}.bfopb{text-align:left;min-height:44px;padding:6px 12px;border-radius:var(--r-sm);border:1px solid var(--line);background:var(--card);color:var(--ink);font:inherit}
 .bfquiet{justify-content:flex-end!important;gap:6px!important}.bfsep{color:var(--muted)}
-.tpick{display:grid;gap:4px;margin:var(--s2) 0}.tvm{border-top:1px solid var(--line);padding:var(--s2) 0}.tvh{display:flex;flex-wrap:wrap;gap:4px 10px;align-items:baseline}.tvh b{font-size:var(--fs-md,17px)}.tvh span{font-size:13px;color:var(--muted)}.tvg{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin:6px 0}.tvg small{display:block;font-size:12px;color:var(--muted)}.tvg b{font-size:17px;font-variant-numeric:tabular-nums}.tvm .seg small{display:block;font-weight:400;font-size:12px;opacity:.85}.tvm .ndet{margin-top:4px}.tvrob{margin-top:var(--s2)}.pgbox{border:1px solid var(--line);border-radius:var(--r-sm);padding:var(--s2) var(--s3);margin:var(--s2) 0}.pgt{margin:4px 0}.ocrow{display:grid;gap:6px;margin:var(--s2) 0;padding-top:var(--s2);border-top:1px solid var(--line)}select[data-stc]{font-size:15px;display:block;width:100%;max-width:100%;min-height:44px;padding:0 8px;box-sizing:border-box;margin:var(--s2) 0}select[data-oc]{font-size:15px;display:block;width:100%;max-width:100%;min-width:0;min-height:44px;padding:0 8px;box-sizing:border-box}.ocrow{min-width:0}.tolul{margin:4px 0 var(--s2);padding-left:1.2em}.tolul li{margin:3px 0}.pgr{padding:6px 0;border-top:1px solid var(--line)}.pgr .sub{margin:2px 0 0}.pgt tr.dim td{opacity:.45}.pgt tr.on td{font-weight:700}.pg-ok,.pg-ca,.pg-no{font-weight:700;white-space:nowrap}.pg-ok{color:var(--ok,#2e7d32)}.pg-ca{color:var(--warn-ink,#b26a00)}.pg-no{color:var(--danger-ink,#c62828)}.tvt{margin:var(--s2) 0}.tvt th small{font-weight:400;color:var(--muted)}.tvt td.hl{font-weight:700}.tvrob table{margin:4px 0}
+.tpick{display:grid;gap:4px;margin:var(--s2) 0}.tvm{border-top:1px solid var(--line);padding:var(--s2) 0}.tvh{display:flex;flex-wrap:wrap;gap:4px 10px;align-items:baseline}.tvh b{font-size:var(--fs-md,17px)}.tvh span{font-size:13px;color:var(--muted)}.tvg{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin:6px 0}.tvg small{display:block;font-size:12px;color:var(--muted)}.tvg b{font-size:17px;font-variant-numeric:tabular-nums}.tvm .seg small{display:block;font-weight:400;font-size:12px;opacity:.85}.tvm .ndet{margin-top:4px}.tvrob{margin-top:var(--s2)}.pgbox{border:1px solid var(--line);border-radius:var(--r-sm);padding:var(--s2) var(--s3);margin:var(--s2) 0}.pgt{margin:4px 0}.ocrow{display:grid;gap:6px;margin:var(--s2) 0;padding-top:var(--s2);border-top:1px solid var(--line)}select[data-oc],select[data-stc]{font-family:inherit;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:10px;-webkit-appearance:none;appearance:none;background-image:linear-gradient(45deg,transparent 50%,var(--muted) 50%),linear-gradient(135deg,var(--muted) 50%,transparent 50%);background-position:calc(100% - 18px) 50%,calc(100% - 12px) 50%;background-size:6px 6px;background-repeat:no-repeat;padding-right:32px!important}select[data-oc]:focus,select[data-stc]:focus{outline:2px solid var(--gc,var(--accent));outline-offset:1px}
+select[data-stc]{font-size:15px;display:block;width:100%;max-width:100%;min-height:44px;padding:0 8px;box-sizing:border-box;margin:var(--s2) 0}select[data-oc]{font-size:15px;display:block;width:100%;max-width:100%;min-width:0;min-height:44px;padding:0 8px;box-sizing:border-box}.ocrow{min-width:0}.tolul{margin:4px 0 var(--s2);padding-left:1.2em}.tolul li{margin:3px 0}.pgr{padding:6px 0;border-top:1px solid var(--line)}.pgr .sub{margin:2px 0 0}.pgt tr.dim td{opacity:.45}.pgt tr.on td{font-weight:700}.pg-ok,.pg-ca,.pg-no{font-weight:700;white-space:nowrap}.pg-ok{color:var(--ok,#2e7d32)}.pg-ca{color:var(--warn-ink,#b26a00)}.pg-no{color:var(--danger-ink,#c62828)}.tvt{margin:var(--s2) 0}.tvt th small{font-weight:400;color:var(--muted)}.tvt td.hl{font-weight:700}.tvrob table{margin:4px 0}
 .tlab{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin-top:6px}.tpick .seg{margin:0}.tpick .seg small{display:block;font-weight:400;font-size:12px;color:var(--muted)}.tpick .seg button[aria-pressed="true"] small{color:inherit;opacity:.85}
 .tticks{display:flex;flex-wrap:wrap;gap:6px}.tck{min-height:40px;padding:0 12px;border-radius:999px;border:1px solid var(--line);background:var(--card);color:var(--ink);font-size:14px}.tck[aria-pressed="true"]{border-color:var(--gc);background:var(--gc-soft);font-weight:600}
 .tres{border:1px solid var(--line);border-radius:var(--r-sm);padding:var(--s3);display:grid;gap:8px;margin:var(--s2) 0}.trow{display:grid;grid-template-columns:96px 1fr;gap:8px}.trow small{color:var(--muted)}.t-yes b{color:var(--ok-ink,#166534)}.t-consider b{color:var(--warn-ink,#92400e)}.t-no{color:var(--muted)}.tbtns{display:flex;gap:8px;flex-wrap:wrap}
@@ -819,6 +821,7 @@ details.bfb[open]>summary{margin-bottom:4px}details.bfb .bfo{margin-top:4px}deta
 .ptile .stag.dsk{display:none}.smpnote{display:none;font-size:var(--fs-xs);color:var(--warn-ink);margin-top:4px}.smpnote::before{content:"Dashed = sample value \2014  type the patient\2019s own."}
 @media (min-width:900px) and (pointer:fine){
   .ptiles{grid-template-columns:repeat(auto-fit,minmax(84px,1fr));gap:6px}
+  .gmain .ptiles{grid-template-columns:repeat(auto-fill,minmax(110px,170px))}
   .ptile{padding:3px 6px 2px;gap:0;border-radius:10px}
   .ptile small{font-size:10px}
   .ptile input{font-family:var(--font-sans);font-size:16px;font-weight:700;text-align:center;color:var(--ink);padding:1px 0}
@@ -864,7 +867,7 @@ if (window.top !== window.self && /\.github\.io$/.test(location.hostname)) {
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.160.2";
+const APP_VERSION = "2.160.3";
 const APP_DATE = "26 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
@@ -2653,7 +2656,7 @@ eCards.adult = () => {
     "IV adrenaline "+B("50 mcg")+" (0.5 mL of 1:10 000), repeat as needed. No IV: IM "+B("0.5 mg")+" (0.5 mL of 1:1000).",
     "Crystalloid "+B("20 mL/kg = "+wk(w,20,"mL"))+".",
     "SBP &lt; 50 mmHg or arrest: <b>start CPR</b> → Cardiac arrest.",
-    "After 3 boluses: adrenaline infusion "+B("0.05–0.1 mcg/kg/min")+" — e.g. "+B("3 mg in 50 mL saline")+" from 3 mL/h (3 mcg/min) up to 40 mL/h (QRH).",
+    "After 3 boluses: adrenaline infusion "+B("0.05–0.1 mcg/kg/min")+" — e.g. "+B("3 mg in 50 mL saline")+" from "+B("3 mL/h")+" (3 mcg/min) up to "+B("40 mL/h")+" (QRH).",
     "Still hypotensive: metaraminol or noradrenaline ± "+B("vasopressin 2 units")+" (repeat; consider infusion). Beta-blocked and not responding: "+B("glucagon 1 mg")+", repeat as needed.",
     "Bronchospasm: salbutamol. Arrest → ALS. Pregnant: left uterine displacement.",
     (AUD_CHECKED?"":"<b>DRAFT:</b> ")+"After stable: antihistamine and steroid are <b>not</b> part of emergency treatment (RCUK 2021). Consider "+B("chlorphenamine 10 mg IV")+" for skin symptoms; "+B("hydrocortisone 200 mg IV")+" only for refractory shock or bronchospasm.",
@@ -6281,6 +6284,7 @@ function vTicks(){
 }
 /* ---------- ABOUT ---------- */
 const CHANGES = [
+  ["2.160.3","Number sizes made consistent: calculated doses 20 px everywhere; volume lines and small dose notes 16 px; adrenaline infusion rates in Anaphylaxis bold. Drop-down lists use the app font and style; single patient fields inside cards no longer stretch across the card on desktop."],
   ["2.160.2","Result numbers now bold as intended."],
   ["2.160.1","Easier-to-read numbers: patient fields, the patient summary bar and the big result numbers in cards now use the normal font in bold (same-width digits). Home monitor tiles, quick answers, clock and timer keep the monitor style."],
   ["2.160","Desktop: the patient box sits under the menu on the left as a vertical list (fields, then BMI, IBW, LBW, AdjBW one per line) and stays in view; cards use the freed width. Phones and tablets unchanged."],
