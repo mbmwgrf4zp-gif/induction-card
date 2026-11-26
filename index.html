@@ -879,6 +879,17 @@ select[data-stc]{font-size:15px;display:block;width:100%;max-width:100%;min-heig
 .lsy{display:block;width:100%;max-width:440px;height:auto;margin:6px 0 2px}
 .sw{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:6px;vertical-align:0}
 .lsyk{margin:4px 0}
+/* v2.163 LA calculator gauge */
+.lag{border:1px solid var(--line);border-radius:var(--r-sm);padding:var(--s2) var(--s3) 18px;background:var(--card);margin:var(--s2) 0}
+.lag.near{border-color:var(--warn-line)}.lag.over{border-color:var(--danger-line);background:var(--danger-bg)}
+.lagh{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}.lag .lagn.big{margin:0;letter-spacing:0;font:700 40px/1.05 var(--font-sans);font-variant-numeric:tabular-nums}.lagn small{font-size:20px}
+.lag.near .lagn{color:var(--warn-ink)}.lag.over .lagn{color:var(--danger-ink)}
+.lagb{position:relative;display:flex;height:22px;border-radius:6px;background:var(--line);overflow:hidden;margin-top:6px}
+.lagb span{display:block;height:100%;border-right:2px solid var(--card)}.lagb span.new{animation:laggrow .45s cubic-bezier(.2,.8,.2,1)}
+@keyframes laggrow{from{max-width:0}to{max-width:100%}}
+.lagb i{position:absolute;top:0;bottom:0;z-index:2;transform:translateX(-50%)}.lagb .t80{width:2px;background:var(--warn-ink);box-shadow:0 0 0 1.5px var(--card)}.lagb .t100{width:3px;background:var(--danger-ink);box-shadow:0 0 0 1.5px var(--card)}
+.lagx{position:relative;height:14px;font-size:13px;color:var(--muted)}.lagx span{position:absolute;transform:translateX(-50%)}.lagx span:first-child{transform:none}
+@media (prefers-reduced-motion:reduce){.lagb span.new{animation:none}}
 </style>
 </head>
 <body>
@@ -893,7 +904,7 @@ if (window.top !== window.self && /\.github\.io$/.test(location.hostname)) {
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.162.0";
+const APP_VERSION = "2.163.0";
 const APP_DATE = "26 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
@@ -4644,27 +4655,35 @@ function laSoFar(lt){ const list = S[laKey(lt)] || []; if (!list.length) return 
   let total = 0; const parts = list.map(it => { const mg = it.ml * it.bi * (+it.c) * 10; total += mg / laMaxMg(it.d, lt) * 100; return `${LAD[it.d].n.split(" ")[0].toLowerCase()} ${dz(mg,"mg")} mg`; });
   const state = total > 100 ? "danger" : total > 80 ? "warn" : "result";
   return `<div class="${state} lasofar" style="margin-top:var(--s2)">LA so far: ${parts.join(" + ")} = <b>${Math.round(total)}% of max</b> <button class="linkish" data-open="1. LA dose calculator" data-g="regional" data-tab="safety">Open calculator ›</button></div>`; }
+const LA_COL = {bupi:"var(--sy-bupi)", ropi:"#7c3aed", lido:"#0d9488", lidoA:"#0f766e"}, LA_PREVN = {};
 function laCalc(lt){
   const list = S[laKey(lt)] || [], D = LAD[S.laD] || LAD.bupi;
   if (!D.concs.includes(S.laC)) S.laC = D.concs[D.concs.length > 2 ? 1 : 0];
   const {why} = laWeight(lt);
   let total = 0;
-  const rows = list.map((it,i) => { const mg = it.ml * it.bi * (+it.c) * 10, pct = mg / laMaxMg(it.d, lt) * 100; total += pct;
-    return `<tr><td>${esc(it.l||LAD[it.d].n)}<div class="sub">${LAD[it.d].n} ${it.c}% · ${dz(it.ml,"mL")} mL${it.bi===2?" × 2":""}</div></td><td class="hl">${dz(mg,"mg")} mg</td><td class="hl">${Math.round(pct)}%</td><td><button class="rmla" data-rmla="${lt}:${i}" aria-label="Remove">×</button></td></tr>`; }).join("");
+  const segs = [];
+  const rows = list.map((it,i) => { const mg = it.ml * it.bi * (+it.c) * 10, pct = mg / laMaxMg(it.d, lt) * 100; total += pct; segs.push([it.d, pct, esc(it.l||LAD[it.d].n)]);
+    return `<tr><td><i class="sw" style="background:${LA_COL[it.d]}"></i>${esc(it.l||LAD[it.d].n)}<div class="sub">${LAD[it.d].n} ${it.c}% · ${dz(it.ml,"mL")} mL${it.bi===2?" × 2":""}</div></td><td class="hl">${dz(mg,"mg")} mg</td><td class="hl">${Math.round(pct)}%</td><td><button class="rmla" data-rmla="${lt}:${i}" aria-label="Remove">×</button></td></tr>`; }).join("");
   const state = total > 100 ? "over" : total > 80 ? "near" : "ok";
+  const grow = list.length > (LA_PREVN[lt] || 0); LA_PREVN[lt] = list.length;
+  const gauge = `<div class="lag ${state}"><div class="lagh"><span class="lagn big">${Math.round(total)}<small>%</small></span><span class="sub">of maximum${state==="over"?" — <b>ABOVE MAXIMUM</b>":state==="near"?" — close to maximum":""}</span></div>
+    <div class="lagb" role="img" aria-label="Local anaesthetic total ${Math.round(total)}% of maximum">${segs.map(([d, pc, l], j) => `<span class="${grow && j === segs.length - 1 ? "new" : ""}" style="width:${Math.max(0.6, Math.min(pc, 150 - segs.slice(0, j).reduce((a, x) => a + x[1], 0)))/150*100}%;background:${LA_COL[d]}" title="${l} ${Math.round(pc)}%"></span>`).join("")}
+      <i class="t80" style="left:${80/150*100}%"></i><i class="t100" style="left:${100/150*100}%"></i></div>
+    <div class="lagx"><span>0</span><span style="left:${80/150*100}%">80</span><span style="left:${100/150*100}%">100%</span></div></div>`;
   const maxLine = Object.entries(LAD).map(([k,v]) => `${v.n} ${dz(laMaxMg(k,lt),"mg",laMaxMg(k,lt))} mg`).join(" · ");   // v2.137: the maximum is never shown rounded up
-  return `<p class="sub">Max for this patient (${why}): ${maxLine}</p>
+  return `${gauge}
     <div class="sub">Add a block</div>${seg("laD",Object.entries(LAD).map(([k,v])=>[k,v.n]))}${seg("laC",D.concs.map(c=>[c,c+"%"]))}
     ${step("laMl","Volume","mL",1,60,1)}${seg("laBi",[["1","One side"],["2","Both sides"]])}
     ${S.laLbl && S.laLbl.lt === lt ? `<p class="sub" style="margin:4px 0">Set up for <b>${esc(S.laLbl.l)}</b> — check the drug, %, volume and sides, then add.</p>` : ""}<button class="homebtn" data-addla="form" data-lt="${lt}">+ Add ${S.laMl} mL ${D.n} ${S.laC}%${S.laBi==="2"?" × 2":""}</button>
     ${S.laNext && S.laNext.lt === lt && S.laNext.items.length ? `<button class="addla" data-lanext="${lt}">Next: ${esc(S.laNext.items[0].l)} — set up ›</button>` : ""}
     ${lt === "a" ? `<button class="addla" data-addla="${esc(JSON.stringify({d:"lido", c:"1", ml:5, bi:1, l:"Skin infiltration"}))}" data-lt="a">+ Lignocaine 1% skin infiltration, 5 mL</button>` : ""}
     ${list.length ? `<div style="overflow-x:auto"><table><tr><th>Block</th><th>Dose</th><th>% max</th><th></th></tr>${rows}</table></div>` : `<p class="sub">No blocks added yet. Use the form above or the "+ Add" button on any block card.</p>`}
-    <div class="meter ${state}"><span style="width:${Math.min(total,100)}%"></span></div>
-    <div class="${state==="over"?"danger":state==="near"?"warn":"result"}" style="margin-top:var(--s2)"><b>Total: ${Math.round(total)}% of maximum</b>${state==="over"?" — ABOVE MAXIMUM. Reduce volume or concentration.":state==="near"?" — close to maximum.":""}</div>
+    ${state==="over" ? `<div class="danger" style="margin-top:var(--s2)"><b>Total: ${Math.round(total)}% of maximum</b> — ABOVE MAXIMUM. Reduce volume or concentration.</div>` : `<div class="sub" style="margin-top:var(--s2)"><b>Total: ${Math.round(total)}% of maximum</b>${state==="near"?" — close to maximum.":""}</div>`}
     ${list.length?`<button class="linkbtn" data-clrla="${lt}">Clear list</button>`:""}
+    <p class="sub"><b>Arithmetic only — the maximum is not a guaranteed safe dose.</b></p>
+    <details class="ndet"><summary>Maximums and how it works</summary><p class="sub lamaxl">Max for this patient (${why}): ${maxLine}</p>
     <p class="sub">Different drugs combine as % of each one's own maximum. Doses apply to one sitting: doses given over the same few hours count together, whatever the order (for example lignocaine first, ropivacaine or levobupivacaine later): LA toxicity is additive.</p>
-    <p class="sub"><b>Arithmetic only — the maximum is not a guaranteed safe dose.</b> Use less for the elderly or frail; heart, liver or kidney disease; and vascular sites (intercostal, bilateral blocks).</p>`;
+    <p class="sub">Use less for the elderly or frail; heart, liver or kidney disease; and vascular sites (intercostal, bilateral blocks).</p></details>`;
 }
 
 // v2.138 "Misses" row on eight block cards: what the block does not reliably cover
@@ -6358,6 +6377,7 @@ function vTicks(){
 }
 /* ---------- ABOUT ---------- */
 const CHANGES = [
+  ["2.163","LA dose calculator: a toxicity gauge — total % of maximum in large type and one bar with each block in its drug colour, amber line at 80%, red line at 100%; maximums and explanations tucked into a collapsible line."],
   ["2.162","Regional › Spinal dose: non-obstetric — height bands with this patient's band highlighted and a syringe showing the range and this patient's dose; additives tucked into a collapsible line. Same doses."],
   ["2.161.3","No more jumping: the card you are working in stays put on screen when the sample banner disappears or text above it changes; LSCS syringe stays at a fixed height between bands."],
   ["2.161.2","LSCS spinal syringe: layers slide smoothly to the new level when height changes; before a height is entered it shows the sample dose faded instead of an empty grey syringe."],
