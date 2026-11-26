@@ -802,7 +802,7 @@ details.bfb[open]>summary{margin-bottom:4px}details.bfb .bfo{margin-top:4px}deta
 .nagtabs button{flex:0 0 auto;background:none;border:0;border-bottom:3px solid transparent;padding:10px 10px 8px;font-size:15px;color:var(--muted);min-height:44px}.nagtabs button.nagx{color:var(--ink)}.nagtabs button[aria-selected="true"]{color:var(--gc);border-bottom-color:var(--gc);font-weight:700}
 .naglist{display:grid;border:1px solid var(--line);border-radius:var(--r-sm);overflow:hidden}.nagrow+.nagrow{border-top:1px solid var(--line)}.nagrt2{display:flex;align-items:stretch}.nagrt2 .nagrh{flex:1;min-width:0}.nagrt2 .favbtn{order:2;background:var(--card)}.nagrow.open .nagrt2 .favbtn{background:var(--gc-soft)}
 .favbtn{flex:0 0 auto;min-width:44px;min-height:44px;border:0;background:none;color:var(--muted);font-size:22px;line-height:1;padding:0 8px;cursor:pointer}.favbtn[aria-pressed="true"]{color:#e0a100}summary .favbtn{margin-left:auto}
-.favs{padding:0 var(--s4) var(--s5)}.favrow{display:flex;align-items:stretch;gap:6px;margin:6px 0}.favgo{flex:1;display:flex;flex-direction:column;align-items:flex-start;gap:2px;min-height:52px;padding:10px 14px;border:1px solid var(--line);border-radius:var(--r-sm);background:var(--card);color:var(--ink);font:inherit;font-weight:600;text-align:left}.favgo small{font-weight:400;color:var(--muted);font-size:13px}.favx{min-width:44px;border:1px solid var(--line);border-radius:var(--r-sm);background:var(--card);color:var(--muted);font-size:16px}
+.herobtn.favhome{color:var(--etco2);border-color:rgba(250,204,21,.55);background:rgba(250,204,21,.12);font-size:22px}.favs{padding:0 var(--s4) var(--s5)}.favrow{display:flex;align-items:stretch;gap:6px;margin:6px 0}.favgo{flex:1;display:flex;flex-direction:column;align-items:flex-start;gap:2px;min-height:52px;padding:10px 14px;border:1px solid var(--line);border-radius:var(--r-sm);background:var(--card);color:var(--ink);font:inherit;font-weight:600;text-align:left}.favgo small{font-weight:400;color:var(--muted);font-size:13px}.favx{min-width:44px;border:1px solid var(--line);border-radius:var(--r-sm);background:var(--card);color:var(--muted);font-size:16px}
 .nagpage{padding:var(--s2) var(--s3)}.nagpage ul{margin-top:0}.nagpage table{margin-left:calc(-1*var(--s3));width:calc(100% + 2*var(--s3))}
 .nagrh{display:grid;grid-template-columns:minmax(0,1fr) auto auto;align-items:center;gap:8px;width:100%;min-height:52px;padding:8px 12px;background:var(--card);border:0;text-align:left;color:var(--ink);font:inherit}
 .nagrn{font-weight:600;font-size:15px}.nagrn small{font-weight:400;color:var(--muted)}.nagsum{font-size:13px;color:var(--muted);max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.nagnone{font-size:13px;font-weight:700;color:var(--ok-ink,#166534);background:var(--ok-bg,#dcfce7);border-radius:6px;padding:2px 8px}.nagch{color:var(--muted)}
@@ -827,7 +827,7 @@ if (window.top !== window.self && /\.github\.io$/.test(location.hostname)) {
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.149.1";
+const APP_VERSION = "2.149.2";
 const APP_DATE = "25 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
@@ -5801,7 +5801,7 @@ function vTicks(){
 }
 /* ---------- ABOUT ---------- */
 const CHANGES = [
-  ["2.149","Favourites: tap ☆ on any card, or on any antibiotic procedure, then ★ on the home screen opens your list (kept on this phone; Reset all clears it). Antibiotic tabs no longer scroll the chosen tab out of view. (checked)"],
+  ["2.149","Favourites: tap ☆ on any card, or on any antibiotic procedure, then ★ on the home screen opens your list (kept on this phone; Reset all clears it). Antibiotic tabs no longer scroll the chosen tab out of view. (checked) Home ★ is now gold so it stands out."],
   ["2.148","IV iron calculator: the four IV irons available in Malaysia (iron sucrose, ferric carboxymaltose, ferric derisomaltose, LMW iron dextran — generic and brand) with the maximum per dose for this patient, how many doses the total needs, and how to give each (MOH PBM 2024 Appendix 1). (checked)"],
   ["2.147","More from the MOH Patient Blood Management consensus 2024: Massive obstetric haemorrhage gets product triggers and doses (FFP 15 mL/kg, platelets 1 adult dose, cryo 1 unit/10 kg); Blood management — cryo 1 unit/10 kg and Hb targets for special groups (ACS, TBI, SAH, stroke, sepsis); Paeds transfusion — MOH points; Anticoagulants — MOH agreement noted (aspirin stays 7 days); Optimise or postpone — IV iron (Ganzoni) calculator. (checked)"],
   ["2.146","Blood management now follows the MOH Malaysia Patient Blood Management consensus (March 2024): major haemorrhage definition, MTP / T-MTP pack and targets, blood loss visual guide, red cell and platelet points, adjuncts and reversal; EBV 70 mL/kg. Tranexamic acid: before incision if expected loss > 500 mL. Which tests: ferritin and group, screen & hold for major surgery. Optimise or postpone: anaemia — wait 4 weeks to treat. (checked)"],
