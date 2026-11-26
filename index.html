@@ -796,7 +796,8 @@ details.bfb[open]>summary{margin-bottom:4px}details.bfb .bfo{margin-top:4px}deta
 .bfsidepick{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.bfsidepick span{font-weight:600}.bfsidepick button{min-height:40px;padding:0 16px;border-radius:999px;border:1px solid var(--line);background:var(--card);color:var(--ink);font-weight:600}
 .bfops{margin:0 0 var(--s2)}.bfops .searchbox{margin:0}#bfopsr{display:grid;gap:4px;margin-top:4px}.bfopb{text-align:left;min-height:44px;padding:6px 12px;border-radius:var(--r-sm);border:1px solid var(--line);background:var(--card);color:var(--ink);font:inherit}
 .bfquiet{justify-content:flex-end!important;gap:6px!important}.bfsep{color:var(--muted)}
-.tpick{display:grid;gap:4px;margin:var(--s2) 0}.tlab{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin-top:6px}.tpick .seg{margin:0}.tpick .seg small{display:block;font-weight:400;font-size:12px;color:var(--muted)}.tpick .seg button[aria-pressed="true"] small{color:inherit;opacity:.85}
+.tpick{display:grid;gap:4px;margin:var(--s2) 0}.tvm{border-top:1px solid var(--line);padding:var(--s2) 0}.tvh{display:flex;flex-wrap:wrap;gap:4px 10px;align-items:baseline}.tvh b{font-size:var(--fs-md,17px)}.tvh span{font-size:13px;color:var(--muted)}.tvg{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin:6px 0}.tvg small{display:block;font-size:12px;color:var(--muted)}.tvg b{font-size:17px;font-variant-numeric:tabular-nums}.tvm .seg small{display:block;font-weight:400;font-size:12px;opacity:.85}.tvm .ndet{margin-top:4px}.tvrob{margin-top:var(--s2)}.tvrob table{margin:4px 0}
+.tlab{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin-top:6px}.tpick .seg{margin:0}.tpick .seg small{display:block;font-weight:400;font-size:12px;color:var(--muted)}.tpick .seg button[aria-pressed="true"] small{color:inherit;opacity:.85}
 .tticks{display:flex;flex-wrap:wrap;gap:6px}.tck{min-height:40px;padding:0 12px;border-radius:999px;border:1px solid var(--line);background:var(--card);color:var(--ink);font-size:14px}.tck[aria-pressed="true"]{border-color:var(--gc);background:var(--gc-soft);font-weight:600}
 .tres{border:1px solid var(--line);border-radius:var(--r-sm);padding:var(--s3);display:grid;gap:8px;margin:var(--s2) 0}.trow{display:grid;grid-template-columns:96px 1fr;gap:8px}.trow small{color:var(--muted)}.t-yes b{color:var(--ok-ink,#166534)}.t-consider b{color:var(--warn-ink,#92400e)}.t-no{color:var(--muted)}.tbtns{display:flex;gap:8px;flex-wrap:wrap}
 .nagsearch{margin:var(--s2) 0}.nagtabs{display:flex;gap:4px;overflow-x:auto;white-space:nowrap;border-bottom:1px solid var(--line);margin:0 calc(-1*var(--s4)) var(--s2);padding:0 var(--s4);scrollbar-width:none}.nagtabs::-webkit-scrollbar{display:none}
@@ -828,7 +829,7 @@ if (window.top !== window.self && /\.github\.io$/.test(location.hostname)) {
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.154.1";
+const APP_VERSION = "2.155.1";
 const APP_DATE = "26 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
@@ -2895,7 +2896,7 @@ gaCards.optpost = () => `<div class="card"><h2>10. Optimise or postpone</h2>${aw
 
 /* ---------- v2.145 INTRA-OP: FLUIDS, BLOOD, ABG (adult) ---------- */
 const FBG_CHECKED = true;   // checked by author 25 Nov 2026 (author asked for these to go live without a draft step)
-const numIn = (grp, k, lab, unit, ph) => `<label class="fbin"><span>${lab}${unit ? ` <small>${unit}</small>` : ""}</span><input inputmode="decimal" autocomplete="off" data-${grp}="${k}" value="${esc(((S[grp === "abg" ? "abg" : grp === "fb" ? "fbal" : grp === "gz" ? "gz" : "blIn"] || {})[k]) ?? "")}" placeholder="${ph || ""}"></label>`;
+const numIn = (grp, k, lab, unit, ph) => `<label class="fbin"><span>${lab}${unit ? ` <small>${unit}</small>` : ""}</span><input inputmode="decimal" autocomplete="off" data-${grp}="${k}" value="${esc(((S[grp === "abg" ? "abg" : grp === "fb" ? "fbal" : grp === "gz" ? "gz" : grp === "tv" ? "tv" : "blIn"] || {})[k]) ?? "")}" placeholder="${ph || ""}"></label>`;
 const numV = (o, k) => { const v = (o || {})[k]; if (v == null || String(v).trim() === "") return null; const n = parseFloat(String(v).replace(",", ".")); return isFinite(n) ? n : NaN; };
 const hbU = () => S.hbU === "gl" ? "gl" : "gdl";
 const hbToGdl = v => v == null || isNaN(v) ? v : hbU() === "gl" ? v / 10 : v;   // g/L → g/dL
@@ -4114,15 +4115,100 @@ txCards.dpost = () => `<div class="card"><h2>3. Donor post-op</h2>${txDraft()}
 function donInputs(){ return ptiles([ptile("aw","Donor weight","kg",30,200,1)]); }
 
 /* MAINTENANCE */
-gaCards.tiva = () => { const W2 = wts(), w = W2.lbw;
-  return `<div class="card"><h2>5. TIVA</h2>${gaDraft()}
-  <table><tr><th>Propofol — Marsh</th><td>Plasma target: induction <b>4–6 mcg/mL</b>, maintenance <b>3–6</b>. Obese: enter <b>AdjBW ${sig(W2.adj)} kg</b>.</td></tr>
-  <tr><th>Propofol — Schnider</th><td>Effect-site target: induction <b>3–5 mcg/mL</b> (step up slowly), maintenance <b>2.5–5</b>. Needs age, height, weight, sex.</td></tr>
-  <tr><th>Remifentanil — Minto</th><td>Effect-site target: intubation <b>4–6 ng/mL</b>, maintenance <b>2–8</b>.</td></tr></table>
-  <h3>Remifentanil without TCI (50 mcg/mL)</h3>
-  <p>0.05–0.25 mcg/kg/min on LBW ${sig(w)} kg = <b>${dz(0.05*w*60/50,"mL/h")}–${dz(0.25*w*60/50,"mL/h")} mL/h</b></p>
-  <p class="sub">Elderly: lower targets. Use processed EEG where available. Dedicated cannula, anti-reflux valves.</p>
-  ${src("Association of Anaesthetists / SIVA TIVA guidance.")}</div>`; };
+const TCIA_CHECKED = true;   // checked by author 26 Nov 2026;
+const tciaDraft = () => TCIA_CHECKED ? "" : `<div class="warn" style="margin-top:0">DRAFT — TIVA re-checked against the Association / SIVA TIVA guidelines 2019 and monitoring standards 2021; TCI | Manual infusion; calculators. Not yet ticked by you.</div>`;
+/* TIVA card (v2.155): TCI | Manual infusion. TCI targets unchanged; manual tab is arithmetic only (dose typed by the user). */
+const tvS = () => (S.tv = S.tv || {});
+const tvGet = (k, d) => { const v = tvS()[k]; return v == null ? d : v; };
+const tvBtn = (k, v, l, d) => `<button aria-pressed="${String(tvGet(k, d)) === String(v)}" data-tvb="${k}:${v}">${l}</button>`;
+const tvSeg = (k, d, opts) => `<div class="seg">${opts.map(([v, l]) => tvBtn(k, v, l, d)).join("")}</div>`;
+function tvModel(name, mode, cells, note, info){
+  return `<div class="tvm"><div class="tvh"><b>${name}</b><span>${mode}</span></div>${cells ? `<div class="tvg">${cells.map(([l, v]) => `<div><small>${l}</small><b>${v}</b></div>`).join("")}</div>` : ""}${note ? `<p class="sub">${note}</p>` : ""}<details class="ndet"><summary>Model info</summary>${info}</details></div>`;
+}
+const tvOk = (b, yes, no) => b ? `<b>✓ ${yes}</b>` : `<b>✗ ${no}</b>`;
+function tvTci(){ const a = S.age, w = S.aw, W2 = wts(), bmi = W2.bmi, f = S.sex !== "M", bmiMax = f ? 35 : 42, bmiOk = bmi < bmiMax;
+  const pOk = a <= 88 && w >= 0.68 && w <= 160, rOk = a <= 85 && w >= 2.5 && w <= 106, smp = isSample("aw") || isSample("height");
+  const bmiTxt = tvOk(bmiOk, `BMI ${sig(bmi)} &lt; ${bmiMax} (${f ? "female" : "male"} limit)`, `BMI ${sig(bmi)} — pump accepts only &lt; ${bmiMax} (${f ? "female" : "male"})`);
+  return `<p class="sub">Model check: ${a} y · ${sig(w)} kg · ${S.height} cm · ${f ? "female" : "male"} · BMI ${sig(bmi)}${smp ? " (sample — enter the patient's weight and height)" : ""}. No target suits every patient: titrate to age, frailty, haemodynamics, surgical stimulation, other drugs, response and processed EEG.</p>${tciaDraft()}
+  <div class="tlab">Propofol (mcg/mL)</div>
+  ${tvModel("Marsh", "Plasma (Cp)", [["Induction","4–6"],["Maintenance","3–6"],["+ opioid","2.5–4"]], `Pump limit: weight ≤ 150 kg — ${tvOk(w <= 150, "OK", "over limit")}`, `<p>Pump needs: weight. Volumes scaled to weight only. Developed in healthy adults; not in obese or older patients.</p>`)}
+  ${tvModel("Schnider", "Effect-site (Ce)", [["Induction","4–6"],["Maintenance","3–6"],["+ opioid","2.5–4"]], bmiTxt, `<p>Pump needs: age, height, weight, sex (lean body mass). Use in effect-site mode. Induction doses similar to Marsh in plasma mode; maintenance rates usually a little lower. Developed in healthy adults; not in obese or older patients.</p>`)}
+  ${tvModel("Eleveld", "Plasma or effect-site (pump-dependent)", null, "No reference targets shown. Check whether your pump offers it.", `<p>Pump needs: age, height, weight, sex; other anaesthetic drugs given? This patient: ${tvOk(pOk, "within study range", "outside study range")} (27 weeks PMA – 88 y, 0.68–160 kg).</p><p class="sub">Built from 1,033 people including children, older and high-BMI patients. The 2019 TIVA guideline noted it was not yet in commercial pumps.</p>`)}
+  <p class="sub"><b>Slow induction</b> (older, frail or unwell): start at 1 mcg/mL, step up 0.5–1. <b>Calibrate:</b> note Ce at loss of response to speech and at loss of movement to firm jaw pressure — the second guides the maintenance target. Raise the target rather than giving a manual bolus (a bolus makes the display wrong for several minutes).</p>
+  <div class="tlab">Remifentanil (ng/mL)</div>
+  ${tvModel("Minto", "Plasma or effect-site", [["Intubation","≈ 6"],["Maintenance","2–6"],["Unit","ng/mL"]], `${tvOk(a >= 12 && w >= 30, "age ≥ 12 y, ≥ 30 kg", "needs age ≥ 12 y and ≥ 30 kg")} · ${bmiTxt}`, `<p>Pump needs: age, height, weight, sex (lean body mass — valid only below the BMI limits). Spontaneous breathing is uncommon above 1.5 ng/mL. Above 5 ng/mL (or 0.2 mcg/kg/min) acute tolerance / hyperalgesia possible; significance uncertain. No postoperative analgesia — plan it.</p>`)}
+  ${tvModel("Eleveld", "Plasma or effect-site (pump-dependent)", null, "No reference targets shown. Check whether your pump offers it.", `<p>Pump needs: age, weight, sex. This patient: ${tvOk(rOk, "within study range", "outside study range")} (5 days – 85 y, 2.5–106 kg).</p><p class="sub">Built from 131 people; outperformed Minto across that range.</p>`)}
+  <p class="sub"><b>Obese:</b> no evidence for total vs adjusted body weight in the pump; titrate to effect with processed EEG. Which models your pump offers (Agilia, Alaris PK, Mindray): check the pump.</p>`; }
+/* conversions (tested in tests/navigation.test.js) */
+const TV = {
+  pRate: (d, u, w, c) => u === "m" ? d*w*60/1000/c : d*w/c,          // propofol mL/h; d mg/kg/h (u "h") or mcg/kg/min (u "m"); c mg/mL
+  pDose: (r, u, w, c) => u === "m" ? r*c*1000/(w*60) : r*c/w,
+  rRate: (d, w, c) => d*w*60/c,                                       // remifentanil mL/h; d mcg/kg/min; c mcg/mL
+  rDose: (r, w, c) => r*c/(w*60) };
+const tvWkeys = [["tbw","TBW"],["ibw","IBW"],["lbw","LBW"],["adj","AdjBW"]];
+function tvConc(dr){ const t = tvS(), c = tvGet(dr + "C", dr === "p" ? "10" : "50");
+  if (c !== "c") return {c: Number(c)};
+  const mg = numV(t, dr + "Mg"), ml = numV(t, dr + "Ml");
+  if (mg == null || ml == null) return {err: `<p class="sub">Enter the drug amount (mg) and the final volume (mL).</p>`};
+  if (isNaN(mg) || isNaN(ml) || mg <= 0 || ml <= 0) return {err: `<div class="danger">Amount and volume must be numbers above 0.</div>`};
+  return {c: dr === "p" ? mg/ml : mg*1000/ml};
+}
+const f1x = x => Number(x.toFixed(1)), s3 = x => sig(x);
+function tvResult(dr){ const t = tvS(), W2 = wts(), wk = tvGet(dr + "W", dr === "p" ? "tbw" : "lbw"), w = W2[wk];
+  const mode = tvGet(dr + "M", "f"), u = dr === "p" ? tvGet("pU", "h") : "m";
+  const cu = dr === "p" ? "mg/mL" : "mcg/mL", du = dr === "p" ? (u === "m" ? "mcg/kg/min" : "mg/kg/h") : "mcg/kg/min", hu = dr === "p" ? "mg/h" : "mcg/h";
+  if (isSample("aw") || (wk !== "tbw" && isSample("height"))) return `<p class="sub">Enter ${wk === "tbw" ? "the weight" : "the weight and height"} in the patient box first.</p>`;
+  const C = tvConc(dr); if (C.err) return C.err; const c = C.c;
+  const key = mode === "r" ? dr + "R" : dr + "D" + (dr === "p" ? u : ""), v = numV(t, key);
+  const head = `<div class="sub">${WN[wk]} ${s3(w)} kg · ${s3(c)} ${cu}</div>`;
+  if (v == null) return `<div class="result">${head}<div class="sub">${mode === "r" ? "Enter the pump rate (mL/h)." : `Enter the dose (${du}).`}</div></div>`;
+  if (isNaN(v) || v <= 0) return `<div class="danger">Enter a number above 0.</div>`;
+  let out, dose, rate;
+  if (mode === "r"){ rate = v; dose = dr === "p" ? TV.pDose(v, u, w, c) : TV.rDose(v, w, c); out = `<div class="big">${s3(dose)} ${du}</div>`; }
+  else { dose = v; rate = dr === "p" ? TV.pRate(v, u, w, c) : TV.rRate(v, w, c); out = `<div class="big">${f1x(rate)} mL/h</div>`; }
+  const pH = dr === "p" ? (u === "m" ? dose*60/1000 : dose) : 0;
+  const ref = dr === "r" && (dose < 0.08 - 1e-9 || dose > 0.25 + 1e-9) ? `<div class="sub">Outside the typical 0.08–0.25 mcg/kg/min.</div>` : pH > 6 + 1e-9 ? `<div class="warn">Above 6 mg/kg/h: propofol infusion syndrome risk, especially if prolonged or critically ill.</div>` : "";
+  return `<div class="result">${head}${out}<div class="sub">${mode === "r" ? `${s3(rate)} mL/h` : `${s3(dose)} ${du}`} = ${s3(rate*c)} ${hu}</div>${ref}</div>`;
+}
+function tvRoberts(){ const W2 = wts(), w = W2[tvGet("pW", "tbw")], C = tvConc("p");
+  const note = `≈ 3 mcg/mL in a healthy young adult (study also gave fentanyl and N₂O). Not right for all patients — may be too little or too much.`;
+  if (isSample("aw") || C.err) return `<p class="sub"><b>Roberts (Bristol) regimen:</b> 1 mg/kg, then 10 → 8 → 6 mg/kg/h, 10 min each. ${note}</p>`;
+  const c = C.c, r = d => f1x(d*w/c);
+  return `<div class="tvrob"><b>Roberts (Bristol) regimen</b> on ${WN[tvGet("pW", "tbw")]} ${sig(w)} kg, ${sig(c)} mg/mL<table><tr><td>Bolus 1 mg/kg</td><td><b>${s3(w)} mg</b> = ${s3(w/c)} mL</td></tr><tr><td>10 mg/kg/h × 10 min</td><td><b>${r(10)} mL/h</b></td></tr><tr><td>8 mg/kg/h × 10 min</td><td><b>${r(8)} mL/h</b></td></tr><tr><td>6 mg/kg/h after</td><td><b>${r(6)} mL/h</b></td></tr></table><p class="sub">${note} Obese: titrate to effect with processed EEG.</p></div>`;
+}
+function tvMan(dr){ const t = tvS(), W2 = wts(), p = dr === "p";
+  const wk = tvGet(dr + "W", p ? "tbw" : "lbw"), mode = tvGet(dr + "M", "f"), u = p ? tvGet("pU", "h") : "m";
+  const conc = p ? [["10","10"],["20","20"],["c","Custom"]] : [["20","20"],["40","40"],["50","50"],["100","100"],["c","Custom"]];
+  const key = mode === "r" ? dr + "R" : dr + "D" + (p ? u : "");
+  return `<div class="tvm"><div class="tvh"><b>${p ? "Propofol" : "Remifentanil"}</b><span>${p ? "Roberts regimen below" : "typical 0.08–0.25 mcg/kg/min"}</span></div>
+  <div class="tlab">Syringe ${p ? "mg/mL" : "mcg/mL"}</div>${tvSeg(dr + "C", p ? "10" : "50", conc)}
+  ${tvGet(dr + "C", "") === "c" ? `<div class="fbgrid">${numIn("tv", dr + "Mg", "Drug", "mg")}${numIn("tv", dr + "Ml", "Final volume", "mL")}</div>` : ""}
+  <div class="tlab">Dosing weight</div>${tvSeg(dr + "W", p ? "tbw" : "lbw", tvWkeys.map(([k, l]) => [k, `${l}<small>${sig(W2[k])} kg</small>`]))}
+  ${tvSeg(dr + "M", "f", [["f","Dose → mL/h"],["r","mL/h → dose"]])}
+  ${p && mode === "f" ? tvSeg("pU", "h", [["h","mg/kg/h"],["m","mcg/kg/min"]]) : ""}${p && mode === "r" ? tvSeg("pU", "h", [["h","show mg/kg/h"],["m","show mcg/kg/min"]]) : ""}
+  <div class="fbgrid">${numIn("tv", key, mode === "r" ? "Pump rate" : "Dose", mode === "r" ? "mL/h" : (p ? (u === "m" ? "mcg/kg/min" : "mg/kg/h") : "mcg/kg/min"))}</div>
+  <div id="tvres-${dr}">${tvResult(dr)}</div>${p ? tvRoberts() : `<p class="sub"><b>Loading:</b> 0.5 mcg/kg/min for 3 min, then 0.25 (≈ 6 ng/mL in a healthy adult). No manual bolus from the syringe (bradycardia, chest-wall rigidity).</p>`}</div>`;
+}
+gaCards.tiva = () => { const tab = tvGet("tab", "tci");
+  return `<div class="card tvcard"><h2>5. TIVA</h2>${gaDraft()}
+  ${tvSeg("tab", "tci", [["tci","TCI"],["man","Manual infusion"]])}
+  ${tab === "man" ? `${tciaDraft()}<p class="sub">Calculator: you type the dose. A fixed rate changes concentration slowly — a bolus or faster start is needed, and concentration can keep rising later.</p>${tvMan("p")}${tvMan("r")}` : tvTci()}
+  <p class="sub">Older, frail or unwell: lower targets. <b>Processed EEG</b> when TIVA is given with a muscle relaxant (consider with TIVA alone): start before induction, continue at least until full neuromuscular recovery. <b>Quantitative</b> neuromuscular monitoring whenever a relaxant is given, until TOF ratio &gt; 0.9.</p>
+  <details class="ndet"><summary>Safety checklist</summary><ul>
+  <li>Anti-siphon valve on each drug line; anti-reflux valve on the fluid line; join close to the patient (dead space)</li>
+  <li>Luer-lock throughout; TIVA-specific sets; no extra connections or three-way taps</li>
+  <li>Program the pump only after the syringe is in it; label syringes; propofol pump at the top of the stack</li>
+  <li>One propofol strength and one remifentanil dilution per department; never mix propofol and remifentanil in one syringe</li>
+  <li>Cannula secure and visible whenever practical (care in the antecubital fossa); pump visible, check the rate every few minutes</li>
+  <li>Alarms on; no pumps that drop to a "keep vein open" rate near empty; mains power when practical</li>
+  <li>Give the relaxant only after loss of consciousness is confirmed</li>
+  <li>At the end: flush the cannula with at least twice its dead space</li></ul></details>
+  <details class="ndet"><summary>Troubleshooting</summary><ul>
+  <li><b>Pump shut down or restarted mid-case:</b> do NOT restart TCI at the old target — it gives another induction dose. Restart in manual mode at the rate it was running.</li>
+  <li><b>Response less than expected / pEEG index high:</b> inspect the cannula and line now. Check signal quality and EMG; do not act on the index alone. Ketamine can raise the index.</li>
+  <li><b>Switching from volatile to TIVA:</b> raise the propofol target as end-tidal volatile falls; start processed EEG before the switch if a relaxant was given.</li>
+  <li><b>Low BP, slow wake-up:</b> see the linked cards.</li></ul>${gLinkId("ga-intra-vasopressors-and-inotropes", "Vasopressors & inotropes")}${gLinkId("ga-post-reversal", "Reversal")}${gLinkId("ga-post-extubation-criteria", "Extubation criteria")}</details>
+  ${src("Association of Anaesthetists / SIVA TIVA guidelines (Nimmo et al. Anaesthesia 2019); monitoring standards (Klein et al. Anaesthesia 2021); Eleveld et al. BJA 2018 (propofol), Anesthesiology 2017 (remifentanil).")}</div>`; };
 gaCards.mac = () => { const a = S.age, f = Math.pow(10, -0.00269*(a-40));
   const r = (m40) => sig(m40*f);
   return `<div class="card"><h2>6. Volatile: MAC by age</h2><p class="sub">Age ${a} y (set in the patient box)</p>${gaDraft()}
@@ -5523,6 +5609,7 @@ const VGROUPS = [["Emergencies",[["Crisis cards","",["High spinal: phenylephrine
  ["Antibiotic prophylaxis","",["Adult: cefazolin 2 g (3 g ≥120 kg) redose 4 h; cefuroxime 1.5 g 4 h; Unasyn 3 g 2 h; Augmentin 1.2 g 2 h; metronidazole 500 mg; gentamicin 5 mg/kg (AdjBW if >120% IBW); clindamycin 900 mg 6 h; vancomycin 15 mg/kg max 2 g; azithromycin 500 mg","Paeds: cefazolin 30 mg/kg (max 2 g); cefuroxime 50 (1.5 g); Unasyn 75 mg/kg combined (3 g); Augmentin 30 (1.2 g); metronidazole 15 (500 mg); gentamicin 2.5; clindamycin 10 (900 mg); vancomycin 15 (2 g); azithromycin 10 (500 mg)","General/upper GI: cefazolin; allergy clinda + gent","HPB: cefazolin or Unasyn; allergy clinda + gent; low-risk lap chole none","Colorectal/appendix: cefazolin + metronidazole or Unasyn; allergy clinda + gent or metronidazole + gent","Urology: cefazolin or gentamicin; bowel opened add metronidazole","Gynae: cefazolin; LSCS cefazolin before incision + azithromycin if labour/ROM","Ortho: cefazolin; allergy/MRSA vancomycin or clinda; open fracture ± gentamicin","Dental/maxfax/H&N clean-contaminated: cefazolin + metronidazole, Unasyn or Augmentin; allergy clinda","Clean with implant/mesh: cefazolin; neuro/vascular/cardiac: cefazolin or cefuroxime","Timing ≤60 min before incision; redose also after 1.5 L (paeds 25 mL/kg) blood loss; stop ≤24 h","Endocarditis (AHA 2021): amoxicillin/ampicillin 2 g (50 mg/kg), cefazolin 1 g (50 mg/kg), azithromycin 500 mg (15 mg/kg)"]],
  ["Discharge criteria","",["Recovery: modified Aldrete (activity, breathing, circulation, consciousness, SpO₂) ≥ 9 with no zero; ≥ 30 min after last IV opioid; temp > 36 °C","Home: PADSS (vital signs, walking, PONV, pain, bleeding) ≥ 9 with no zero; escort + adult at home 24 h; no driving 24 h","Spinal: voiding required only if high risk (hernia, anorectal, urology, pelvic, retention history)","Nerve block: home with protected numb limb; oral analgesia before block wears off","Paeds: drinking not required; ex-prem < 60 weeks PCA overnight; tonsillectomy < 3 y / OSA overnight; paracetamol 15 mg/kg 6-hourly, ibuprofen 10 mg/kg 8-hourly"]],
  ["Ventilation & one-lung ventilation","15 Nov 2026",["PBW (ARDSNet/Devine) from sex + height: male 50, female 45.5 + 0.91 × (height − 152.4); TV never from actual weight","Start: TV 6–8 mL/kg PBW, PEEP 5 then individualise, RR 12–14 to EtCO₂ 35–45 mmHg, lowest FiO₂ for SpO₂ ≥ 94%","Limits: plateau < 30, driving pressure < 15 cmH₂O; mode default PCV-VG / PRVC","Laparoscopy: PEEP 8–10, RR 14–18, re-check after insufflation / position; Obese: PEEP 8–10, recruit, ramped","Asthma/COPD: RR 8–10, I:E 1:3–1:4, auto-PEEP → disconnect 10–30 s; ARDS: TV 4–6, ARDSNet lower-PEEP table (0.3→5 … 1.0→18–24), pH ≥ 7.25","Neuro: PaCO₂ 35–40 mmHg, no prophylactic hyperventilation (≤ 25 mmHg); Pregnancy GA: EtCO₂ 30–32 mmHg","Recruitment: 30–40 cmH₂O × 30 s or stepwise PEEP 5→10→15(→20); caution hypotension, pneumothorax, ICP","OLV: left DLT female <160 cm 35 / ≥160 37 Fr; male <170 cm 37 / ≥170 39 Fr; depth 12 + height/10 cm; confirm with fibreoptic","Blocker 9 Fr: ETT ≥ 7.5 (8.0 easier); 7 Fr: ETT ≥ 6.0","OLV settings: TV 4–6 mL/kg PBW, PEEP 5, FiO₂ 0.8–1.0 then lower, peak < 30, driving < 15; hypoxia: FiO₂ 1.0 → scope → suction → recruit/PEEP → CPAP 5–10 to non-ventilated lung → intermittent 2-lung → PA clamp"]],
+ ["Adult TCI model check","26 Nov 2026",["Eleveld propofol: study range 27 weeks PMA – 88 y, 0.68–160 kg (1,033 people, incl. high BMI); inputs age, height, weight, sex, other anaesthetic drugs","Eleveld remifentanil: study range 5 days – 85 y, 2.5–106 kg (131 people); inputs age, weight, sex","Marsh plasma; Schnider / Minto effect-site; pump limits and model menus: check the pump (Agilia, Alaris PK, Mindray)","Re-checked (Nimmo 2019): Marsh Cp / Schnider Ce induction 4–6, maintenance 3–6 (2.5–4 with opioid); slow induction 1 then +0.5–1; Minto intubation ≈ 6, maintenance 2–6 ng/mL","Pump limits: Marsh ≤ 150 kg; Schnider / Minto BMI < 35 female, < 42 male; Minto ≥ 12 y and ≥ 30 kg; obese: no evidence TBW vs AdjBW, titrate + pEEG","Manual: Roberts 1 mg/kg then 10 → 8 → 6 mg/kg/h (10 min each); PRIS caution > 6 mg/kg/h; remifentanil 0.08–0.25 mcg/kg/min, load 0.5 × 3 min then 0.25, no syringe bolus","pEEG with TIVA + relaxant, start before induction, until full NM recovery; quantitative NM monitoring to TOF > 0.9 (Klein 2021)","Pump stopped: restart in manual mode at the running rate, not TCI at the old target","Manual calculator: propofol mL/h = mg/kg/h × kg ÷ mg/mL (mcg/kg/min × kg × 60 ÷ 1000 ÷ mg/mL); remifentanil mL/h = mcg/kg/min × kg × 60 ÷ mcg/mL; reverse the same; defaults propofol TBW 10 mg/mL, remifentanil LBW 50 mcg/mL"]],
  ["Intra-op analgesia","15 Nov 2026",["Base: paracetamol 1 g (15 mg/kg < 50 kg, AdjBW if obese); parecoxib 40 mg (20 mg elderly / < 50 kg) or diclofenac PR 1 mg/kg max 100 mg; dexamethasone 0.1 mg/kg IBW max 8 mg","Opioids: fentanyl 1–2 mcg/kg LBW then 0.5–1; morphine 0.1–0.15 mg/kg IBW; tramadol 1–2 mg/kg max 100 mg; halve if ≥ 65; remi → morphine 0.1 mg/kg or fentanyl 1–2 mcg/kg 30 min before stopping","Ketamine 0.15–0.35 mg/kg then 0.1–0.5 mg/kg/h (max 1); 2 mg/mL","Lignocaine 1.5 mg/kg IBW over 10 min then ≤ 1.5 mg/kg/h ≤ 24 h; not within 4 h of a nerve block","Magnesium 30–50 mg/kg then 10–15 mg/kg/h; dexmedetomidine 0.5–1 mcg/kg then 0.2–0.7 mcg/kg/h; clonidine 1–2 mcg/kg max 150 mcg","Modifiers: kidney → no NSAID, fentanyl not morphine; liver → paracetamol ≤ 2–3 g/day, reduce lignocaine; OSA → opioid-sparing; tolerant → continue baseline + ketamine","PROSPECT table: lap chole port-site; laparotomy epidural / rectus sheath / TAP; hernia II-IH block; TKA adductor canal + LIA; THA LIA or fascia iliaca / PENG; spine infiltration / ESP; breast PECS II / paravertebral"]],
  ["Guideline updates Nov 2026","14 Nov 2026",["GLP-1: most continue; high risk → 24 h clear-liquid diet, adjust plan, consider holding; symptomatic → full stomach","PONV: 0 factors risk reduction ± 1 agent; 1–2 factors 2 agents; ≥ 3 factors 3–4 agents + TIVA; PDNV long-acting antiemetic"]]]],
  ["Regional",[["Spinal – non-obstetric (0.5% heavy)","",["Perineal/saddle S1–S5: 1.0–1.5 mL","TURP/urology T10: 2.0–2.5 mL","Inguinal hernia/lower abdo T10: 2.5–3.0 mL","Lower limb/hip/knee T10–T12: 2.5–3.0 mL","Height ≤150 → lower end; 151–165 → middle; >165 → upper end","Optional: fentanyl 10–25 mcg; morphine 0.1 mg (1 mg/mL) for hip/knee"]],
@@ -5978,7 +6065,7 @@ function sampleWarn(keys){ const k = keys.filter(isSample); if (!k.length) retur
   const names = {k:"K⁺", hb:"Hb", height:"height", aw:"weight", pw:"weight", pY:"age", spHt:"height", morWt:"weight", sex:"sex", age:"age"};
   return `<div class="samplewarn"><b>Sample values</b> — ${(a => a.length > 1 ? a.slice(0,-1).join(", ") + " and " + a[a.length-1] : a[0])([...new Set(k.map(x=>names[x]))])} not entered. Enter the patient or tap a case.</div>`; }
 /* Each case keeps its own clinical entries, in memory only (never saved). */
-const CLIN = ["csDec","sc","asa","met","pnF","pnMP","pnNeck","pnPonv","pnUrg","pnLay","csNote","leNote","pnNote","csWho","csLang","csOut","csLen","leLen","csMode","crea","k","hb","todayWt","hdH","hbNow","hbLow","hbTarget","fastH","pBE","laA","txck","derm","abg","fbal","blIn","hbU","gz"];
+const CLIN = ["csDec","sc","asa","met","pnF","pnMP","pnNeck","pnPonv","pnUrg","pnLay","csNote","leNote","pnNote","csWho","csLang","csOut","csLen","leLen","csMode","crea","k","hb","todayWt","hdH","hbNow","hbLow","hbTarget","fastH","pBE","laA","txck","derm","abg","fbal","blIn","hbU","gz","tv"];
 const CLIN_T = ["crea","k","hb","todayWt","hdH"];
 const CLIN_OBJ = {sc:{}, pnF:{}, txck:{}, laA:[]};
 const clone = v => v === undefined ? undefined : JSON.parse(JSON.stringify(v));
@@ -6019,6 +6106,7 @@ function vTicks(){
 }
 /* ---------- ABOUT ---------- */
 const CHANGES = [
+  ["2.155","General › Intra-op › TIVA reorganised: TCI | Manual infusion tabs. TCI: propofol and remifentanil models as compact blocks (targets unchanged), with model info — what the pump needs and whether this patient is inside the Eleveld study ranges (Eleveld BJA 2018; Anesthesiology 2017). Manual infusion: propofol and remifentanil calculators, dose → mL/h and back, any syringe strength, choice of dosing weight; Roberts regimen worked out. Re-checked against the Association / SIVA TIVA guidelines 2019: Schnider induction 4–6; maintenance 3–6 (2.5–4 with opioid); Minto ≈ 6 / 2–6 ng/mL; manual remifentanil 0.08–0.25; pump BMI and weight limits shown; obese AdjBW advice removed (no evidence). Processed EEG and neuromuscular monitoring per 2021 standards; safety checklist and troubleshooting. (checked)"],
   ["2.154","About redesigned: offline · private · free; 6 feature tiles; Clinical foundations (sources grouped by topic), How calculations work, Clinical governance (honest validation status); Privacy and data (what is stored, how to clear); What's new shows the latest 3. Sources: tranexamic acid now cites the local blood bank guideline; analgesia ladder & PCA and epidural cite the local OAS guideline."],
   ["2.153","Emergencies › Adult re-checked against the QRH 2023: Cardiac arrest (theatre-specific steps), Anaphylaxis (CPR if SBP < 50, glucagon, vasopressin, infusion recipe), Bronchospasm (QRH drugs; ketamine 20 mg), Malignant hyperthermia (complications), CICO (impalpable membrane technique), High spinal (metaraminol, wider ephedrine and atropine ranges, reduced induction dose). (checked) QRH cards now show only the QRH step numbers (❶ ❷ …), one step per line. Fix: Blood management showed only the major haemorrhage box — the rest of the card (blood volume, allowable loss, transfusion thresholds, products, adjuncts) is back."],
   ["2.152","Emergencies › Adult › Theatre & equipment: Patient fire, Mains oxygen failure (with cylinder contents), Mains electricity failure, Emergency evacuation (Association of Anaesthetists QRH 2023; reporting to Malaysia's Medical Device Authority). (checked)"],
@@ -7148,11 +7236,12 @@ document.addEventListener("toggle", e => {
 }, true);
 document.addEventListener("toggle", e => { const d = e.target; if (!d.matches || !d.matches("details.catgrp")) return; S.catOpen = S.catOpen || new Set();
   if (d.open) S.catOpen.add(d.dataset.cat); else { S.catOpen.delete(d.dataset.cat); if (d.querySelector("details.acc[open]")) S.open = null; } }, true);
+document.addEventListener("click", e => { const t = e.target.closest && e.target.closest("[data-tvb]"); if (!t) return; const [k, v] = t.getAttribute("data-tvb").split(":"); tvS()[k] = v; render(); });
 document.addEventListener("click", e => { const t = e.target.closest && e.target.closest("[data-dl]"); if (!t) return; S.dermAnim = {prev: dermState().top}; S.derm = t.getAttribute("data-dl"); render(); });
 let vtaps = 0, vtimer = null;
 document.addEventListener("click", e => { if (!e.target.closest || !e.target.closest(".vtap")) return; vtaps++; clearTimeout(vtimer); vtimer = setTimeout(()=>vtaps=0, 1500); if (vtaps >= 5){ vtaps = 0; location.hash = "#values"; window.scrollTo(0,0); } });
 document.addEventListener("change", e => { if (e.target.id==="csNote"){ S.csNote = e.target.value.slice(0,300); render(); } if (e.target.id==="leNote"){ S.leNote = e.target.value.slice(0,300); render(); } if (e.target.id==="pnNote"){ S.pnNote = e.target.value.slice(0,300); render(); } if (e.target.dataset && e.target.dataset.pnf){ const f = e.target.dataset.pnf, v = e.target.value.slice(0,300); (S.pnF = S.pnF || {})[f] = v; if (f === "cr"){ const n = parseFloat(v); if (n >= 30 && n <= 1200){ S.crea = n; S.touched.crea = true; } } render(); } });
-document.addEventListener("input", e => { if (e.target.id==="csNote") S.csNote = e.target.value.slice(0,300); if (e.target.id==="leNote"){ S.leNote = e.target.value.slice(0,300); store.set("consLast","le"); } if (e.target.id==="pnNote") S.pnNote = e.target.value.slice(0,300); if (e.target.dataset && e.target.dataset.pnf) (S.pnF = S.pnF || {})[e.target.dataset.pnf] = e.target.value.slice(0,300); if (e.target.id==="q") runSearch(e.target.value); if (e.target.id==="nagq" || e.target.id==="nagpq"){ const pd = e.target.id === "nagpq"; S[(pd ? "nagp" : "nag") + "Q"] = e.target.value; S[(pd ? "nagp" : "nag") + "Open"] = null; const l = document.getElementById(pd ? "nagplist" : "naglist"); if (l) l.innerHTML = nagList(pd); document.querySelectorAll(`[data-nagtab^="${pd ? "p" : "a"}|"]`).forEach(b => b.setAttribute("aria-selected", "false")); } const fbg = e.target.dataset && (e.target.dataset.abg ? ["abg", "abg", "abgres", abgResult] : e.target.dataset.fb ? ["fbal", "fb", "fbres", fbBalance] : e.target.dataset.bl ? ["blIn", "bl", "blres", ablText] : e.target.dataset.gz ? ["gz", "gz", "gzres", gzText] : null); if (fbg){ (S[fbg[0]] = S[fbg[0]] || {})[e.target.dataset[fbg[1]]] = e.target.value.slice(0, 12); const r = document.getElementById(fbg[2]); if (r) r.innerHTML = fbg[3](); } if (e.target.id==="bfq"){ S.bfq = e.target.value; const r = document.getElementById("bfopsr"); if (r) r.innerHTML = bfOpsList(); } if (e.target.id==="vq"){ S.vq = e.target.value; const pos = e.target.selectionStart; render(); const el = document.getElementById("vq"); if (el){ el.focus(); try{ el.setSelectionRange(pos,pos); }catch(_){} } } if (e.target.id==="cNick") S.cNick = e.target.value.slice(0,12); if (e.target.id==="dname") S.dname = e.target.value.slice(0,24); });
+document.addEventListener("input", e => { if (e.target.id==="csNote") S.csNote = e.target.value.slice(0,300); if (e.target.id==="leNote"){ S.leNote = e.target.value.slice(0,300); store.set("consLast","le"); } if (e.target.id==="pnNote") S.pnNote = e.target.value.slice(0,300); if (e.target.dataset && e.target.dataset.pnf) (S.pnF = S.pnF || {})[e.target.dataset.pnf] = e.target.value.slice(0,300); if (e.target.id==="q") runSearch(e.target.value); if (e.target.id==="nagq" || e.target.id==="nagpq"){ const pd = e.target.id === "nagpq"; S[(pd ? "nagp" : "nag") + "Q"] = e.target.value; S[(pd ? "nagp" : "nag") + "Open"] = null; const l = document.getElementById(pd ? "nagplist" : "naglist"); if (l) l.innerHTML = nagList(pd); document.querySelectorAll(`[data-nagtab^="${pd ? "p" : "a"}|"]`).forEach(b => b.setAttribute("aria-selected", "false")); } const fbg = e.target.dataset && (e.target.dataset.abg ? ["abg", "abg", "abgres", abgResult] : e.target.dataset.fb ? ["fbal", "fb", "fbres", fbBalance] : e.target.dataset.bl ? ["blIn", "bl", "blres", ablText] : e.target.dataset.gz ? ["gz", "gz", "gzres", gzText] : null); if (e.target.dataset && e.target.dataset.tv){ tvS()[e.target.dataset.tv] = e.target.value.slice(0, 12); ["p","r"].forEach(d => { const r = document.getElementById("tvres-" + d); if (r){ r.innerHTML = tvResult(d); seg1(r); } }); } if (fbg){ (S[fbg[0]] = S[fbg[0]] || {})[e.target.dataset[fbg[1]]] = e.target.value.slice(0, 12); const r = document.getElementById(fbg[2]); if (r) r.innerHTML = fbg[3](); } if (e.target.id==="bfq"){ S.bfq = e.target.value; const r = document.getElementById("bfopsr"); if (r) r.innerHTML = bfOpsList(); } if (e.target.id==="vq"){ S.vq = e.target.value; const pos = e.target.selectionStart; render(); const el = document.getElementById("vq"); if (el){ el.focus(); try{ el.setSelectionRange(pos,pos); }catch(_){} } } if (e.target.id==="cNick") S.cNick = e.target.value.slice(0,12); if (e.target.id==="dname") S.dname = e.target.value.slice(0,24); });
 function clamp(v,min,max){ return Math.min(max, Math.max(min, v)); }
 /* hold − / + : repeat, speeding up; the click after a hold is ignored */
 (() => { let tm = null, n = 0, held = false, key = null, dd = 0, mn = 0, mx = 0;
