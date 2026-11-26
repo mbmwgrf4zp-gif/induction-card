@@ -890,6 +890,18 @@ select[data-stc]{font-size:15px;display:block;width:100%;max-width:100%;min-heig
 .lagb i{position:absolute;top:0;bottom:0;z-index:2;transform:translateX(-50%)}.lagb .t80{width:2px;background:var(--warn-ink);box-shadow:0 0 0 1.5px var(--card)}.lagb .t100{width:3px;background:var(--danger-ink);box-shadow:0 0 0 1.5px var(--card)}
 .lagx{position:relative;height:14px;font-size:13px;color:var(--muted)}.lagx span{position:absolute;transform:translateX(-50%)}.lagx span:first-child{transform:none}
 @media (prefers-reduced-motion:reduce){.lagb span.new{animation:none}}
+/* v2.164 anticoagulant timeline */
+.ackey{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:13px;color:var(--muted);margin:2px 0 8px}.ackey i{display:inline-block;width:14px;height:8px;border-radius:3px;margin-right:5px;vertical-align:1px}
+.ackey .acs{background:var(--danger-ink);opacity:.75}.ackey .acr2{background:var(--g-paeds,#16a34a)}
+.acax{position:relative;height:18px;font-size:13px;color:var(--muted);margin:0 0 2px}.acax span,.acax b{position:absolute;top:0;transform:translateX(-50%);white-space:nowrap}.acax span:first-child{transform:none}.acax span:last-child{transform:translateX(-100%)}.acax b{color:var(--ink);font-size:13px}
+.acr{padding:7px 0;border-top:1px solid var(--line)}.acd{font-weight:700;font-size:15px}
+.act{display:grid;grid-template-columns:60% 2px 1fr;align-items:center;height:14px;margin:4px 0 3px}
+.acb{position:relative;height:10px;background:var(--line);border-radius:5px 0 0 5px}.aca{position:relative;height:10px;background:var(--line);border-radius:0 5px 5px 0}
+.acb span{position:absolute;right:0;top:0;bottom:0;border-radius:5px 0 0 5px}.acb .acs{background:var(--danger-ink);opacity:.75;z-index:1}.acb .acs2{background:var(--danger-ink);opacity:.3}
+.aca span{position:absolute;left:0;top:0;bottom:0;background:var(--g-paeds,#16a34a);border-radius:0 5px 5px 0}
+.acl{display:block;width:2px;height:16px;background:var(--ink)}
+.acok{position:absolute;right:6px;top:-4px;font-size:13px;font-weight:700;color:var(--g-paeds,#16a34a)}
+.acx{display:grid;grid-template-columns:60% 1fr;gap:8px;font-size:14px}.acx span:last-child{color:var(--muted);padding-left:6px}.acx .hl{text-align:right;font-weight:700}
 </style>
 </head>
 <body>
@@ -904,7 +916,7 @@ if (window.top !== window.self && /\.github\.io$/.test(location.hostname)) {
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.163.0";
+const APP_VERSION = "2.164.0";
 const APP_DATE = "26 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
@@ -4612,21 +4624,33 @@ gaCards.analgesia = () => { const W2 = wts(), w = S.aw;
   <p class="sub">Monitor sedation score and RR. Naloxone 100–200 mcg IV for respiratory depression.</p>${src("Local OAS guideline.")}</div>`; };
 
 /* REGIONAL: anticoagulant timing */
+// v2.164: timeline — stop before (left) and restart after (right) the block / catheter line; same wording as the table it replaces
+const AC_ROWS = [  // [drug, before text, before h [lo,hi] or null, after text, after h or null]
+  ["Aspirin, NSAIDs", "No need to stop", null, "—", null],
+  ["Clopidogrel", "5–7 days", [120,168], "6 h (no loading dose)", 6],
+  ["Ticagrelor", "5–7 days", [120,168], "6 h", 6],
+  ["Prasugrel", "7–10 days", [168,240], "6 h", 6],
+  ["Warfarin", "5 days, INR normal (≤ 1.4)", [120,120], "After catheter removal", null],
+  ["UFH SC low dose (5000 IU)", "4–6 h", [4,6], "1 h", 1],
+  ["UFH IV", "4–6 h, normal aPTT", [4,6], "1 h", 1],
+  ["Enoxaparin low dose (e.g. 40 mg OD)", "12 h", [12,12], "12 h after puncture; 4 h after catheter removal", 12],
+  ["Enoxaparin high dose (treatment)", "24 h", [24,24], "24 h; 4 h after catheter removal", 24],
+  ["Fondaparinux", "36–42 h; avoid catheters", [36,42], "6 h after removal", 6],
+  ["Rivaroxaban, apixaban, edoxaban", "72 h", [72,72], "6 h after catheter removal", 6],
+  ["Dabigatran", "<b>72–120 h</b> by CrCl (≥ 80: 72 h; 50–79: 96 h; 30–49: 120 h)", [72,120], "6 h after catheter removal", 6],
+  ["Thrombolytics", "48 h; avoid", [48,48], "—", null]];
+const AC_B = [0,1,4,6,12,24,36,48,72,120,168,240], AC_A = [0,1,4,6,12,24];
+const acPos = (h, bp) => { if (h <= 0) return 0; for (let i = 1; i < bp.length; i++) if (h <= bp[i]) return (i - 1 + (h - bp[i-1])/(bp[i] - bp[i-1]))/(bp.length - 1); return 1; };
+const acRow = ([d, bt, bh, at, ah]) => {
+  const L = bh ? acPos(bh[0], AC_B)*100 : 0, Lh = bh ? acPos(bh[1], AC_B)*100 : 0, R = ah ? acPos(ah, AC_A)*100 : 0;
+  return `<div class="acr"> <div class="acd">${d}</div> 
+    <div class="act"><div class="acb">${bh ? `<span class="acs" style="width:${L}%"></span>${Lh > L ? `<span class="acs2" style="width:${Lh}%"></span>` : ""}` : `<span class="acok">✓</span>`}</div><i class="acl"></i><div class="aca">${ah ? `<span class="acr2" style="width:${R}%"></span>` : ""}</div></div>
+    <div class="acx"><span class="hl">${bt}</span> <span>${at}</span></div></div>`;
+};
 gaCards.anticoag = () => `<div class="card"><h2>Neuraxial &amp; deep blocks: anticoagulant timing</h2>${gaDraft()}
-  <div style="overflow-x:auto"><table><tr><th>Drug</th><th>Last dose before block</th><th>Restart after block / catheter removal</th></tr>
-  <tr><td>Aspirin, NSAIDs</td><td class="hl">No need to stop</td><td>—</td></tr>
-  <tr><td>Clopidogrel</td><td class="hl">5–7 days</td><td>6 h (no loading dose)</td></tr>
-  <tr><td>Ticagrelor</td><td class="hl">5–7 days</td><td>6 h</td></tr>
-  <tr><td>Prasugrel</td><td class="hl">7–10 days</td><td>6 h</td></tr>
-  <tr><td>Warfarin</td><td class="hl">5 days, INR normal (≤ 1.4)</td><td>After catheter removal</td></tr>
-  <tr><td>UFH SC low dose (5000 IU)</td><td class="hl">4–6 h</td><td>1 h</td></tr>
-  <tr><td>UFH IV</td><td class="hl">4–6 h, normal aPTT</td><td>1 h</td></tr>
-  <tr><td>Enoxaparin low dose (e.g. 40 mg OD)</td><td class="hl">12 h</td><td>12 h after puncture; 4 h after catheter removal</td></tr>
-  <tr><td>Enoxaparin high dose (treatment)</td><td class="hl">24 h</td><td>24 h; 4 h after catheter removal</td></tr>
-  <tr><td>Fondaparinux</td><td class="hl">36–42 h; avoid catheters</td><td>6 h after removal</td></tr>
-  <tr><td>Rivaroxaban, apixaban, edoxaban</td><td class="hl">72 h</td><td>6 h after catheter removal</td></tr>
-  <tr><td>Dabigatran</td><td><b>72–120 h</b> by CrCl (≥ 80: 72 h; 50–79: 96 h; 30–49: 120 h)</td><td>6 h after catheter removal</td></tr>
-  <tr><td>Thrombolytics</td><td class="hl">48 h; avoid</td><td>—</td></tr></table></div>
+  <div class="ackey"><span><i class="acs"></i>Last dose before block</span><span><i class="acr2"></i>Restart after block / catheter removal</span></div>
+  <div class="acax">${[[240,"10 d"],[72,"72 h"],[24,"24 h"],[6,"6 h"]].map(([h,l]) => `<span style="left:${(60*(1 - acPos(h, AC_B))).toFixed(1)}%">${l}</span>`).join("")}<b style="left:60%">block</b>${[[6,"6 h"],[24,"24 h"]].map(([h,l]) => `<span style="left:${(60 + 40*acPos(h, AC_A)).toFixed(1)}%">${l}</span>`).join("")}</div>
+  <div class="acl0">${AC_ROWS.map(acRow).join("\n")}</div>
   <p><b>Platelets:</b> ≥ 80 × 10⁹/L for neuraxial (obstetric ≥ 70 if stable).</p>
   <p class="sub">ASRA 5th edition: "low / high dose" replaces "prophylactic / therapeutic"; DOAC intervals are individualised by kidney function and thrombosis risk. The 72 h shown is the <b>high-dose</b> interval. ${AUD_CHECKED?"":"<b>DRAFT</b> — "}<b>Low-dose regimens and restart times: check the ASRA 5th edition table (Kopp et al., RAPM 2025) — not verified in this app.</b></p>
   ${updNote("ASRA 5th edition (2025) — wording only; DOAC table not yet checked against the paper","ESRA newsletter + NYSORA summaries")}${src("ASRA 5th ed. 2025 / ESAIC 2022. Check local policy.")}</div>`;
@@ -6377,6 +6401,7 @@ function vTicks(){
 }
 /* ---------- ABOUT ---------- */
 const CHANGES = [
+  ["2.164","Regional › Anticoagulant timing as a timeline: for each drug a red bar for how long before the block to stop and a green bar for when to restart, either side of the block line; same times and wording."],
   ["2.163","LA dose calculator: a toxicity gauge — total % of maximum in large type and one bar with each block in its drug colour, amber line at 80%, red line at 100%; maximums and explanations tucked into a collapsible line."],
   ["2.162","Regional › Spinal dose: non-obstetric — height bands with this patient's band highlighted and a syringe showing the range and this patient's dose; additives tucked into a collapsible line. Same doses."],
   ["2.161.3","No more jumping: the card you are working in stays put on screen when the sample banner disappears or text above it changes; LSCS syringe stays at a fixed height between bands."],
@@ -7301,7 +7326,7 @@ const isWide = () => window.matchMedia("(min-width: 1100px)").matches;
    Text is unchanged (only <span> wrappers). Not touched: per-kg rules (mg/kg…), lab thresholds (≥ / ≤ / < / >, x/L, g/dL…),
    small notes, placeholders, ventilation and echo values. */
 const DOSE_RX = /\d[\d.,]*(?:\s?[–-]\s?\d[\d.,]*)?\s?(?:mL\/h|mg\/h|mcg\/h|mmol\/h|units?\/h|IU\/h|mg|mcg|mL|g|units?|IU|mmol|J)(?![\w\/⁰¹²³⁴⁵⁶⁷⁸⁹])/g;
-const DOSE_SKIP = "table.dt tr[data-dr], .result, .big, .sub, small, button, .rt, .nw, .dzb, svg, textarea, select, label, .ptile, .chip, .jumprow";
+const DOSE_SKIP = "table.dt tr[data-dr], .acd, .acx, .acax, .result, .big, .sub, small, button, .rt, .nw, .dzb, svg, textarea, select, label, .ptile, .chip, .jumprow";
 /* recipes (v2.78): amounts in a make-up / dilution line stay normal size; a line that says what to give keeps its doses large */
 const RECIPE_RX = /\bin\s+\d+(?:\.\d+)?\s*mL\b|made up|make up|\bdilut|reconstitut|\bdraw\b|\d\s*mL\s+(?:NS|saline|D5|D50|Hartmann|Sterofundin)/i,
   GIVE_RX = /\b(?:give|dose|bolus|run|loading|stat)\b/i, ROUTE_RX = /\b(?:IV|IM|PO|PR|SC|SL|IO)\b/;
