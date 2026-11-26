@@ -910,6 +910,14 @@ select[data-stc]{font-size:15px;display:block;width:100%;max-width:100%;min-heig
 .z-ok{background:color-mix(in srgb,#16a34a 35%,var(--card))}.z-mid{background:color-mix(in srgb,#f59e0b 45%,var(--card))}.z-hi{background:color-mix(in srgb,#dc2626 45%,var(--card))}
 .sgx{display:grid;gap:3px;font-size:13px;color:var(--muted);text-align:center;margin-bottom:6px}.sgz{grid-template-columns:repeat(9,1fr)}
 .ombar{margin-top:6px;height:16px;background:linear-gradient(to right,color-mix(in srgb,#16a34a 22%,var(--card)) 0 26.7%,color-mix(in srgb,#f59e0b 25%,var(--card)) 26.7% 66.7%,color-mix(in srgb,#dc2626 22%,var(--card)) 66.7% 100%)}.ombar span{display:block;height:100%;border-radius:6px 0 0 6px}.ombar span.z-ok{background:#16a34a}.ombar span.z-mid{background:#d97706}.ombar span.z-hi{background:#b91c1c}.ombar + .lagx{margin-bottom:8px}.ombar + .lagx span:last-child{transform:translateX(-100%)}
+/* v2.166 fasting timeline */
+.fti{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:2px 0 8px;font-size:14px}.fti label{display:flex;align-items:center;gap:8px;font-weight:600}
+.fti input{font:700 16px var(--font-sans);padding:6px 8px;border:1px solid var(--line);border-radius:8px;background:var(--field);color:var(--ink);min-height:38px}
+.ftax{position:relative;display:flex;justify-content:space-between;font-size:13px;color:var(--muted);margin-bottom:2px}.ftax b{color:var(--ink);font-size:13px}
+.ftr{padding:7px 0;border-top:1px solid var(--line)}.ftn{font-size:15px;font-weight:600}
+.ftb{display:flex;height:12px;border-radius:6px;overflow:hidden;margin:5px 0 3px;border-right:3px solid var(--ink)}
+.ftok{background:var(--g-paeds,#16a34a);opacity:.75}.ftno{background:repeating-linear-gradient(135deg,var(--line) 0 5px,color-mix(in srgb,var(--muted) 35%,var(--card)) 5px 10px)}
+.ftv{display:flex;justify-content:flex-end;align-items:baseline;gap:8px}.ftv .hl{font-weight:700}
 </style>
 </head>
 <body>
@@ -924,7 +932,7 @@ if (window.top !== window.self && /\.github\.io$/.test(location.hostname)) {
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.165.0";
+const APP_VERSION = "2.166.0";
 const APP_DATE = "26 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
@@ -2263,9 +2271,7 @@ function pEndo(){ const w = W(), m = (k,c) => `${dz(Math.min(k*w,c),"mg")} mg`;
   ${intl("AHA 2021 — high-risk only; clindamycin no longer recommended.")}</details>`; }
 /* Pre-op */
 pCards.fast = () => `<div class="card"><h2>Paeds fasting</h2>${p3Draft()}
-  <table><tr><th>Solids (rice, biscuit, bread), yogurt, soya milk, Milo, juice with pulp</th><td class="hl">6 h</td></tr>
-  <tr><th>Formula milk</th><td class="hl">6 h</td></tr><tr><th>Breast milk</th><td class="hl">4 h</td></tr>
-  <tr><th>Clear fluids (water, Ribena, apple juice, glucose drink, juice without pulp)</th><td class="hl">1 h</td></tr></table>
+  ${fastTL([["Solids (rice, biscuit, bread), yogurt, soya milk, Milo, juice with pulp", 6], ["Formula milk", 6], ["Breast milk", 4], ["Clear fluids (water, Ribena, apple juice, glucose drink, juice without pulp)", 1]], 6)}
   <ul><li>Avoid unnecessary prolonged fasting; keep comfortable and hydrated</li><li>Not for high aspiration risk — specialist decides</li><li>Write fasting times in full (no abbreviations); tell parents clearly</li></ul>
   ${intl("ESAIC / APA 2022 also allow clear fluids up to 1 h in children.")}${src(PLOC+".")}</div>`;
 pCards.premed = () => `<div class="card"><h2>Paeds premedication</h2>${p3Draft()}${pbDraft()}<div class="${isNeo() || (isPreterm() && pmaWk() < 60) ? "danger" : "sub"}"><b>Neonate, or ex-prem under 60 weeks PMA: no sedative premed</b> (apnoea risk).</div>${T([
@@ -2970,8 +2976,13 @@ function gaInputs(){
 const MEDS3_CHECKED = true;   // checked by author 25 Nov 2026;   // v2.141 ACEi / ARB / diuretics, insulin pump, adrenal insufficiency lines
 const gaCards = {};
 /* PRE-OP */
+/* v2.166 fasting timeline: green = still allowed, hatched = fasting, up to induction; optional induction time gives clock times */
+const ftClock = (h) => { const t = /^(\d{1,2}):(\d{2})$/.exec(S.indT || ""); if (!t) return ""; let m = (+t[1])*60 + (+t[2]) - h*60; m = ((m % 1440) + 1440) % 1440; return `until ${String(Math.floor(m/60)).padStart(2,"0")}:${String(m%60).padStart(2,"0")}`; };
+const fastTL = (rows, max) => `<div class="fti"><label>Induction time <input type="time" data-indt="1" value="${esc(S.indT || "")}"></label>${S.indT ? `<button class="linkish" data-indtclr="1">clear</button>` : `<span class="sub">optional — shows clock times</span>`}</div>
+  <div class="ftax"><span>${max} h before</span><b>induction</b></div>
+  ${rows.map(([name, h]) => `<div class="ftr"> <div class="ftn">${name}</div> <div class="ftb"><span class="ftok" style="width:${(1 - h/max)*100}%"></span><span class="ftno" style="width:${h/max*100}%"></span></div> <div class="ftv"><span class="hl">${h} h</span> <span class="sub">${ftClock(h)}</span></div></div>`).join("\n")}`;
 gaCards.fasting = () => `<div class="card"><h2>5. Fasting</h2>${gaDraft()}
-  <table><tr><td>Clear fluids</td><td class="hl">2 h</td></tr><tr><td>Light meal, milk</td><td class="hl">6 h</td></tr><tr><td>Fatty / heavy meal</td><td class="hl">8 h</td></tr></table>
+  ${fastTL([["Clear fluids", 2], ["Light meal, milk", 6], ["Fatty / heavy meal", 8]], 8)}
   <h3>GLP-1 agonists (semaglutide, liraglutide…)</h3>${updNote("2024 multisociety GLP-1 guidance","AGA (gastro.org) + EMJ / News-Medical coverage of the guidance")}
   <ul><li><b>Most patients continue</b> the drug as prescribed; assess individual risk</li>
   <li><b>Higher risk</b> (dose-escalation phase, higher doses, GI symptoms, other causes of slow gastric emptying): <b>clear-liquid diet for 24 h</b> before; adjust the anaesthetic plan (e.g. RSI, gastric ultrasound); holding the drug may be considered, weighed against glycaemic risk; rarely, delay</li>
@@ -6374,7 +6385,7 @@ function sampleWarn(keys){ const k = keys.filter(isSample); if (!k.length) retur
   const names = {k:"K⁺", hb:"Hb", height:"height", aw:"weight", pw:"weight", pY:"age", spHt:"height", morWt:"weight", sex:"sex", age:"age"};
   return `<div class="samplewarn"><b>Sample values</b> — ${(a => a.length > 1 ? a.slice(0,-1).join(", ") + " and " + a[a.length-1] : a[0])([...new Set(k.map(x=>names[x]))])} not entered. Enter the patient or tap a case.</div>`; }
 /* Each case keeps its own clinical entries, in memory only (never saved). */
-const CLIN = ["csDec","sc","asa","met","pnF","pnMP","pnNeck","pnPonv","pnUrg","pnLay","csNote","leNote","pnNote","csWho","csLang","csOut","csLen","leLen","csMode","crea","k","hb","todayWt","hdH","hbNow","hbLow","hbTarget","fastH","pBE","laA","txck","derm","abg","fbal","blIn","hbU","gz","tv","preg","oc","stc"];
+const CLIN = ["csDec","sc","asa","met","pnF","pnMP","pnNeck","pnPonv","pnUrg","pnLay","csNote","leNote","pnNote","csWho","csLang","csOut","csLen","leLen","csMode","crea","k","hb","todayWt","hdH","hbNow","hbLow","hbTarget","fastH","pBE","laA","txck","derm","abg","fbal","blIn","hbU","gz","tv","preg","oc","stc","indT"];
 const CLIN_T = ["crea","k","hb","todayWt","hdH"];
 const CLIN_OBJ = {sc:{}, pnF:{}, txck:{}, laA:[]};
 const clone = v => v === undefined ? undefined : JSON.parse(JSON.stringify(v));
@@ -6415,6 +6426,7 @@ function vTicks(){
 }
 /* ---------- ABOUT ---------- */
 const CHANGES = [
+  ["2.166","Fasting (adult and paeds) as a timeline to induction: green while allowed, hatched while fasting; optional induction time shows the clock time for each. Same times and wording."],
   ["2.165","Risk gauges: Apfel (PONV) and STOP-BANG show a row of score steps coloured low → high with the patient's step raised; opioid conversion total shows a bar with lines at 40, 60 and 100 mg/day. Same scores and wording."],
   ["2.164","Regional › Anticoagulant timing as a timeline: for each drug a red bar for how long before the block to stop and a green bar for when to restart, either side of the block line; same times and wording."],
   ["2.163","LA dose calculator: a toxicity gauge — total % of maximum in large type and one bar with each block in its drug colour, amber line at 80%, red line at 100%; maximums and explanations tucked into a collapsible line."],
@@ -7341,7 +7353,7 @@ const isWide = () => window.matchMedia("(min-width: 1100px)").matches;
    Text is unchanged (only <span> wrappers). Not touched: per-kg rules (mg/kg…), lab thresholds (≥ / ≤ / < / >, x/L, g/dL…),
    small notes, placeholders, ventilation and echo values. */
 const DOSE_RX = /\d[\d.,]*(?:\s?[–-]\s?\d[\d.,]*)?\s?(?:mL\/h|mg\/h|mcg\/h|mmol\/h|units?\/h|IU\/h|mg|mcg|mL|g|units?|IU|mmol|J)(?![\w\/⁰¹²³⁴⁵⁶⁷⁸⁹])/g;
-const DOSE_SKIP = "table.dt tr[data-dr], .acd, .acx, .acax, .result, .big, .sub, small, button, .rt, .nw, .dzb, svg, textarea, select, label, .ptile, .chip, .jumprow";
+const DOSE_SKIP = "table.dt tr[data-dr], .ftn, .ftv, .ftax, .acd, .acx, .acax, .result, .big, .sub, small, button, .rt, .nw, .dzb, svg, textarea, select, label, .ptile, .chip, .jumprow";
 /* recipes (v2.78): amounts in a make-up / dilution line stay normal size; a line that says what to give keeps its doses large */
 const RECIPE_RX = /\bin\s+\d+(?:\.\d+)?\s*mL\b|made up|make up|\bdilut|reconstitut|\bdraw\b|\d\s*mL\s+(?:NS|saline|D5|D50|Hartmann|Sterofundin)/i,
   GIVE_RX = /\b(?:give|dose|bolus|run|loading|stat)\b/i, ROUTE_RX = /\b(?:IV|IM|PO|PR|SC|SL|IO)\b/;
@@ -7587,6 +7599,8 @@ document.addEventListener("keydown", e => { const t = e.target; if (!t.dataset |
   const b = [...tile.querySelectorAll("[data-step]")].find(x => (+x.dataset.d > 0) === (e.key === "ArrowUp")); if (!b) return; e.preventDefault(); const id = t.id; b.click();
   requestAnimationFrame(() => { const n = document.getElementById(id); if (n){ n.focus(); try { n.select(); } catch(_){} } }); });
 document.addEventListener("change", e => { const t = e.target; if (t.tagName !== "SELECT" || !t.dataset.oc) return; (S.oc = S.oc || {})[t.dataset.oc] = t.value; render(); });
+document.addEventListener("change", e => { const t = e.target; if (!t.dataset || !t.dataset.indt) return; S.indT = /^\d{1,2}:\d{2}$/.test(t.value) ? t.value : ""; render(); });
+document.addEventListener("click", e => { const t = e.target.closest && e.target.closest("[data-indtclr]"); if (!t) return; S.indT = ""; render(); });
 document.addEventListener("change", e => { const t = e.target; if (t.tagName !== "SELECT" || !t.dataset.stc) return; (S.stc = S.stc || {}).d = t.value; const r = document.getElementById("stcres"); if (r){ r.innerHTML = stcRes(); seg1(r); } });
 document.addEventListener("click", e => { const t = e.target.closest && e.target.closest("[data-ocreset]"); if (!t) return; S.oc = {}; render(); });
 document.addEventListener("click", e => { const t = e.target.closest && e.target.closest("[data-tvb]"); if (!t) return; const [k, v] = t.getAttribute("data-tvb").split(":"); tvS()[k] = v; render(); });
