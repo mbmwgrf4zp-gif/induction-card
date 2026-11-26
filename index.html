@@ -506,7 +506,7 @@ details.endo summary{cursor:pointer;font-weight:600;font-size:var(--fs-sm)}
 .toprow .t-emerg{margin-top:0}
 @media (min-width:700px){
   main{max-width:1000px}
-  .gwrap{grid-template-columns:minmax(0,1fr) 320px;gap:var(--s4);align-items:start}
+  .gwrap{grid-template-columns:minmax(0,1fr) 260px;gap:var(--s4);align-items:start}
   .gwrap.noside{grid-template-columns:1fr}
   .gwrap.fw{grid-template-columns:minmax(0,1fr)}.gwrap.fw .gside{order:0;position:static}.gwrap.fw .gside .ptbar{margin-top:var(--s2)}
   .gwrap.fw .bfin{grid-template-columns:minmax(0,1.5fr) minmax(0,1fr)}.gwrap.fw .bfin .bfstage{height:80vh;height:80svh}
@@ -944,6 +944,18 @@ details.ptx .pbs{margin-top:2px}
 .pscale i{position:absolute;top:26px;width:2px;height:20px;background:var(--ink);transform:translateX(-50%)}.pscale i.t{background:var(--gc,var(--accent));width:3px;height:26px;top:23px}
 .pscale em{position:absolute;font-style:normal;font-size:13px;font-weight:700;transform:translateX(-50%);white-space:nowrap;font-variant-numeric:tabular-nums}
 .pscale em.u.l0{top:8px}.pscale em.u.l1{top:-8px}.pscale em.d.l0{top:48px;color:var(--muted);font-weight:600}.pscale em.d.l1{top:62px;color:var(--muted);font-weight:600}.pscale em.t{color:var(--gc,var(--accent))}
+/* v2.170 tablet + desktop: patient fields as vertical rows in the side column (touch keeps − / +) */
+@media (min-width:700px){
+  .gside .ptiles{grid-template-columns:1fr;gap:4px}
+  .gside .ptile{flex-direction:row;flex-wrap:nowrap;align-items:center;justify-content:space-between;gap:6px;padding:3px 6px 3px 10px;border-radius:10px;min-height:44px}
+  .gside .ptile small{flex:1;flex-direction:column;align-items:flex-start;gap:0;font-size:11px;min-width:0}
+  .gside .ptile input{width:3.6em;flex:none;text-align:right;font:700 18px var(--font-sans);font-variant-numeric:tabular-nums;color:var(--ink);padding:2px 0}
+  .gside .ptile.sample input{color:var(--muted)}
+  .gside .ptile .pm{display:flex;width:auto;gap:3px;margin:0}.gside .ptile .pm button{width:36px;height:36px;font-size:1rem}
+  .gside .samplewarn{display:none}.gside .smpnote{display:block}
+}
+@media (min-width:700px) and (pointer:fine){ .gside .ptile .pm{display:none} }
+@media (min-width:1100px){ .gside.innav .ptile{flex-wrap:nowrap;padding:3px 4px 3px 8px;gap:4px} .gside.innav .ptile .pm{width:auto} .gside.innav .ptile .pm button{width:32px;height:34px} .gside.innav .ptile input{width:3.2em;font-size:17px} }
 </style>
 </head>
 <body>
@@ -958,7 +970,7 @@ if (window.top !== window.self && /\.github\.io$/.test(location.hostname)) {
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.169.0";
+const APP_VERSION = "2.170.0";
 const APP_DATE = "26 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
@@ -6492,6 +6504,7 @@ function vTicks(){
 }
 /* ---------- ABOUT ---------- */
 const CHANGES = [
+  ["2.170","iPad and other wide screens: the patient box is a narrow vertical list (one row per field, − / + kept on touch screens), the sample note sits inside it, and cards get the extra width. Phones unchanged."],
   ["2.169","Patient bar: one line (sex · age · height · weight) with a BMI badge; tap it to open a weight scale showing LBW, IBW, AdjBW and actual weight on one bar; ✎ to edit."],
   ["2.168","General › Intra-op › 7. Intra-op analgesia: patient factors become a drug × patient matrix (✓ use · ⚠ caution / adjust · ✗ avoid · \"·\" no specific note); tap a column to set the patient, tap a symbol for the reason. Cells taken from the card's existing notes. (checked)"],
   ["2.167","Volatile: MAC by age — small curve of MAC against age (Mapleson) with a dot at the patient's age."],
