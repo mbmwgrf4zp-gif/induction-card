@@ -783,7 +783,7 @@ details.faqg>summary{cursor:pointer;font-weight:700;color:var(--accent);min-heig
 .bfkid{font-weight:400;font-size:14px;color:var(--muted);min-height:40px}
 .bfchips button{flex:1 1 0;min-height:44px;border-radius:var(--r-sm);border:1px solid var(--line);background:var(--card);color:var(--ink);font:600 14px var(--font-sans);cursor:pointer;padding:0 6px}
 .bfchips button{flex:1 1 40%}.bfchips button[aria-pressed="true"]{background:var(--gc);border-color:var(--gc);color:var(--on)}
-.bfdot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px;vertical-align:0;flex:0 0 auto}.jn{white-space:nowrap}.ndet summary{cursor:pointer;font-weight:600;min-height:44px;display:flex;align-items:center}.bfdot.jnone{box-shadow:inset 0 0 0 1.5px var(--muted)}
+.bfdot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px;vertical-align:0;flex:0 0 auto}.jn{white-space:nowrap}.ndet{margin:var(--s2) 0}.ndet summary{cursor:pointer;font-weight:600;min-height:44px;display:flex;align-items:center;gap:8px;padding:8px 12px;border:1px solid var(--line);border-radius:var(--r-sm);background:var(--card);color:var(--gc);list-style:none}.ndet summary::-webkit-details-marker{display:none}.ndet summary::after{content:"Show ▾";margin-left:auto;font-size:13px;font-weight:600;color:var(--muted);white-space:nowrap}.ndet[open] summary::after{content:"Hide ▴"}.ndet[open] summary{margin-bottom:var(--s2)}.bfdot.jnone{box-shadow:inset 0 0 0 1.5px var(--muted)}
 .bfmore summary{cursor:pointer;font-weight:600;color:var(--gc);min-height:44px;display:flex;align-items:center}.bfmore[open]{display:grid;gap:8px}
 .nhd{margin:var(--s2) 0 0;font-size:13px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
 .nlv{display:inline-block;background:var(--gc-soft);color:var(--gc);border-radius:6px;padding:0 6px;font-size:.9em}.ncov{display:flex;flex-wrap:wrap;align-items:center;gap:4px 10px;margin:0 0 4px}.ncov .rellink{margin:0}
@@ -827,7 +827,7 @@ if (window.top !== window.self && /\.github\.io$/.test(location.hostname)) {
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.149.2";
+const APP_VERSION = "2.149.3";
 const APP_DATE = "25 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
@@ -5801,7 +5801,7 @@ function vTicks(){
 }
 /* ---------- ABOUT ---------- */
 const CHANGES = [
-  ["2.149","Favourites: tap ☆ on any card, or on any antibiotic procedure, then ★ on the home screen opens your list (kept on this phone; Reset all clears it). Antibiotic tabs no longer scroll the chosen tab out of view. (checked) Home ★ is now gold so it stands out."],
+  ["2.149","Favourites: tap ☆ on any card, or on any antibiotic procedure, then ★ on the home screen opens your list (kept on this phone; Reset all clears it). Antibiotic tabs no longer scroll the chosen tab out of view. (checked) Home ★ is now gold so it stands out. Fold-out sections (IV iron, formulas, fluid balance and others) now look like buttons with Show / Hide."],
   ["2.148","IV iron calculator: the four IV irons available in Malaysia (iron sucrose, ferric carboxymaltose, ferric derisomaltose, LMW iron dextran — generic and brand) with the maximum per dose for this patient, how many doses the total needs, and how to give each (MOH PBM 2024 Appendix 1). (checked)"],
   ["2.147","More from the MOH Patient Blood Management consensus 2024: Massive obstetric haemorrhage gets product triggers and doses (FFP 15 mL/kg, platelets 1 adult dose, cryo 1 unit/10 kg); Blood management — cryo 1 unit/10 kg and Hb targets for special groups (ACS, TBI, SAH, stroke, sepsis); Paeds transfusion — MOH points; Anticoagulants — MOH agreement noted (aspirin stays 7 days); Optimise or postpone — IV iron (Ganzoni) calculator. (checked)"],
   ["2.146","Blood management now follows the MOH Malaysia Patient Blood Management consensus (March 2024): major haemorrhage definition, MTP / T-MTP pack and targets, blood loss visual guide, red cell and platelet points, adjuncts and reversal; EBV 70 mL/kg. Tranexamic acid: before incision if expected loss > 500 mL. Which tests: ferritin and group, screen & hold for major surgery. Optimise or postpone: anaemia — wait 4 weeks to treat. (checked)"],
