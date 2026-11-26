@@ -902,6 +902,14 @@ select[data-stc]{font-size:15px;display:block;width:100%;max-width:100%;min-heig
 .acl{display:block;width:2px;height:16px;background:var(--ink)}
 .acok{position:absolute;right:6px;top:-4px;font-size:13px;font-weight:700;color:var(--g-paeds,#16a34a)}
 .acx{display:grid;grid-template-columns:60% 1fr;gap:8px;font-size:14px}.acx span:last-child{color:var(--muted);padding-left:6px}.acx .hl{text-align:right;font-weight:700}
+/* v2.165 step gauges */
+.sgw{margin:6px 0 2px}.sg{display:grid;gap:3px;align-items:end;height:40px}
+.sg i{font-style:normal;display:grid;place-items:center;height:26px;border-radius:6px;font:700 13px var(--font-sans);font-variant-numeric:tabular-nums;color:var(--ink);opacity:.55;transition:height .25s,opacity .25s}
+.sg i.on{height:40px;opacity:1;font-size:16px;box-shadow:0 0 0 2px var(--ink) inset}
+.sgw.pend .sg i.on{box-shadow:0 0 0 2px var(--muted) inset;background-image:repeating-linear-gradient(45deg,transparent 0 5px,rgba(255,255,255,.35) 5px 10px)}
+.z-ok{background:color-mix(in srgb,#16a34a 35%,var(--card))}.z-mid{background:color-mix(in srgb,#f59e0b 45%,var(--card))}.z-hi{background:color-mix(in srgb,#dc2626 45%,var(--card))}
+.sgx{display:grid;gap:3px;font-size:13px;color:var(--muted);text-align:center;margin-bottom:6px}.sgz{grid-template-columns:repeat(9,1fr)}
+.ombar{margin-top:6px;height:16px;background:linear-gradient(to right,color-mix(in srgb,#16a34a 22%,var(--card)) 0 26.7%,color-mix(in srgb,#f59e0b 25%,var(--card)) 26.7% 66.7%,color-mix(in srgb,#dc2626 22%,var(--card)) 66.7% 100%)}.ombar span{display:block;height:100%;border-radius:6px 0 0 6px}.ombar span.z-ok{background:#16a34a}.ombar span.z-mid{background:#d97706}.ombar span.z-hi{background:#b91c1c}.ombar + .lagx{margin-bottom:8px}.ombar + .lagx span:last-child{transform:translateX(-100%)}
 </style>
 </head>
 <body>
@@ -916,7 +924,7 @@ if (window.top !== window.self && /\.github\.io$/.test(location.hostname)) {
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.164.0";
+const APP_VERSION = "2.165.0";
 const APP_DATE = "26 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
@@ -3567,8 +3575,9 @@ gaCards.stopbang = () => { const x = wts(), n = sbScore(), auto = (on, t) => `<d
   const lvl = n<=2 ? ["result ok","Low risk of OSA",""] : n<=4 ? ["warn","Intermediate risk","Treat as possible OSA if other features."] : ["danger","High risk of moderate–severe OSA","Opioid-sparing plan, extubate awake and sitting up, monitored bed if opioids needed; consider sleep study / CPAP if time allows."];
   return `<div class="card"><h2>OSA screen (STOP-BANG)</h2>${preDraft()}
   <div class="txck">${SB_MAN.slice(0,4).map(([k,l])=>tog("sb",k,l)).join("")}${auto(x.bmi>35,`<b>B</b>MI &gt; 35 — now ${sig(x.bmi)}`)}${auto(S.age>50,`<b>A</b>ge &gt; 50 — now ${S.age}`)}${tog("sb","n",SB_MAN[4][1])}${auto(S.sex==="M","<b>G</b>ender male")}</div>${sbDone() ? "" : `<div class="scdone"><span class="sub">${SB_MAN.filter(([k])=>scv("sb",k)!=null).length} of ${SB_MAN.length} questions answered${["aw","height","age","sex"].every(k=>S.touched[k]) ? "" : "; enter sex, age, height and weight"} — the note shows \"incomplete\" until then.</span><button class="linkbtn" data-restno="sb">Rest are No ✓</button></div>`}
-  ${fin ? `<div class="${lvl[0]}" style="margin-top:var(--s2)"><div class="big">${n} / 8</div><b>${lvl[1]}.</b> ${lvl[2]}</div>`
-    : `<div class="result" style="margin-top:var(--s2)"><div class="big">${n} / 8</div>Score so far — answer every question for the risk.</div>`}${reset("sb")}
+  ${(() => { const g = stepGauge([0,1,2,3,4,5,6,7,8].map(i => [i, i <= 2 ? "ok" : i <= 4 ? "mid" : "hi"]), n, `STOP-BANG ${n} of 8`, !fin) + `<div class="sgx sgz"><span style="grid-column:span 3">low</span><span style="grid-column:span 2">intermediate</span><span style="grid-column:span 4">high</span></div>`;
+    return fin ? `<div class="${lvl[0]}" style="margin-top:var(--s2)"><div class="big">${n} / 8</div>${g}<b>${lvl[1]}.</b> ${lvl[2]}</div>`
+    : `<div class="result" style="margin-top:var(--s2)"><div class="big">${n} / 8</div>${g}Score so far — answer every question for the risk.</div>`; })()}${reset("sb")}
   <p class="sub">Screening, not a diagnosis. 0–2 low · 3–4 intermediate · 5–8 high. Also high if ≥ 2 STOP items plus male, BMI &gt; 35 or neck &gt; 40 cm.</p>
   ${n>=5?`<button class="homebtn" data-open="7. Intra-op analgesia" data-g="ga" data-tab="maint">Opioid-sparing plan → Intra-op analgesia ›</button>`:""}
   ${src("Chung et al. STOP-BANG (Anesthesiology 2008; BJA 2012); SASM guidance.")}</div>`; };
@@ -4406,7 +4415,8 @@ function ocResult(){ const x = S.oc || {}; let tot = 0, n = 0; const lines = [],
     return `<div class="result"><div class="sub">${lines.join("<br>")}</div><div class="sub">Oral morphine equivalent</div><div class="big">${sig(tot)} mg/day</div></div><div class="result"><div class="sub">Buprenorphine patch — MOH Table 8.5 (no interpolation)</div>${txt}<div class="sub">Start at ½–⅔ of the calculated equivalent (MOH).</div></div><div class="danger">Not a prescription. A full calculated "equivalent" may overdose — titrate and monitor sedation and respiratory rate.</div>`; }
   const out = t ? `<div class="result"><div class="sub">${ocName(t)} — calculated equivalent (÷ ${t[4]}, ${t[5]})</div><div class="big">${sig(eq)} ${t[3]}</div><div class="sub"><b>Start at ½–⅔: ${sig(eq/2)}–${sig(eq*2/3)} ${t[3]}</b> (MOH: incomplete cross-tolerance; adjust for age and side effects)${t[3] !== "mcg/h" ? ` · breakthrough ≈ ⅙ of the 24 h dose` : ""}</div></div><div class="danger">Not a prescription. A full calculated "equivalent" may overdose — titrate and monitor sedation and respiratory rate.</div>` : `<p class="sub">Choose an opioid to convert to (optional).</p>`;
   const risk = tot >= 100 ? "&gt; 100 mg: ~11× cardiorespiratory event risk" : tot > 40 ? "&gt; 40 mg: ~4× cardiorespiratory event risk" : "";
-  return `<div class="result"><div class="sub">${lines.join("<br>")}</div><div class="sub">Oral morphine equivalent</div><div class="big">${sig(tot)} mg/day</div>${tot >= 60 ? `<div class="sub">≥ 60 mg/day for ≥ 7 days: opioid tolerance likely (FPM 2021).</div>` : ""}${risk ? `<div class="sub">${risk} (ANZCA).</div>` : ""}</div>${out}`;
+  const omx = 150, ob = `<div class="lagb ombar" role="img" aria-label="Oral morphine equivalent ${sig(tot)} mg per day"><span class="${tot > 100 ? "z-hi" : tot >= 60 ? "z-mid" : tot > 40 ? "z-mid" : "z-ok"}" style="width:${Math.min(tot, omx)/omx*100}%"></span>${[40,60,100].map(v => `<i class="t80" style="left:${v/omx*100}%"></i>`).join("")}</div><div class="lagx">${[[0,"0"],[40,"40"],[60,"60"],[100,"100"]].map(([v,l]) => `<span style="left:${v/omx*100}%">${l}</span>`).join("")}<span style="left:100%">150+</span></div>`;
+  return `<div class="result"><div class="sub">${lines.join("<br>")}</div><div class="sub">Oral morphine equivalent</div><div class="big">${sig(tot)} mg/day</div>${ob}${tot >= 60 ? `<div class="sub">≥ 60 mg/day for ≥ 7 days: opioid tolerance likely (FPM 2021).</div>` : ""}${risk ? `<div class="sub">${risk} (ANZCA).</div>` : ""}</div>${out}`;
 }
 gaCards.oconv = () => { const x = (S.oc = S.oc || {});
   const row = i => `<div class="ocrow">${ocSel("d" + i, x["d" + i] || "", i === 1 ? "Current opioid…" : "Another opioid (optional)…")}${x["d" + i] && x["d" + i] !== "mtd" ? numIn("oc", "v" + i, "Total per 24 h", ocF(x["d" + i])[3] === "mcg/h" ? "mcg/h (patch)" : ocF(x["d" + i])[3]) : ""}</div>`;
@@ -4593,12 +4603,16 @@ gaCards.reversal = () => { const W2 = wts(); const neo = Math.min(0.05*W2.ibw, 5
   <li>Severe kidney impairment (CrCl &lt; 30, dialysis): sugammadex not recommended</li></ul>
   ${src("Bridion (sugammadex) product information, Malaysia (NPRA); UK SmPC.")}
   <p class="sub" style="margin-top:var(--s2)">Other doses:</p>${src(GSRC)}</div>`; };
+/* v2.165 step gauge: one cell per score, coloured by zone; the patient's cell raised */
+const stepGauge = (cells, idx, aria, pend) => `<div class="sgw${pend ? " pend" : ""}" role="img" aria-label="${aria}"><div class="sg" style="grid-template-columns:repeat(${cells.length},1fr)">${cells.map(([t, z], i) => `<i class="z-${z}${i === idx ? " on" : ""}">${t}</i>`).join("")}</div></div>`;
 gaCards.ponv = () => { const f = S.apfel || 0, n = [0,1,2,3].filter(i => f & (1<<i)).length;
   const risk = [10,21,39,61,79][n], plan = n<=0 ? "Risk reduction; consider 1 agent" : n<=2 ? "2 agents" : "3–4 agents + risk reduction (consider TIVA)";
   const labels = ["Female","Non-smoker","History of PONV / motion sickness","Post-op opioids"];
   return `<div class="card"><h2>PONV: Apfel score</h2>${gaDraft()}
   <div class="seg">${labels.map((l,i)=>`<button aria-pressed="${!!(f&(1<<i))}" data-apf="${i}">${l}</button>`).join("")}</div>
-  <div class="result"><div class="sub">${n} risk factor${n===1?"":"s"}</div><div class="big">${risk}%</div><div class="sub">Prophylaxis: <b>${plan}</b></div></div>
+  <div class="result"><div class="sub">${n} risk factor${n===1?"":"s"}</div><div class="big">${risk}%</div>
+  ${stepGauge([10,21,39,61,79].map((r, i) => [`${r}%`, i === 0 ? "ok" : i <= 2 ? "mid" : "hi"]), n, `Apfel ${n} factors, risk ${risk}%`)}<div class="sgx" style="grid-template-columns:repeat(5,1fr)">${[0,1,2,3,4].map(i => `<span>${i}</span>`).join("")}</div>
+  <div class="sub">Prophylaxis: <b>${plan}</b></div></div>
   ${f1Draft()}${FT([
     R("Dexamethasone","at induction","4–8 mg",null,"IV"),
     R("Ondansetron","end of surgery","4 mg",null,"IV"),
@@ -6401,6 +6415,7 @@ function vTicks(){
 }
 /* ---------- ABOUT ---------- */
 const CHANGES = [
+  ["2.165","Risk gauges: Apfel (PONV) and STOP-BANG show a row of score steps coloured low → high with the patient's step raised; opioid conversion total shows a bar with lines at 40, 60 and 100 mg/day. Same scores and wording."],
   ["2.164","Regional › Anticoagulant timing as a timeline: for each drug a red bar for how long before the block to stop and a green bar for when to restart, either side of the block line; same times and wording."],
   ["2.163","LA dose calculator: a toxicity gauge — total % of maximum in large type and one bar with each block in its drug colour, amber line at 80%, red line at 100%; maximums and explanations tucked into a collapsible line."],
   ["2.162","Regional › Spinal dose: non-obstetric — height bands with this patient's band highlighted and a syringe showing the range and this patient's dose; additives tucked into a collapsible line. Same doses."],
