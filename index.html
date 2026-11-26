@@ -489,7 +489,7 @@ details.endo summary{cursor:pointer;font-weight:600;font-size:var(--fs-sm)}
 .dchip.r-c{border-bottom:3px solid #f59e0b}.dchip.r-t{border-bottom:3px solid #0891b2}.dchip.r-l{border-bottom:3px solid #16a34a}.dchip.r-s{border-bottom:3px solid #db2777}
 .dchip.on{background:var(--ink);color:var(--card)}.dchip.in{background:var(--gc-soft)}
 .linkish{background:none;border:0;padding:0;color:var(--accent);font-weight:700;font-family:var(--font-mono);cursor:pointer;font-size:inherit}
-.dermlink{display:block;box-sizing:border-box;margin:var(--s2) 0 0;padding:var(--s2) var(--s3);border-radius:var(--r-sm);border:1px solid var(--line);background:var(--card);color:var(--ink);font-weight:600;font-size:var(--fs-sm);text-align:left;cursor:pointer}
+.dermlink{display:inline;margin:0;padding:6px 0;border:0;background:none;color:var(--gc,var(--accent));font:600 var(--fs-sm) var(--font-sans);text-align:left;cursor:pointer;text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:3px}.dermlink:hover{text-decoration-thickness:2px}.dlp{margin:var(--s2) 0}
 .scrow{padding:var(--s2) 0;border-bottom:1px solid var(--line)}
 .sclab{font-size:var(--fs-sm);font-weight:700;margin-bottom:var(--s1)}
 .scopts{display:grid;grid-template-columns:repeat(3,1fr);gap:4px}
@@ -893,7 +893,7 @@ if (window.top !== window.self && /\.github\.io$/.test(location.hostname)) {
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.161.0";
+const APP_VERSION = "2.161.1";
 const APP_DATE = "26 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
@@ -914,8 +914,9 @@ const S = { ettMode:"adult", sex:"F", height:158, ageY:4, ageM:0, wt:3.0,
             touched:{}, sc:{}, abg:{}, fbal:{}, blIn:{}, hbU:"gdl", gz:{}, fastH:6, leLen:"brief", leNote:"", csDec:"", pnNote:"", pnF:{}, pnLay:"mine", pnMP:"", pnNeck:"", pnPonv:"", pnUrg:"", crea:80, hbNow:12, hbLow:8, hbTarget:10, derm:"", abxSp:"general", spOp:"lscs", spHt:155, morWt:60, pw:10, pY:1, pM:0, pHt:75, pBE:-5, aw:70, emTab:"adult", obTab:"labour", pTab:"pre", gaTab:"ind", pmTab:"assess", raTab:"safety", laA:[], laP:[], cSex:"F", cY:40, cM:0, cH:160, cW:60, cD:7, cGA:40, cBW:3, cNick:"", laD:"bupi", laC:"0.5", laMl:15, laBi:"1", age:45, apfel:0, pump:"pcea_cse", topup:"lig", ventSc:"std", vfio:"", txTab:"pre", txck:{}, gaB:40, chW:6, pD:7, bw:3, dermMode:"block", asa:"", met:"", csWho:"patient", csOut:"full", csLen:"brief", csLang:"English", csNote:"", k:4.5, hb:10, todayWt:70, hdH:12 };
 
 function src(text){ return `<div class="src">Source: ${text}</div>`; }
-function protoSrc(){
+function protoSrc(inNotes){
   const past = new Date() > new Date(PROTO.review+"T00:00:00");
+  if (inNotes) return past ? `<div class="sub">⚠ Protocol review date (1 Sep 2026) has passed — check for a newer version.</div>` : "";   // v2.161.1: shown inside Notes
   return src(esc(PROTO.name)+" · review due 1 Sep 2026") +
     (past ? `<div class="warn">⚠ Protocol review date (1 Sep 2026) has passed — check for a newer version.</div>` : "");
 }
@@ -1378,10 +1379,10 @@ const lscsBody = () => {
     <li><i class="sw" style="background:var(--sy-fen)"></i><b>Fentanyl 10 mcg (0.2 mL</b> of 50 mcg/mL)</li></ul>
     <div class="sub"><i class="sw" style="background:var(--sy-bupi)"></i>Total volume: <b>${rng(row[3],row[4])} mL</b></div>
     <div class="warn">Obese / big abdomen (polyhydramnios, twins): <b>REDUCE</b> heavy bupivacaine dose (amount: your judgement).</div>
+    <p class="dlp">${dermLink("T4")}</p>
     <details class="ndet"><summary>Notes</summary><p>Preload unless contraindicated. Left lateral tilt (right side up).</p>
-    <div class="sub">Easier to manage hypotension than an inadequate block.</div></details>
-    ${dermLink("T4")}
-    ${protoSrc()}</div>`;
+    <div class="sub">Easier to manage hypotension than an inadequate block.</div>${protoSrc(true)}</details>
+    ${src(esc(PROTO.name)+" · review due 1 Sep 2026")}</div>`;
 };
 /* ---------- SPINAL: non-obstetric (own home button) ---------- */
 const nonObsCalc = () => {
@@ -6339,6 +6340,7 @@ function vTicks(){
 }
 /* ---------- ABOUT ---------- */
 const CHANGES = [
+  ["2.161.1","LSCS spinal card: protocol review reminder moved into Notes; \"see dermatomes\" links are plain text links everywhere."],
   ["2.161","Obstetric › LSCS › A1 Spinal: dose by height redesigned — height ruler with the four bands (drag or tap to set height) and a syringe showing bupivacaine, morphine and fentanyl layers with the total. Same doses and wording."],
   ["2.160.4","Done ✓ moved up to the patient header, next to the sex switch; always shown, greyed until the patient is entered. The box is shorter."],
   ["2.160.3","Number sizes made consistent: calculated doses 20 px everywhere; volume lines and small dose notes 16 px; adrenaline infusion rates in Anaphylaxis bold. Drop-down lists use the app font and style; single patient fields inside cards no longer stretch across the card on desktop."],
