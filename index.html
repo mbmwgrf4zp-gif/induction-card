@@ -933,6 +933,17 @@ select[data-stc]{font-size:15px;display:block;width:100%;max-width:100%;min-heig
 .mx-ut{color:#15803d;font-weight:700}.mx-ct{color:#b45309;font-weight:700}.mx-at{color:#b91c1c;font-weight:700}
 :root[data-theme="dark"] .mx-u,:root[data-theme="dark"] .mx-ut{color:#4ade80}:root[data-theme="dark"] .mx-c,:root[data-theme="dark"] .mx-ct{color:#fbbf24}:root[data-theme="dark"] .mx-a,:root[data-theme="dark"] .mx-at{color:#f87171}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .mx-u,:root:not([data-theme="light"]) .mx-ut{color:#4ade80}:root:not([data-theme="light"]) .mx-c,:root:not([data-theme="light"]) .mx-ct{color:#fbbf24}:root:not([data-theme="light"]) .mx-a,:root:not([data-theme="light"]) .mx-at{color:#f87171}}
+/* v2.169 patient bar: one line + weight scale */
+.ptwrap{position:relative}
+details.ptx{display:block;padding:10px 46px 10px 14px}details.ptx>summary{list-style:none;display:flex;align-items:center;gap:8px;flex-wrap:wrap;cursor:pointer}details.ptx>summary::-webkit-details-marker{display:none}
+details.ptx .pbm{font-size:18px}.pbbmi{background:color-mix(in srgb,var(--gc,var(--accent)) 14%,var(--card));color:var(--gc,var(--accent));font-weight:700;border-radius:8px;padding:2px 8px;font-size:14px;white-space:nowrap}
+.pbcar{display:inline-block;width:0;height:0;margin-left:4px;vertical-align:2px;border-left:5px solid transparent;border-right:5px solid transparent;border-top:6px solid currentColor;transition:transform .2s}details.ptx[open] .pbcar{transform:rotate(180deg)}
+.pbedit{position:absolute;top:8px;right:8px;width:36px;height:36px;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--muted);font-size:16px;cursor:pointer}
+details.ptx .pbs{margin-top:2px}
+.pscale{position:relative;height:84px;margin:14px 4px 0}.pscale .bar{position:absolute;left:0;right:0;top:32px;height:8px;border-radius:4px;background:linear-gradient(90deg,var(--line),color-mix(in srgb,var(--gc,var(--accent)) 30%,var(--card)))}
+.pscale i{position:absolute;top:26px;width:2px;height:20px;background:var(--ink);transform:translateX(-50%)}.pscale i.t{background:var(--gc,var(--accent));width:3px;height:26px;top:23px}
+.pscale em{position:absolute;font-style:normal;font-size:13px;font-weight:700;transform:translateX(-50%);white-space:nowrap;font-variant-numeric:tabular-nums}
+.pscale em.u.l0{top:8px}.pscale em.u.l1{top:-8px}.pscale em.d.l0{top:48px;color:var(--muted);font-weight:600}.pscale em.d.l1{top:62px;color:var(--muted);font-weight:600}.pscale em.t{color:var(--gc,var(--accent))}
 </style>
 </head>
 <body>
@@ -947,7 +958,7 @@ if (window.top !== window.self && /\.github\.io$/.test(location.hostname)) {
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.168.2";
+const APP_VERSION = "2.169.0";
 const APP_DATE = "26 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
@@ -6481,6 +6492,7 @@ function vTicks(){
 }
 /* ---------- ABOUT ---------- */
 const CHANGES = [
+  ["2.169","Patient bar: one line (sex · age · height · weight) with a BMI badge; tap it to open a weight scale showing LBW, IBW, AdjBW and actual weight on one bar; ✎ to edit."],
   ["2.168","General › Intra-op › 7. Intra-op analgesia: patient factors become a drug × patient matrix (✓ use · ⚠ caution / adjust · ✗ avoid · \"·\" no specific note); tap a column to set the patient, tap a symbol for the reason. Cells taken from the card's existing notes. (checked)"],
   ["2.167","Volatile: MAC by age — small curve of MAC against age (Mapleson) with a dot at the patient's age."],
   ["2.166","Fasting (adult and paeds) as a timeline to induction: green while allowed, hatched while fasting; optional induction time shows the clock time for each. Same times and wording."],
@@ -7436,12 +7448,23 @@ function accordion(c, t, gid, label, tab, id){
   const summ = mm ? `<span class="stepno">${mm[1]}</span><span class="st">${mm[2]}</span>` : `<span class="st">${sum}</span>`;
   return `<details class="card acc" ${isWide()?"":'name="acc"'} data-t="${esc(t)}" data-g="${gid}" data-tab="${tab||""}" data-id="${id||""}"><summary>${summ}${id ? favBtn("c|" + id, bareLabel(label || h.textContent)) : ""}</summary>${cl.innerHTML}${relLinks(gid, tab, id)}</details>`;
 }
+function ptScale(W2){
+  const pts = [["LBW", W2.lbw], ["IBW", W2.ibwRaw], ["AdjBW", W2.adj], ["actual", W2.tbw]].sort((a, b) => a[1] - b[1]);
+  const lo = pts[0][1]*0.94, hi = pts[3][1]*1.03, X = v => 4 + (v - lo)/(hi - lo)*92;
+  let lastX = -99, lvl = 0;
+  const marks = pts.map(([l, v]) => { const x = X(v); lvl = x - lastX < 15 ? 1 - lvl : 0; lastX = x; const act = l === "actual";
+    return `<i class="${act ? "t" : ""}" style="left:${x.toFixed(1)}%"></i><em class="u l${lvl}${act ? " t" : ""}" style="left:${x.toFixed(1)}%">${sig(v)}</em><em class="d l${lvl}" style="left:${x.toFixed(1)}%">${l}</em>`; }).join("");
+  return `<div class="pscale" role="img" aria-label="Weights: ${pts.map(([l, v]) => `${l} ${sig(v)} kg`).join(", ")}"><div class="bar"></div>${marks}</div>`;
+}
 function ptBar(gid, tab, samp){
   const W2 = wts(), n = v => `<span class="n7">${v}</span>`, acx = activeCase(); let t, sub = "";
   if (gid==="paeds" || (gid==="emerg" && tab==="paeds")) { t = AGEM() < 1 ? `${n(sig(S.pw))} kg · day ${n(S.pD)} · ${n(S.gaB)} wk GA` : `${n(sig(S.pw))} kg · ${n(S.pY)} y${S.pM?` ${n(S.pM)} m`:""} · ${n(S.pHt)} cm`;
     sub = AGEM() < 1 ? `${isPreterm()?"preterm · ":""}PMA ${sig(pmaWk())} wk · birth weight ${sig(bwKg())} kg` : isPreterm() && AGEM() < 14 ? `ex-prem ${S.gaB} wk · PMA ${sig(pmaWk())} wk` : ""; }
   else if (gid==="emerg" || (gid==="tx" && tab==="don")) t = `${n(sig(S.aw))} kg`;
-  else { t = `${sxi(S.sex)} ${n(S.height)} cm · ${n(sig(S.aw))} kg · ${n(S.age)} y`; sub = `BMI ${sig(W2.bmi)} · IBW/PBW ${sig(W2.ibwRaw)} · LBW ${sig(W2.lbw)} · AdjBW ${sig(W2.adj)} kg`; if (gid==="tx") sub += ` · K⁺ ${S.k} · Hb ${S.hb}`; }
+  else {   // v2.169: one line + BMI badge; tap opens the weight scale (LBW · IBW/PBW · AdjBW · actual)
+    const line = `${sxi(S.sex)} ${n(S.age)} y · ${n(S.height)} cm · ${n(sig(S.aw))} kg`;
+    return `<div class="ptwrap"><details class="ptbar ptx"${S.ptOpen ? " open" : ""}><summary>${acx ? `<span class="pbc">${caseName(acx)}</span>` : ""}<span class="pbm">${samp ? `<span class="pbsamp">Sample</span> ` : ""}${line}</span><span class="pbbmi">BMI ${sig(W2.bmi)} <span class="pbcar" aria-hidden="true"></span></span></summary>
+      ${ptScale(W2)}<div class="pbs">All weights in kg · IBW = PBW${gid==="tx" ? ` · K⁺ ${S.k} · Hb ${S.hb}` : ""}</div></details><button class="pbedit" data-ptedit="1" aria-label="Edit patient">✎</button></div>`; }
   return `<button class="ptbar" data-ptedit="1"><span>${acx ? `<span class="pbc">${caseName(acx)}</span>` : ""}<span class="pbm">${samp ? `<span class="pbsamp">Sample</span> ` : ""}${t}</span>${sub ? `<span class="pbs">${sub}</span>` : ""}</span><span class="sub">edit ✎</span></button>`;
 }
 const isHead = it => typeof it==="string" && it[0]==="§";
@@ -7660,6 +7683,7 @@ document.addEventListener("change", e => { const t = e.target; if (!t.dataset ||
 document.addEventListener("click", e => { const t = e.target.closest && e.target.closest("[data-indtclr]"); if (!t) return; S.indT = ""; render(); });
 document.addEventListener("change", e => { const t = e.target; if (t.tagName !== "SELECT" || !t.dataset.stc) return; (S.stc = S.stc || {}).d = t.value; const r = document.getElementById("stcres"); if (r){ r.innerHTML = stcRes(); seg1(r); } });
 document.addEventListener("click", e => { const t = e.target.closest && e.target.closest("[data-ocreset]"); if (!t) return; S.oc = {}; render(); });
+document.addEventListener("toggle", e => { const d = e.target; if (d.matches && d.matches("details.ptx")) S.ptOpen = d.open; }, true);
 document.addEventListener("click", e => { const t = e.target.closest && e.target.closest("[data-mx]"); if (!t) return; S.mxSel = S.mxSel === t.dataset.mx ? "" : t.dataset.mx; render(); });
 document.addEventListener("click", e => { const t = e.target.closest && e.target.closest("[data-tvb]"); if (!t) return; const [k, v] = t.getAttribute("data-tvb").split(":"); tvS()[k] = v; render(); });
 document.addEventListener("click", e => { const t = e.target.closest && e.target.closest("[data-dl]"); if (!t) return; S.dermAnim = {prev: dermState().top}; S.derm = t.getAttribute("data-dl"); render(); });
