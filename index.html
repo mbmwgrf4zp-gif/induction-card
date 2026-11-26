@@ -188,6 +188,7 @@ header h1{font-size:var(--fs-lg);font-weight:700;margin:0;flex:1;display:flex;al
 .emtabs.six{flex-wrap:wrap}@media (min-width:700px){.emtabs.six{flex-wrap:nowrap}.emtabs.five.six button{flex:1 1 0}}.emtabs.five.six button{flex:1 1 30%;font-size:var(--fs-sm);padding:0 var(--s1)}.acchead{margin:var(--s4) 2px var(--s1)}.rellink{display:block;width:calc(100% - 2*var(--s4));box-sizing:border-box;text-align:left;margin-top:var(--s3);padding:var(--s2) var(--s3);border:1px dashed var(--line);border-radius:var(--r-sm);background:none;color:var(--muted);font:inherit;font-size:var(--fs-sm);font-weight:600;cursor:pointer}.emtabs.five{gap:4px}.emtabs.five button{font-size:var(--fs-xs);padding:0 2px;letter-spacing:-.01em}
 /* patient tiles: number in the 7-segment font of the home monitor, section colour */
 .pthead{display:flex;justify-content:space-between;align-items:center;gap:var(--s2);margin-bottom:var(--s2)}
+.pthead .segmini{margin-left:auto}.ptdone{flex:none;height:36px;padding:0 12px;border:1.5px solid var(--gc,var(--accent));color:var(--gc,var(--accent));background:var(--card);border-radius:10px;font:700 var(--fs-sm) var(--font-sans);cursor:pointer;white-space:nowrap}.ptdone:disabled{border-color:var(--line);color:var(--muted);opacity:.55;cursor:default}
 .pthead .t{font-size:var(--fs-xs);font-weight:700;color:var(--muted);letter-spacing:.06em;text-transform:uppercase}
 .segmini{display:inline-grid;grid-template-columns:1fr 1fr;border:1px solid var(--line);border-radius:10px;overflow:hidden}
 .segmini button{border:0;background:var(--card);color:var(--muted);width:44px;height:36px;padding:0;display:grid;place-items:center;cursor:pointer}
@@ -841,6 +842,8 @@ select[data-stc]{font-size:15px;display:block;width:100%;max-width:100%;min-heig
   .gwrap.noside .gmain{max-width:980px}
   .sidenav .gside.innav{order:0;position:static;margin:var(--s3) 0 0;display:grid;gap:var(--s2)}
   .gside.innav .card{margin:0;padding:var(--s3)}
+  .gside.innav .ptdone{padding:0 10px}.gside.innav .ptdone .lbl{display:none}
+  .gside.innav .pthead{gap:6px}
   .gside.innav .ptiles{grid-template-columns:1fr;gap:4px}
   .gside.innav .ptile{flex-direction:row;flex-wrap:wrap;justify-content:space-between;align-items:center;padding:4px 10px;border-radius:10px}
   .gside.innav .ptile small{font-size:11px}
@@ -867,7 +870,7 @@ if (window.top !== window.self && /\.github\.io$/.test(location.hostname)) {
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.160.3";
+const APP_VERSION = "2.160.4";
 const APP_DATE = "26 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
@@ -2853,6 +2856,14 @@ function ptile(key, label, unit, min, max, stp){
     <div class="pm"><button aria-label="${label} down" data-step="${key}" data-d="${-stp}" data-min="${min}" data-max="${max}">−</button><button aria-label="${label} up" data-step="${key}" data-d="${stp}" data-min="${min}" data-max="${max}">+</button></div></div>`;
 }
 const ptiles = list => `<div class="ptiles">${list.join("")}</div>${list.some(t => t.includes('class="ptile sample"')) ? `<div class="smpnote"></div>` : ""}`;
+/* v2.160.4: Done sits in the patient header (always shown; greyed until the patient is entered) */
+function withDone(html, on){
+  const btn = `<button class="ptdone" data-ptdone="1" aria-label="Done" ${on ? "" : `disabled title="Enter the patient first"`}><span class="lbl">Done </span>✓</button>`;
+  const i = html.indexOf('<div class="pthead"'); if (i < 0) return btn + html;
+  let d = 0, j = i; const re = /<\/?div\b[^>]*>/g; re.lastIndex = i; let m;
+  while ((m = re.exec(html))){ d += m[0][1] === "/" ? -1 : 1; if (d === 0){ j = m.index; break; } }
+  return html.slice(0, j) + btn + html.slice(j);
+}
 const sexMini = (title="Patient") => `<div class="pthead"><span class="t">${title}</span><div class="segmini ${isSample("sex")?"sample":""}" role="group" aria-label="Sex">${[["F","Female"],["M","Male"]].map(([v,l])=>`<button data-seg="sex" data-val="${v}" aria-label="${l}" title="${l}" aria-pressed="${!isSample("sex") && S.sex===v}">${sxi(v)}</button>`).join("")}</div></div>`;
 const dLine = W2 => `<div class="dline"><span>BMI <b>${sig(W2.bmi)}</b></span><i class="sep"> · </i><span>IBW/PBW <b>${sig(W2.ibwRaw)}</b></span><i class="sep"> · </i><span>LBW <b>${sig(W2.lbw)}</b></span><i class="sep"> · </i><span>AdjBW <b>${sig(W2.adj)}</b> kg</span></div>`;
 const awStep = () => S.aw < 40 ? 0.5 : 1;
@@ -6284,6 +6295,7 @@ function vTicks(){
 }
 /* ---------- ABOUT ---------- */
 const CHANGES = [
+  ["2.160.4","Done ✓ moved up to the patient header, next to the sex switch; always shown, greyed until the patient is entered. The box is shorter."],
   ["2.160.3","Number sizes made consistent: calculated doses 20 px everywhere; volume lines and small dose notes 16 px; adrenaline infusion rates in Anaphylaxis bold. Drop-down lists use the app font and style; single patient fields inside cards no longer stretch across the card on desktop."],
   ["2.160.2","Result numbers now bold as intended."],
   ["2.160.1","Easier-to-read numbers: patient fields, the patient summary bar and the big result numbers in cards now use the normal font in bold (same-width digits). Home monitor tiles, quick answers, clock and timer keep the monitor style."],
@@ -7259,7 +7271,7 @@ function groupScreen(g){
     const links = (tab.links||[]).map(([t,tb,label])=>`<button class="emlink" data-open="${esc(t)}" data-g="emerg" data-tab="${tb}">⚠ ${esc(label)} ›</button>`).join("");
     const keys = SAMPLE_BY[g.id] ? (SAMPLE_BY[g.id][tab.id] || SAMPLE_BY[g.id]["*"] || []) : [];
     const filled = !!tab.input && keys.length > 0 && !keys.some(isSample), slim = filled && !S.ptEditing;
-    const side = ab + (tab.input ? (fw ? (S.ptEditing ? `<div class="card">${tab.input()}<button class="linkbtn" data-ptdone="1">Done ✓</button></div>` : ptBar(g.id, tab.id, !filled)) : slim ? ptBar(g.id, tab.id) : `<div class="card">${tab.input()}${filled?`<button class="linkbtn" data-ptdone="1">Done ✓</button>`:""}</div>`) : "") + printBtn(g.id, tab.id);
+    const side = ab + (tab.input ? (fw ? (S.ptEditing ? `<div class="card">${withDone(tab.input(), true)}</div>` : ptBar(g.id, tab.id, !filled)) : slim ? ptBar(g.id, tab.id) : `<div class="card">${withDone(tab.input(), filled)}</div>`) : "") + printBtn(g.id, tab.id);
     const see = (tab.see||[]).map(([id, lab]) => shortcut(id, lab, g.id, tab.id, tab.seeLabel)).join("");
     const neo = g.id==="paeds" && AGEM() < 1 ? NEO_JUMPS.map(([id, lab]) => shortcut(id, lab, g.id, tab.id)).join("") + `<button class="chip seechip" data-cat-open="paeds:cases:Neonate &amp; infant">Neonatal scenarios<small>Clinical Scenarios</small></button>` : "";
     const seeRow = see ? `<div class="seerow${g.id==="emerg"?" seeafter":""}"><span class="sub">${esc(tab.seeLabel || "Also here")}</span>${see}</div>` : "";
