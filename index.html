@@ -800,7 +800,9 @@ details.bfb[open]>summary{margin-bottom:4px}details.bfb .bfo{margin-top:4px}deta
 .tres{border:1px solid var(--line);border-radius:var(--r-sm);padding:var(--s3);display:grid;gap:8px;margin:var(--s2) 0}.trow{display:grid;grid-template-columns:96px 1fr;gap:8px}.trow small{color:var(--muted)}.t-yes b{color:var(--ok-ink,#166534)}.t-consider b{color:var(--warn-ink,#92400e)}.t-no{color:var(--muted)}.tbtns{display:flex;gap:8px;flex-wrap:wrap}
 .nagsearch{margin:var(--s2) 0}.nagtabs{display:flex;gap:4px;overflow-x:auto;white-space:nowrap;border-bottom:1px solid var(--line);margin:0 calc(-1*var(--s4)) var(--s2);padding:0 var(--s4);scrollbar-width:none}.nagtabs::-webkit-scrollbar{display:none}
 .nagtabs button{flex:0 0 auto;background:none;border:0;border-bottom:3px solid transparent;padding:10px 10px 8px;font-size:15px;color:var(--muted);min-height:44px}.nagtabs button.nagx{color:var(--ink)}.nagtabs button[aria-selected="true"]{color:var(--gc);border-bottom-color:var(--gc);font-weight:700}
-.naglist{display:grid;border:1px solid var(--line);border-radius:var(--r-sm);overflow:hidden}.nagrow+.nagrow{border-top:1px solid var(--line)}
+.naglist{display:grid;border:1px solid var(--line);border-radius:var(--r-sm);overflow:hidden}.nagrow+.nagrow{border-top:1px solid var(--line)}.nagrt2{display:flex;align-items:stretch}.nagrt2 .nagrh{flex:1;min-width:0}.nagrt2 .favbtn{order:2;background:var(--card)}.nagrow.open .nagrt2 .favbtn{background:var(--gc-soft)}
+.favbtn{flex:0 0 auto;min-width:44px;min-height:44px;border:0;background:none;color:var(--muted);font-size:22px;line-height:1;padding:0 8px;cursor:pointer}.favbtn[aria-pressed="true"]{color:#e0a100}summary .favbtn{margin-left:auto}
+.favs{padding:0 var(--s4) var(--s5)}.favrow{display:flex;align-items:stretch;gap:6px;margin:6px 0}.favgo{flex:1;display:flex;flex-direction:column;align-items:flex-start;gap:2px;min-height:52px;padding:10px 14px;border:1px solid var(--line);border-radius:var(--r-sm);background:var(--card);color:var(--ink);font:inherit;font-weight:600;text-align:left}.favgo small{font-weight:400;color:var(--muted);font-size:13px}.favx{min-width:44px;border:1px solid var(--line);border-radius:var(--r-sm);background:var(--card);color:var(--muted);font-size:16px}
 .nagpage{padding:var(--s2) var(--s3)}.nagpage ul{margin-top:0}.nagpage table{margin-left:calc(-1*var(--s3));width:calc(100% + 2*var(--s3))}
 .nagrh{display:grid;grid-template-columns:minmax(0,1fr) auto auto;align-items:center;gap:8px;width:100%;min-height:52px;padding:8px 12px;background:var(--card);border:0;text-align:left;color:var(--ink);font:inherit}
 .nagrn{font-weight:600;font-size:15px}.nagrn small{font-weight:400;color:var(--muted)}.nagsum{font-size:13px;color:var(--muted);max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.nagnone{font-size:13px;font-weight:700;color:var(--ok-ink,#166534);background:var(--ok-bg,#dcfce7);border-radius:6px;padding:2px 8px}.nagch{color:var(--muted)}
@@ -825,7 +827,7 @@ if (window.top !== window.self && /\.github\.io$/.test(location.hostname)) {
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.148.1";
+const APP_VERSION = "2.149.1";
 const APP_DATE = "25 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
@@ -903,6 +905,24 @@ function head(title, back, icon){
 }
 
 const screens = {};
+// v2.149 favourites: whole cards (by id) and antibiotic procedures; kept on this phone
+const favList = () => { const f = store.get("fav", []); return Array.isArray(f) ? f : []; };
+const favKey = x => x.k === "c" ? "c|" + x.id : `p|${x.w}|${x.i}:${x.j}`;
+const isFav = key => favList().some(x => favKey(x) === key);
+function favToggle(key){ let f = favList(); if (f.some(x => favKey(x) === key)) f = f.filter(x => favKey(x) !== key);
+  else { const a = key.split("|"); f.push(a[0] === "c" ? {k: "c", id: a[1]} : {k: "p", w: a[1], i: +a[2].split(":")[0], j: +a[2].split(":")[1]}); }
+  store.set("fav", f); return f.some(x => favKey(x) === key); }
+const favBtn = (key, lab) => `<button class="favbtn" data-fav="${esc(key)}" aria-pressed="${isFav(key)}" aria-label="${isFav(key) ? "Remove from" : "Add to"} favourites${lab ? ": " + esc(lab) : ""}">${isFav(key) ? "★" : "☆"}</button>`;
+screens.fav = () => { const f = favList(), GN = id => (GROUPS.find(g => g.id === id) || {}).name || id;
+  const rows = f.map((x, n) => { let b = "", g = "";
+    if (x.k === "c"){ const e = findEntry(x.id); if (!e) return ""; g = e.g; const og = GROUPS.find(y => y.id === e.g), tl = og && og.tabs ? (og.tabs.find(t => t.id === e.tab) || {}).label : "";
+      b = `<button class="favgo" data-id="${e.id}" data-open="${esc(e.label)}" data-g="${e.g}" data-tab="${e.tab || ""}"><span>${esc(bareLabel(e.label))}</span><small>${tl || ""}</small></button>`; }
+    else { const D = x.w === "p" ? NAGP : NAG, sp = D[x.i], r = sp && sp[1][x.j]; if (!r) return ""; g = x.w === "p" ? "paeds" : "ga";
+      b = `<button class="favgo" data-favp="${x.w}|${x.i}:${x.j}"><span>${r[0]}</span><small>${x.w === "p" ? "Paeds antibiotic" : "Antibiotic"} · ${sp[0]}</small></button>`; }
+    return {g, h: `<div class="favrow">${b}<button class="favx" data-unfav="${esc(favKey(x))}" aria-label="Remove">✕</button></div>`}; }).filter(Boolean);
+  const groups = [...new Set(rows.map(r => r.g))];
+  return head("Favourites", "home") + `<main class="favs">${rows.length ? groups.map(g => `<div class="label">${GN(g)}</div>${rows.filter(r => r.g === g).map(r => r.h).join("")}`).join("")
+    : `<p class="sub">Tap ☆ on any card or antibiotic procedure to add it here.</p>`}</main>`; };
 
 const tile = (cls, icon, title, sub, attrs) => `<button class="tile ${cls}" ${attrs}><span class="ico">${svg(icon)}</span><span class="txt"><span class="tt">${title}</span><span class="ts">${sub}</span></span><span class="chev">›</span></button>`;
 const DOCTOR = "Dr X";
@@ -1207,7 +1227,7 @@ screens.home = () => {
   return `<section class="hero"><div class="hero-in">
     <svg class="capno" viewBox="0 0 400 48" preserveAspectRatio="none" aria-hidden="true"><g class="trace"><path d="${CAPNO}"/></g></svg>
     <div class="hero-top"><span class="brand">${svg("capno")} Induction Card</span>
-      <span class="hero-r"><button class="iconbtn herobtn gearbtn" data-go="settings" aria-label="Customise">${svg("sliders")}</button>${custBubble()}<button class="iconbtn themebtn herobtn" data-theme-toggle aria-label="Theme: ${th}">${thLabel}</button></span></div>
+      <span class="hero-r"><button class="iconbtn herobtn gearbtn" data-go="settings" aria-label="Customise">${svg("sliders")}</button>${custBubble()}<button class="iconbtn themebtn herobtn" data-theme-toggle aria-label="Theme: ${th}">${thLabel}</button><button class="iconbtn herobtn favhome" data-go="fav" aria-label="Favourites">★</button></span></div>
     <div class="hero-mid"><div class="hgreet"><h1 class="hello">${greet()},<br>${(() => { const w = esc(doctorName()).split(" "), last = w.pop(); return `${w.join(" ")}${w.length ? " " : ""}<span class="nobr">${last}&nbsp;<button class="namebtn" data-go="settings" aria-label="Change display name">✎</button></span>`; })()}</h1>${!customName() && tvDoc()[1] ? `<div class="tvdoc"><i>${esc(tvDoc()[1])}</i></div>` : ""}
     <div class="date">${dateTxt()}</div></div>${(() => { const m = tmrMain(tmrState()); return `<button class="tmrbtn" data-tmr="toggle" aria-label="Anaesthesia timer" aria-expanded="${!!S.tmrOpen}"><small id="tmrl">${m.lab}</small><span id="tmrv" class="clock">${m.txt}</span></button>`; })()}</div></div>
     ${ticker()}
@@ -4844,7 +4864,7 @@ function nagList(paeds){ const D = paeds ? NAGP : NAG, key = paeds ? "nagp" : "n
   if (!rows.length) return `<p class="sub">No procedure matches "${esc(q)}".</p>`;
   return rows.map(([i, j, r, spn]) => { const [n, ex, pr, al, ag, cm] = r, id = `${i}:${j}`, open = S[key + "Open"] === id;
     const short = pr === 0 ? `<span class="nagnone">None</span>` : `<span class="nagsum">${esc(nagShort(pr.join(" · ")).split(" · ")[0])}</span>`;
-    return `<div class="nagrow${open ? " open" : ""}"><button class="nagrh" data-nagrow="${paeds ? "p" : "a"}|${id}" aria-expanded="${open}"><span class="nagrn">${spn ? `<small>${spn} › </small>` : ""}${n}</span>${short}<span class="nagch">${open ? "▴" : "▾"}</span></button>
+    return `<div class="nagrow${open ? " open" : ""}"><div class="nagrt2">${favBtn(`p|${paeds ? "p" : "a"}|${id}`, n)}<button class="nagrh" data-nagrow="${paeds ? "p" : "a"}|${id}" aria-expanded="${open}"><span class="nagrn">${spn ? `<small>${spn} › </small>` : ""}${n}</span>${short}<span class="nagch">${open ? "▴" : "▾"}</span></button></div>
     ${open ? `<div class="nagrb">${ex ? `<p class="sub" style="margin:0 0 var(--s1)">${ex}</p>` : ""}${pr === 0 ? `<div class="result ok"><b>${NO}</b></div>` : `<div class="naghd">Preferred</div><ul>${li(pr)}</ul>`}
       ${al.length ? `<div class="naghd">Alternative</div><ul>${li(al)}</ul>` : ""}${ag.length ? `<div class="naghd">${alLab}</div><ul>${li(ag)}</ul>` : ""}
       ${cm.length ? `<div class="naghd">Comments</div><ul class="sub">${li(cm)}</ul>` : ""}</div>` : ""}</div>`; }).join(""); }
@@ -5781,6 +5801,7 @@ function vTicks(){
 }
 /* ---------- ABOUT ---------- */
 const CHANGES = [
+  ["2.149","Favourites: tap ☆ on any card, or on any antibiotic procedure, then ★ on the home screen opens your list (kept on this phone; Reset all clears it). Antibiotic tabs no longer scroll the chosen tab out of view. (checked)"],
   ["2.148","IV iron calculator: the four IV irons available in Malaysia (iron sucrose, ferric carboxymaltose, ferric derisomaltose, LMW iron dextran — generic and brand) with the maximum per dose for this patient, how many doses the total needs, and how to give each (MOH PBM 2024 Appendix 1). (checked)"],
   ["2.147","More from the MOH Patient Blood Management consensus 2024: Massive obstetric haemorrhage gets product triggers and doses (FFP 15 mL/kg, platelets 1 adult dose, cryo 1 unit/10 kg); Blood management — cryo 1 unit/10 kg and Hb targets for special groups (ACS, TBI, SAH, stroke, sepsis); Paeds transfusion — MOH points; Anticoagulants — MOH agreement noted (aspirin stays 7 days); Optimise or postpone — IV iron (Ganzoni) calculator. (checked)"],
   ["2.146","Blood management now follows the MOH Malaysia Patient Blood Management consensus (March 2024): major haemorrhage definition, MTP / T-MTP pack and targets, blood loss visual guide, red cell and platelet points, adjuncts and reversal; EBV 70 mL/kg. Tranexamic acid: before incision if expected loss > 500 mL. Which tests: ferritin and group, screen & hold for major surgery. Optimise or postpone: anaemia — wait 4 weeks to treat. (checked)"],
@@ -6647,7 +6668,7 @@ function accordion(c, t, gid, label, tab, id){
   cl.querySelectorAll("[data-ctx]").forEach(b => ctxLink(b, gid, tab)); markDoses(cl, id);
   const mm = sum.match(/^([A-C]?\d+[a-z]?)\.\s+(.*)$/s);
   const summ = mm ? `<span class="stepno">${mm[1]}</span><span class="st">${mm[2]}</span>` : `<span class="st">${sum}</span>`;
-  return `<details class="card acc" ${isWide()?"":'name="acc"'} data-t="${esc(t)}" data-g="${gid}" data-tab="${tab||""}" data-id="${id||""}"><summary>${summ}</summary>${cl.innerHTML}${relLinks(gid, tab, id)}</details>`;
+  return `<details class="card acc" ${isWide()?"":'name="acc"'} data-t="${esc(t)}" data-g="${gid}" data-tab="${tab||""}" data-id="${id||""}"><summary>${summ}${id ? favBtn("c|" + id, bareLabel(label || h.textContent)) : ""}</summary>${cl.innerHTML}${relLinks(gid, tab, id)}</details>`;
 }
 function ptBar(gid, tab, samp){
   const W2 = wts(), n = v => `<span class="n7">${v}</span>`, acx = activeCase(); let t, sub = "";
@@ -6779,7 +6800,7 @@ function renderNow(){
   S.scrollTo = false;
   if (S.srchFocus){ S.srchFocus = false; const q = app.querySelector("#q"); if (q) q.focus(); }
   if (app.querySelector("#bfstage")) BF.mount();
-  app.querySelectorAll('.nagtabs [aria-selected="true"]').forEach(t => { const r = t.parentElement; r.scrollLeft = t.offsetLeft - (r.clientWidth - t.offsetWidth)/2; });   // keep the chosen specialty tab in view
+  app.querySelectorAll('.nagtabs [aria-selected="true"]').forEach(t => { const r = t.parentElement, rr = r.getBoundingClientRect(), tr = t.getBoundingClientRect(); if (tr.left < rr.left || tr.right > rr.right) r.scrollLeft += (tr.left - rr.left) - (rr.width - tr.width)/2; });   // v2.149: scroll only if the chosen tab is off-screen   // keep the chosen specialty tab in view
   if (S.faqOpen != null && location.hash === "#about"){ const el = document.getElementById("faq-" + S.faqOpen); if (el) requestAnimationFrame(() => el.scrollIntoView({block: "center"})); S.faqOpen = null; }
   if (S.dermAnim){ const a = S.dermAnim; S.dermAnim = null; requestAnimationFrame(() => { dermAnimate(a); BF.dermRise(a.prev); }); }
   if (active){ const el = app.querySelector(`[data-in="${active}"]`); if (el){ el.focus(); const v=el.value; el.value=""; el.value=v; } }
@@ -6824,6 +6845,7 @@ function collapseAcc(d){
 }
 document.addEventListener("click", e => {
   const sm = e.target.closest && e.target.closest("details.acc > summary"); if (!sm) return;
+  if (e.target.closest(".favbtn")){ e.preventDefault(); return; }   // the star in the header must not open or close the card
   const d = sm.parentElement; if (reduceMotion() || d.dataset.g === "emerg") return;   // emergencies: instant
   e.preventDefault(); if (d._anim) return;
   if (d.open) collapseAcc(d); else expandAcc(d);
@@ -6866,6 +6888,11 @@ function clamp(v,min,max){ return Math.min(max, Math.max(min, v)); }
 document.addEventListener("click", e => {
   const b = e.target.closest("button, input[type=checkbox]"); if (!b) return;
   const d = b.dataset;
+  if (d.fav){ e.preventDefault(); e.stopPropagation(); const on = favToggle(d.fav); b.textContent = on ? "★" : "☆"; b.setAttribute("aria-pressed", on); b.setAttribute("aria-label", (on ? "Remove from" : "Add to") + " favourites"); return; }
+  if (d.unfav){ favToggle(d.unfav); render(); return; }
+  if (d.favp){ const [w, ij] = d.favp.split("|"), [i, j] = ij.split(":").map(Number), k = w === "p" ? "nagp" : "nag", e2 = findEntry(w === "p" ? "paeds-intra-antibiotic-prophylaxis" : "ga-intra-antibiotic-prophylaxis");
+    S[k + "Sp"] = i; S[k + "Q"] = ""; S[k + "Open"] = `${i}:${j}`; if (!e2) return; S.open = e2.label; const og = GROUPS.find(x => x.id === e2.g); if (og && og.tabs) S[og.tabKey] = e2.tab; S.scrollTo = true; S.srch = false;
+    if (location.hash === "#g-" + e2.g) render(); else location.hash = "#g-" + e2.g; return; }
   if (d.seg==="leLen") store.set("consLast","le");
   if (d.seg==="csMode"){ store.set("consLast", d.val==="le" ? "le" : "cs"); }
   if (d.csmode){ S.csMode = d.csmode; store.set("consLast", d.csmode==="le" ? "le" : "cs"); }
@@ -6913,7 +6940,7 @@ document.addEventListener("click", e => {
     S.tmrArm = null; tmrSave(t); tmrWake(); render(); return; }
   if (d.themeset){ store.set("theme", d.themeset); applyTheme(); render(); return; }
   if (d.resetall){ if (d.resetall === "1"){ S.resetArm = true; render(); return; } if (d.resetall === "0"){ S.resetArm = false; render(); return; }
-    ["quick","tiles","lcd","theme","quotes","bf3d","doctor","timerShow","abxMin","wake"].forEach(k => { try { localStorage.removeItem("ic." + k); } catch (e) {} }); S.resetArm = false; S.quotesSet = undefined; applyTheme(); applyLcd(); render(); return; }
+    ["quick","tiles","lcd","theme","quotes","bf3d","doctor","timerShow","abxMin","wake","fav"].forEach(k => { try { localStorage.removeItem("ic." + k); } catch (e) {} }); S.resetArm = false; S.quotesSet = undefined; applyTheme(); applyLcd(); render(); return; }
   if (d.faq !== undefined){ S.faqOpen = +d.faq; if (location.hash === "#about") render(); else location.hash = "#about"; return; }
   if (d.insttab){ S.instTab = d.insttab; render(); return; }
   if (d.install){ if (BIP){ BIP.prompt(); BIP.userChoice.finally(() => { BIP = null; render(); }); } return; }
