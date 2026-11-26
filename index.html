@@ -914,6 +914,7 @@ select[data-stc]{font-size:15px;display:block;width:100%;max-width:100%;min-heig
 .fti{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:2px 0 8px;font-size:14px}.fti label{display:flex;align-items:center;gap:8px;font-weight:600}
 .fti input{font:700 16px var(--font-sans);padding:6px 8px;border:1px solid var(--line);border-radius:8px;background:var(--field);color:var(--ink);min-height:38px}
 .ftax{position:relative;display:flex;justify-content:space-between;font-size:13px;color:var(--muted);margin-bottom:2px}.ftax b{color:var(--ink);font-size:13px}
+.macc{display:block;width:100%;max-width:440px;height:auto;margin:4px 0 8px}
 .ftr{padding:7px 0;border-top:1px solid var(--line)}.ftn{font-size:15px;font-weight:600}
 .ftb{display:flex;height:12px;border-radius:6px;overflow:hidden;margin:5px 0 3px;border-right:3px solid var(--ink)}
 .ftok{background:var(--g-paeds,#16a34a);opacity:.75}.ftno{background:repeating-linear-gradient(135deg,var(--line) 0 5px,color-mix(in srgb,var(--muted) 35%,var(--card)) 5px 10px)}
@@ -932,7 +933,7 @@ if (window.top !== window.self && /\.github\.io$/.test(location.hostname)) {
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.166.0";
+const APP_VERSION = "2.167.0";
 const APP_DATE = "26 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
@@ -4387,9 +4388,21 @@ gaCards.tiva = () => { const tab = tvGet("tab", "tci");
   <li><b>Switching from volatile to TIVA:</b> raise the propofol target as end-tidal volatile falls; start processed EEG before the switch if a relaxant was given.</li>
   <li><b>Low BP, slow wake-up:</b> see the linked cards.</li></ul>${gLinkId("ga-intra-vasopressors-and-inotropes", "Vasopressors & inotropes")}${gLinkId("ga-post-reversal", "Reversal")}${gLinkId("ga-post-extubation-criteria", "Extubation criteria")}</details>
   ${src("Association of Anaesthetists / SIVA TIVA guidelines (Nimmo et al. Anaesthesia 2019); monitoring standards (Klein et al. Anaesthesia 2021); Eleveld et al. BJA 2018 (propofol), Anesthesiology 2017 (remifentanil).")}</div>`; };
+const macCurve = (age) => {   // v2.167: MAC relative to age 40 (Mapleson), 20–90 y, with the patient's dot
+  const W = 300, H = 100, X = a => 34 + (a - 20)/70*(W - 44), Y = r => 10 + (1.15 - r)/0.4*(H - 50), r = a => Math.pow(10, -0.00269*(a - 40));
+  const pts = []; for (let a = 20; a <= 90; a += 2) pts.push(`${X(a).toFixed(1)},${Y(r(a)).toFixed(1)}`);
+  const ag = Math.max(20, Math.min(90, age)), px = X(ag), py = Y(r(ag));
+  return `<svg class="macc" viewBox="0 0 ${W} ${H}" role="img" aria-label="MAC falls with age; at ${age} y it is ${Math.round(r(age)*100)}% of the value at 40">
+    ${[1.1,1.0,0.9,0.8].map(v => `<line x1="34" x2="${W - 10}" y1="${Y(v)}" y2="${Y(v)}" stroke="var(--line)"/><text x="30" y="${Y(v) + 4}" text-anchor="end" font-size="11" fill="var(--muted)">${Math.round(v*100)}%</text>`).join("")}
+    ${[20,40,60,80].map(a => `<text x="${X(a)}" y="${H - 4}" text-anchor="middle" font-size="11" fill="var(--muted)">${a} y</text>`).join("")}
+    <polyline points="${pts.join(" ")}" fill="none" stroke="var(--gc,var(--accent))" stroke-width="2.5"/>
+    <line x1="${px}" x2="${px}" y1="${py}" y2="${H - 38}" stroke="var(--gc,var(--accent))" stroke-dasharray="3 2"/>
+    <circle cx="${px}" cy="${py}" r="6" fill="var(--gc,var(--accent))" stroke="var(--card)" stroke-width="2"/>
+    <text x="${W - 10}" y="${H - 22}" text-anchor="end" font-size="12" font-weight="700" fill="var(--ink)">${Math.round(r(age)*100)}% of age-40 MAC at ${age} y</text></svg>`;
+};
 gaCards.mac = () => { const a = S.age, f = Math.pow(10, -0.00269*(a-40));
   const r = (m40) => sig(m40*f);
-  return `<div class="card"><h2>6. Volatile: MAC by age</h2><p class="sub">Age ${a} y (set in the patient box)</p>${gaDraft()}
+  return `<div class="card"><h2>6. Volatile: MAC by age</h2><p class="sub">Age ${a} y (set in the patient box)</p>${gaDraft()}${macCurve(a)}
   <table><tr><th>Agent</th><th>MAC at 40 y</th><th>MAC at ${a} y</th></tr>
   <tr><td>Sevoflurane</td><td>2.1%</td><td class="hl">${r(2.1)}%</td></tr>
   <tr><td>Isoflurane</td><td>1.17%</td><td class="hl">${r(1.17)}%</td></tr>
@@ -6426,6 +6439,7 @@ function vTicks(){
 }
 /* ---------- ABOUT ---------- */
 const CHANGES = [
+  ["2.167","Volatile: MAC by age — small curve of MAC against age (Mapleson) with a dot at the patient's age."],
   ["2.166","Fasting (adult and paeds) as a timeline to induction: green while allowed, hatched while fasting; optional induction time shows the clock time for each. Same times and wording."],
   ["2.165","Risk gauges: Apfel (PONV) and STOP-BANG show a row of score steps coloured low → high with the patient's step raised; opioid conversion total shows a bar with lines at 40, 60 and 100 mg/day. Same scores and wording."],
   ["2.164","Regional › Anticoagulant timing as a timeline: for each drug a red bar for how long before the block to stop and a green bar for when to restart, either side of the block line; same times and wording."],
