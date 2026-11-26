@@ -295,6 +295,7 @@ details.acc[open]{padding-bottom:var(--s3)}
 ol.crisis{padding-left:26px;margin:var(--s2) 0}
 ol.crisis li{margin:var(--s2) 0;font-size:var(--fs-md);line-height:1.45;padding-left:2px}
 ol.crisis li::marker{font-weight:800;color:var(--g-emerg)}
+ol.crisis.qrh{list-style:none;padding-left:0}ol.crisis.qrh>li.qs{padding-left:0;border-left:0 !important}ol.crisis.qrh>li.qn{padding-left:12px;border-left:3px solid var(--line)}
 b.dose{font-weight:700;background:var(--gc-soft);padding:0 .28em;border-radius:5px;-webkit-box-decoration-break:clone;box-decoration-break:clone}
 .emlinks{padding:var(--s3) var(--s4)}
 .sx{width:1em;height:1em;vertical-align:-.14em;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;flex:none}
@@ -827,7 +828,7 @@ if (window.top !== window.self && /\.github\.io$/.test(location.hostname)) {
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.153.1";
+const APP_VERSION = "2.153.2";
 const APP_DATE = "25 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
@@ -2395,8 +2396,13 @@ const qrh4Draft = () => QRH4_CHECKED ? "" : `<div class="warn" style="margin-top
 const crisisDraft = () => CRISIS_CHECKED ? "" : `<div class="warn" style="margin-top:0">DRAFT — from published guidelines, not yet ticked by you.</div>`;
 const wk = (w, per, unit, max) => { if (WKS) return "— (enter weight)"; let v = per*w, c = false; if (max!=null && v>max){ v=max; c=true; } return `${dz(v, unit, max)} ${unit}${c?` (max ${max} ${unit})`:""}`; };
 const B = x => `<b class="dose">${x}</b>`;
+// v2.154: QRH cards (steps marked ❶ ❷ …) show the QRH step numbers only — one step per line, other lines unnumbered
+const QSTEP = /[\u2776-\u277F\u24EB-\u24F4]/, QSPLIT = /(?<=[.;:!?)>\u00b7]\s|^)(?=[\u2776-\u277F\u24EB-\u24F4]\s)/;
+const crisisList = steps => { if (!steps.some(x => QSTEP.test(x))) return `<ol class="crisis">${steps.map(s=>`<li>${s}</li>`).join("")}</ol>`;
+  const items = steps.flatMap(x => x.split(QSPLIT).map(y => y.trim()).filter(Boolean));
+  return `<ol class="crisis qrh">${items.map(y => `<li class="${QSTEP.test(y.replace(/^(<[^>]+>)+/, "").slice(0, 2)) ? "qs" : "qn"}">${y}</li>`).join("")}</ol>`; };
 const crisis = (title, steps, srcTxt, extra="", top="") =>
-  `<div class="card"><h2>${title}</h2>${top}${crisisDraft()}${CRISIS_W === null ? "" : WKS ? `<p class="cwt">Enter the weight above to see doses.</p>` : `<p class="cwt">Doses for <b>${sig(CRISIS_W)} kg</b></p>`}<ol class="crisis">${steps.map(s=>`<li>${s}</li>`).join("")}</ol>${extra}${src(srcTxt)}</div>`;
+  `<div class="card"><h2>${title}</h2>${top}${crisisDraft()}${CRISIS_W === null ? "" : WKS ? `<p class="cwt">Enter the weight above to see doses.</p>` : `<p class="cwt">Doses for <b>${sig(CRISIS_W)} kg</b></p>`}${crisisList(steps)}${extra}${src(srcTxt)}</div>`;
 
 const HK_CARD = () => `<div class="card"><h2>Hyperkalaemia</h2>${TX_CHECKED ? "" : `<div class="warn" style="margin-top:0">DRAFT — UK Kidney Association hyperkalaemia guideline, checked against two sources. Not yet ticked by you.</div>`}<ol class="crisis">
   <li>Severity (UKKA): mild 5.5–5.9 · moderate 6.0–6.4 · <b>severe ≥ 6.5</b> mmol/L. Stop K⁺-containing fluids; 12-lead ECG / monitor.</li>
@@ -6013,7 +6019,7 @@ function vTicks(){
 }
 /* ---------- ABOUT ---------- */
 const CHANGES = [
-  ["2.153","Emergencies › Adult re-checked against the QRH 2023: Cardiac arrest (theatre-specific steps), Anaphylaxis (CPR if SBP < 50, glucagon, vasopressin, infusion recipe), Bronchospasm (QRH drugs; ketamine 20 mg), Malignant hyperthermia (complications), CICO (impalpable membrane technique), High spinal (metaraminol, wider ephedrine and atropine ranges, reduced induction dose). (checked)"],
+  ["2.153","Emergencies › Adult re-checked against the QRH 2023: Cardiac arrest (theatre-specific steps), Anaphylaxis (CPR if SBP < 50, glucagon, vasopressin, infusion recipe), Bronchospasm (QRH drugs; ketamine 20 mg), Malignant hyperthermia (complications), CICO (impalpable membrane technique), High spinal (metaraminol, wider ephedrine and atropine ranges, reduced induction dose). (checked) QRH cards now show only the QRH step numbers (❶ ❷ …), one step per line."],
   ["2.152","Emergencies › Adult › Theatre & equipment: Patient fire, Mains oxygen failure (with cylinder contents), Mains electricity failure, Emergency evacuation (Association of Anaesthetists QRH 2023; reporting to Malaysia's Medical Device Authority). (checked)"],
   ["2.151","Emergencies › Adult: Laryngospasm & stridor, Massive blood loss (with MOH targets), Circulatory embolus, Cardiac tamponade, Cardiac ischaemia, After cardiac arrest: neuroprotection, Sepsis (Association of Anaesthetists QRH 2023). (checked)"],
   ["2.150","Emergencies › Adult: Key basic plan first, then Common intra-op problems — hypoxia, high airway pressure, hypotension, hypertension, bradycardia, tachycardia, hyperthermia (Association of Anaesthetists QRH 2023), doses per kg for the weight. Bradycardia now has its own card; the arrest card is Cardiac arrest. (checked)"],
