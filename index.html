@@ -827,7 +827,7 @@ if (window.top !== window.self && /\.github\.io$/.test(location.hostname)) {
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.150.1";
+const APP_VERSION = "2.151.1";
 const APP_DATE = "25 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
@@ -2386,6 +2386,8 @@ const lastDraft = () => LAST_CHECKED ? "" : `<div class="warn">DRAFT — updated
 let WKS = false, CRISIS_W = null;   // emergency cards: sample weight → no totals
 const QRH1_CHECKED = true;   // checked by author 26 Nov 2026;   // v2.150 QRH key basic plan + common intra-op problems
 const qrh1Draft = () => QRH1_CHECKED ? "" : `<div class="warn" style="margin-top:0">DRAFT — Association of Anaesthetists QRH (2023), adapted wording (v2.150). Check before use.</div>`;
+const QRH2_CHECKED = true;   // checked by author 26 Nov 2026;   // v2.151 QRH crises
+const qrh2Draft = () => QRH2_CHECKED ? "" : `<div class="warn" style="margin-top:0">DRAFT — Association of Anaesthetists QRH (2023), adapted wording (v2.151). Check before use.</div>`;
 const crisisDraft = () => CRISIS_CHECKED ? "" : `<div class="warn" style="margin-top:0">DRAFT — from published guidelines, not yet ticked by you.</div>`;
 const wk = (w, per, unit, max) => { if (WKS) return "— (enter weight)"; let v = per*w, c = false; if (max!=null && v>max){ v=max; c=true; } return `${dz(v, unit, max)} ${unit}${c?` (max ${max} ${unit})`:""}`; };
 const B = x => `<b class="dose">${x}</b>`;
@@ -2480,6 +2482,68 @@ eCards.adult = () => {
     "❽ Watch for: hyperkalaemia, hypoglycaemia, acidosis · hypotension, malignant hypertension · altered consciousness, seizures · coagulopathy, DIC.",
     "<b>Causes:</b> over-warming (most common) · surgical devices (HIFU, diathermy) · long epidurals · sepsis (urological manipulation) · transfusion · anaphylaxis · drugs: neuroleptic malignant, malignant hyperthermia (late sign), serotonin (cocaine, MDMA, amphetamine), anticholinergic, sympathomimetic · contrast neurotoxicity, alcohol withdrawal · thyrotoxicosis, phaeochromocytoma · meningitis, intracranial blood, hypoxic or traumatic brain injury."],
     "Association of Anaesthetists QRH 2-8 Peri-operative hyperthermia v.1, CC BY-NC-SA 4.0.", "", qrh1Draft())
+  + crisis("Laryngospasm & stridor", [
+    "Usually light anaesthesia plus airway stimulation. A correctly placed tracheal tube rules it out.",
+    "❶ Call for help; tell the team. ❷ Jaw thrust; stop all stimulation. ❸ Remove airway devices and anything stimulating or obstructing (suction catheters, blood, vomit) — look and suction if in doubt.",
+    "❹ CPAP with 100% O₂ by face mask; don't inflate too hard (stomach). Oral and/or nasal airway if unsure the airway above the larynx is clear.",
+    "❺ Persists: keep CPAP · deepen anaesthesia · neuromuscular blocker. 0.25–0.5 mg/kg IV: "+B("propofol = "+wk(w,0.25,"mg")+"–"+wk(w,0.5,"mg"))+" · "+B("rocuronium = "+wk(w,0.25,"mg")+"–"+wk(w,0.5,"mg"))+" · "+B("atracurium = "+wk(w,0.25,"mg")+"–"+wk(w,0.5,"mg"))+" · "+B("suxamethonium = "+wk(w,0.25,"mg")+"–"+wk(w,0.5,"mg"))+" (IM, including into the tongue: "+B("4 mg/kg = "+wk(w,4,"mg"))+").",
+    "❻ Consider intubation, especially if likely to recur. ❼ NG tube to decompress the stomach.",
+    "❽ Mimics: foreign body, laryngeal infection, anaphylaxis, airway tumour, vocal cord palsy, laryngeal or tracheal obstruction or compression, subglottic stenosis, malacia. ❾ See Increased airway pressure.",
+    "❿ Plan waking: strategy, place, support. ⓫ Aspiration or negative-pressure pulmonary oedema may need ongoing airway and ventilation support."],
+    "Association of Anaesthetists QRH 3-6 Laryngospasm and stridor v.1, CC BY-NC-SA 4.0.", "", qrh2Draft())
+  + crisis("Massive blood loss", [
+    "❶ Call for help; tell the team; note the time. ❷ More FiO₂; cautiously reduce the anaesthetic. ❸ Check and expose IV access.",
+    "❹ Control obvious bleeding: pressure, uterotonics, tourniquet, haemostatic dressings.",
+    "❺ <b>Call the blood bank</b> — one person liaises: activate the major haemorrhage protocol; say how fast and how much. ❻ Warm the patient. ❼ Rapid infuser and fluid warmer.",
+    "❽ Plan with surgeon, anaesthetist and nurses: haematologist if needed · interventional radiology · cell salvage.",
+    "❾ Monitor: point-of-care Hb, lactate, coagulation; lab calcium and fibrinogen. Targets and MTP pack: <b>MOH</b> (Blood management card) — pH 7.35–7.45, iCa &gt; 1.1, platelets &gt; 50, PT/APTT &lt; 1.5 × normal, fibrinogen &gt; 1.5 g/L. <span class=\"sub\">(QRH goals differ: Hb &gt; 80 g/L, platelets &gt; 75, fibrinogen &gt; 1.0 g/L.)</span>",
+    "❿ "+B("Calcium chloride 10% 10 mL")+" or "+B("calcium gluconate 10% 20 mL")+" IV. "+B("Tranexamic acid 1 g IV")+", then non-obstetric: 1 g over 8 h (obstetric: repeat 1 g after 30 min).",
+    "⓫ Still bleeding: recombinant factor VIIa — with haematology. Haematology also for uncontrolled bleeding despite products, warfarin, DOACs, inherited bleeding disorders.",
+    "⓬ Plan ongoing care in the right clinical area. Avoid DIC: keep BP up, treat acidosis, hypothermia, low calcium and high potassium."],
+    "Association of Anaesthetists QRH 3-2 Massive blood loss v.2, CC BY-NC-SA 4.0; targets and products: MOH Patient Blood Management consensus 2024.", "", qrh2Draft())
+  + crisis("Circulatory embolus", [
+    "Thrombus, fat, amniotic fluid, air or gas. Signs: hypotension, tachycardia, hypoxaemia, <b>falling EtCO₂</b>; awake — breathlessness, anxiety. Also think of it in sudden unexplained loss of cardiac output.",
+    "❶ Call for help; tell the team; note the time. ❷ Cardiac arrest trolley. ❸ Stop all triggers; stop surgery.",
+    "❹ 100% O₂, adequate ventilation; secure the airway if needed. ❺ CPR straight away if indicated (helps disperse air and large thrombi).",
+    "❻ Crystalloid fast: "+B("500–1000 mL")+"; inotropes may be needed.",
+    "<b>Air / gas:</b> stop the source and nitrous oxide · surgeon floods the wound with saline, wet packs · surgical field below the heart · left lateral if possible · aspirate air from a central line · volume load, Valsalva. 'Mill-wheel' murmur.",
+    "<b>Thrombus:</b> consider thrombolysis, e.g. "+B("alteplase 10 mg IV, then 90 mg over 2 h")+" (&gt; 65 kg) · surgical (vascular) or percutaneous (radiology) removal.",
+    "<b>Fat:</b> petechial rash, desaturation, confusion — supportive care. <b>Amniotic fluid:</b> supportive · monitor the fetus · treat coagulopathy (FFP, cryo, platelets) · consider plasmapheresis.",
+    "❽ Confirm: blood gas (wide PaCO₂–EtCO₂ gap), TOE (right heart strain, emboli), CT. ❾ Refractory collapse: ECMO or intra-aortic balloon pump. ❿ Critical care transfer.",
+    "Rule out: pneumothorax (tension), bronchospasm, anaphylaxis, pulmonary oedema, cardiogenic shock, hypovolaemia, myocardial failure, sepsis, bone cement implantation syndrome."],
+    "Association of Anaesthetists QRH 3-5 Circulatory embolus v.1, CC BY-NC-SA 4.0.", "", qrh2Draft())
+  + crisis("Cardiac tamponade", [
+    "Blood, pus, effusion or air — mostly after cardiac surgery, trauma, or a central line.",
+    "❶ Call for help; note the time. ❷ CPR straight away if indicated. ❸ 100% O₂, ventilate; exclude tension pneumothorax; secure the airway if needed.",
+    "❹ <b>Diagnose and drain fast:</b> ultrasound (preferred) · pericardiocentesis kit (e.g. 18G spinal needle, 3-way tap, 20 mL syringe) · arrest trolley. Signs: breathlessness, agitation; Beck's triad (raised JVP, muffled heart sounds, hypotension); pulsus paradoxus; ECG low voltage, electrical alternans or PEA; big heart on chest X-ray.",
+    "❺ Wait for an expert, or is thoracotomy better? ❻ Temporise: fluid "+B("500–1000 mL")+" · inotropes · low tidal volume, low or no PEEP.",
+    "❼ <b>Sub-xiphoid pericardiocentesis</b> (ultrasound-guided preferred): find the xiphoid tip · prep · LA if time · needle just left of the tip, towards the left shoulder (or the biggest collection on ultrasound) · 3-way tap and syringe · aspirate — a small volume can transform things. Relative contraindications: myocardial rupture, aortic dissection, severe bleeding disorder.",
+    "❽ Reassess with ultrasound and vital signs; ❾ watch for recurrence. ❿ Treat the cause; specialist referral. ⓫ Critical care transfer."],
+    "Association of Anaesthetists QRH 3-9 Cardiac tamponade v.1, CC BY-NC-SA 4.0.", "", qrh2Draft())
+  + crisis("Cardiac ischaemia", [
+    "Under GA: ST elevation or depression, T-wave flattening or inversion, (ventricular) arrhythmias, BP or HR swings, new wall-motion abnormality on echo. Awake: chest pain, breathlessness, dizziness, nausea.",
+    "❶ Arrest trolley and 12-lead ECG. ❷ Adequate oxygenation and anaesthesia / analgesia. ❸ Treat instability: see Hypotension, Hypertension, Bradycardia, Tachycardia, Cardiac arrest.",
+    "❹ CM5 monitoring: right-arm (red) upper right sternum · left-arm (yellow) 5th intercostal space under the left nipple · neutral (green/black) left shoulder. 12-lead ECG as soon as possible.",
+    "❺ Not resolving: call for help; tell the team; stop or finish surgery quickly · "+B("GTN")+" sublingual, or IV 1 mg/mL starting "+B("0.1 mL/kg/h = "+wk(w,0.1,"mL")+"/h")+", titrated — <b>extreme caution if hypotensive</b>.",
+    "❻ Arterial line. ❼ Correct K⁺, Mg²⁺, Ca²⁺. ❽ Treat anaemia (haematocrit &gt; 30%) — beware overload in heart failure; head up if possible.",
+    "❾ Persistent ST elevation: anticoagulation, antiplatelets, revascularisation — with cardiology and surgeons. After: critical care, cardiology, serial ECGs and troponin."],
+    "Association of Anaesthetists QRH 3-12 Cardiac ischaemia v.2, CC BY-NC-SA 4.0.", "", qrh2Draft())
+  + crisis("After cardiac arrest: neuroprotection", [
+    "After ROSC, not obeying commands → start neuroprotection.",
+    "❶ Arrest trolley ready. ❷ Ventilate: SpO₂ 94–98% · PaCO₂ 4.5–5.5 kPa (≈ 34–41 mmHg).",
+    "❸ Sedation and neuromuscular block to stop shivering. ❹ Arterial line; vasopressor or inotrope for <b>SBP &gt; 100 mmHg</b>. ❺ 12-lead ECG; discuss PCI with cardiology.",
+    "❻ Glucose: treat if &gt; 10 mmol/L. ❼ Core temperature: QRH (2018) targets a constant 32–36 °C by local policy; temperature usually falls by itself. <b>Avoid &gt; 37.5 °C.</b> Newer resuscitation guidance (2021 onwards) mainly prevents fever rather than cooling — follow your ICU's policy. Cooling if used: cold non-glucose fluid "+B("30 mL/kg = "+wk(w,30,"mL"))+" (if not contraindicated), ice packs, cooling blankets or pads.",
+    "❽ Seizures: benzodiazepine or propofol first; then valproate, levetiracetam, phenytoin or a barbiturate. ❾ Critical care; more help as needed."],
+    "Association of Anaesthetists QRH 3-13 Neuroprotection following cardiac arrest v.1, CC BY-NC-SA 4.0.", "", qrh2Draft())
+  + crisis("Sepsis", [
+    "Severe sepsis: hypotension after an initial 30 mL/kg, or lactate ≥ 4 mmol/L, with likely infection. Septic shock: with organ dysfunction.",
+    "❶ Call for help; tell the team. ❷ Increase FiO₂; consider less anaesthetic agent; intubate.",
+    "❸ Crystalloid at least "+B("30 mL/kg = "+wk(w,30,"mL"))+" — more if still responding; reassess as you go. <b>No starches.</b>",
+    "❹ Blood gas, lactate, FBC, U&amp;E, clotting, cultures. ❺ <b>IV antibiotics within 1 h</b> (microbiology advice). ❻ Could an indwelling device be the source?",
+    "❼ Not improving: ❽ central and arterial lines; serial lactate · ❾ "+B("noradrenaline")+" for MAP ≥ 65 mmHg; add adrenaline if needed; "+B("vasopressin 0.03 units/min")+" to raise MAP or cut noradrenaline; "+B("dobutamine up to 20 mcg/kg/min")+" for myocardial dysfunction; hydrocortisone if still unstable.",
+    "❿ Urinary catheter, hourly urine. ⓫ Consider cardiac-output monitoring. Goals: MAP, urine output, ScvO₂ (CVP).",
+    "⓬ Find and control the source; send cultures. ⓭ Abandon or limit surgery? ⓮ Plan with intensive care."],
+    "Association of Anaesthetists QRH 3-14 Sepsis v.1, CC BY-NC-SA 4.0.", "", qrh2Draft())
   + crisis("High / total spinal", [
     "Call for help. Tell the surgeon.",
     "Keep left uterine displacement. <b>Do not</b> tip head-down.",
@@ -2883,7 +2947,7 @@ gaCards.blood = () => { const x = wts(), sm = isSample("aw"), ebv = 70 * x.tbw, 
     <li><b>Reversal:</b> UFH, LMWH → protamine · fondaparinux → PCC · dabigatran → idarucizumab or PCC · rivaroxaban, apixaban → andexanet alfa or PCC</li>
     <li>rFVIIa and PCC: not routine — only after conventional measures fail, or licensed uses; haematology advice</li></ul></details>
   ${abgForBlood()}
-  ${gLinkId("ga-intra-abg-analysis", "ABG analysis")}${gLinkId("ga-intra-vasopressors-and-inotropes", "Vasopressors & inotropes")}${gLinkId("ga-intra-tranexamic-acid", "Tranexamic acid")}${gLinkId("emerg-adult-massive-obstetric-haemorrhage", "Obstetric: Massive obstetric haemorrhage")}
+  ${gLinkId("emerg-adult-massive-blood-loss", "⚠ Emergency: Massive blood loss")}${gLinkId("ga-intra-abg-analysis", "ABG analysis")}${gLinkId("ga-intra-vasopressors-and-inotropes", "Vasopressors & inotropes")}${gLinkId("ga-intra-tranexamic-acid", "Tranexamic acid")}${gLinkId("emerg-adult-massive-obstetric-haemorrhage", "Obstetric: Massive obstetric haemorrhage")}
   ${src("MOH Malaysia Consensus Statement on Patient Blood Management (March 2024): perioperative and massive haemorrhage modules. AABB red cell transfusion guideline (Carson et al., JAMA 2023); MINT trial (NEJM 2023); NICE NG24 Blood transfusion (2015); British Society for Haematology guidance; Malaysian National Blood Centre Transfusion Practice Guidelines. Follow your hospital's major haemorrhage protocol.")}</div>`; };
 
 // 11. ABG analysis — interpretation engine (no treatment advice)
@@ -5801,6 +5865,12 @@ VGROUPS.find(g => g[0]==="General")[1].push(["QRH common problems (v2.150)", "26
   "Tachycardia: fluid 10 mL/kg; magnesium 50 mg/kg (adult 2 g) > 10 min; amiodarone 5 mg/kg > 3 min (not polymorphic VT); adenosine 0.1–0.5 mg/kg; cardioversion 1 J/kg sync",
   "Hyperthermia: cool if ≥ 39 °C; iced lavage 10 mL/kg; chlorpromazine 25–50 mg IM 6–8-hourly for serotonin syndrome",
   "Bradycardia lines moved from the arrest card; arrest card renamed Cardiac arrest (same id)"]]);
+VGROUPS.find(g => g[0]==="General")[1].push(["QRH crises (v2.151)", "26 Nov 2026", [
+  "Laryngospasm 3-6: propofol / rocuronium / atracurium / suxamethonium 0.25–0.5 mg/kg IV; suxamethonium IM 4 mg/kg",
+  "Massive blood loss 3-2: calcium chloride 10% 10 mL or gluconate 10% 20 mL; TXA 1 g then 1 g over 8 h (obstetric: repeat at 30 min); MOH targets used (QRH: Hb > 80 g/L, platelets > 75, fibrinogen > 1.0 g/L)",
+  "Embolus 3-5: crystalloid 500–1000 mL; alteplase 10 mg then 90 mg over 2 h (> 65 kg). Tamponade 3-9: fluid 500–1000 mL; sub-xiphoid pericardiocentesis",
+  "Ischaemia 3-12: GTN IV 1 mg/mL from 0.1 mL/kg/h; haematocrit > 30%. Neuroprotection 3-13: SpO₂ 94–98%, PaCO₂ 4.5–5.5 kPa, SBP > 100, glucose ≤ 10, QRH 32–36 °C vs newer fever prevention — local ICU policy",
+  "Sepsis 3-14: crystalloid ≥ 30 mL/kg; antibiotics within 1 h; noradrenaline MAP ≥ 65; vasopressin 0.03 units/min; dobutamine ≤ 20 mcg/kg/min; no starches"]]);
 VGROUPS.find(g => g[0]==="General")[1].push(["Induction drugs & relaxants combined", "22 Nov 2026", [
   "Adult: General › Induction › 1. Induction drugs & relaxants — Opioid · Hypnotic · Muscle relaxant · No IV access (rows moved unchanged)",
   "Paeds: Paediatric › Induction › 3. Induction drugs & relaxants — Anticholinergic · Opioid · Hypnotic · Muscle relaxant · No IV access (rows moved unchanged)",
@@ -5883,6 +5953,7 @@ function vTicks(){
 }
 /* ---------- ABOUT ---------- */
 const CHANGES = [
+  ["2.151","Emergencies › Adult: Laryngospasm & stridor, Massive blood loss (with MOH targets), Circulatory embolus, Cardiac tamponade, Cardiac ischaemia, After cardiac arrest: neuroprotection, Sepsis (Association of Anaesthetists QRH 2023). (checked)"],
   ["2.150","Emergencies › Adult: Key basic plan first, then Common intra-op problems — hypoxia, high airway pressure, hypotension, hypertension, bradycardia, tachycardia, hyperthermia (Association of Anaesthetists QRH 2023), doses per kg for the weight. Bradycardia now has its own card; the arrest card is Cardiac arrest. (checked)"],
   ["2.149","Favourites: tap ☆ on any card, or on any antibiotic procedure, then ★ on the home screen opens your list (kept on this phone; Reset all clears it). Antibiotic tabs no longer scroll the chosen tab out of view. (checked) Home ★ is now gold so it stands out. Fold-out sections (IV iron, formulas, fluid balance and others) now look like buttons with Show / Hide."],
   ["2.148","IV iron calculator: the four IV irons available in Malaysia (iron sucrose, ferric carboxymaltose, ferric derisomaltose, LMW iron dextran — generic and brand) with the maximum per dose for this patient, how many doses the total needs, and how to give each (MOH PBM 2024 Appendix 1). (checked)"],
@@ -6066,7 +6137,7 @@ screens.values = () => {
 
 /* ================= ROUTER & EVENTS ================= */
 /* ================= GROUPS (by situation) ================= */
-const EMERG_ADULT = ["§Start here","Key basic plan","§Common intra-op problems","Hypoxia / desaturation","Increased airway pressure","Hypotension","Hypertension","Bradycardia","Tachycardia","Peri-operative hyperthermia","§Airway & oxygenation","Failed intubation / CICO","Bronchospasm","Anaphylaxis","§Circulation & cardiac arrest","Cardiac arrest","§Drug-related & metabolic","LA toxicity (LAST)","Malignant hyperthermia","Hyperkalaemia","Latex allergy","§Neuraxial & obstetric","High / total spinal","Hypotension after spinal","Massive obstetric haemorrhage","Eclampsia"];
+const EMERG_ADULT = ["§Start here","Key basic plan","§Common intra-op problems","Hypoxia / desaturation","Increased airway pressure","Hypotension","Hypertension","Bradycardia","Tachycardia","Peri-operative hyperthermia","§Airway & oxygenation","Failed intubation / CICO","Laryngospasm & stridor","Bronchospasm","Anaphylaxis","§Circulation & cardiac arrest","Cardiac arrest","After cardiac arrest: neuroprotection","Massive blood loss","Circulatory embolus","Cardiac tamponade","Cardiac ischaemia","Sepsis","§Drug-related & metabolic","LA toxicity (LAST)","Malignant hyperthermia","Hyperkalaemia","Latex allergy","§Neuraxial & obstetric","High / total spinal","Hypotension after spinal","Massive obstetric haemorrhage","Eclampsia"];
 const EMERG_PAEDS = ["§Airway & breathing","Paeds hypoxia / desaturation","Laryngospasm","Paeds bronchospasm","Paeds difficult airway / CICO","Post-tonsillectomy bleed","§Circulation","Paeds cardiac arrest","Paeds anaphylaxis","Cyanotic heart disease / Fallot spell","Paeds massive transfusion","§Drug-related","Paeds LA toxicity (LAST)","Paeds malignant hyperthermia","Latex allergy","§Recovery","Paeds PACU crises"];
 /* ---------- PRINT PLAN SHEETS (paper copy for theatre) ---------- */
 const PRINT_CHECKED = true;
@@ -6429,6 +6500,13 @@ const SEARCH_EXTRA = {   // keyed by stable card id
   "regional-neuraxial-dermatomes-and-block-height":"myotome myotomes key muscles motor level motor block power dermatome dermatomes block height level t4 t10 nipple umbilicus xiphoid bromage sensory testing cold pinprick",
   "ga-intra-ventilation-strategies":"ventilation ventilator ventilate lung protective tidal volume tv peep recruitment recruit driving pressure plateau pcv vcv pcv-vg prvc ards asthma copd auto-peep laparoscopy trendelenburg obese neuro icp hyperventilation pregnancy lscs dopes desaturation hypoxia high airway pressure",
   "ga-intra-one-lung-ventilation":"one-lung ventilation olv dlt double-lumen double lumen tube bronchial blocker arndt thoracic vats lung isolation thoracotomy cpap",
+  "emerg-adult-laryngospasm-stridor":"laryngospasm stridor adult jaw thrust cpap qrh 3-6",
+  "emerg-adult-massive-blood-loss":"massive blood loss major haemorrhage hemorrhage mtp transfusion calcium txa qrh 3-2",
+  "emerg-adult-circulatory-embolus":"embolus embolism pe air gas fat amniotic thrombolysis alteplase etco2 drop qrh 3-5",
+  "emerg-adult-cardiac-tamponade":"tamponade pericardiocentesis pericardial effusion beck qrh 3-9",
+  "emerg-adult-cardiac-ischaemia":"cardiac ischaemia myocardial ischemia st depression st elevation gtn cm5 qrh 3-12",
+  "emerg-adult-post-arrest-neuroprotection":"rosc post arrest neuroprotection cooling targeted temperature qrh 3-13",
+  "emerg-adult-sepsis":"sepsis septic shock noradrenaline lactate antibiotics within 1 hour qrh 3-14",
   "emerg-adult-key-basic-plan":"key basic plan abcde sweep unexpected problem qrh 1-1 oxygen delivery airway breathing circulation depth",
   "emerg-adult-hypoxia-desaturation":"hypoxia desaturation desat cyanosis low spo2 qrh 2-2",
   "emerg-adult-increased-airway-pressure":"high airway pressure peak pressure increased airway pressure qrh 2-3 kinked tube",
@@ -6473,6 +6551,13 @@ const CARD_IDS = {
   "Latex allergy":"emerg-latex-allergy",
   "Cardiac arrest":"emerg-adult-bradycardia-and-cardiac-arrest",
   "Key basic plan":"emerg-adult-key-basic-plan",
+  "Laryngospasm & stridor":"emerg-adult-laryngospasm-stridor",
+  "Massive blood loss":"emerg-adult-massive-blood-loss",
+  "Circulatory embolus":"emerg-adult-circulatory-embolus",
+  "Cardiac tamponade":"emerg-adult-cardiac-tamponade",
+  "Cardiac ischaemia":"emerg-adult-cardiac-ischaemia",
+  "After cardiac arrest: neuroprotection":"emerg-adult-post-arrest-neuroprotection",
+  "Sepsis":"emerg-adult-sepsis",
   "Hypoxia / desaturation":"emerg-adult-hypoxia-desaturation",
   "Increased airway pressure":"emerg-adult-increased-airway-pressure",
   "Hypotension":"emerg-adult-hypotension",
