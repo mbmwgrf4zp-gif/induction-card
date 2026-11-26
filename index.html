@@ -828,7 +828,7 @@ if (window.top !== window.self && /\.github\.io$/.test(location.hostname)) {
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.153.2";
+const APP_VERSION = "2.153.3";
 const APP_DATE = "25 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
@@ -2970,7 +2970,7 @@ gaCards.blood = () => { const x = wts(), sm = isSample("aw"), ebv = 70 * x.tbw, 
     <br><b>Activate MTP</b> (specialist decides; a medical officer coordinates with the blood bank) · send 10 mL EDTA for GXM · baseline FBC, coagulation + fibrinogen, renal, liver, troponin, CK, blood gas · stop the bleeding (surgery, radiology) · warm everything.
     <br><b>MTP pack:</b> 4 PRBC + 4 FFP + 4 cryo + 4 random platelets (or 1 apheresis) — 1:1:1:1; next pack prepared at once. <b>T-MTP:</b> you choose the products, guided by point-of-care tests.
     <br><b>Every 30–60 min:</b> FBC, coagulation, ionised Ca, blood gas (TEG / ROTEM if available). <b>Aim:</b> normothermia · pH 7.35–7.45 · BE −2 to +2 · lactate ≤ 2 · iCa &gt; 1.1 · platelets &gt; 50 · PT / APTT &lt; 1.5 × normal · INR ≤ 1.5 · fibrinogen &gt; 1.5 g/L.
-    <br><span class="sub">Ready: safe group O on site · first-stage crossmatch ≤ 30 min · full crossmatch ≤ 45 min · FFP, cryo ≤ 30 min · platelets immediately (carried without ice). MOH PBM 2024 template — your hospital's pack may differ.</span></div></div>
+    <br><span class="sub">Ready: safe group O on site · first-stage crossmatch ≤ 30 min · full crossmatch ≤ 45 min · FFP, cryo ≤ 30 min · platelets immediately (carried without ice). MOH PBM 2024 template — your hospital's pack may differ.</span></div>
   <h3>Estimated blood volume</h3>
   <div class="result"><b>${sm ? "Enter weight" : `EBV ≈ ${dz(ebv, "mL")} mL (${sig(ebv/1000)} L)`}</b> <span class="sub">70 mL/kg × actual weight ${sig(x.tbw)} kg (MOH PBM 2024)</span>
     <div class="sub">An estimate only.${x.bmi >= 30 ? " <b>Obese:</b> overestimates (fat holds little blood) — read it as an upper limit." : ""}</div></div>
@@ -6019,7 +6019,7 @@ function vTicks(){
 }
 /* ---------- ABOUT ---------- */
 const CHANGES = [
-  ["2.153","Emergencies › Adult re-checked against the QRH 2023: Cardiac arrest (theatre-specific steps), Anaphylaxis (CPR if SBP < 50, glucagon, vasopressin, infusion recipe), Bronchospasm (QRH drugs; ketamine 20 mg), Malignant hyperthermia (complications), CICO (impalpable membrane technique), High spinal (metaraminol, wider ephedrine and atropine ranges, reduced induction dose). (checked) QRH cards now show only the QRH step numbers (❶ ❷ …), one step per line."],
+  ["2.153","Emergencies › Adult re-checked against the QRH 2023: Cardiac arrest (theatre-specific steps), Anaphylaxis (CPR if SBP < 50, glucagon, vasopressin, infusion recipe), Bronchospasm (QRH drugs; ketamine 20 mg), Malignant hyperthermia (complications), CICO (impalpable membrane technique), High spinal (metaraminol, wider ephedrine and atropine ranges, reduced induction dose). (checked) QRH cards now show only the QRH step numbers (❶ ❷ …), one step per line. Fix: Blood management showed only the major haemorrhage box — the rest of the card (blood volume, allowable loss, transfusion thresholds, products, adjuncts) is back."],
   ["2.152","Emergencies › Adult › Theatre & equipment: Patient fire, Mains oxygen failure (with cylinder contents), Mains electricity failure, Emergency evacuation (Association of Anaesthetists QRH 2023; reporting to Malaysia's Medical Device Authority). (checked)"],
   ["2.151","Emergencies › Adult: Laryngospasm & stridor, Massive blood loss (with MOH targets), Circulatory embolus, Cardiac tamponade, Cardiac ischaemia, After cardiac arrest: neuroprotection, Sepsis (Association of Anaesthetists QRH 2023). (checked)"],
   ["2.150","Emergencies › Adult: Key basic plan first, then Common intra-op problems — hypoxia, high airway pressure, hypotension, hypertension, bradycardia, tachycardia, hyperthermia (Association of Anaesthetists QRH 2023), doses per kg for the weight. Bradycardia now has its own card; the arrest card is Cardiac arrest. (checked)"],
