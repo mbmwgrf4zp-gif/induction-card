@@ -635,7 +635,7 @@ a{color:var(--accent)}
 .ahmon span{display:block;font-size:13px;text-transform:uppercase;letter-spacing:.06em}.ahmon b{font-family:'DSEG7',var(--font-mono);font-weight:400;font-size:26px;text-shadow:0 0 10px color-mix(in srgb,var(--c) 45%,transparent)}
 .ahnote{margin:6px 0 0;font-size:13px;color:var(--mon-muted)}
 .astory p{margin:0 0 var(--s2)}.asig{color:var(--muted);font-style:italic}
-.ausp{display:grid;grid-template-columns:1fr;gap:8px;margin:var(--s3) 0}@media (min-width:640px){.ausp{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.ausp{display:grid;grid-template-columns:1fr;gap:8px;margin:var(--s3) 0}.aind{display:flex;flex-wrap:wrap;gap:6px 14px;margin:var(--s2) 0 0;font-size:14px;color:var(--muted)}.aintro{margin:var(--s2) 0}@media (min-width:640px){.ausp{grid-template-columns:repeat(2,minmax(0,1fr))}}
 .afacts{margin:var(--s2) 4px 0;font-size:13px;color:var(--muted);text-align:center}.aver{margin:var(--s4) 4px var(--s2);font-size:12px;color:var(--muted);text-align:center;line-height:1.5}.acard h3{margin:var(--s3) 0 var(--s2);font-size:13px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}.acard h3:first-of-type{margin-top:var(--s1)}.acare ul{margin:0;padding-left:1.1em}.acare li{margin:0 0 6px}.auspi{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:12px;display:grid;grid-template-columns:auto 1fr;column-gap:12px;row-gap:2px;align-content:start}.auspi .ahi{grid-row:span 2}
 .auspi b{font-size:16px}.auspi span:last-child{font-size:14px;color:var(--muted)}.ahi{width:36px;height:36px;border-radius:10px;display:grid;place-items:center;background:var(--t-soft,var(--accent-soft));color:var(--t,var(--accent))}.ahi svg{width:22px;height:22px}
 .agrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.agi{display:flex;align-items:center;gap:10px;text-align:left;min-height:56px;padding:8px 10px;border-radius:12px;border:1px solid var(--line);background:var(--t-soft);color:var(--ink);font:inherit;cursor:pointer}
@@ -828,8 +828,8 @@ if (window.top !== window.self && /\.github\.io$/.test(location.hostname)) {
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.153.3";
-const APP_DATE = "25 Nov 2026";
+const APP_VERSION = "2.154.0";
+const APP_DATE = "26 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
 /* ================= HELPERS ================= */
@@ -6019,6 +6019,7 @@ function vTicks(){
 }
 /* ---------- ABOUT ---------- */
 const CHANGES = [
+  ["2.154","About redesigned: offline · private · free; 6 feature tiles; Clinical foundations (sources grouped by topic), How calculations work, Clinical governance (honest validation status); Privacy and data (what is stored, how to clear); What's new shows the latest 3."],
   ["2.153","Emergencies › Adult re-checked against the QRH 2023: Cardiac arrest (theatre-specific steps), Anaphylaxis (CPR if SBP < 50, glucagon, vasopressin, infusion recipe), Bronchospasm (QRH drugs; ketamine 20 mg), Malignant hyperthermia (complications), CICO (impalpable membrane technique), High spinal (metaraminol, wider ephedrine and atropine ranges, reduced induction dose). (checked) QRH cards now show only the QRH step numbers (❶ ❷ …), one step per line. Fix: Blood management showed only the major haemorrhage box — the rest of the card (blood volume, allowable loss, transfusion thresholds, products, adjuncts) is back."],
   ["2.152","Emergencies › Adult › Theatre & equipment: Patient fire, Mains oxygen failure (with cylinder contents), Mains electricity failure, Emergency evacuation (Association of Anaesthetists QRH 2023; reporting to Malaysia's Medical Device Authority). (checked)"],
   ["2.151","Emergencies › Adult: Laryngospasm & stridor, Massive blood loss (with MOH targets), Circulatory embolus, Cardiac tamponade, Cardiac ischaemia, After cardiac arrest: neuroprotection, Sepsis (Association of Anaesthetists QRH 2023). (checked)"],
@@ -6083,13 +6084,15 @@ const CHANGES = [
 
 
 
-const SRC_LINKS = [
-  ["Emergencies", [["Resuscitation Council UK — ALS / PLS guidelines","https://www.resus.org.uk/library"],["Difficult Airway Society guidelines","https://das.uk.com/guidelines"],["Association of Anaesthetists — guidelines (anaphylaxis, LAST, safety)","https://anaesthetists.org/Home/Resources-publications/Guidelines"],["European Malignant Hyperthermia Group","https://www.emhg.org"],["UK Kidney Association — hyperkalaemia guideline","https://www.ukkidney.org/health-professionals/guidelines"]]],
-  ["General", [["ASA standards & practice parameters (fasting, PACU)","https://www.asahq.org/standards-and-practice-parameters"],["Centre for Perioperative Care — diabetes guideline","https://cpoc.org.uk/guidelines-resources-guidelines"],["PROSPECT procedure-specific analgesia (ESRA)","https://esraeurope.org/prospect/"],["ASRA Pain Medicine — guidelines (ketamine, anticoagulation)","https://www.asra.com/guidelines-articles/guidelines"],["Brain Trauma Foundation guidelines","https://braintrauma.org/coma/guidelines"]]],
-  ["Regional", [["ASRA Pain Medicine — anticoagulation & regional","https://www.asra.com/guidelines-articles/guidelines"],["ISNCSCI dermatome standard (ASIA)","https://asia-spinalinjury.org/isncsci-2019-revision-released/"]]],
+const SRC_LINKS = [   // v2.154: grouped by topic; "" = no public link (summarised, readable offline)
+  ["Malaysian guidance", [["Malaysian National Antimicrobial Guideline 2024 (MOH)","https://sites.google.com/moh.gov.my/nag/contents"],["MOH Consensus Statement on Patient Blood Management (March 2024)",""],["MOH Malaysia pharmacy guidance","https://pharmacy.moh.gov.my"]]],
+  ["Resuscitation & crisis", [["Resuscitation Council UK — ALS / PLS guidelines","https://www.resus.org.uk/library"],["Association of Anaesthetists — Quick Reference Handbook (2023)","https://anaesthetists.org/Portals/0/PDFs/QRH/QRH_complete_June_2023.pdf"],["Association of Anaesthetists — guidelines (anaphylaxis, LAST, safety)","https://anaesthetists.org/Home/Resources-publications/Guidelines"],["European Malignant Hyperthermia Group","https://www.emhg.org"],["UK Kidney Association — hyperkalaemia guideline","https://www.ukkidney.org/health-professionals/guidelines"]]],
+  ["Airway", [["Difficult Airway Society guidelines","https://das.uk.com/guidelines"]]],
+  ["General anaesthesia & peri-operative", [["ASA standards & practice parameters (fasting, PACU)","https://www.asahq.org/standards-and-practice-parameters"],["Centre for Perioperative Care — diabetes guideline","https://cpoc.org.uk/guidelines-resources-guidelines"],["NICE NG45 — routine preoperative tests","https://www.nice.org.uk/guidance/ng45"],["NICE CG174 — IV fluids in adults","https://www.nice.org.uk/guidance/cg174"],["AABB red cell transfusion guideline (2023)",""],["Brain Trauma Foundation guidelines","https://braintrauma.org/coma/guidelines"]]],
+  ["Regional anaesthesia", [["NYSORA","https://www.nysora.com"],["ASRA Pain Medicine — guidelines (anticoagulation, ketamine)","https://www.asra.com/guidelines-articles/guidelines"],["PROSPECT procedure-specific analgesia (ESRA)","https://esraeurope.org/prospect/"],["ISNCSCI dermatome standard (ASIA)","https://asia-spinalinjury.org/isncsci-2019-revision-released/"]]],
   ["Paediatric", [["Association of Paediatric Anaesthetists of GB & Ireland","https://www.apagbi.org.uk/guidelines"]]],
   ["Obstetric", [["Obstetric Anaesthetists' Association","https://www.oaa-anaes.ac.uk"]]],
-  ["Antibiotics", [["Malaysian National Antimicrobial Guideline (MOH pharmacy)","https://pharmacy.moh.gov.my"]]]];
+  ["Transplant", [["Local renal transplant protocol (see Local sources)",""]]]];
 const LOCAL_SRC = ["Departmental obstetric anaesthesia protocol","Main OT departmental protocol","Local paediatric anaesthesia manual & pain / regional protocol (Nov 2025)","Local renal transplant protocol (1st ed.)","Author's own practice notes"];
 /* ---------- SHARE THIS APP ---------- */
 const APP_URL = "https://mbmwgrf4zp-gif.github.io/induction-card/";
@@ -6139,46 +6142,63 @@ function installCard(){ const tab = S.instTab || (IS_ANDROID ? "and" : "ios");
     <div class="insttabs" role="group" aria-label="Phone">${t("ios", "iPhone")}${t("and", "Android")}</div>${steps}
     <p class="sub">Then open it once with signal; after that it works offline. On a computer: Chrome or Edge → install icon in the address bar.</p>
     <h3>First use</h3><ol class="isteps"><li>Enter the patient once (sex, height, weight, age) at the top of a section; every card uses it.</li><li>Use <b>search</b> (magnifier in any section, or <b>/</b> on a keyboard).</li><li>Pick your three <b>Quick tiles</b> for the home screen.</li></ol></div>`; }
-screens.about = () => head("About","home") + `
+screens.about = () => { const nBlk = Object.keys(BLKS).length, srcLi = ls => ls.map(([t,u]) => `<li>${u ? `<a href="${u}" target="_blank" rel="noopener noreferrer">${t} ↗</a>` : t}</li>`).join("");
+  return head("About","home") + `
   <section class="ahero"><div class="ahtop"><span class="ahico">${svg("capno")}</span><div><div class="ahname">Induction Card</div><div class="ahtag">Every dose for your patient — offline</div></div><span class="ahver mono">v${APP_VERSION}</span></div>
     <div class="ahmon"><div style="--c:#f472b6"><span>LSCS spinal</span><b>2.2</b></div><div style="--c:#22d3ee"><span>LA max</span><b>140</b></div><div style="--c:#fbbf24"><span>Adult ETT</span><b>7.0</b></div></div>
     <p class="ahnote">Sample readings</p></section>
+  <div class="aind"><span>✓ Works offline</span><span>✓ Private by design</span><span>✓ Free, no login</span></div>
   <p class="afacts">${aboutFacts()}</p>
-  <div class="card astory"><h2>Why this exists</h2>
-  <p>It started as my own pocket card for theatre: the doses, tube sizes and protocols I kept looking up. It grew card by card, checked against guidelines and local practice. Colleagues found it useful, so I'm sharing it with fellow anaesthetists — free and without a login.</p>
-  <p class="asig">— an anaesthetist in Malaysia</p></div>
+  <p class="aintro">A patient-specific reference for anaesthetists through the whole peri-operative journey — calculations, drug doses, crisis steps and practical guidance in one offline app, adapted to Malaysian practice.</p>
   <div class="ausp">
-    <div class="auspi"><span class="ahi">${svg("airway")}</span><b>Weight → every dose</b><span>Enter height &amp; weight once; IBW, LBW and adjusted weight are built in, maximums applied.</span></div>
-    <div class="auspi"><span class="ahi">${svg("capno")}</span><b>Works offline</b><span>In theatre with no signal. No login; nothing leaves the phone.</span></div>
-    <div class="auspi"><span class="ahi">${svg("spinal")}</span><b>3D Block finder</b><span>Operation site, nerve map, myotomes and joints on a 3D body; ${Object.keys(BLKS).length} block cards with a running LA total.</span></div>
-    <div class="auspi"><span class="ahi">${svg("emerg")}</span><b>Crisis cards</b><span>Emergencies with the doses already worked out for your patient — adult and paeds.</span></div></div>
+    <div class="auspi"><span class="ahi">${svg("airway")}</span><b>Patient-specific</b><span>Enter height, weight, age and sex once. Actual, ideal, lean and adjusted weight are built in; doses use the weight each drug is dosed on, with maximums applied.</span></div>
+    <div class="auspi"><span class="ahi">${svg("emerg")}</span><b>Crisis cards</b><span>Adult and paediatric emergencies with doses worked out for the weight where a per-kg dose applies.</span></div>
+    <div class="auspi"><span class="ahi">${svg("ga")}</span><b>Peri-operative</b><span>Pre-op assessment and scores, plan and consent note, induction, intra-op, post-op.</span></div>
+    <div class="auspi"><span class="ahi">${svg("spinal")}</span><b>Regional</b><span>3D block finder (operation site, nerves, myotomes, joints), ${nBlk} block cards, running LA total.</span></div>
+    <div class="auspi"><span class="ahi">${svg("paeds")}</span><b>Special patients</b><span>Paediatric and neonatal, obstetric, kidney transplant.</span></div>
+    <div class="auspi"><span class="ahi">${svg("capno")}</span><b>Offline</b><span>No account. Works in theatre without signal once opened; calculations happen on the phone.</span></div></div>
   <div class="card acard"><h2>What's inside</h2>${ABOUT_GROUPS.map(([g, items]) => `<h3>${g}</h3><div class="agrid">${items.map(([t, sub, ic, gg, at]) => `<button class="agi" style="--t:var(--g-${gg});--t-soft:var(--g-${gg}-soft)" ${at}><span class="ahi">${svg(ic)}</span><span><b>${t}</b><small>${sub}</small></span></button>`).join("")}</div>`).join("")}</div>
-  ${installCard()}${shareCard()}
-  <div class="card acare"><h2>Use with care</h2><ul>
-  <li>A personal memory aid, built and reviewed by an individual anaesthetist. <b>Not endorsed by any hospital or the Ministry of Health.</b></li>
-  <li>It does not replace clinical judgement, your local protocols or a second check of every dose.</li>
-  <li>A yellow <b>DRAFT</b> banner means that content is new and not yet checked.</li>
-  <li>Found an error? Screenshot the card and tell whoever shared the app with you.</li></ul></div>
-  <h2 class="adet">Details</h2>
-  ${faqCard()}
-  <details class="card adt"><summary>Sources</summary><p class="sub">Every card shows its own source line. Main public guidelines:</p>
-  ${SRC_LINKS.map(([g,ls])=>`<h3>${g}</h3><ul class="srcl">${ls.map(([t,u])=>`<li><a href="${u}" target="_blank" rel="noopener noreferrer">${t} ↗</a></li>`).join("")}</ul>`).join("")}
-  <h3>Local and personal sources</h3><ul>${LOCAL_SRC.map(t=>`<li>${t}</li>`).join("")}</ul>
-  <p class="sub">Local documents are summarised, not reproduced, and are not linked. Sources reviewed Nov 2026; next review Nov 2027.</p>
-  <p class="sub">All block cards and the nerve map were checked against NYSORA in Nov 2026; each card names the page it was read from.</p></details>
-  <details class="card adt"><summary>What changed recently</summary><table>${CHANGES.map(([v,t])=>`<tr><td class="mono">${v}</td><td>${t}</td></tr>`).join("")}</table>
+  <h2 class="adet">Clinical information</h2>
+  <details class="card adt"><summary>Clinical foundations</summary>
+    <p>Content draws on Malaysian guidance and local practice references alongside international anaesthesia guidelines. Where Malaysian recommendations differ from international ones, the card says so. Every card shows its own source line.</p>
+    ${SRC_LINKS.map(([g,ls])=>`<h3>${g}</h3><ul class="srcl">${srcLi(ls)}</ul>`).join("")}
+    <h3>Local and personal sources</h3><ul>${LOCAL_SRC.map(t=>`<li>${t}</li>`).join("")}</ul>
+    <p class="sub">Local documents are summarised, not reproduced, and are not linked. Links open online; this list reads offline. Sources reviewed Nov 2026; next review Nov 2027. All block cards and the nerve map were checked against NYSORA in Nov 2026; each card names the page it was read from.</p></details>
+  <details class="card adt"><summary>How calculations work</summary><ul>
+    <li>Doses come from the weight you enter, using the weight each drug is dosed on: <b>TBW</b> (actual), <b>IBW</b> (ideal, Devine), <b>LBW</b> (lean, Janmahasatian) or <b>AdjBW</b> (IBW + 0.4 × excess). Each row says which one it used. Different drugs need different weights — that's why it varies.</li>
+    <li><b>BMI</b> = weight ÷ height² (m). From BMI ≥ 30, some cards switch to ideal or lean weight (e.g. IV fluid maintenance, LA maximums) and say so.</li>
+    <li><b>PBW</b> (predicted body weight, ARDSNet): male 50, female 45.5 + 0.91 × (height − 152.4). Same formula as IBW but never capped at actual weight; used for tidal volume.</li>
+    <li><b>Children</b> use their own inputs (weight, age, gestation) and paediatric formulas; adult formulas are not used for them.</li>
+    <li>Doses are rounded to amounts you can draw up: volume first where the strength is known (0.1 mL steps under 10 mL), and never above a stated maximum.</li>
+    <li>Maximum doses (adult caps, paediatric caps, local anaesthetic limits) are applied automatically and labelled.</li>
+    <li>Values marked "sample" are placeholders until you enter the patient; emergency cards hide totals until then.</li>
+    <li>The <b>3D body</b>, block-finder regions, nerve map and dermatome map are schematic: landmarks are measured on the model (nipple, xiphisternum, umbilicus, inguinal ligament) and real anatomy varies. 3D starts only when you ask; <b>Hide 3D</b> brings back the list or 2D chart.</li></ul></details>
+  <details class="card adt"><summary>Clinical governance</summary>
+    <table><tr><th>App version</th><td class="mono">v${APP_VERSION}</td></tr><tr><th>Last software update</th><td>${APP_DATE}</td></tr>
+    <tr><th>Clinical sources</th><td>Reviewed Nov 2026; next review Nov 2027</td></tr>
+    <tr><th>Review</th><td>Built and checked by one practising anaesthetist against the named guidelines. New content carries a yellow <b>DRAFT</b> banner until checked; the Values sheet records each check.</td></tr>
+    <tr><th>Validation</th><td><b>Not independently validated</b> and not a regulated medical device. Not endorsed by any hospital or the Ministry of Health.</td></tr></table>
+    <p><b>Clinical use.</b> Induction Card is a reference and memory aid for trained healthcare professionals. It supports, but does not replace, clinical judgement, local protocols or independent checking of drug doses and equipment. Review calculated values for the individual patient; verify dose, concentration, route and contraindications before use.</p>
+    <p class="sub">Software updates (layout, fixes) and clinical content changes are listed together in What's new; clinical changes are checked before release.</p></details>
+  <h2 class="adet">Application</h2>
+  <details class="card adt"><summary>Privacy and data</summary><ul>
+    <li><b>Patient values stay on this phone.</b> Calculations run on the device; the app has no accounts, no cookies, no analytics and no tracking, and its security settings allow it to load only its own files.</li>
+    <li>Like any website, the pages themselves are downloaded from the host (GitHub Pages), which may keep ordinary access logs. Nothing you enter is sent.</li>
+    <li>Saved in the browser's local storage on this phone only: anonymous cases (sex, age, height, weight — deleted after 36 hours), favourites, quick tiles, 3D on/off, theme and display settings, and Values-sheet ticks.</li>
+    <li>Offline: a service worker keeps a copy of the app after the first visit. When a new version is published, the app downloads it and offers <b>tap to update</b>.</li>
+    <li>To clear: delete cases on the <button class="linkish" data-go="cases">Cases</button> screen; reset settings in <button class="linkish" data-go="settings">Customise › Reset all</button>; or clear the site's data in your browser.</li></ul></details>
+  ${installCard()}
+  <details class="card adt"><summary>What's new</summary><table>${CHANGES.slice(0, 3).map(([v,t])=>`<tr><td class="mono">${v}</td><td>${t}</td></tr>`).join("")}</table>
   <details class="allch"><summary>Show all ›</summary><table>${CHANGES_ALL.map(([v,t])=>`<tr><td class="mono">${v}</td><td>${esc(t)}</td></tr>`).join("")}</table></details></details>
-  <details class="card adt"><summary>Privacy</summary><ul><li>Nothing you enter leaves this phone. No accounts, no tracking, no analytics.</li><li>Anonymous cases (sex, age, height, weight) are kept on this phone only and deleted after 36 hours.</li>
-  <li>Also kept on this phone only: your quick-tile choice, the 3D on/off choice, theme and display settings, and your Values-sheet ticks. Nothing else is stored.</li><li>Works offline once opened.</li></ul></details>
-  <details class="card adt"><summary>How it works</summary><ul>
-  <li>Doses come from the weight you enter, using the weight each drug is dosed on: <b>TBW</b> (actual), <b>IBW</b> (ideal, Devine), <b>LBW</b> (lean, Janmahasatian) or <b>AdjBW</b> (IBW + 0.4 × excess). Each row says which one it used.</li>
-  <li><b>PBW</b> (predicted body weight, ARDSNet): male 50, female 45.5 + 0.91 × (height − 152.4). Same formula as IBW but never capped at actual weight; used for tidal volume.</li>
-  <li>Doses are rounded to amounts you can draw up: volume first where the strength is known (0.1 mL steps under 10 mL), and never above a stated maximum.</li>
-  <li>Maximum doses (adult caps, paediatric caps, local anaesthetic limits) are applied automatically and labelled.</li>
-  <li>Values marked "sample" are placeholders until you enter the patient.</li>
-  <li>The <b>3D body</b>, block-finder regions, nerve map and dermatome map are schematic: landmarks are measured on the model (nipple, xiphisternum, umbilicus, inguinal ligament) and real anatomy varies. 3D starts only when you ask; <b>Hide 3D</b> brings back the list or 2D chart.</li></ul></details>
-  <details class="card adt"><summary>Licences</summary><p class="sub">IBM Plex Sans / Mono and DSEG7 (keshikan) fonts — SIL Open Font License 1.1.</p><p class="sub">3D body: MakeHuman base mesh and male targets — CC0 1.0 (makehumancommunity.org).</p></details>
-  <p class="aver mono">v${APP_VERSION} · built ${APP_DATE} · offline copy: ${OFFLINE === "ready" ? "ready" : OFFLINE === "fail" ? `unavailable <button class="flink" data-offretry="1">Retry</button>` : OFFLINE === "na" ? "not available in this view" : "saving…"} · sources reviewed Nov 2026, next review Nov 2027</p>` + disc;
+  ${faqCard()}
+  <h2 class="adet">Community</h2>
+  <div class="card astory"><h2>Behind Induction Card</h2>
+  <p>It started as my own pocket card for theatre: the doses, tube sizes and protocols I kept looking up. It grew card by card, checked against guidelines and local practice. Colleagues found it useful, so I'm sharing it with fellow anaesthetists — free and without a login.</p>
+  <p>The aim is simple: less mental arithmetic and searching at the point of care, so attention stays on the patient.</p>
+  <p class="asig">— a practising anaesthetist in Malaysia</p></div>
+  ${shareCard()}
+  <details class="card adt"><summary>Licences</summary><p class="sub">IBM Plex Sans / Mono and DSEG7 (keshikan) fonts — SIL Open Font License 1.1.</p><p class="sub">3D body: MakeHuman base mesh and male targets — CC0 1.0 (makehumancommunity.org).</p><p class="sub">Association of Anaesthetists Quick Reference Handbook — CC BY-NC-SA 4.0, adapted wording.</p></details>
+  <p class="aver mono">Induction Card v${APP_VERSION} · built ${APP_DATE} · offline copy: ${OFFLINE === "ready" ? "ready" : OFFLINE === "fail" ? `unavailable <button class="flink" data-offretry="1">Retry</button>` : OFFLINE === "na" ? "not available in this view" : "saving…"}<br>Developed in Malaysia · for healthcare professionals</p>` + disc; };
 function aboutFacts(){ let cards = 0; try { cards = Object.keys(cardSrc()).length; } catch (e){} return `${cards ? cards + " cards · " : ""}${Object.keys(BLKS).length} block cards · ${Object.keys(NERVES).length} nerves mapped · sources reviewed Nov 2026`; }
 screens.values = () => {
   const ticks = vTicks(), q = (S.vq||"").trim().toLowerCase();
