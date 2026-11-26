@@ -827,7 +827,7 @@ if (window.top !== window.self && /\.github\.io$/.test(location.hostname)) {
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.152.0";
+const APP_VERSION = "2.152.1";
 const APP_DATE = "25 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
@@ -2388,7 +2388,7 @@ const QRH1_CHECKED = true;   // checked by author 26 Nov 2026;   // v2.150 QRH k
 const qrh1Draft = () => QRH1_CHECKED ? "" : `<div class="warn" style="margin-top:0">DRAFT — Association of Anaesthetists QRH (2023), adapted wording (v2.150). Check before use.</div>`;
 const QRH2_CHECKED = true;   // checked by author 26 Nov 2026;   // v2.151 QRH crises
 const qrh2Draft = () => QRH2_CHECKED ? "" : `<div class="warn" style="margin-top:0">DRAFT — Association of Anaesthetists QRH (2023), adapted wording (v2.151). Check before use.</div>`;
-const QRH3_CHECKED = false;   // v2.152 QRH theatre & equipment
+const QRH3_CHECKED = true;   // checked by author 26 Nov 2026;   // v2.152 QRH theatre & equipment
 const qrh3Draft = () => QRH3_CHECKED ? "" : `<div class="warn" style="margin-top:0">DRAFT — Association of Anaesthetists QRH (2023), adapted wording (v2.152). Check before use.</div>`;
 const crisisDraft = () => CRISIS_CHECKED ? "" : `<div class="warn" style="margin-top:0">DRAFT — from published guidelines, not yet ticked by you.</div>`;
 const wk = (w, per, unit, max) => { if (WKS) return "— (enter weight)"; let v = per*w, c = false; if (max!=null && v>max){ v=max; c=true; } return `${dz(v, unit, max)} ${unit}${c?` (max ${max} ${unit})`:""}`; };
@@ -5908,7 +5908,7 @@ VGROUPS.find(g => g[0]==="General")[1].push(["QRH crises (v2.151)", "26 Nov 2026
   "Embolus 3-5: crystalloid 500–1000 mL; alteplase 10 mg then 90 mg over 2 h (> 65 kg). Tamponade 3-9: fluid 500–1000 mL; sub-xiphoid pericardiocentesis",
   "Ischaemia 3-12: GTN IV 1 mg/mL from 0.1 mL/kg/h; haematocrit > 30%. Neuroprotection 3-13: SpO₂ 94–98%, PaCO₂ 4.5–5.5 kPa, SBP > 100, glucose ≤ 10, QRH 32–36 °C vs newer fever prevention — local ICU policy",
   "Sepsis 3-14: crystalloid ≥ 30 mL/kg; antibiotics within 1 h; noradrenaline MAP ≥ 65; vasopressin 0.03 units/min; dobutamine ≤ 20 mcg/kg/min; no starches"]]);
-VGROUPS.find(g => g[0]==="General")[1].push(["QRH theatre & equipment (v2.152)", "", [
+VGROUPS.find(g => g[0]==="General")[1].push(["QRH theatre & equipment (v2.152)", "26 Nov 2026", [
   "Patient fire 3-7 (airway vs non-airway), reporting to incident system and Medical Device Authority (QRH: MHRA)",
   "Mains oxygen failure 4-1: UK cylinder sizes C 170 L to J 6800 L at 137 bar; minutes ≈ litres ÷ flow",
   "Mains electricity failure 4-2: socket colours are UK (red secondary, blue uninterrupted) — check local",
@@ -5995,7 +5995,7 @@ function vTicks(){
 }
 /* ---------- ABOUT ---------- */
 const CHANGES = [
-  ["2.152","Emergencies › Adult › Theatre & equipment: Patient fire, Mains oxygen failure (with cylinder contents), Mains electricity failure, Emergency evacuation (Association of Anaesthetists QRH 2023; reporting to Malaysia's Medical Device Authority). (draft)"],
+  ["2.152","Emergencies › Adult › Theatre & equipment: Patient fire, Mains oxygen failure (with cylinder contents), Mains electricity failure, Emergency evacuation (Association of Anaesthetists QRH 2023; reporting to Malaysia's Medical Device Authority). (checked)"],
   ["2.151","Emergencies › Adult: Laryngospasm & stridor, Massive blood loss (with MOH targets), Circulatory embolus, Cardiac tamponade, Cardiac ischaemia, After cardiac arrest: neuroprotection, Sepsis (Association of Anaesthetists QRH 2023). (checked)"],
   ["2.150","Emergencies › Adult: Key basic plan first, then Common intra-op problems — hypoxia, high airway pressure, hypotension, hypertension, bradycardia, tachycardia, hyperthermia (Association of Anaesthetists QRH 2023), doses per kg for the weight. Bradycardia now has its own card; the arrest card is Cardiac arrest. (checked)"],
   ["2.149","Favourites: tap ☆ on any card, or on any antibiotic procedure, then ★ on the home screen opens your list (kept on this phone; Reset all clears it). Antibiotic tabs no longer scroll the chosen tab out of view. (checked) Home ★ is now gold so it stands out. Fold-out sections (IV iron, formulas, fluid balance and others) now look like buttons with Show / Hide."],
