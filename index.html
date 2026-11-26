@@ -893,7 +893,7 @@ if (window.top !== window.self && /\.github\.io$/.test(location.hostname)) {
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.161.2";
+const APP_VERSION = "2.161.3";
 const APP_DATE = "26 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
@@ -1375,13 +1375,13 @@ const lscsBody = () => {
   const h = Math.round(S.spHt), row = LSCS.find(r => h <= r[0]), i = LSCS.indexOf(row), smp = isSample("spHt");
   const [a, z] = LSCS_SPAN[i], frac = Math.max(0, Math.min(1, (Math.min(h, z) - a) / Math.max(1, z - a)));
   const ruler = `<div class="lruler${smp ? " sample" : ""}">
-    <div class="lrh"><span class="tlab" style="margin:0">Height</span><button aria-label="Height down" data-step="spHt" data-d="-1" data-min="140" data-max="200">−</button><input id="in-spHt" inputmode="decimal" aria-label="Height (cm)${smp ? ", sample value" : ""}" data-in="spHt" data-min="140" data-max="200" value="${h}"><span class="u">cm</span><button aria-label="Height up" data-step="spHt" data-d="1" data-min="140" data-max="200">+</button>${smp ? `<span class="stag">sample</span>` : ""}</div>
+    <div class="lrh"><span class="tlab" style="margin:0">Height</span><button aria-label="Height down" data-step="spHt" data-d="-1" data-min="140" data-max="200">−</button><input id="in-spHt" inputmode="decimal" aria-label="Height (cm)${smp ? ", sample value" : ""}" data-in="spHt" data-min="140" data-max="200" value="${h}"><span class="u">cm</span><button aria-label="Height up" data-step="spHt" data-d="1" data-min="140" data-max="200">+</button></div>
     <div class="lrk"><span>Height</span><span>Bupi mL</span><span>Total mL</span></div>
     <div class="lrb" data-lruler="1">${LSCS.map((r, j) => `<div class="lband${j === i ? " on" : ""}"><b>${r[5]}</b><span class="bv">${rng(r[1], r[2])}</span><small>${rng(r[3], r[4])}</small></div>`).join("")}
       <div class="lmark" style="left:${((i + frac)/4*100).toFixed(1)}%"><span>${h}</span></div></div>
-    <div class="sub" style="margin-top:2px">Drag or tap along the bands to set height.</div></div>`;
+    <div class="sub" style="margin-top:2px">${smp ? `<span class="stag">sample</span> Type, drag or tap to set height.` : "Drag or tap along the bands to set height."}</div></div>`;
   return ruler + `<div class="result">
-    <div class="sub">Heavy bupivacaine 0.5% (height ${row[5]} cm)</div>
+    <div class="sub">Heavy bupivacaine 0.5%<br>(height ${row[5]} cm)</div>
     <div class="big">${rng(row[1],row[2])} mL</div>
     <div class="sub">= ${rng(row[1]*5,row[2]*5)} mg</div>
     ${lscsSyringe(row, smp)}
@@ -6351,6 +6351,7 @@ function vTicks(){
 }
 /* ---------- ABOUT ---------- */
 const CHANGES = [
+  ["2.161.3","No more jumping: the card you are working in stays put on screen when the sample banner disappears or text above it changes; LSCS syringe stays at a fixed height between bands."],
   ["2.161.2","LSCS spinal syringe: layers slide smoothly to the new level when height changes; before a height is entered it shows the sample dose faded instead of an empty grey syringe."],
   ["2.161.1","LSCS spinal card: protocol review reminder moved into Notes; \"see dermatomes\" links are plain text links everywhere."],
   ["2.161","Obstetric › LSCS › A1 Spinal: dose by height redesigned — height ruler with the four bands (drag or tap to set height) and a syringe showing bupivacaine, morphine and fentanyl layers with the total. Same doses and wording."],
@@ -7403,6 +7404,8 @@ function render(){
   try { renderNow(); } finally { rendering = false; }
   if (renderAgain){ renderAgain = false; render(); }
 }
+let LASTEL = null, LASTHASH = location.hash;
+addEventListener("pointerdown", e => { LASTEL = e.target; }, true); addEventListener("focusin", e => { LASTEL = e.target; }, true);
 function renderNow(){
   let h = (location.hash||"#home").slice(1);
   if (h==="ett"||h==="g-airway") h="g-ga"; if (h==="spinal"||h==="g-spinal") h="g-regional";
@@ -7411,6 +7414,10 @@ function renderNow(){
   else html = (screens[h]||screens.home)();
   const app = $("#app"), active = document.activeElement && document.activeElement.dataset ? document.activeElement.dataset.in : null;
   const y = window.scrollY;
+  // v2.161.3: keep the card being worked in at the same place on screen (no jump when content above changes)
+  let anc = null; if (LASTEL && LASTEL.isConnected && location.hash === LASTHASH){ const d = LASTEL.closest("details.acc"), sd = LASTEL.closest(".gside");
+    const sel = d && d.dataset.t ? `details.acc[data-t="${CSS.escape(d.dataset.t)}"]` : sd ? ".gside" : null; const el = sel && document.querySelector(sel); if (el) anc = {sel, top: el.getBoundingClientRect().top}; }
+  LASTHASH = location.hash;
   app.dataset.group = h.startsWith("g-") ? h.slice(2) : "";
   const navItems = [["home","Home","search","home"],["g-emerg","Emergencies","emerg","emerg"],["g-premed","Pre-op","premed","premed"],["g-ga","General","ga","ga"],["g-regional","Regional","regional","regional"],["g-paeds","Paediatric","paeds","paeds"],["g-obs","Obstetric","obs","obs"],["g-tx","Kidney Transplant","tx","tx"],["about","About","about","values"]];
   const nav = `<nav class="sidenav" aria-label="Sections"><div class="snbrand">${svg("capno")} Induction Card</div>${navItems.map(([hh,l,ic,cls])=>`<button class="snitem sn-${cls} ${h===hh||(hh==="home"&&!h.startsWith("g-")&&h!=="values"&&h!=="about")?"on":""}" data-go="${hh}"><span class="snico">${svg(ic)}</span>${l}</button>`).join("")}
@@ -7427,7 +7434,7 @@ function renderNow(){
   if (S.open){ const d = app.querySelector(`details[data-t="${CSS.escape(S.open)}"]`); if (d){ d.open = true; if (S.scrollTo){ d.scrollIntoView({block:"start"}); }
     if (S.anchor){ const a = d.querySelector(`[data-anchor="${S.anchor}"]`); if (a) a.scrollIntoView({block:"start"}); } } }
   S.anchor = null;
-  if (!S.scrollTo) window.scrollTo(0, y);
+  if (!S.scrollTo){ window.scrollTo(0, y); if (anc){ const el = app.querySelector(anc.sel); if (el){ const dy = el.getBoundingClientRect().top - anc.top; if (Math.abs(dy) > 1) window.scrollBy(0, dy); } } }
   S.scrollTo = false;
   if (S.srchFocus){ S.srchFocus = false; const q = app.querySelector("#q"); if (q) q.focus(); }
   if (app.querySelector("#bfstage")) BF.mount();
