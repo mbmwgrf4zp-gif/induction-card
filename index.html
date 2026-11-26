@@ -815,6 +815,22 @@ details.bfb[open]>summary{margin-bottom:4px}details.bfb .bfo{margin-top:4px}deta
 .bftag{font-size:13px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--gc)}.fbgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:var(--s2) 0}.fbin{display:flex;flex-direction:column;gap:2px;font-size:14px;color:var(--muted)}.fbin small{font-size:13px}.fbin input{font:inherit;font-size:17px;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px;min-height:44px;width:100%;box-sizing:border-box}.bfopl{margin:var(--s2) 0;padding:var(--s2) var(--s3);border-left:4px solid var(--gc);background:var(--card);border-radius:var(--r-sm)}.bfrole{display:block;font-size:13px;font-weight:700;color:var(--muted)}.bfrole.rs{color:var(--gc)}.bfrole.rx{color:var(--warn-ink)}
 .bfo{display:flex;justify-content:space-between;align-items:baseline;gap:8px;background:none;border:0;padding:0;color:var(--ink);font:inherit;text-align:left;cursor:pointer}
 .bfn{font-weight:700;font-size:16px;color:var(--gc);text-decoration:underline;text-decoration-thickness:1.5px;text-underline-offset:3px}.bfempty{margin:0;font-size:15px}.bfd{font-weight:700;font-size:20px;white-space:nowrap}.bfw{font-size:14px;color:var(--muted)}.bfw.bfc{color:var(--ink)}
+/* v2.159.2 desktop: compact patient fields (wide screen + mouse / trackpad) */
+.ptile .stag.dsk{display:none}.smpnote{display:none;font-size:var(--fs-xs);color:var(--warn-ink);margin-top:4px}
+@media (min-width:900px) and (pointer:fine){
+  .ptiles{grid-template-columns:repeat(auto-fit,minmax(84px,1fr));gap:6px}
+  .ptile{padding:3px 6px 2px;gap:0;border-radius:10px}
+  .ptile small{font-size:10px}
+  .ptile input{font-family:var(--font-sans);font-size:16px;font-weight:700;text-align:center;color:var(--ink);padding:1px 0}
+  .ptile input:focus{outline-offset:-2px}
+  .smpnote{display:block}
+  .ptile.sample input{color:var(--muted)}
+  .ptile .pm{display:none}
+  .pthead{margin-bottom:6px}
+  .segmini button{height:30px;width:38px}
+  .dline{margin-top:6px}
+  .samplewarn{display:none}
+}
 </style>
 </head>
 <body>
@@ -829,7 +845,7 @@ if (window.top !== window.self && /\.github\.io$/.test(location.hostname)) {
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.159.1";
+const APP_VERSION = "2.159.2";
 const APP_DATE = "26 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
@@ -2814,7 +2830,7 @@ function ptile(key, label, unit, min, max, stp){
     <input id="in-${key}" inputmode="decimal" aria-label="${label} (${unit})${smp?", sample value":""}" data-in="${key}" data-min="${min}" data-max="${max}" value="${S[key]}">
     <div class="pm"><button aria-label="${label} down" data-step="${key}" data-d="${-stp}" data-min="${min}" data-max="${max}">−</button><button aria-label="${label} up" data-step="${key}" data-d="${stp}" data-min="${min}" data-max="${max}">+</button></div></div>`;
 }
-const ptiles = list => `<div class="ptiles">${list.join("")}</div>`;
+const ptiles = list => `<div class="ptiles">${list.join("")}</div>${list.some(t => t.includes('class="ptile sample"')) ? `<div class="smpnote">Dashed = sample value — type the patient's own.</div>` : ""}`;
 const sexMini = (title="Patient") => `<div class="pthead"><span class="t">${title}</span><div class="segmini ${isSample("sex")?"sample":""}" role="group" aria-label="Sex">${[["F","Female"],["M","Male"]].map(([v,l])=>`<button data-seg="sex" data-val="${v}" aria-label="${l}" title="${l}" aria-pressed="${!isSample("sex") && S.sex===v}">${sxi(v)}</button>`).join("")}</div></div>`;
 const dLine = W2 => `<div class="dline">BMI <b>${sig(W2.bmi)}</b> · IBW/PBW <b>${sig(W2.ibwRaw)}</b> · LBW <b>${sig(W2.lbw)}</b> · AdjBW <b>${sig(W2.adj)}</b> kg</div>`;
 const awStep = () => S.aw < 40 ? 0.5 : 1;
@@ -6246,6 +6262,7 @@ function vTicks(){
 }
 /* ---------- ABOUT ---------- */
 const CHANGES = [
+  ["2.159.2","Desktop: patient fields are compact one-line boxes (no − / + buttons; ↑ ↓ keys step the value); sample values shown dashed with one short note, replacing the yellow banner. Phones unchanged."],
   ["2.159","Pre-op › Prepare › 4. Steroid cover: steroid equivalence — prednisolone, hydrocortisone or dexamethasone daily dose → prednisolone and hydrocortisone equivalent, with the ≥ 5 mg prednisolone threshold (Woodcock et al. Anaesthesia 2020: 10 mg hydrocortisone ≈ 2 mg prednisolone ≈ 0.1 mg dexamethasone). (checked)"],
   ["2.158","General › Post-op › 7. Opioid conversion: add up current opioids (oral, sublingual, rectal, patch, IV / SC) as oral morphine equivalent and see the equivalent of another opioid, with the MOH ½–⅔ starting range; methadone not calculated (MOH ratios shown for reference); MOH Pain Management Handbook factors first, ANZCA 2025 for the rest. Linked from the opioid-tolerant box, which also gains the MOH buprenorphine option and parenteral conversion. (checked)"],
   ["2.157","General › Intra-op › 7. Intra-op analgesia: Opioid-tolerant now opens a box — continue usual opioids, tolerance ≥ 60 mg oral morphine a day ≥ 7 days; buprenorphine: don't stop or taper, add a high-affinity full agonist if needed; methadone: continue, QT, specialist-only conversion; PACU and discharge points (Faculty of Pain Medicine 2021; multisociety buprenorphine panel, RAPM 2021). (checked)"],
@@ -7382,6 +7399,9 @@ document.addEventListener("toggle", e => {
 }, true);
 document.addEventListener("toggle", e => { const d = e.target; if (!d.matches || !d.matches("details.catgrp")) return; S.catOpen = S.catOpen || new Set();
   if (d.open) S.catOpen.add(d.dataset.cat); else { S.catOpen.delete(d.dataset.cat); if (d.querySelector("details.acc[open]")) S.open = null; } }, true);
+document.addEventListener("keydown", e => { const t = e.target; if (!t.dataset || !t.dataset.in || (e.key !== "ArrowUp" && e.key !== "ArrowDown")) return; const tile = t.closest(".ptile"); if (!tile) return;
+  const b = [...tile.querySelectorAll("[data-step]")].find(x => (+x.dataset.d > 0) === (e.key === "ArrowUp")); if (!b) return; e.preventDefault(); const id = t.id; b.click();
+  requestAnimationFrame(() => { const n = document.getElementById(id); if (n){ n.focus(); try { n.select(); } catch(_){} } }); });
 document.addEventListener("change", e => { const t = e.target; if (t.tagName !== "SELECT" || !t.dataset.oc) return; (S.oc = S.oc || {})[t.dataset.oc] = t.value; render(); });
 document.addEventListener("change", e => { const t = e.target; if (t.tagName !== "SELECT" || !t.dataset.stc) return; (S.stc = S.stc || {}).d = t.value; const r = document.getElementById("stcres"); if (r){ r.innerHTML = stcRes(); seg1(r); } });
 document.addEventListener("click", e => { const t = e.target.closest && e.target.closest("[data-ocreset]"); if (!t) return; S.oc = {}; render(); });
