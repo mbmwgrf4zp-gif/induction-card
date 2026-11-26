@@ -827,7 +827,7 @@ if (window.top !== window.self && /\.github\.io$/.test(location.hostname)) {
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.151.1";
+const APP_VERSION = "2.152.0";
 const APP_DATE = "25 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
@@ -2388,6 +2388,8 @@ const QRH1_CHECKED = true;   // checked by author 26 Nov 2026;   // v2.150 QRH k
 const qrh1Draft = () => QRH1_CHECKED ? "" : `<div class="warn" style="margin-top:0">DRAFT — Association of Anaesthetists QRH (2023), adapted wording (v2.150). Check before use.</div>`;
 const QRH2_CHECKED = true;   // checked by author 26 Nov 2026;   // v2.151 QRH crises
 const qrh2Draft = () => QRH2_CHECKED ? "" : `<div class="warn" style="margin-top:0">DRAFT — Association of Anaesthetists QRH (2023), adapted wording (v2.151). Check before use.</div>`;
+const QRH3_CHECKED = false;   // v2.152 QRH theatre & equipment
+const qrh3Draft = () => QRH3_CHECKED ? "" : `<div class="warn" style="margin-top:0">DRAFT — Association of Anaesthetists QRH (2023), adapted wording (v2.152). Check before use.</div>`;
 const crisisDraft = () => CRISIS_CHECKED ? "" : `<div class="warn" style="margin-top:0">DRAFT — from published guidelines, not yet ticked by you.</div>`;
 const wk = (w, per, unit, max) => { if (WKS) return "— (enter weight)"; let v = per*w, c = false; if (max!=null && v>max){ v=max; c=true; } return `${dz(v, unit, max)} ${unit}${c?` (max ${max} ${unit})`:""}`; };
 const B = x => `<b class="dose">${x}</b>`;
@@ -2544,6 +2546,41 @@ eCards.adult = () => {
     "❿ Urinary catheter, hourly urine. ⓫ Consider cardiac-output monitoring. Goals: MAP, urine output, ScvO₂ (CVP).",
     "⓬ Find and control the source; send cultures. ⓭ Abandon or limit surgery? ⓮ Plan with intensive care."],
     "Association of Anaesthetists QRH 3-14 Sepsis v.1, CC BY-NC-SA 4.0.", "", qrh2Draft())
+  + crisis("Patient fire", [
+    "Smoke, heat, smell, flash or flame on the patient, drapes, or in the airway.",
+    "❶ Call for help; tell the team · fire alarm · hospital fire number: say where and what · bring the CO₂ extinguisher. <span class=\"sub\">Know where your alarm and extinguisher are.</span>",
+    "<b>Airway fire</b> — ❷ stop laser or diathermy · stop ventilation AND fresh gas flow · remove the tube if on fire · remove flammable material from the airway · flood the airway with 0.9% saline. ❸ Then: re-ventilate · minimise O₂, no N₂O · check the airway for damage and debris · consider bronchoscopy · re-intubate.",
+    "<b>Non-airway fire</b> — ❷ stop laser or diathermy · remove drapes and burning material · flood with 0.9% saline or soaked gauze · CO₂ extinguisher. ❸ Then: re-ventilate · minimise O₂, no N₂O · assess damage · inhalational injury if not intubated · intubate depending on injury.",
+    "❹ Assess and plan: no secondary fire? smoke risk? intensive care?",
+    "❺ Keep the materials and devices; report through your incident system and to the Medical Device Authority (UK QRH: MHRA). ❻ Spreading fire or smoke risk to staff: follow local fire procedures."],
+    "Association of Anaesthetists QRH 3-7 Patient fire v.1, CC BY-NC-SA 4.0.", "", qrh3Draft())
+  + crisis("Mains oxygen failure", [
+    "Wall or pendant O₂ lost — one theatre, a zone, or the whole hospital.",
+    "❶ Tell the team and the theatre coordinator. ❷ Call for help (others may be affected too). ❸ <b>Switch to cylinder O₂.</b> ❹ Check what's left; keep one spare cylinder.",
+    "❺ Make it last: circle system · lowest fresh gas flow · lowest safe FiO₂ · check FiO₂ alarms. ❻ Gas-driven ventilator? Hand-ventilate to save O₂.",
+    "❼ Move to a nearby area with O₂? ❽ Keep checking inspired O₂ and volatile. ❾ No new case unless clinically essential; finish the current one if appropriate; recover in theatre if recovery is also affected (cylinder O₂ there; who doesn't need O₂?).",
+    "❿ Disconnect from failed outlets; don't reconnect until a competent person confirms the gas — it may not be 100% O₂ at first.",
+    "<b>Cylinder contents (UK sizes)</b> — full 137 bar: C 170 L · D 340 · E 680 · F 1360 · G 3400 · J 6800 L. Half (69 bar) = half; quarter (34 bar) = quarter. Minutes left ≈ litres ÷ flow (L/min). <span class=\"sub\">Check your cylinder's label.</span>",
+    "Coordinator: stop new cases, find the extent and reserves, start emergency plans, organise more cylinders, keep theatres informed."],
+    "Association of Anaesthetists QRH 4-1 Mains oxygen failure v.1, CC BY-NC-SA 4.0.", "", qrh3Draft())
+  + crisis("Mains electricity failure", [
+    "Total power loss is rare and sudden — safe anaesthesia is at risk straight away.",
+    "❶ Call for help: extra people to monitor and fetch equipment. ❷ Coordinator: start the local plan — extent, likely duration, other services (oxygen, water). Need to evacuate → Emergency evacuation.",
+    "❸ Light: open doors and blinds; torches, portable lights, phones, laryngoscopes.",
+    "❹ Keep ventilating — by hand if needed; consider spontaneous breathing; keep the patient anaesthetised. ❺ Monitors down: pulse and BP by hand. ❻ Check the O₂ supply — failed → Mains oxygen failure.",
+    "❼ Unplug what you don't need. Socket types (UK colours; check your theatre): ordinary (no protection) · secondary supply (UK red) for devices with their own battery · uninterrupted supply (UK blue) — limited, essentials only · device batteries may not run every function, for an unknown time.",
+    "❽ Decide: stop surgery now · continue until stable and closed (temporary closure) · or move to a theatre with power.",
+    "❾ Prepare recovery: theatre, recovery or ICU."],
+    "Association of Anaesthetists QRH 4-2 Mains electricity failure v.1, CC BY-NC-SA 4.0.", "", qrh3Draft())
+  + crisis("Emergency evacuation", [
+    "Anaesthetised or sedated patient must move now — flood, fire, smoke, collapse, noxious gas.",
+    "❶ Can the patient be moved safely? <b>If not:</b> deep enough anaesthesia · 100% O₂ at low flow, fill the vaporiser · adequate relaxation · evacuate all staff (including you when indicated) · tell rescue services and the coordinator.",
+    "❷ Stop surgery as soon as safe; pack and cover wounds. ❸ Onto a bed or trolley (the table only in extremis). ❹ Non-essential staff out; helpers may not be able to come.",
+    "❺ Airway: intubate if time allows. ❻ Breathing: minimise O₂ — lowest flows; self-inflating bag ± O₂ (ventilators and C-circuits use more).",
+    "❼ Circulation: secure IV access; take fluid and sets; vasopressors or the resuscitation box. ❽ Anaesthesia: intermittent propofol boluses are quickest; infusion if time (take the pump's mains cable); blankets or warming.",
+    "❾ Take if possible: oxygen, propofol or another hypnotic, relaxant, vasopressor, analgesia, IV fluid, reversal. ❿ Take the monitoring and mains cables.",
+    "⓫ Agree the muster point: able-bodied → nearby safe zone; anaesthetised patient → somewhere with oxygen and drugs (theatre, recovery or critical care in a safe zone). Tell rescue services where. Route avoids the hazard; careful with lifts, especially in fire."],
+    "Association of Anaesthetists QRH 4-3 Emergency evacuation v.1, CC BY-NC-SA 4.0.", "", qrh3Draft())
   + crisis("High / total spinal", [
     "Call for help. Tell the surgeon.",
     "Keep left uterine displacement. <b>Do not</b> tip head-down.",
@@ -5871,6 +5908,11 @@ VGROUPS.find(g => g[0]==="General")[1].push(["QRH crises (v2.151)", "26 Nov 2026
   "Embolus 3-5: crystalloid 500–1000 mL; alteplase 10 mg then 90 mg over 2 h (> 65 kg). Tamponade 3-9: fluid 500–1000 mL; sub-xiphoid pericardiocentesis",
   "Ischaemia 3-12: GTN IV 1 mg/mL from 0.1 mL/kg/h; haematocrit > 30%. Neuroprotection 3-13: SpO₂ 94–98%, PaCO₂ 4.5–5.5 kPa, SBP > 100, glucose ≤ 10, QRH 32–36 °C vs newer fever prevention — local ICU policy",
   "Sepsis 3-14: crystalloid ≥ 30 mL/kg; antibiotics within 1 h; noradrenaline MAP ≥ 65; vasopressin 0.03 units/min; dobutamine ≤ 20 mcg/kg/min; no starches"]]);
+VGROUPS.find(g => g[0]==="General")[1].push(["QRH theatre & equipment (v2.152)", "", [
+  "Patient fire 3-7 (airway vs non-airway), reporting to incident system and Medical Device Authority (QRH: MHRA)",
+  "Mains oxygen failure 4-1: UK cylinder sizes C 170 L to J 6800 L at 137 bar; minutes ≈ litres ÷ flow",
+  "Mains electricity failure 4-2: socket colours are UK (red secondary, blue uninterrupted) — check local",
+  "Emergency evacuation 4-3"]]);
 VGROUPS.find(g => g[0]==="General")[1].push(["Induction drugs & relaxants combined", "22 Nov 2026", [
   "Adult: General › Induction › 1. Induction drugs & relaxants — Opioid · Hypnotic · Muscle relaxant · No IV access (rows moved unchanged)",
   "Paeds: Paediatric › Induction › 3. Induction drugs & relaxants — Anticholinergic · Opioid · Hypnotic · Muscle relaxant · No IV access (rows moved unchanged)",
@@ -5953,6 +5995,7 @@ function vTicks(){
 }
 /* ---------- ABOUT ---------- */
 const CHANGES = [
+  ["2.152","Emergencies › Adult › Theatre & equipment: Patient fire, Mains oxygen failure (with cylinder contents), Mains electricity failure, Emergency evacuation (Association of Anaesthetists QRH 2023; reporting to Malaysia's Medical Device Authority). (draft)"],
   ["2.151","Emergencies › Adult: Laryngospasm & stridor, Massive blood loss (with MOH targets), Circulatory embolus, Cardiac tamponade, Cardiac ischaemia, After cardiac arrest: neuroprotection, Sepsis (Association of Anaesthetists QRH 2023). (checked)"],
   ["2.150","Emergencies › Adult: Key basic plan first, then Common intra-op problems — hypoxia, high airway pressure, hypotension, hypertension, bradycardia, tachycardia, hyperthermia (Association of Anaesthetists QRH 2023), doses per kg for the weight. Bradycardia now has its own card; the arrest card is Cardiac arrest. (checked)"],
   ["2.149","Favourites: tap ☆ on any card, or on any antibiotic procedure, then ★ on the home screen opens your list (kept on this phone; Reset all clears it). Antibiotic tabs no longer scroll the chosen tab out of view. (checked) Home ★ is now gold so it stands out. Fold-out sections (IV iron, formulas, fluid balance and others) now look like buttons with Show / Hide."],
@@ -6137,7 +6180,7 @@ screens.values = () => {
 
 /* ================= ROUTER & EVENTS ================= */
 /* ================= GROUPS (by situation) ================= */
-const EMERG_ADULT = ["§Start here","Key basic plan","§Common intra-op problems","Hypoxia / desaturation","Increased airway pressure","Hypotension","Hypertension","Bradycardia","Tachycardia","Peri-operative hyperthermia","§Airway & oxygenation","Failed intubation / CICO","Laryngospasm & stridor","Bronchospasm","Anaphylaxis","§Circulation & cardiac arrest","Cardiac arrest","After cardiac arrest: neuroprotection","Massive blood loss","Circulatory embolus","Cardiac tamponade","Cardiac ischaemia","Sepsis","§Drug-related & metabolic","LA toxicity (LAST)","Malignant hyperthermia","Hyperkalaemia","Latex allergy","§Neuraxial & obstetric","High / total spinal","Hypotension after spinal","Massive obstetric haemorrhage","Eclampsia"];
+const EMERG_ADULT = ["§Start here","Key basic plan","§Common intra-op problems","Hypoxia / desaturation","Increased airway pressure","Hypotension","Hypertension","Bradycardia","Tachycardia","Peri-operative hyperthermia","§Airway & oxygenation","Failed intubation / CICO","Laryngospasm & stridor","Bronchospasm","Anaphylaxis","§Circulation & cardiac arrest","Cardiac arrest","After cardiac arrest: neuroprotection","Massive blood loss","Circulatory embolus","Cardiac tamponade","Cardiac ischaemia","Sepsis","§Drug-related & metabolic","LA toxicity (LAST)","Malignant hyperthermia","Hyperkalaemia","Latex allergy","§Neuraxial & obstetric","High / total spinal","Hypotension after spinal","Massive obstetric haemorrhage","Eclampsia","§Theatre & equipment","Patient fire","Mains oxygen failure","Mains electricity failure","Emergency evacuation"];
 const EMERG_PAEDS = ["§Airway & breathing","Paeds hypoxia / desaturation","Laryngospasm","Paeds bronchospasm","Paeds difficult airway / CICO","Post-tonsillectomy bleed","§Circulation","Paeds cardiac arrest","Paeds anaphylaxis","Cyanotic heart disease / Fallot spell","Paeds massive transfusion","§Drug-related","Paeds LA toxicity (LAST)","Paeds malignant hyperthermia","Latex allergy","§Recovery","Paeds PACU crises"];
 /* ---------- PRINT PLAN SHEETS (paper copy for theatre) ---------- */
 const PRINT_CHECKED = true;
@@ -6507,6 +6550,10 @@ const SEARCH_EXTRA = {   // keyed by stable card id
   "emerg-adult-cardiac-ischaemia":"cardiac ischaemia myocardial ischemia st depression st elevation gtn cm5 qrh 3-12",
   "emerg-adult-post-arrest-neuroprotection":"rosc post arrest neuroprotection cooling targeted temperature qrh 3-13",
   "emerg-adult-sepsis":"sepsis septic shock noradrenaline lactate antibiotics within 1 hour qrh 3-14",
+  "emerg-adult-patient-fire":"fire airway fire patient fire drapes laser diathermy co2 extinguisher qrh 3-7",
+  "emerg-adult-mains-oxygen-failure":"oxygen failure pipeline failure wall oxygen cylinder qrh 4-1",
+  "emerg-adult-mains-electricity-failure":"power failure electricity failure blackout ups qrh 4-2",
+  "emerg-adult-emergency-evacuation":"evacuation evacuate theatre fire flood muster qrh 4-3",
   "emerg-adult-key-basic-plan":"key basic plan abcde sweep unexpected problem qrh 1-1 oxygen delivery airway breathing circulation depth",
   "emerg-adult-hypoxia-desaturation":"hypoxia desaturation desat cyanosis low spo2 qrh 2-2",
   "emerg-adult-increased-airway-pressure":"high airway pressure peak pressure increased airway pressure qrh 2-3 kinked tube",
@@ -6551,6 +6598,10 @@ const CARD_IDS = {
   "Latex allergy":"emerg-latex-allergy",
   "Cardiac arrest":"emerg-adult-bradycardia-and-cardiac-arrest",
   "Key basic plan":"emerg-adult-key-basic-plan",
+  "Patient fire":"emerg-adult-patient-fire",
+  "Mains oxygen failure":"emerg-adult-mains-oxygen-failure",
+  "Mains electricity failure":"emerg-adult-mains-electricity-failure",
+  "Emergency evacuation":"emerg-adult-emergency-evacuation",
   "Laryngospasm & stridor":"emerg-adult-laryngospasm-stridor",
   "Massive blood loss":"emerg-adult-massive-blood-loss",
   "Circulatory embolus":"emerg-adult-circulatory-embolus",
