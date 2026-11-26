@@ -827,7 +827,7 @@ if (window.top !== window.self && /\.github\.io$/.test(location.hostname)) {
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.152.1";
+const APP_VERSION = "2.153.1";
 const APP_DATE = "25 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
@@ -2390,6 +2390,8 @@ const QRH2_CHECKED = true;   // checked by author 26 Nov 2026;   // v2.151 QRH c
 const qrh2Draft = () => QRH2_CHECKED ? "" : `<div class="warn" style="margin-top:0">DRAFT — Association of Anaesthetists QRH (2023), adapted wording (v2.151). Check before use.</div>`;
 const QRH3_CHECKED = true;   // checked by author 26 Nov 2026;   // v2.152 QRH theatre & equipment
 const qrh3Draft = () => QRH3_CHECKED ? "" : `<div class="warn" style="margin-top:0">DRAFT — Association of Anaesthetists QRH (2023), adapted wording (v2.152). Check before use.</div>`;
+const QRH4_CHECKED = true;   // checked by author 26 Nov 2026;   // v2.153 existing cards re-checked against QRH 2023
+const qrh4Draft = () => QRH4_CHECKED ? "" : `<div class="warn" style="margin-top:0">DRAFT — re-checked against Association of Anaesthetists QRH (2023) (v2.153). Check before use.</div>`;
 const crisisDraft = () => CRISIS_CHECKED ? "" : `<div class="warn" style="margin-top:0">DRAFT — from published guidelines, not yet ticked by you.</div>`;
 const wk = (w, per, unit, max) => { if (WKS) return "— (enter weight)"; let v = per*w, c = false; if (max!=null && v>max){ v=max; c=true; } return `${dz(v, unit, max)} ${unit}${c?` (max ${max} ${unit})`:""}`; };
 const B = x => `<b class="dose">${x}</b>`;
@@ -2586,10 +2588,12 @@ eCards.adult = () => {
     "Keep left uterine displacement. <b>Do not</b> tip head-down.",
     "100% O₂. Support breathing with bag-mask.",
     "Can't speak, weak cough, falling SpO₂ or unconscious → "+B("RSI and intubate")+". Sedate after (may be aware).",
-    "Hypotension: fast fluids + "+B("phenylephrine 50–100 mcg")+" or "+B("ephedrine 6–9 mg")+". Severe: "+B("adrenaline 10–100 mcg IV")+".",
-    "Bradycardia: "+B("atropine 0.5 mg")+" (to 3 mg) or "+B("glycopyrrolate 200–400 mcg")+". Severe: adrenaline.",
+    "Hypotension: fast fluids, legs up + "+B("phenylephrine 50–100 mcg")+" repeated or infusion, "+B("metaraminol 1–2 mg")+" repeated, or "+B("ephedrine 6–12 mg")+" repeated (max 30 mg — tachyphylaxis). Severe: "+B("adrenaline 10–100 mcg IV")+". CPR may be needed to circulate drugs.",
+    "Bradycardia: "+B("atropine 0.6–1.2 mg")+" or "+B("glycopyrrolate 200–400 mcg")+". Severe: adrenaline.",
+    "Inducing: reassure — they may be fully aware. <b>Reduced hypnotic dose</b> (full dose not needed if consciousness is already impaired); relaxant may not be needed if unconscious, paralysed and apnoeic.",
+    "Obstetric: consider expediting delivery (aorto-caval compression, fetal oxygenation). Mimics: aorto-caval compression, LA toxicity, embolism, vasovagal, haemorrhage.",
     "Arrest → ALS. Pregnant ≥ 20 weeks: perimortem Caesarean within 5 min."],
-    "OAA / Association of Anaesthetists guidance.")
+    "OAA / Association of Anaesthetists guidance; QRH 3-11 High central neuraxial block v.1, CC BY-NC-SA 4.0.", "", qrh4Draft())
   + crisis("LA toxicity (LAST)", [
     "Stop injecting LA (remember infusion pumps). Call for help; cardiac arrest trolley and lipid rescue pack.",
     "100% O₂; secure the airway if needed; avoid hypercarbia (mild hyperventilation). IV access.",
@@ -2606,11 +2610,13 @@ eCards.adult = () => {
     "100% O₂, secure airway. Legs up.",
     "IV adrenaline "+B("50 mcg")+" (0.5 mL of 1:10 000), repeat as needed. No IV: IM "+B("0.5 mg")+" (0.5 mL of 1:1000).",
     "Crystalloid "+B("20 mL/kg = "+wk(w,20,"mL"))+".",
-    "Needing repeated boluses: adrenaline infusion "+B("0.05–0.1 mcg/kg/min")+".",
+    "SBP &lt; 50 mmHg or arrest: <b>start CPR</b> → Cardiac arrest.",
+    "After 3 boluses: adrenaline infusion "+B("0.05–0.1 mcg/kg/min")+" — e.g. "+B("3 mg in 50 mL saline")+" from 3 mL/h (3 mcg/min) up to 40 mL/h (QRH).",
+    "Still hypotensive: metaraminol or noradrenaline ± "+B("vasopressin 2 units")+" (repeat; consider infusion). Beta-blocked and not responding: "+B("glucagon 1 mg")+", repeat as needed.",
     "Bronchospasm: salbutamol. Arrest → ALS. Pregnant: left uterine displacement.",
     (AUD_CHECKED?"":"<b>DRAFT:</b> ")+"After stable: antihistamine and steroid are <b>not</b> part of emergency treatment (RCUK 2021). Consider "+B("chlorphenamine 10 mg IV")+" for skin symptoms; "+B("hydrocortisone 200 mg IV")+" only for refractory shock or bronchospasm.",
-    "Tryptase: as soon as resuscitated, at 1–2 h, and at 24 h. Refer for allergy testing."],
-    "Association of Anaesthetists / RCUK anaphylaxis guidance.")
+    "Tryptase: as soon as resuscitated, at 1–2 h, and at 24 h. Refer for allergy testing. Triggers to think of: antibiotics, relaxants, patent blue, chlorhexidine (lines, lubricants, skin prep), colloids. Label the allergy."],
+    "Association of Anaesthetists / RCUK anaphylaxis guidance; QRH 3-1 Anaphylaxis v.5, CC BY-NC-SA 4.0.", "", qrh4Draft())
   + crisis("Hypotension after spinal", [
     "Left uterine displacement. Fluid co-load running.",
     "Phenylephrine (50 mcg/mL): bolus "+B("50–100 mcg")+" or infusion "+B("25–50 mcg/min = 30–60 mL/h")+", started at spinal.",
@@ -2624,16 +2630,20 @@ eCards.adult = () => {
     "Shockable (VF/pVT): first shock "+B("≥ 150 J")+" biphasic (pulsed biphasic 130–150 J); increase energy for later shocks if possible. Adrenaline "+B("1 mg")+" and "+B("amiodarone 300 mg")+" after 3rd shock; amiodarone "+B("150 mg")+" after 5th. Alternative: "+B("lignocaine 100 mg")+" (+ 50 mg after 5th).",
     "Non-shockable: "+B("adrenaline 1 mg")+" ASAP, then every 3–5 min.",
     "Pregnant ≥ 20 weeks: manual uterine displacement; perimortem Caesarean within 5 min.",
-    "4 Hs and 4 Ts (think high spinal, LAST, haemorrhage, anaphylaxis)."],
-    "Resuscitation Council UK ALS 2025 (updated from the 2025 text, Nov 2026).")
+    "4 Hs and 4 Ts (think high spinal, LAST, haemorrhage, anaphylaxis).",
+    "<b>In theatre:</b> turn off the anaesthetic; 100% O₂ · no EtCO₂ = assume oesophageal intubation until excluded · EtCO₂ to judge compressions; a sudden rise = ROSC · fluid "+B("500 mL")+" · vagal: "+B("atropine 0.5–1 mg")+" · polymorphic VT or low Mg: "+B("magnesium 2 g")+" · high K⁺, low Ca²⁺ or Mg overdose: "+B("calcium chloride 10% 10 mL")+" · massive PE: thrombolysis · IO if no IV.",
+    "Peri-operative causes: vagal tone, drug error, LA toxicity, anaphylaxis, embolus (gas, fat, amniotic), massive blood loss, tamponade, tension pneumothorax. After ROSC: re-establish anaesthesia; ventilator on volume control, avoid over-ventilation."],
+    "Resuscitation Council UK ALS 2025 (updated from the 2025 text, Nov 2026); QRH 2-1 Cardiac arrest v.1, CC BY-NC-SA 4.0.", "", qrh4Draft())
   + crisis("Bronchospasm", [
-    "100% O₂. Check tube, circuit, capnograph (rule out kink, endobronchial, pneumothorax).",
-    "Deepen: sevoflurane, propofol or "+B("ketamine 0.5–1 mg/kg = "+wk(w,0.5,"mg")+"–"+wk(w,1,"mg"))+".",
-    "Salbutamol "+B("6–10 puffs")+" into circuit, or neb "+B("5 mg")+".",
-    "IV salbutamol "+B("250 mcg")+" slow. IV "+B("magnesium 2 g")+" over 20 min.",
-    "Severe: "+B("adrenaline 10–100 mcg IV")+". Think anaphylaxis.",
-    "IV "+B("hydrocortisone 200 mg")+". Ventilate slow with long expiration."],
-    "Standard crisis management.")
+    "Wheeze, long expiration, high airway pressure, falling SpO₂, rising CO₂, up-sloping capnograph, silent chest (= severe).",
+    "100% O₂. Stop surgery and stimulation. Check tube, circuit, capnograph (rule out kink, endobronchial or oesophageal tube, pneumothorax). Think anaphylaxis.",
+    "Deepen: sevoflurane or propofol (avoid isoflurane, desflurane), or "+B("ketamine 20 mg")+" bolus; infusion "+B("1–3 mg/kg/h = "+wk(w,1,"mg")+"–"+wk(w,3,"mg")+"/h")+".",
+    "<b>First line:</b> salbutamol "+B("6–10 puffs")+" into circuit, or neb "+B("5 mg")+" (remove the HME or nebulise downstream). "+B("Ipratropium neb 0.5 mg")+".",
+    "<b>Second line IV:</b> "+B("salbutamol 250 mcg")+" slow, then "+B("5–20 mcg/min")+" · "+B("magnesium 2 g")+" over 20 min · "+B("aminophylline 5 mg/kg = "+wk(w,5,"mg"))+" over 20 min (omit if on theophylline), then "+B("0.5 mg/kg/h = "+wk(w,0.5,"mg")+"/h")+".",
+    "Severe: "+B("adrenaline 10–100 mcg IV")+" slow, or "+B("IM 500 mcg")+", or neb "+B("5 mL of 1:1000")+".",
+    "IV "+B("hydrocortisone 200 mg")+". Ventilate slow with long expiration; pressure control may be better; watch for breath stacking; permissive hypercapnia.",
+    "Aspiration: intubate, tracheal toilet, NG tube. Mimics: pulmonary oedema, ARDS, laryngospasm, airway obstruction, pneumothorax. Chest X-ray when safe."],
+    "Association of Anaesthetists QRH 3-4 Bronchospasm v.3, CC BY-NC-SA 4.0.", "", qrh4Draft())
   + crisis("Malignant hyperthermia", [
     "Stop volatile. Call for help, get MH kit.",
     "High-flow O₂ &gt; 10 L/min. Activated charcoal filters on inspiratory and expiratory limbs if available. Switch to TIVA.",
@@ -2641,16 +2651,18 @@ eCards.adult = () => {
     "Repeat the same dose "+B("every 10 min")+" until PaCO₂ &lt; 6 kPa with normal ventilation and signs settle. Max total 10 mg/kg = "+wk(w,10,"mg")+" may need exceeding (reconsider diagnosis); an adult may need 1200 mg.",
     "Cool: 2–3 L chilled (4–8 °C) crystalloid IV, surface cooling; stop below 38.5 °C.",
     "Hyperkalaemia: insulin + dextrose, "+B("calcium chloride 10% 10 mL")+". Arrhythmia: amiodarone (no calcium channel blockers).",
-    "Monitor urine output, CK, ABG. ICU."],
-    "EMHG malignant hyperthermia crisis guideline 2024.", updNote("EMHG 2024","the EMHG guideline text (emhg.org) + NYSORA summary"))
+    "Hyperventilate 2–3 × normal. Acidosis pH &lt; 7.2: "+B("sodium bicarbonate 8.4% 50 mL")+". Myoglobinuria: urine &gt; 2 mL/kg/h, urine pH &gt; 7. DIC: FFP, cryo, platelets. Watch for compartment syndrome.",
+    "Monitor urine output, CK (peak 12–24 h), ABG. ICU. <span class=\"sub\">QRH 3-8 gives dantrolene 2–3 mg/kg then 1 mg/kg every 5 min; this card follows EMHG 2024.</span>"],
+    "EMHG malignant hyperthermia crisis guideline 2024; QRH 3-8 v.2, CC BY-NC-SA 4.0.", updNote("EMHG 2024","the EMHG guideline text (emhg.org) + NYSORA summary"), qrh4Draft())
   + crisis("Failed intubation / CICO", [
     "Plan A: "+B("videolaryngoscope first-line")+" whenever possible; neuromuscular block routinely; peroxygenation throughout. Max 3 + 1 attempts (obstetric: 2, 3rd by most experienced). Release cricoid if view poor.",
     "Plan B: 2nd-generation supraglottic airway, max 3 attempts. No blind intubation through it. If SGA ventilation is difficult, start preparing for front-of-neck access.",
     "Plan C: face mask. Wake up — "+B("sugammadex 16 mg/kg = "+wk(w,16,"mg"))+" if rocuronium. Re-paralysis after sugammadex: wait times on General › Post-op › Reversal (non-steroidal relaxant if sooner).",
     "Plan D — CICO: declare it. Full paralysis, 100% O₂.",
-    "Front of neck: "+B("scalpel – bougie – size 6.0 cuffed tube")+" through cricothyroid membrane.",
+    "Front of neck: "+B("scalpel – bougie – size 6.0 cuffed tube")+" through cricothyroid membrane. Neck fully extended; right-handed stand on the patient's left; laryngeal handshake. Transverse stab, turn the blade 90° (sharp edge to the feet), bougie past the blade, railroad the tube.",
+    "<b>Membrane can't be felt:</b> 8–10 cm vertical midline incision, blunt dissection to find the trachea, steady it, then the same scalpel–bougie–tube through the membrane.",
     "Obstetric: decide early — wake up or proceed with SAD."],
-    "DAS 2025 / OAA-DAS obstetric guideline.", updNote("DAS 2025 (Nov 2025)","NYSORA summary + BJA guideline text excerpts"))
+    "DAS 2025 / OAA-DAS obstetric guideline; QRH 3-3 CICO v.1, CC BY-NC-SA 4.0.", updNote("DAS 2025 (Nov 2025)","NYSORA summary + BJA guideline text excerpts"), qrh4Draft())
   + crisis("Massive obstetric haemorrhage", [
     "Call for help — activate massive transfusion protocol. 2 large-bore IVs, crossmatch, FBC, coags, fibrinogen.",
     "Uterine massage. Empty bladder.",
@@ -5913,6 +5925,12 @@ VGROUPS.find(g => g[0]==="General")[1].push(["QRH theatre & equipment (v2.152)",
   "Mains oxygen failure 4-1: UK cylinder sizes C 170 L to J 6800 L at 137 bar; minutes ≈ litres ÷ flow",
   "Mains electricity failure 4-2: socket colours are UK (red secondary, blue uninterrupted) — check local",
   "Emergency evacuation 4-3"]]);
+VGROUPS.find(g => g[0]==="General")[1].push(["QRH re-check of existing cards (v2.153)", "26 Nov 2026", [
+  "Cardiac arrest + QRH 2-1: fluid 500 mL; atropine 0.5–1 mg (vagal); magnesium 2 g; calcium chloride 10% 10 mL; no EtCO₂ = oesophageal",
+  "Anaphylaxis + QRH 3-1 v.5: CPR if SBP < 50; infusion after 3 boluses, 3 mg/50 mL at 3–40 mL/h; vasopressin 2 units; glucagon 1 mg",
+  "Bronchospasm = QRH 3-4 v.3: ketamine 20 mg (was 0.5–1 mg/kg) then 1–3 mg/kg/h; ipratropium 0.5 mg; salbutamol 250 mcg then 5–20 mcg/min; aminophylline 5 mg/kg then 0.5 mg/kg/h; adrenaline IM 500 mcg / neb 5 mL 1:1000",
+  "MH: EMHG dantrolene kept (QRH 1 mg/kg every 5 min noted); bicarbonate 50 mL 8.4% if pH < 7.2; urine > 2 mL/kg/h",
+  "CICO + QRH 3-3: impalpable membrane — 8–10 cm vertical incision. High spinal + QRH 3-11: ephedrine 6–12 mg (max 30), atropine 0.6–1.2 mg, metaraminol 1–2 mg, reduced induction dose"]]);
 VGROUPS.find(g => g[0]==="General")[1].push(["Induction drugs & relaxants combined", "22 Nov 2026", [
   "Adult: General › Induction › 1. Induction drugs & relaxants — Opioid · Hypnotic · Muscle relaxant · No IV access (rows moved unchanged)",
   "Paeds: Paediatric › Induction › 3. Induction drugs & relaxants — Anticholinergic · Opioid · Hypnotic · Muscle relaxant · No IV access (rows moved unchanged)",
@@ -5995,6 +6013,7 @@ function vTicks(){
 }
 /* ---------- ABOUT ---------- */
 const CHANGES = [
+  ["2.153","Emergencies › Adult re-checked against the QRH 2023: Cardiac arrest (theatre-specific steps), Anaphylaxis (CPR if SBP < 50, glucagon, vasopressin, infusion recipe), Bronchospasm (QRH drugs; ketamine 20 mg), Malignant hyperthermia (complications), CICO (impalpable membrane technique), High spinal (metaraminol, wider ephedrine and atropine ranges, reduced induction dose). (checked)"],
   ["2.152","Emergencies › Adult › Theatre & equipment: Patient fire, Mains oxygen failure (with cylinder contents), Mains electricity failure, Emergency evacuation (Association of Anaesthetists QRH 2023; reporting to Malaysia's Medical Device Authority). (checked)"],
   ["2.151","Emergencies › Adult: Laryngospasm & stridor, Massive blood loss (with MOH targets), Circulatory embolus, Cardiac tamponade, Cardiac ischaemia, After cardiac arrest: neuroprotection, Sepsis (Association of Anaesthetists QRH 2023). (checked)"],
   ["2.150","Emergencies › Adult: Key basic plan first, then Common intra-op problems — hypoxia, high airway pressure, hypotension, hypertension, bradycardia, tachycardia, hyperthermia (Association of Anaesthetists QRH 2023), doses per kg for the weight. Bradycardia now has its own card; the arrest card is Cardiac arrest. (checked)"],
