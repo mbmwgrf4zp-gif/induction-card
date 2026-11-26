@@ -796,7 +796,7 @@ details.bfb[open]>summary{margin-bottom:4px}details.bfb .bfo{margin-top:4px}deta
 .bfsidepick{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.bfsidepick span{font-weight:600}.bfsidepick button{min-height:40px;padding:0 16px;border-radius:999px;border:1px solid var(--line);background:var(--card);color:var(--ink);font-weight:600}
 .bfops{margin:0 0 var(--s2)}.bfops .searchbox{margin:0}#bfopsr{display:grid;gap:4px;margin-top:4px}.bfopb{text-align:left;min-height:44px;padding:6px 12px;border-radius:var(--r-sm);border:1px solid var(--line);background:var(--card);color:var(--ink);font:inherit}
 .bfquiet{justify-content:flex-end!important;gap:6px!important}.bfsep{color:var(--muted)}
-.tpick{display:grid;gap:4px;margin:var(--s2) 0}.tvm{border-top:1px solid var(--line);padding:var(--s2) 0}.tvh{display:flex;flex-wrap:wrap;gap:4px 10px;align-items:baseline}.tvh b{font-size:var(--fs-md,17px)}.tvh span{font-size:13px;color:var(--muted)}.tvg{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin:6px 0}.tvg small{display:block;font-size:12px;color:var(--muted)}.tvg b{font-size:17px;font-variant-numeric:tabular-nums}.tvm .seg small{display:block;font-weight:400;font-size:12px;opacity:.85}.tvm .ndet{margin-top:4px}.tvrob{margin-top:var(--s2)}.tvrob table{margin:4px 0}
+.tpick{display:grid;gap:4px;margin:var(--s2) 0}.tvm{border-top:1px solid var(--line);padding:var(--s2) 0}.tvh{display:flex;flex-wrap:wrap;gap:4px 10px;align-items:baseline}.tvh b{font-size:var(--fs-md,17px)}.tvh span{font-size:13px;color:var(--muted)}.tvg{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin:6px 0}.tvg small{display:block;font-size:12px;color:var(--muted)}.tvg b{font-size:17px;font-variant-numeric:tabular-nums}.tvm .seg small{display:block;font-weight:400;font-size:12px;opacity:.85}.tvm .ndet{margin-top:4px}.tvrob{margin-top:var(--s2)}.tvt{margin:var(--s2) 0}.tvt th small{font-weight:400;color:var(--muted)}.tvt td.hl{font-weight:700}.tvrob table{margin:4px 0}
 .tlab{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin-top:6px}.tpick .seg{margin:0}.tpick .seg small{display:block;font-weight:400;font-size:12px;color:var(--muted)}.tpick .seg button[aria-pressed="true"] small{color:inherit;opacity:.85}
 .tticks{display:flex;flex-wrap:wrap;gap:6px}.tck{min-height:40px;padding:0 12px;border-radius:999px;border:1px solid var(--line);background:var(--card);color:var(--ink);font-size:14px}.tck[aria-pressed="true"]{border-color:var(--gc);background:var(--gc-soft);font-weight:600}
 .tres{border:1px solid var(--line);border-radius:var(--r-sm);padding:var(--s3);display:grid;gap:8px;margin:var(--s2) 0}.trow{display:grid;grid-template-columns:96px 1fr;gap:8px}.trow small{color:var(--muted)}.t-yes b{color:var(--ok-ink,#166534)}.t-consider b{color:var(--warn-ink,#92400e)}.t-no{color:var(--muted)}.tbtns{display:flex;gap:8px;flex-wrap:wrap}
@@ -829,7 +829,7 @@ if (window.top !== window.self && /\.github\.io$/.test(location.hostname)) {
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.155.1";
+const APP_VERSION = "2.155.2";
 const APP_DATE = "26 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
@@ -4122,23 +4122,30 @@ const tvS = () => (S.tv = S.tv || {});
 const tvGet = (k, d) => { const v = tvS()[k]; return v == null ? d : v; };
 const tvBtn = (k, v, l, d) => `<button aria-pressed="${String(tvGet(k, d)) === String(v)}" data-tvb="${k}:${v}">${l}</button>`;
 const tvSeg = (k, d, opts) => `<div class="seg">${opts.map(([v, l]) => tvBtn(k, v, l, d)).join("")}</div>`;
-function tvModel(name, mode, cells, note, info){
-  return `<div class="tvm"><div class="tvh"><b>${name}</b><span>${mode}</span></div>${cells ? `<div class="tvg">${cells.map(([l, v]) => `<div><small>${l}</small><b>${v}</b></div>`).join("")}</div>` : ""}${note ? `<p class="sub">${note}</p>` : ""}<details class="ndet"><summary>Model info</summary>${info}</details></div>`;
-}
-const tvOk = (b, yes, no) => b ? `<b>✓ ${yes}</b>` : `<b>✗ ${no}</b>`;
-function tvTci(){ const a = S.age, w = S.aw, W2 = wts(), bmi = W2.bmi, f = S.sex !== "M", bmiMax = f ? 35 : 42, bmiOk = bmi < bmiMax;
-  const pOk = a <= 88 && w >= 0.68 && w <= 160, rOk = a <= 85 && w >= 2.5 && w <= 106, smp = isSample("aw") || isSample("height");
-  const bmiTxt = tvOk(bmiOk, `BMI ${sig(bmi)} &lt; ${bmiMax} (${f ? "female" : "male"} limit)`, `BMI ${sig(bmi)} — pump accepts only &lt; ${bmiMax} (${f ? "female" : "male"})`);
-  return `<p class="sub">Model check: ${a} y · ${sig(w)} kg · ${S.height} cm · ${f ? "female" : "male"} · BMI ${sig(bmi)}${smp ? " (sample — enter the patient's weight and height)" : ""}. No target suits every patient: titrate to age, frailty, haemodynamics, surgical stimulation, other drugs, response and processed EEG.</p>${tciaDraft()}
-  <div class="tlab">Propofol (mcg/mL)</div>
-  ${tvModel("Marsh", "Plasma (Cp)", [["Induction","4–6"],["Maintenance","3–6"],["+ opioid","2.5–4"]], `Pump limit: weight ≤ 150 kg — ${tvOk(w <= 150, "OK", "over limit")}`, `<p>Pump needs: weight. Volumes scaled to weight only. Developed in healthy adults; not in obese or older patients.</p>`)}
-  ${tvModel("Schnider", "Effect-site (Ce)", [["Induction","4–6"],["Maintenance","3–6"],["+ opioid","2.5–4"]], bmiTxt, `<p>Pump needs: age, height, weight, sex (lean body mass). Use in effect-site mode. Induction doses similar to Marsh in plasma mode; maintenance rates usually a little lower. Developed in healthy adults; not in obese or older patients.</p>`)}
-  ${tvModel("Eleveld", "Plasma or effect-site (pump-dependent)", null, "No reference targets shown. Check whether your pump offers it.", `<p>Pump needs: age, height, weight, sex; other anaesthetic drugs given? This patient: ${tvOk(pOk, "within study range", "outside study range")} (27 weeks PMA – 88 y, 0.68–160 kg).</p><p class="sub">Built from 1,033 people including children, older and high-BMI patients. The 2019 TIVA guideline noted it was not yet in commercial pumps.</p>`)}
-  <p class="sub"><b>Slow induction</b> (older, frail or unwell): start at 1 mcg/mL, step up 0.5–1. <b>Calibrate:</b> note Ce at loss of response to speech and at loss of movement to firm jaw pressure — the second guides the maintenance target. Raise the target rather than giving a manual bolus (a bolus makes the display wrong for several minutes).</p>
-  <div class="tlab">Remifentanil (ng/mL)</div>
-  ${tvModel("Minto", "Plasma or effect-site", [["Intubation","≈ 6"],["Maintenance","2–6"],["Unit","ng/mL"]], `${tvOk(a >= 12 && w >= 30, "age ≥ 12 y, ≥ 30 kg", "needs age ≥ 12 y and ≥ 30 kg")} · ${bmiTxt}`, `<p>Pump needs: age, height, weight, sex (lean body mass — valid only below the BMI limits). Spontaneous breathing is uncommon above 1.5 ng/mL. Above 5 ng/mL (or 0.2 mcg/kg/min) acute tolerance / hyperalgesia possible; significance uncertain. No postoperative analgesia — plan it.</p>`)}
-  ${tvModel("Eleveld", "Plasma or effect-site (pump-dependent)", null, "No reference targets shown. Check whether your pump offers it.", `<p>Pump needs: age, weight, sex. This patient: ${tvOk(rOk, "within study range", "outside study range")} (5 days – 85 y, 2.5–106 kg).</p><p class="sub">Built from 131 people; outperformed Minto across that range.</p>`)}
-  <p class="sub"><b>Obese:</b> no evidence for total vs adjusted body weight in the pump; titrate to effect with processed EEG. Which models your pump offers (Agilia, Alaris PK, Mindray): check the pump.</p>`; }
+function tvTci(){ const a = S.age, w = S.aw, W2 = wts(), bmi = W2.bmi, f = S.sex !== "M", bmiMax = f ? 35 : 42;
+  const pOk = a <= 88 && w >= 0.68 && w <= 160, rOk = a <= 85 && w >= 2.5 && w <= 106;
+  const fails = [w > 150 && `✗ ${sig(w)} kg — Marsh pump accepts only ≤ 150 kg`,
+    bmi >= bmiMax && `✗ BMI ${sig(bmi)} — Schnider / Minto pump accepts only &lt; ${bmiMax} (${f ? "female" : "male"})`,
+    (a < 12 || w < 30) && "✗ Minto needs age ≥ 12 y and ≥ 30 kg"].filter(Boolean);
+  return `<p class="sub">Starting ranges — titrate to response and pEEG.</p>${tciaDraft()}
+  ${fails.map(x => `<div class="danger">${x}</div>`).join("")}
+  <table class="tvt"><tr><th>Propofol <small>mcg/mL</small></th><th>Induction</th><th>Maint</th><th>+ opioid</th></tr>
+  <tr><td>Marsh (Cp) · Schnider (Ce)</td><td class="hl">4–6</td><td class="hl">3–6</td><td class="hl">2.5–4</td></tr></table>
+  <table class="tvt"><tr><th>Remifentanil <small>ng/mL</small></th><th>Intubation</th><th>Maint</th></tr>
+  <tr><td>Minto (Ce)</td><td class="hl">≈ 6</td><td class="hl">2–6</td></tr></table>
+  <details class="ndet"><summary>How to titrate</summary><ul>
+  <li><b>Older, frail or unwell:</b> lower targets. Slow induction: start at 1 mcg/mL, step up 0.5–1.</li>
+  <li><b>Calibrate:</b> note Ce at loss of response to speech and at loss of movement to firm jaw pressure — the second guides the maintenance target.</li>
+  <li>Raise the target rather than giving a manual bolus (a bolus makes the display wrong for several minutes).</li>
+  <li>Remifentanil: spontaneous breathing uncommon above 1.5 ng/mL; above 5 ng/mL acute tolerance / hyperalgesia possible. No postoperative analgesia — plan it.</li>
+  <li><b>Obese:</b> no evidence for total vs adjusted body weight in the pump; titrate to effect with processed EEG.</li></ul></details>
+  <details class="ndet"><summary>Other models &amp; pump limits</summary><ul>
+  <li><b>Marsh:</b> plasma; needs weight; pump max 150 kg. Developed in healthy adults, not obese or older patients.</li>
+  <li><b>Schnider:</b> use effect-site; needs age, height, weight, sex; pump BMI &lt; 35 female / &lt; 42 male. Induction doses similar to Marsh; maintenance rates a little lower.</li>
+  <li><b>Minto:</b> plasma or effect-site; age ≥ 12 y, ≥ 30 kg; same BMI limits (lean body mass).</li>
+  <li><b>Eleveld propofol:</b> needs age, height, weight, sex, other anaesthetic drugs; study range 27 weeks PMA – 88 y, 0.68–160 kg (incl. high BMI). This patient: ${pOk ? "✓ within" : "✗ outside"}. No reference targets shown; the 2019 guideline noted it was not yet in commercial pumps — check yours.</li>
+  <li><b>Eleveld remifentanil:</b> needs age, weight, sex; study range 5 days – 85 y, 2.5–106 kg. This patient: ${rOk ? "✓ within" : "✗ outside"}.</li>
+  <li>Which models your pump offers (Agilia, Alaris PK, Mindray): check the pump.</li></ul></details>`; }
 /* conversions (tested in tests/navigation.test.js) */
 const TV = {
   pRate: (d, u, w, c) => u === "m" ? d*w*60/1000/c : d*w/c,          // propofol mL/h; d mg/kg/h (u "h") or mcg/kg/min (u "m"); c mg/mL
@@ -4180,21 +4187,23 @@ function tvMan(dr){ const t = tvS(), W2 = wts(), p = dr === "p";
   const wk = tvGet(dr + "W", p ? "tbw" : "lbw"), mode = tvGet(dr + "M", "f"), u = p ? tvGet("pU", "h") : "m";
   const conc = p ? [["10","10"],["20","20"],["c","Custom"]] : [["20","20"],["40","40"],["50","50"],["100","100"],["c","Custom"]];
   const key = mode === "r" ? dr + "R" : dr + "D" + (p ? u : "");
-  return `<div class="tvm"><div class="tvh"><b>${p ? "Propofol" : "Remifentanil"}</b><span>${p ? "Roberts regimen below" : "typical 0.08–0.25 mcg/kg/min"}</span></div>
+  return `<div class="tvm"><p class="sub">${p ? "Calculator: you type the dose. PRIS risk above 6 mg/kg/h." : "Typical maintenance 0.08–0.25 mcg/kg/min."}</p>
   <div class="tlab">Syringe ${p ? "mg/mL" : "mcg/mL"}</div>${tvSeg(dr + "C", p ? "10" : "50", conc)}
   ${tvGet(dr + "C", "") === "c" ? `<div class="fbgrid">${numIn("tv", dr + "Mg", "Drug", "mg")}${numIn("tv", dr + "Ml", "Final volume", "mL")}</div>` : ""}
   <div class="tlab">Dosing weight</div>${tvSeg(dr + "W", p ? "tbw" : "lbw", tvWkeys.map(([k, l]) => [k, `${l}<small>${sig(W2[k])} kg</small>`]))}
   ${tvSeg(dr + "M", "f", [["f","Dose → mL/h"],["r","mL/h → dose"]])}
   ${p && mode === "f" ? tvSeg("pU", "h", [["h","mg/kg/h"],["m","mcg/kg/min"]]) : ""}${p && mode === "r" ? tvSeg("pU", "h", [["h","show mg/kg/h"],["m","show mcg/kg/min"]]) : ""}
   <div class="fbgrid">${numIn("tv", key, mode === "r" ? "Pump rate" : "Dose", mode === "r" ? "mL/h" : (p ? (u === "m" ? "mcg/kg/min" : "mg/kg/h") : "mcg/kg/min"))}</div>
-  <div id="tvres-${dr}">${tvResult(dr)}</div>${p ? tvRoberts() : `<p class="sub"><b>Loading:</b> 0.5 mcg/kg/min for 3 min, then 0.25 (≈ 6 ng/mL in a healthy adult). No manual bolus from the syringe (bradycardia, chest-wall rigidity).</p>`}</div>`;
+  <div id="tvres-${dr}">${tvResult(dr)}</div>${p ? `<details class="ndet"><summary>Roberts (Bristol) regimen</summary>${tvRoberts()}</details>` : `<details class="ndet"><summary>Loading</summary><p>0.5 mcg/kg/min for 3 min, then 0.25 (≈ 6 ng/mL in a healthy adult). No manual bolus from the syringe (bradycardia, chest-wall rigidity).</p></details>`}</div>`;
 }
 gaCards.tiva = () => { const tab = tvGet("tab", "tci");
   return `<div class="card tvcard"><h2>5. TIVA</h2>${gaDraft()}
   ${tvSeg("tab", "tci", [["tci","TCI"],["man","Manual infusion"]])}
-  ${tab === "man" ? `${tciaDraft()}<p class="sub">Calculator: you type the dose. A fixed rate changes concentration slowly — a bolus or faster start is needed, and concentration can keep rising later.</p>${tvMan("p")}${tvMan("r")}` : tvTci()}
-  <p class="sub">Older, frail or unwell: lower targets. <b>Processed EEG</b> when TIVA is given with a muscle relaxant (consider with TIVA alone): start before induction, continue at least until full neuromuscular recovery. <b>Quantitative</b> neuromuscular monitoring whenever a relaxant is given, until TOF ratio &gt; 0.9.</p>
-  <details class="ndet"><summary>Safety checklist</summary><ul>
+  ${tab === "man" ? `${tciaDraft()}${tvSeg("drug", "p", [["p","Propofol"],["r","Remifentanil"]])}${tvMan(tvGet("drug", "p"))}<p class="sub">A fixed rate changes concentration slowly — a bolus or faster start is needed, and concentration can keep rising later.</p>` : tvTci()}
+  <div class="warn"><b>Pump stopped mid-case:</b> restart in MANUAL at the running rate — not TCI at the old target.</div>
+  <details class="ndet"><summary>Safety &amp; monitoring</summary><ul>
+  <li><b>Processed EEG</b> when TIVA is given with a muscle relaxant (consider with TIVA alone): start before induction, continue at least until full neuromuscular recovery. Don't act on the index alone.</li>
+  <li><b>Quantitative</b> neuromuscular monitoring whenever a relaxant is given, until TOF ratio &gt; 0.9.</li>
   <li>Anti-siphon valve on each drug line; anti-reflux valve on the fluid line; join close to the patient (dead space)</li>
   <li>Luer-lock throughout; TIVA-specific sets; no extra connections or three-way taps</li>
   <li>Program the pump only after the syringe is in it; label syringes; propofol pump at the top of the stack</li>
@@ -6106,7 +6115,7 @@ function vTicks(){
 }
 /* ---------- ABOUT ---------- */
 const CHANGES = [
-  ["2.155","General › Intra-op › TIVA reorganised: TCI | Manual infusion tabs. TCI: propofol and remifentanil models as compact blocks (targets unchanged), with model info — what the pump needs and whether this patient is inside the Eleveld study ranges (Eleveld BJA 2018; Anesthesiology 2017). Manual infusion: propofol and remifentanil calculators, dose → mL/h and back, any syringe strength, choice of dosing weight; Roberts regimen worked out. Re-checked against the Association / SIVA TIVA guidelines 2019: Schnider induction 4–6; maintenance 3–6 (2.5–4 with opioid); Minto ≈ 6 / 2–6 ng/mL; manual remifentanil 0.08–0.25; pump BMI and weight limits shown; obese AdjBW advice removed (no evidence). Processed EEG and neuromuscular monitoring per 2021 standards; safety checklist and troubleshooting. (checked)"],
+  ["2.155","General › Intra-op › TIVA reorganised: TCI | Manual infusion tabs. TCI: propofol and remifentanil models as compact blocks (targets unchanged), with model info — what the pump needs and whether this patient is inside the Eleveld study ranges (Eleveld BJA 2018; Anesthesiology 2017). Manual infusion: propofol and remifentanil calculators, dose → mL/h and back, any syringe strength, choice of dosing weight; Roberts regimen worked out. Re-checked against the Association / SIVA TIVA guidelines 2019: Schnider induction 4–6; maintenance 3–6 (2.5–4 with opioid); Minto ≈ 6 / 2–6 ng/mL; manual remifentanil 0.08–0.25; pump BMI and weight limits shown; obese AdjBW advice removed (no evidence). Processed EEG and neuromuscular monitoring per 2021 standards; safety checklist and troubleshooting. (checked) 2.155.2: decluttered — one target table per drug, pump-limit warnings only when they apply, details collapsed."],
   ["2.154","About redesigned: offline · private · free; 6 feature tiles; Clinical foundations (sources grouped by topic), How calculations work, Clinical governance (honest validation status); Privacy and data (what is stored, how to clear); What's new shows the latest 3. Sources: tranexamic acid now cites the local blood bank guideline; analgesia ladder & PCA and epidural cite the local OAS guideline."],
   ["2.153","Emergencies › Adult re-checked against the QRH 2023: Cardiac arrest (theatre-specific steps), Anaphylaxis (CPR if SBP < 50, glucagon, vasopressin, infusion recipe), Bronchospasm (QRH drugs; ketamine 20 mg), Malignant hyperthermia (complications), CICO (impalpable membrane technique), High spinal (metaraminol, wider ephedrine and atropine ranges, reduced induction dose). (checked) QRH cards now show only the QRH step numbers (❶ ❷ …), one step per line. Fix: Blood management showed only the major haemorrhage box — the rest of the card (blood volume, allowable loss, transfusion thresholds, products, adjuncts) is back."],
   ["2.152","Emergencies › Adult › Theatre & equipment: Patient fire, Mains oxygen failure (with cylinder contents), Mains electricity failure, Emergency evacuation (Association of Anaesthetists QRH 2023; reporting to Malaysia's Medical Device Authority). (checked)"],
