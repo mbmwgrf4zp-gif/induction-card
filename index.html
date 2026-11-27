@@ -1003,7 +1003,7 @@ if (window.top !== window.self && /\.github\.io$/.test(location.hostname)) {
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.174.2";
+const APP_VERSION = "2.175";
 const APP_DATE = "27 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
@@ -2642,7 +2642,11 @@ const EM_PHASES = {
   "Cardiac arrest": {count:8,phases:[["Recognition and immediate response",0,2],["Shockable and non-shockable rhythms",2,4],["Special circumstances and after ROSC",4,8]]},
   "LA toxicity (LAST)": {count:9,phases:[["Immediate response",0,2],["Lipid rescue",2,6],["Cardiac arrest, seizures and aftercare",6,9]]},
   "Malignant hyperthermia": {count:8,phases:[["Immediate response",0,2],["Dantrolene and cooling",2,5],["Complications and monitoring",5,8]]},
-  "Hyperkalaemia": {count:8,phases:[["Recognition and cardiac protection",0,2],["Potassium shifting and removal",2,6],["Special circumstances and cardiac arrest",6,8]]}
+  "Hyperkalaemia": {count:8,phases:[["Recognition and cardiac protection",0,2],["Potassium shifting and removal",2,6],["Special circumstances and cardiac arrest",6,8]]},
+  "High / total spinal": {count:9,phases:[["Immediate response and airway support",0,4],["Circulation and induction",4,7],["Obstetric considerations and arrest",7,9]]},
+  "Hypotension after spinal": {count:5,phases:[["Immediate measures",0,1],["Vasopressors and blood pressure target",1,3],["Bradycardia and reassessment",3,5]]},
+  "Massive obstetric haemorrhage": {count:9,phases:[["Immediate response",0,2],["Uterotonics and tranexamic acid",2,7],["Blood products and ongoing management",7,9]]},
+  "Eclampsia": {count:8,phases:[["Immediate response and seizure treatment",0,4],["Monitoring and magnesium toxicity",4,6],["Blood pressure and delivery",6,8]]}
 };
 function emergencyPhases(title, steps){
   const cfg=EM_PHASES[title];
@@ -6584,6 +6588,7 @@ function vTicks(){
 }
 /* ---------- ABOUT ---------- */
 const CHANGES = [
+  ["2.175","Emergencies: consistent phase layout for high spinal, hypotension after spinal, massive obstetric haemorrhage and eclampsia; original clinical instructions retained."],
   ["2.174.2","Emergency card regression checks distinguish layout headings from clinical text while preserving the original instruction comparison."],
   ["2.174.1","Emergency cards: consistent inset for QRH rows and headings; extra room at dose-highlight line ends on every screen size. Clinical content unchanged."],
   ["2.174","Emergencies: phase headings for local anaesthetic toxicity, malignant hyperthermia and hyperkalaemia; original instructions and doses retained."],
