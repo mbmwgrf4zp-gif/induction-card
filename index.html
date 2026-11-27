@@ -971,7 +971,7 @@ select[data-stc]{font-size:15px;display:block;width:100%;max-width:100%;min-heig
 :root[data-theme="dark"] .mx-u,:root[data-theme="dark"] .mx-ut{color:#4ade80}:root[data-theme="dark"] .mx-c,:root[data-theme="dark"] .mx-ct{color:#fbbf24}:root[data-theme="dark"] .mx-a,:root[data-theme="dark"] .mx-at{color:#f87171}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .mx-u,:root:not([data-theme="light"]) .mx-ut{color:#4ade80}:root:not([data-theme="light"]) .mx-c,:root:not([data-theme="light"]) .mx-ct{color:#fbbf24}:root:not([data-theme="light"]) .mx-a,:root:not([data-theme="light"]) .mx-at{color:#f87171}}
 /* v2.169 patient bar: one line + weight scale */
-.ptwrap{position:relative}
+.ptwrap{position:relative}div.ptx{display:block;padding:10px 46px 10px 14px}.ptx .pbsum{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 details.ptx{display:block;padding:10px 46px 10px 14px}details.ptx>summary{list-style:none;display:flex;align-items:center;gap:8px;flex-wrap:wrap;cursor:pointer}details.ptx>summary::-webkit-details-marker{display:none}
 details.ptx .pbm{font-size:18px}.pbbmi{background:color-mix(in srgb,var(--gc,var(--accent)) 14%,var(--card));color:var(--gc,var(--accent));font-weight:700;border-radius:8px;padding:2px 8px;font-size:14px;white-space:nowrap}
 .pbcar{display:inline-block;width:0;height:0;margin-left:4px;vertical-align:2px;border-left:5px solid transparent;border-right:5px solid transparent;border-top:6px solid currentColor;transition:transform .2s}details.ptx[open] .pbcar{transform:rotate(180deg)}
@@ -1013,7 +1013,7 @@ if (window.top !== window.self && /\.github\.io$/.test(location.hostname)) {
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.180.0";
+const APP_VERSION = "2.181.0";
 const APP_DATE = "27 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
@@ -1905,9 +1905,10 @@ function LAR(name, ml, mgml, max, note, capml, rt){
   return `<tr class="dz ${over?"over":""}" data-dr="1"><td><span class="dn">${name}</span>${note?`<div class="sub dnote">${note}</div>`:""}${add}</td><td class="sub">${ml[0]===ml[1]?ml[0]:ml.join("–")} mL/kg · ${sig(mgkg)} mg/kg</td><td class="hl">${a===b?sig(a):sig(a)+"–"+dz(b,"mL")} mL${RT(rt)}${cap?` <span class="sub">(max ${capml} mL)</span>`:""}${over?`<div class="danger" style="margin:4px 0 0;font-weight:700">Above max ${max} mg/kg</div>`:""}</td></tr>`;
 }
 
+function aplsEst(){ const y = S.pY, mo = AGEM();   // APLS estimated weight (moved out of pInputs in v2.181, unchanged)
+  return mo < 1 ? null : y < 1 ? [0.5*mo+4, "0.5 × months + 4"] : y <= 5 ? [2*y+8, "2 × age + 8"] : y <= 12 ? [3*y+7, "3 × age + 7"] : null; }
 function pInputs(forEtt){
-  const y = S.pY, mo = AGEM();
-  const est = mo < 1 ? null : y < 1 ? [0.5*mo+4, "0.5 × months + 4"] : y <= 5 ? [2*y+8, "2 × age + 8"] : y <= 12 ? [3*y+7, "3 × age + 7"] : null;
+  const est = aplsEst();
   return `<div class="pthead"><span class="t">Child</span></div>${ptiles([ptile("pw","Weight","kg",0.4,90,0.5), ptile("pY","Age","y",0,16,1), ptile("pM","Months","m",0,11,1), ptile("pHt","Height","cm",30,190,1), ...(AGEM() >= 1 && AGEM() < 14 ? [ptile("gaB","Born at","wk",22,42,1)] : [])])}
     ${est?`<div class="sub">Estimated weight (APLS): ${est[1]} = <b>${sig(est[0])} kg</b> <button class="iconbtn" style="height:34px;min-width:0" data-setw="${sig(est[0])}">Use</button></div>`:""}
     ${W()>40?`<div class="warn" style="margin-bottom:0">Weight &gt; 40 kg: doses are capped at adult maximums — consider the General (adult) section.</div>`:""}
@@ -6942,6 +6943,7 @@ function vTicks(){
 }
 /* ---------- ABOUT ---------- */
 const CHANGES = [
+  ["2.181","Paediatrics: the patient bar now matches the adult one — age · height · weight on one line with an APLS estimated-weight badge (1 month – 12 y); tap it to see actual vs APLS weight on a scale; ✎ to edit. Neonates: day · GA · weight."],
   ["2.180","Pre-op › Plan & notes: \"Premed note\" is now \"Pre-op note\"; the tab has Plan (plan & consent) and Notes (Pre-op note, Anaesthetic Notes) headings, with Anaesthetic Notes below the Pre-op note. Old links and favourites still work."],
   ["2.179","Anaesthetic Notes is now card 3 in Pre-op › Plan & note, with standard search, favourites and recents. Existing five checked technique templates and clinical content unchanged."],
   ["2.178","Neonatal fluids: prescribed maintenance, total intake and IV glucose infusion rate at the top; no routine neonatal fasting deficit; separate replacement and monitoring (checked)"],
@@ -7925,9 +7927,9 @@ function accordion(c, t, gid, label, tab, id){
   const summ = mm ? `<span class="stepno">${mm[1]}</span><span class="st">${mm[2]}</span>` : `<span class="st">${sum}</span>`;
   return `<details class="card acc" ${isWide()?"":'name="acc"'} data-t="${esc(t)}" data-g="${gid}" data-tab="${tab||""}" data-id="${id||""}"><summary>${summ}${id ? favBtn("c|" + id, bareLabel(label || h.textContent)) : ""}</summary>${cl.innerHTML}${relLinks(gid, tab, id)}</details>`;
 }
-function ptScale(W2){
-  const pts = [["LBW", W2.lbw], ["IBW", W2.ibwRaw], ["AdjBW", W2.adj], ["actual", W2.tbw]].sort((a, b) => a[1] - b[1]);
-  const lo = pts[0][1]*0.94, hi = pts[3][1]*1.03, X = v => 4 + (v - lo)/(hi - lo)*92;
+function ptScale(W2, P){   // P (v2.181): optional [[label, kg], …] — paeds passes APLS + actual
+  const pts = (P || [["LBW", W2.lbw], ["IBW", W2.ibwRaw], ["AdjBW", W2.adj], ["actual", W2.tbw]]).sort((a, b) => a[1] - b[1]);
+  const lo = pts[0][1]*0.94, hi = pts[pts.length-1][1]*1.03, X = v => 4 + (v - lo)/(hi - lo)*92;
   let lastX = -99, lvl = 0;
   const marks = pts.map(([l, v]) => { const x = X(v); lvl = x - lastX < 15 ? 1 - lvl : 0; lastX = x; const act = l === "actual";
     return `<i class="${act ? "t" : ""}" style="left:${x.toFixed(1)}%"></i><em class="u l${lvl}${act ? " t" : ""}" style="left:${x.toFixed(1)}%">${sig(v)}</em><em class="d l${lvl}" style="left:${x.toFixed(1)}%">${l}</em>`; }).join("");
@@ -7935,8 +7937,13 @@ function ptScale(W2){
 }
 function ptBar(gid, tab, samp){
   const W2 = wts(), n = v => `<span class="n7">${v}</span>`, acx = activeCase(); let t, sub = "";
-  if (gid==="paeds" || (gid==="emerg" && tab==="paeds")) { t = AGEM() < 1 ? `${n(sig(S.pw))} kg · day ${n(S.pD)} · ${n(S.gaB)} wk GA` : `${n(sig(S.pw))} kg · ${n(S.pY)} y${S.pM?` ${n(S.pM)} m`:""} · ${n(S.pHt)} cm`;
-    sub = AGEM() < 1 ? `${isPreterm()?"preterm · ":""}PMA ${sig(pmaWk())} wk · birth weight ${sig(bwKg())} kg` : isPreterm() && AGEM() < 14 ? `ex-prem ${S.gaB} wk · PMA ${sig(pmaWk())} wk` : ""; }
+  if (gid==="paeds" || (gid==="emerg" && tab==="paeds")) {   // v2.181: same look as the adult bar; tap opens APLS-vs-actual scale (1 month – 12 y)
+    const est = aplsEst(), ed = `<button class="pbedit" data-ptedit="1" aria-label="Edit patient">✎</button>`, hd = `${acx ? `<span class="pbc">${caseName(acx)}</span>` : ""}${samp ? `<span class="pbsamp">Sample</span> ` : ""}`;
+    if (AGEM() < 1) return `<div class="ptwrap"><div class="ptbar ptx"><div class="pbsum">${hd}<span class="pbm"><span class="nobr">day ${n(S.pD)}</span> · <span class="nobr">${n(S.gaB)} wk GA</span> · <span class="nobr">${n(sig(S.pw))} kg</span></span></div><span class="pbs">${isPreterm()?"preterm · ":""}PMA ${sig(pmaWk())} wk · birth weight ${sig(bwKg())} kg</span></div>${ed}</div>`;
+    const nb = x => `<span class="nobr">${x}</span>`, line = `${nb(`${n(S.pY)} y`)}${S.pM?` ${nb(`${n(S.pM)} m`)}`:""} · ${nb(`${n(S.pHt)} cm`)} · ${nb(`${n(sig(S.pw))} kg`)}`, ep = isPreterm() && AGEM() < 14 ? `ex-prem ${S.gaB} wk · PMA ${sig(pmaWk())} wk` : "";
+    if (!est) return `<div class="ptwrap"><div class="ptbar ptx"><div class="pbsum">${hd}<span class="pbm">${line}</span></div>${ep?`<span class="pbs">${ep}</span>`:""}</div>${ed}</div>`;
+    return `<div class="ptwrap"><details class="ptbar ptx"${S.ptOpen ? " open" : ""}><summary>${hd}<span class="pbm">${line}</span><span class="pbbmi">APLS ${sig(est[0])} kg <span class="pbcar" aria-hidden="true"></span></span></summary>
+      ${ptScale(null, [["APLS", est[0]], ["actual", S.pw]])}<div class="pbs">APLS estimate: ${est[1]} · all weights in kg${ep?`<br>${ep}`:""}</div></details>${ed}</div>`; }
   else if (gid==="emerg" || (gid==="tx" && tab==="don")) t = `${n(sig(S.aw))} kg`;
   else {   // v2.169: one line + BMI badge; tap opens the weight scale (LBW · IBW/PBW · AdjBW · actual)
     const line = `${sxi(S.sex)} ${n(S.age)} y · ${n(S.height)} cm · ${n(sig(S.aw))} kg`;
