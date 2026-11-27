@@ -61,6 +61,8 @@ Run **every file in `tests/`** before any deploy (Playwright + Chromium) — new
 for t in tests/*.test.js; do NODE_PATH=$(npm root -g) node "$t"; done
 ```
 
+Some suites regenerate screenshots in `test-artifacts/`. Unless you intend to update them, restore them before switching branches or committing: `git checkout -- test-artifacts`.
+
 A suite fails if its exit code ≠ 0 **or any output line starts with `✗`** (count `grep -c '^✗'`, not every ✗ character).
 
 - **Never edit, skip or loosen a test to make it pass** without the owner's explicit approval. If a redesign legitimately changes card text, register it (`REDESIGNED` = every old word kept; `REWRITTEN` = must cite its source) and explain why in a comment.
