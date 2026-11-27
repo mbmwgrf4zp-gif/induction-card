@@ -1009,7 +1009,7 @@ if (window.top !== window.self && /\.github\.io$/.test(location.hostname)) {
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.177.1";
+const APP_VERSION = "2.177.4";
 const APP_DATE = "27 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
@@ -1748,6 +1748,106 @@ function dz(x, unit, max){
 const W = () => S.pw;
 const AGEM = () => S.pY*12 + S.pM;
 /* Age eligibility: a correct calculation is not an appropriate dose. Minimum age (months) below which no dose is shown. Tested in tests/eligibility.test.js */
+const PAED_ANALGESIA_CHECKED = true; // checked by author 27 Nov 2026
+// MOH Paediatric Pain Management Guidelines 2023, IV paracetamol table.
+const infantIvPcm = {mgPerKg:7.5, interval:"6–8 h", maxPerKgDay:30};
+function paedAnalgesia(){
+  const months = AGEM(), weight = W(), neonatal = months === 0;
+  const known = !isSample("pw") && !isSample("pY") && (months >= 12 || !isSample("pM"));
+  const patient = [store.get("active", ""), weight, months, S.pD, S.gaB, S.pHt].join("|");
+  const settings = S.paDose?.patient === patient ? S.paDose : {};
+  const ideal = Number(settings.ideal);
+  const obese = settings.weightMode === "ideal";
+  const validIdeal = ideal > 0 && ideal <= weight;
+  const adjusted = validIdeal ? ideal + 0.4 * (weight - ideal) : null;
+  const weightReady = settings.weightMode === "actual" || (obese && validIdeal);
+  const group = S.paGroup || "Non-opioids";
+  const fixed = n => Number(n.toFixed(3));
+  const amount = (lo,hi,w,unit,cap = Infinity) => {
+    const a = fixed(Math.min(lo*w,cap)), b = fixed(Math.min(hi*w,cap));
+    return (a === b ? a : a + "–" + b) + " " + unit;
+  };
+  const doseWeight = obese ? (group === "Opioids" ? ideal : adjusted) : weight;
+  const calc = (lo,hi,unit,cap) => amount(lo,hi,doseWeight,unit,cap);
+  const jump = (id,title) => '<button class="homebtn" data-open="1" data-id="'+id+'">'+title+' ›</button>';
+  const rows = [];
+  const row = (name,rule,result,note,route="IV") => rows.push(R(name,rule,result,note,route));
+  const hold = (name,reason,route="IV") => row(name,reason,"—",null,route);
+  const details = (title,body) => '<details class="ndet"><summary>'+title+'</summary>'+body+'</details>';
+  const source = details("Sources", "<p>Paediatric Anaesthesia Clinical Practice Manual (20 Nov 2025), PDF p. 18. Paediatric Pain &amp; Regional Anaesthesia Protocol (20 Nov 2025), PDF pp. 6–8. MOH Paediatric Pain Management Guidelines 2023, IV paracetamol and NSAID tables.</p>");
+  const tabs = ["Non-opioids","Opioids","Adjuncts"].map(g => '<button data-seg="paGroup" data-val="'+g+'" aria-pressed="'+(g===group)+'">'+g+'</button>').join("");
+  let controls = "";
+  let extra = "";
+  if (!known || months >= 216){
+    controls = '<p class="warn">'+(known ? "Paediatric doses apply below 18 years." : "Enter the child’s age and weight for doses.")+'</p>';
+  } else {
+    const setWeight = mode => '<button data-pa-mode="'+mode+'" aria-pressed="'+(settings.weightMode===mode)+'">'+(mode==="actual"?"Actual weight":"Obesity dosing")+'</button>';
+    controls = '<div class="seg" aria-label="Dosing weight">'+setWeight("actual")+setWeight("ideal")+'</div>';
+    if (obese) controls += '<label>Confirmed ideal weight (kg) <input type="number" inputmode="decimal" min="0" step="any" data-pa-ideal value="'+(validIdeal?ideal:"")+'"></label>';
+    if (!weightReady) controls += '<p class="sub">Confirm the dosing weight to show calculated doses.</p>';
+    if (weightReady) {
+      controls = details("Dosing weight · "+(obese?"obesity dosing":weight+" kg actual"),controls);
+      if (obese) controls += '<p class="sub">'+(obese ? 'Ideal '+fixed(ideal)+' kg · Adjusted '+fixed(adjusted)+' kg' : 'Actual weight '+weight+' kg')+'</p>';
+      if (group === "Non-opioids"){
+        if (neonatal && !settings.specialist){
+          hold("Paracetamol","Specialist confirmation required");
+          controls += '<button class="homebtn" data-pa-confirm="pcm">Confirm specialist approval for neonatal IV paracetamol</button>';
+        } else if (weight >= 50 && (months < 144 || obese)){
+          hold("Paracetamol","Confirm regimen for age and weight");
+        } else {
+          const small = weight < 2;
+          const per = neonatal ? (small?7.5:10) : weight<10?infantIvPcm.mgPerKg:15;
+          const interval = neonatal && small ? "8 h" : neonatal ? "6–8 h" : weight<10 ? infantIvPcm.interval : "4–6 h";
+          const daily = neonatal && small ? 25 : neonatal ? 30 : weight<10 ? infantIvPcm.maxPerKgDay : 60;
+          const ceiling = weight<33?2000:3000;
+          const adult = weight>=50;
+          row("Paracetamol", (adult?"500 mg–1 g":per+" mg/kg")+" every "+interval,adult?"500–1000 mg":calc(per,per,"mg",1000),
+            "Specialist approval · All routes ≤ "+(adult?"4 g":fixed(Math.min(doseWeight*daily,ceiling))+" mg")+"/24 h");
+          if(neonatal) extra += details("Neonatal paracetamol guidance","<p>Local protocol uses weight. MOH uses gestation: term 7.5 mg/kg every 6–8 h (30 mg/kg/day); preterm over 32 weeks corrected age 7.5 mg/kg every 8 h (25 mg/kg/day).</p>");
+        }
+        if(months<3 || months>144) hold("Ibuprofen",months<3?"Below 3 months":"Outside approved age band","PO");
+        else {
+          const upper=months<6?5:10, daily=months<6?20:30;
+          row("Ibuprofen",(upper===5?"5":"5–10")+" mg/kg every 6–8 h",calc(5,upper,"mg",400),"≤ "+fixed(Math.min(doseWeight*daily,1200))+" mg/24 h","PO");
+        }
+        if(months<=24) hold("Parecoxib","Over 2 years only");
+        else row("Parecoxib","0.5–1 mg/kg once · max 40 mg",calc(0.5,1,"mg",40),"Off-label · Check prior NSAIDs. No NSAID for 24 h afterwards.");
+        row("Ketorolac","Initial 0.5 mg/kg · max 10 mg","Reference only","Verify local product and age eligibility");
+      } else if(group === "Opioids"){
+        row("Fentanyl",neonatal?"0.5–3 mcg/kg over 3–5 min":"1–2 mcg/kg",neonatal?calc(0.5,3,"mcg"):calc(1,2,"mcg"),
+          neonatal?"Repeat after 2–4 h if required":"Acute pain: total ≤ "+fixed(4*doseWeight)+" mcg. Halve dose with sedatives.");
+        if(neonatal){
+          const gestationKnown = S.touched.gaB || Number.isFinite(activeCase()?.ga);
+          const dayKnown = S.touched.pD || Number.isFinite(activeCase()?.d);
+          if(!gestationKnown || !dayKnown || (isPreterm() && pmaWk()<=37) || (!isPreterm() && pmaWk()>40)) hold("Morphine","Verify gestation and neonatal regimen");
+          else {
+            const lo=isPreterm()?0.025:0.05, hi=isPreterm()?0.05:0.1;
+            row("Morphine",lo+"–"+hi+" mg/kg over 5 min",calc(lo,hi,"mg"),"Next dose ≥4 h");
+          }
+        } else {
+          const young=months<=6, large=!young && doseWeight>50, increment=young?0.02:0.05;
+          row("Morphine",large?"1–2 mg per increment":increment+" mg/kg per increment",large?"1–2 mg":calc(increment,increment,"mg"),
+            "Episode limit "+(large?"5–10 mg":fixed(doseWeight*(young?0.1:0.2))+" mg")+" · Next episode ≥"+(young?"6":"4")+" h");
+        }
+        row("Remifentanil","Infusion",jump("paeds-ind-remifentanil","Open calculator"),"10 mcg/mL","IV infusion");
+      } else if(obese){
+        for(const name of ["Ketamine","Dexmedetomidine","Clonidine"]) hold(name,"Confirm drug-specific dosing weight");
+      } else {
+        if(months<3) hold("Ketamine","Below 3 months · specialist review");
+        else row("Ketamine","0.2–0.5 mg/kg",calc(0.2,0.5,"mg"),"Analgesic bolus");
+        if(neonatal) { hold("Dexmedetomidine","Neonatal regimen unverified"); hold("Clonidine","Neonatal regimen unverified"); }
+        else {
+          row("Dexmedetomidine","1 mcg/kg over 10 min",calc(1,1,"mcg"),"Off-label · Optional infusion "+calc(0.1,1,"mcg")+"/h");
+          row("Clonidine","1–2 mcg/kg over 10 min",calc(1,2,"mcg"),"Withhold if hypotensive · Repeat if required at 8 h");
+          extra += details("Preparation","<p>Local manual: dilute the dexmedetomidine or clonidine loading dose in 10–20 mL normal saline. Confirm the final concentration before setting an infusion rate.</p>");
+        }
+      }
+    }
+  }
+  return '<section class="pa-analgesia"><h3>Analgesia</h3>'+(PAED_ANALGESIA_CHECKED?"":'<div class="warn">DRAFT · Clinical review pending</div>')+controls+'<div class="seg">'+tabs+'</div>'+(rows.length?T(rows,doseWeight):"")+extra+source+
+    '<button class="homebtn" data-go-tab="paeds:blocks">Regional blocks ›</button></section>';
+}
+
 const AGE_MIN = {promethazine:24, parecoxib:24, ibuprofen:3, diclofenac:6, "diclofenac (voren suppository)":12, "paracetamol (suppository)":3, tramadol:12, oxycodone:1, ondansetron:1, cisatracurium:1, metoclopramide:12};
 const ageOK = drug => AGEM() >= (AGE_MIN[drug] || 0);
 const ageRow = (drug, row, label, route) => ageOK(drug) ? row : R(label, notFor(drug), "—", "pain protocol age limit", route);
@@ -1785,7 +1885,7 @@ const doseFmt = res => String(res).replace(/(\d) – (\d)/g, "$1–$2")
   .replace(/(\d[\d.,]*(?:–[\d.,]+)?\s(?:mg\/kg\/h|mcg\/kg\/min|mL\/h|mmol\/h|mg|mcg|mL|g|units?|mmol|J|kg)(?![a-zA-Z]))/g, '<span class="nw">$1</span>')
   .replace(/ = /g, '<span class="eqbr"> = </span>');
 const R = (name, rule, res, note, rt) => `<tr class="${rt==="nd"?"nd":"dz"}" data-dr="1"><td><span class="dn">${name}</span>${note?`<div class="sub dnote">${note}</div>`:""}</td><td class="sub">${rule}</td><td class="hl">${doseFmt(res)}${RT(rt)}</td></tr>`;
-const T = rows => `${rtDraft()}<div class="dfor" data-w="${sig(W())}"></div><div style="overflow-x:auto"><table class="dt"><tr class="dth"><th>Drug / item</th><th>Rule</th><th>For ${sig(W())} kg</th></tr>${rows.join("")}</table></div>`;
+const T = (rows, weight = W()) => `${rtDraft()}<div class="dfor" data-w="${sig(weight)}"></div><div style="overflow-x:auto"><table class="dt"><tr class="dth"><th>Drug / item</th><th>Rule</th><th>For ${sig(weight)} kg</th></tr>${rows.join("")}</table></div>`;
 const DR = (name, per, unit, note, max, rt) => R(name, perTxt(per,unit), pk(per,unit,max), note, rt);
 function unvP(what, why, prop){ return `<div class="unv"><b>UNVERIFIED — HIDDEN.</b> ${what}<br>${why}${prop?`<br><b>Proposed:</b> ${prop}`:""}</div>`; }
 const psrc = () => src(PSRC);
@@ -2007,7 +2107,7 @@ pCards.drugs = () => {
   <p class="sub"><b>No IV access:</b> IM options are ketamine, or suxamethonium + atropine. Then site IV / IO.</p>
   <p class="sub">Full stomach: RSI (child). Remifentanil: TIVA card. Ketamine top-ups and MRI / EUA use: Ketamine anaesthesia card.</p>
   <button class="homebtn" data-id="paeds-blocks-la-dose-calculator" data-open="1. LA dose calculator (child)" data-g="paeds" data-tab="blocks">Local anaesthetic maximum → Blocks › LA dose calculator (child) ›</button>${psrc()}</div>
-  <div class="card"><h2>Paeds intra-op drugs</h2>${pindDraft()}${neoDraft()}${T([
+  <div class="card"><h2>Paeds intra-op drugs</h2>${paedAnalgesia()}${pindDraft()}${neoDraft()}${T([
     R("Tranexamic acid","15 mg/kg over 30 min, then 2–5 mg/kg/h",`${pk(15,"mg",1000)}, then ${pk([2,5],"mg")}/h`,"bolus: &gt; 1 y laparotomy; infusion: craniofacial, scoliosis","IV"),
     R("Dexamethasone (oedema)","0.2 mg/kg (up to 0.6)",`${pk(0.2,"mg")} (up to ${dz(0.6*w,"mg")} mg)`,"watch for tumour lysis syndrome","IV"),
     DR("Hydrocortisone",[2,4],"mg","max 200 mg (local manual)",200,"IV"),
@@ -2505,10 +2605,15 @@ pCards.pscore = () => { const mo = AGEM(), y = S.pY, t = sumOf("flacc",FLACC), d
 pCards.pdrug = () => { const w = W(), mo = AGEM(), y = S.pY, neo = mo < 1, lt2 = w < 2;
   const para = neo ? (lt2?"7.5 mg/kg 6–8-hourly (max 30 mg/kg/day)":"10 mg/kg 6–8-hourly (max 60 mg/kg/day)") : mo < 3 ? "15 mg/kg 6–8-hourly (max 60 mg/kg/day)" : "15 mg/kg 4–6-hourly (max 75 mg/kg/day, 4 g/day)";
   const paraK = neo ? (lt2?7.5:10) : 15;
+  const smallInfant = !neo && w < 10;
+  const infantRule = `${infantIvPcm.mgPerKg} mg/kg every ${infantIvPcm.interval} (max ${infantIvPcm.maxPerKgDay} mg/kg/day across all routes)`;
+  const infantDose = isSample("pw") || isSample("pY") || (y === 0 && isSample("pM"))
+    ? "Enter age and weight" : Number((w*infantIvPcm.mgPerKg).toFixed(3))+" mg";
   const ivPara = neo ? (lt2?"7.5 mg/kg 8-hourly (max 25 mg/kg/day)":"10 mg/kg 6–8-hourly (max 30 mg/kg/day)") : w < 50 ? "15 mg/kg 4–6-hourly (max 60 mg/kg/day; &lt; 33 kg max 2 g/day, 33–50 kg 3 g/day)" : "500 mg – 1 g 4–6-hourly (max 4 g/day)";
-  return `<div class="card"><h2>Paeds analgesia by age</h2>${p3Draft()}<p class="sub">Age ${y} y ${S.pM} m · ${sig(w)} kg. Obese (BMI ≥ 95th percentile for age — read BMI on a BMI-for-age chart, not adult cut-offs): opioids on IBW; paracetamol and NSAIDs on adjusted weight (IBW + 0.4 × excess).</p>${T([
+  return `<div class="card"><h2>Paeds analgesia by age</h2>${p3Draft()}${smallInfant && !PAED_ANALGESIA_CHECKED ? '<div class="warn">DRAFT · IV paracetamol below 10 kg: clinical review pending</div>' : ""}<p class="sub">Age ${y} y ${S.pM} m · ${sig(w)} kg. Obese (BMI ≥ 95th percentile for age — read BMI on a BMI-for-age chart, not adult cut-offs): opioids on IBW; paracetamol and NSAIDs on adjusted weight (IBW + 0.4 × excess).</p>${T([
   R("Paracetamol",para,pk(paraK,"mg",1000),null,"PO"),
-  R("Paracetamol (needs specialist OK)",ivPara,neo?pk(paraK,"mg"):w<50?pk(15,"mg",1000):"0.5–1 g",null,"IV"),
+  smallInfant ? R("Paracetamol (needs specialist OK)",infantRule,infantDose,null,"IV") :
+    R("Paracetamol (needs specialist OK)",ivPara,neo?pk(paraK,"mg"):w<50?pk(15,"mg",1000):"0.5–1 g",null,"IV"),
   R("Paracetamol",mo<3?"Not recommended &lt; 3 months (rectal bleeding)":"Loading 40 mg/kg, then 15–20 mg/kg 6-hourly (max 75 mg/kg/day)",mo<3?"—":`load ${pk(40,"mg",1000)}`,mo<3?"pain protocol; the manual's drug table lists 30 mg/kg loading":null,"PR"),
   R("Ibuprofen",mo<3?"Not &lt; 3 months":mo<6?"3–6 months: 5 mg/kg 6–8-hourly (max 20 mg/kg/day)":"5–10 mg/kg 6–8-hourly (max 30–40 mg/kg/day, 1.2 g/day)",mo<3?"—":mo<6?pk(5,"mg",400):pk([5,10],"mg",400),null,"PO"),
   R("Diclofenac",mo<6&&w<10?"Not &lt; 6 months":"Oral 0.3–1 mg/kg 8-hourly · PR ≥ 1 y 1 mg/kg 8–12-hourly (max 3 mg/kg/day, 150 mg/day)",mo<6&&w<10?"—":pk([0.3,1],"mg",50),null,"PO / PR"),
@@ -6189,6 +6294,7 @@ VGROUPS.find(g => g[0]==="General")[1].push(["Echo report: what matters", "18 No
   "PH: TRV > 3.4 m/s high probability (≈ PASP > 50); RV strain TAPSE < 17 mm or TAPSE/sPAP < 0.55 (ESC/ERS 2022, ASE 2015)",
   "HOCM: LVOT gradient ≥ 30 (≥ 50 significant), SAM; tamponade signs; IVC > 2.1 cm < 50% collapse → RAP 15 (3 / 8)",
   "Goals: AS HR 50–70 sinus, preload ↑, SVR ↑, art line pre-induction, no single-shot spinal; MS HR ↓, avoid PVR rise; AR / MR HR normal–high, afterload ↓; PH SVR > PVR; HOCM HR ↓ preload ↑ afterload ↑ contractility ↓, no inotropes; tamponade fast full tight, drain under LA"]]);
+VGROUPS.find(g => g[0]==="Paediatric")[1].push(["Intra-op analgesia", "27 Nov 2026", ["Both cards: post-neonatal IV paracetamol below 10 kg, 7.5 mg/kg every 6–8 h, maximum 30 mg/kg/day across all routes (MOH Paediatric Pain Management Guidelines 2023).", "Age-specific drug rows, neonatal regimens, individual dosing weights and repeat limits. See the intra-op drug card for dose rules and sources."]]);
 VGROUPS.find(g => g[0]==="Paediatric")[1].push(["Transfusion protocol", "19 Nov 2026", [
   "Paeds › Intra-op card 3 (later intra-op cards renumbered 4–9); paeds Hb calculator in g/dL (4 mL/kg ≈ 1 g/dL)",
   "Preterm < 32 wk Hb (g/dL) vent / O₂ / no O₂: first 24 h 12/12/10; days 1–7 12/10/10; days 8–14 10/9.5/7.5; day 15+ 10/8.5/7.5 (BSH 2016)",
@@ -6568,7 +6674,7 @@ function sampleWarn(keys){ const k = keys.filter(isSample); if (!k.length) retur
   const names = {k:"K⁺", hb:"Hb", height:"height", aw:"weight", pw:"weight", pY:"age", spHt:"height", morWt:"weight", sex:"sex", age:"age"};
   return `<div class="samplewarn"><b>Sample values</b> — ${(a => a.length > 1 ? a.slice(0,-1).join(", ") + " and " + a[a.length-1] : a[0])([...new Set(k.map(x=>names[x]))])} not entered. Enter the patient or tap a case.</div>`; }
 /* Each case keeps its own clinical entries, in memory only (never saved). */
-const CLIN = ["csDec","sc","asa","met","pnF","pnMP","pnNeck","pnPonv","pnUrg","pnLay","csNote","leNote","pnNote","csWho","csLang","csOut","csLen","leLen","csMode","crea","k","hb","todayWt","hdH","hbNow","hbLow","hbTarget","fastH","pBE","laA","txck","derm","abg","fbal","blIn","hbU","gz","tv","preg","oc","stc","indT","mxSel"];
+const CLIN = ["paDose","csDec","sc","asa","met","pnF","pnMP","pnNeck","pnPonv","pnUrg","pnLay","csNote","leNote","pnNote","csWho","csLang","csOut","csLen","leLen","csMode","crea","k","hb","todayWt","hdH","hbNow","hbLow","hbTarget","fastH","pBE","laA","txck","derm","abg","fbal","blIn","hbU","gz","tv","preg","oc","stc","indT","mxSel"];
 const CLIN_T = ["crea","k","hb","todayWt","hdH"];
 const CLIN_OBJ = {sc:{}, pnF:{}, txck:{}, laA:[]};
 const clone = v => v === undefined ? undefined : JSON.parse(JSON.stringify(v));
@@ -6609,6 +6715,9 @@ function vTicks(){
 }
 /* ---------- ABOUT ---------- */
 const CHANGES = [
+  ["2.177.4","Paediatric intra-op analgesia and aligned post-op IV paracetamol dosing below 10 kg (checked)"],
+  ["2.177.3","Post-op IV paracetamol below 10 kg now matches intra-op dosing after the neonatal period (checked)"],
+  ["2.177.2","Paediatric intra-op analgesia: drug groups, age limits and dosing weights (checked)"],
   ["2.177.1","Emergency layout verification: check visible panel elements on every screen size, respecting the existing mobile-only dose label."],
   ["2.177","Emergencies: consistent layouts for paediatric crisis cards, transfusion, shared tables and recovery reference cards; original clinical instructions, order and dose calculations retained."],
   ["2.176","Emergencies: consistent phase layout for patient fire, mains oxygen failure, mains electricity failure and emergency evacuation; original QRH numbers and instructions retained."],
@@ -7120,7 +7229,8 @@ const GROUPS = [
     links:[["Hyperkalaemia","adult","Hyperkalaemia"]]},
    {id:"don", label:"Donor", input:()=>donInputs(), hint:"Living donor nephrectomy.",
     cards:["1. Donor pre-op","2. Donor intra-op","3. Donor post-op"], links:[]}], cards:[]}];
-const SEARCH_EXTRA = {   // keyed by stable card id
+const SEARCH_EXTRA = {
+  "paeds-intra-drugs":"paediatric analgesia pain paracetamol ibuprofen parecoxib ketorolac fentanyl morphine remifentanil ketamine dexmedetomidine clonidine",   // keyed by stable card id
   "regional-safety-la-dose-calculator":"combined total la mixture lignocaine plus ropivacaine levobupivacaine bupivacaine toxicity additive skin infiltration",
   "regional-upper-infraclavicular":"icb infraclavicular brachial plexus cords coracoid elbow forearm hand",
   "regional-trunk-thoracic-paravertebral":"tpvb pvb paravertebral breast thoracotomy rib fractures",
@@ -7579,6 +7689,7 @@ function accordion(c, t, gid, label, tab, id){
   const cl = c.cloneNode(true), h = cl.querySelector("h2"), sum = label ? esc(label) : h.innerHTML; h.remove();
   cl.querySelectorAll("[data-ctx]").forEach(b => ctxLink(b, gid, tab)); markDoses(cl, id);
   const mm = sum.match(/^([A-C]?\d+[a-z]?)\.\s+(.*)$/s);
+  if (id === "paeds-intra-drugs" && mm) mm[2] = "Drugs: analgesia, TXA, steroids, calcium…";
   const summ = mm ? `<span class="stepno">${mm[1]}</span><span class="st">${mm[2]}</span>` : `<span class="st">${sum}</span>`;
   return `<details class="card acc" ${isWide()?"":'name="acc"'} data-t="${esc(t)}" data-g="${gid}" data-tab="${tab||""}" data-id="${id||""}"><summary>${summ}${id ? favBtn("c|" + id, bareLabel(label || h.textContent)) : ""}</summary>${cl.innerHTML}${relLinks(gid, tab, id)}</details>`;
 }
@@ -7783,6 +7894,7 @@ document.addEventListener("click", e => {
   if (d.open) collapseAcc(d); else expandAcc(d);
 }, true);
 document.addEventListener("change", e => { const el = e.target; if (!el.dataset) return;
+  if (el.hasAttribute("data-pa-ideal") && S.paDose){ S.paDose.ideal = Number(el.value); delete S.paDose.specialist; render(); return; }
   if (el.dataset.tmrremind){ const t = tmrState(); t.nm.remind = +el.value || 0; tmrSave(t); render(); }
   if (el.dataset.tmrwake){ store.set("wake", el.checked); tmrWake(); }
   if (el.dataset.tmrshow){ const v = store.get("timerShow", {}); v[el.dataset.tmrshow] = el.checked; store.set("timerShow", v); render(); }
@@ -7938,6 +8050,13 @@ document.addEventListener("click", e => {
   if (d.clrla){ S[laKey(d.clrla)] = []; render(); return; }
   if (d.apf!==undefined){ S.apfel = (S.apfel||0) ^ (1<<(+d.apf)); render(); return; }
   if (d.goTab){ const [gid,tid] = d.goTab.split(":"); const og = GROUPS.find(x=>x.id===gid); if (og) S[og.tabKey]=tid; S.open=null; const tg="#g-"+gid; if (location.hash===tg) render(); else location.hash=tg; window.scrollTo(0,0); return; }
+  if (d.paMode || d.paConfirm){
+    const patient = [store.get("active", ""), W(), AGEM(), S.pD, S.gaB, S.pHt].join("|");
+    if (S.paDose?.patient !== patient) S.paDose = {patient};
+    if (d.paMode) { S.paDose.weightMode = d.paMode; delete S.paDose.specialist; }
+    if (d.paConfirm) S.paDose.specialist = true;
+    render(); return;
+  }
   if (d.setw){ S.pw = parseFloat(d.setw); S.touched.pw = true; S.pwEst = true; render(); return; }
   if (d.print){ try { window.print(); } catch (err) {} return; }
   if (d.qpick){ S.qOpen = true; let c = qSaved(); S.qmsg = ""; if (c.includes(d.qpick)) c = c.filter(x=>x!==d.qpick); else if (c.length >= 3) S.qmsg = "Three are already chosen — remove one first."; else c = [...c, d.qpick]; store.set("quick", c); render(); return; }
