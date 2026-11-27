@@ -995,6 +995,7 @@ details.ptx .pbs{margin-top:2px}
 }
 @media (min-width:700px) and (pointer:fine){ .gside .ptile .pm{display:none} }
 @media (min-width:1100px){ .gside.innav .ptile{flex-wrap:nowrap;padding:3px 4px 3px 8px;gap:4px} .gside.innav .ptile .pm{width:auto} .gside.innav .ptile .pm button{width:32px;height:34px} .gside.innav .ptile input{width:3.2em;font-size:17px} }
+.nfcard .nfsum{display:grid;gap:var(--s2);grid-template-columns:repeat(2,minmax(0,1fr));margin:var(--s2) 0}.nfcard .nfsum>div{border:1px solid var(--line);border-radius:var(--r-sm);background:var(--field);padding:var(--s2);min-width:0}.nfcard .nfsum>div:last-child{grid-column:1/-1;background:var(--field);border-color:var(--gc)}.nfcard .nfsum b{font-size:var(--fs-lg);display:block;overflow-wrap:anywhere}.nfcard .nfsum small{display:block;font-size:var(--fs-xs);color:var(--muted)}.nfcard .nfinputs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--s2);min-width:0}.nfcard .nfinputs input{width:100%;min-width:0;box-sizing:border-box}.nfcard .nfinputs label{min-width:0}.nfcard table{font-size:var(--fs-xs)}
 </style>
 </head>
 <body>
@@ -1009,7 +1010,7 @@ if (window.top !== window.self && /\.github\.io$/.test(location.hostname)) {
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.177.9";
+const APP_VERSION = "2.178.1";
 const APP_DATE = "27 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
@@ -1268,7 +1269,7 @@ const QT = (() => {
   spin:{lab:"Spinal (non-obs)", ic:"spinal", cls:"t-regional", kind:"adult", keys:["height"], inp:()=>`${Math.round(S.height)} cm`, goTab:"regional:neuraxial",
     ans:()=>{ const o=OPS[S.spOp]||OPS.saddle, [lo,hi]=o.r, mid=Math.round((lo+hi)/2*10)/10, h=Math.round(S.height); return sm(fmt(h<=150?lo:h<=165?mid:hi),`mL heavy bupi · ${o.name.split(" / ")[0]}`); }},
   pfl:{lab:"Paeds fluids", ic:"paeds", cls:"t-paeds", kind:"paeds", keys:["pw"], inp:()=>`${sig(S.pw)} kg`, open:["6. Maintenance & insensible loss","paeds","intra"],
-    ans:()=>{ const w=S.pw, m0=w<=10?4*w:w<=20?40+2*(w-10):60+(w-20); return sm(dz(Math.min(m0,100),"mL/h"),"mL/h maintenance"); }},
+    ans:()=>{ if(isNeo()){const n=nfCalc();return n.rxRate===null?sm("—",n.noRx?"No NICU prescription; see local reference":"Confirm neonatal prescription"):sm(sig(n.rxRate),"mL/h prescribed");} const w=S.pw, m0=w<=10?4*w:w<=20?40+2*(w-10):60+(w-20); return sm(dz(Math.min(m0,100),"mL/h"),"mL/h maintenance"); }},
   padr:{lab:"Paeds arrest adrenaline", ic:"emerg", cls:"t-emerg", kind:"paeds", keys:["pw"], inp:()=>`${sig(S.pw)} kg`, open:["Paeds cardiac arrest","emerg","paeds"],
     ans:()=>{ const ml=dz(Math.min(0.1*S.pw,10),"mL",10); return sm(ml,`mL of 1:10 000 (10 mcg/kg)`); }},
   dlt:{lab:"Double-lumen tube", ic:"airway", cls:"t-ga", kind:"adult", keys:["height"], inp:aHt, open:["12. One-lung ventilation","ga","maint"],
@@ -2190,6 +2191,51 @@ pCards.drugs = () => {
 };
 
 const NEO_FL = [["600–800 g",[[80,100],[100,125],[130,130],[150,150]]],["800 g–1 kg",[[60,100],[90,115],[120,120],[150,150]]],["&gt; 1 kg",[[60,60],[70,70],[100,100],[150,150]]]];
+
+const NEO_FLUID_CHECKED = true;   // checked by author 27 Nov 2026;
+const NF_LINES = [["iv1","IV maintenance 1",true],["iv2","IV maintenance 2",true],["pn","Parenteral nutrition",true],["med1","Medication carrier 1",true],["med2","Medication carrier 2",true],["feed","Enteral feeds (average)",false]];
+function nfState(){ return S.nf || {}; }
+function nfNumber(v){if(v==null||String(v).trim()==="")return null;const t=String(v).trim().replace(",",".");if(!/^(?:\d+(?:\.\d*)?|\.\d+)$/.test(t))return null;const n=Number(t);return Number.isFinite(n)&&n>=0?n:null;}
+function nfFingerprint(){return JSON.stringify([S.pY,S.pM,S.pw,S.gaB,S.bw,S.pD,!!S.pwEst]);}
+function nfConfirmed(){const f=nfState();return isNeo()&&!S.pwEst&&f.confirm===nfFingerprint()&&W()>0&&S.bw>0&&S.gaB>=22&&S.gaB<=42;}
+function nfCalc(){
+ const f=nfState(), hours=nfNumber(f.hours), weight=nfNumber(f.weight), rx=nfNumber(f.rx);
+ const ready=nfConfirmed()&&hours!==null&&hours<28*24&&weight!==null&&weight>0;
+ let all=ready, ivKnown=ready, rate=0, glucose=0;
+ for(const [key,,iv] of NF_LINES){const r=nfNumber(f[key+"Rate"]),g=iv?nfNumber(f[key+"Glucose"]):0;
+   if(r===null){all=false;if(iv)ivKnown=false;continue;}
+   rate+=r;
+   if(iv&&r>0){if(g===null||g>100)ivKnown=false;else glucose+=g*r;}
+ }
+ const day=ready?Math.floor(hours/24)+1:null;
+ const bw=S.bw, band=bw>=0.6&&bw<0.8?0:bw>0.8&&bw<=1?1:bw>1?2:null;
+ const col=day===null?null:day===1?0:day===2?1:day<=4?2:3;
+ const local=ready&&band!==null?NEO_FL[band][1][col]:null;
+ const moh=ready&&day<=5?(S.gaB>=37?[60,90,120,150,150][day-1]:[60,80,100,120,140][day-1]):null;
+ const finite=n=>Number.isFinite(n)?n:null;
+ const noRx=f.noRx===true&&String(f.rx??"").trim()==="";
+ return {ready,day,weight,noRx,rx:ready?rx:null,rxRate:ready&&rx!==null?finite(rx*weight/24):null,total:all?finite(rate):null,tfi:all?finite(rate*24/weight):null,gir:ivKnown?finite(glucose/(6*weight)):null,local,moh,localRate:local&&noRx?local.map(v=>finite(v*weight/24)):null};
+}
+function nfInput(key,label,unit){return '<label class="fbin"><span>'+label+' <small>'+unit+'</small></span><input inputmode="decimal" autocomplete="off" data-nf="'+key+'" value="'+esc(nfState()[key]??"")+'" placeholder="Enter"></label>';}
+function nfFmt(v,unit){return v===null?"Confirm inputs":sig(Math.round(v*100)/100)+" "+unit;}
+function nfSummary(){const n=nfCalc();return '<div class="nfsum"><div><small>NICU prescription</small><b>'+(n.noRx?'Unavailable':nfFmt(n.rxRate,"mL/h"))+'</b><small>'+(n.noRx?'See local reference below':nfFmt(n.rx,"mL/kg/day"))+'</small></div><div><small>Total planned intake</small><b>'+nfFmt(n.total,"mL/h")+'</b><small>'+nfFmt(n.tfi,"mL/kg/day")+'</small></div><div><small>IV GIR</small><b>'+nfFmt(n.gir,"mg/kg/min")+'</b></div></div>';}
+function neoFluidDesign(){
+ const n=nfCalc(), f=nfState(), local=n.local?n.local.join("–").replace(/^(\d+)–\1$/,"$1")+" mL/kg/day":"Confirm inputs / no matching band";
+ return '<div class="nfcard"><h3 class="irh">Neonatal fluid management</h3>'+(NEO_FLUID_CHECKED?"":'<div class="warn">DRAFT — neonatal fluid management. Awaiting clinical sign-off; not for patient care.</div>')+nfSummary()+
+ '<div class="jumprow">'+[["nf-maint","Maintenance"],["nf-gir","GIR / inputs"],["nf-repl","Replacement"],["nf-mon","Monitoring"]].map(([id,label])=>'<button class="chip" data-jump="'+id+'">'+label+'</button>').join("")+'</div>'+
+ '<h3 class="irh" data-anchor="nf-maint">1. Maintenance</h3><p><b>Existing NICU prescription first.</b> Continue as clinically appropriate. No routine fasting-deficit calculation.</p>'+
+ '<div class="pgbox"><p>Confirm patient: gestation '+sig(S.gaB)+' weeks · birth '+sig(S.bw)+' kg · current '+sig(W())+' kg · chronological age '+S.pY+' y '+S.pM+' m.</p><button class="homebtn" data-nfconfirm="1">'+(nfConfirmed()?"Patient values confirmed ✓":"Confirm these actual patient values")+'</button><p class="sub">Verify the patient panel first; estimated weight is not accepted. Confirmation invalidates when values change.</p></div>'+
+ '<div class="nfinputs">'+nfInput("hours","Elapsed hours since birth","h")+nfInput("weight","NICU-selected calculation weight","kg")+nfInput("rx","Prescribed total fluid intake","mL/kg/day")+'</div>'+ '<button class="homebtn" data-nfnorx="1" aria-pressed="'+n.noRx+'">'+(n.noRx?'No NICU prescription available ✓':'No NICU prescription available')+'</button>'+ (n.noRx?'<p><b>Local manual reference only:</b> '+(n.localRate&&n.localRate.every(v=>v!==null)?local+' · '+(n.localRate[0]===n.localRate[1]?nfFmt(n.localRate[0],"mL/h"):sig(n.localRate[0])+'–'+nfFmt(n.localRate[1],"mL/h")):'Confirm inputs / consult neonatal team')+'. This is not a prescribed rate.</p>':'')+
+ '<p class="sub">Enter actual elapsed hours, not the day-of-life number. Select the weight specified in the NICU prescription. Composition depends on glucose, electrolytes, postnatal age and current treatment.</p>'+
+ '<details class="ndet"><summary>Local and MOH neonatal references</summary><p>Local manual reference: '+local+'. Exact 800 g overlaps bands; below 600 g is outside the table.</p><table><tr><th>Birth weight</th><th>Day 1</th><th>Day 2</th><th>Day 3–4</th><th>Day 5+</th></tr>'+NEO_FL.map(([lab,vals])=>'<tr><td>'+lab+'</td>'+vals.map(v=>'<td>'+ (v[0]===v[1]?v[0]:v.join("–"))+'</td>').join("")+'</tr>').join("")+'</table><p>MOH 2025 reference (not prescription): '+(n.moh==null?"Confirm inputs / consult neonatal protocol":n.moh+" mL/kg/day")+'. Term days 1–5: 60 / 90 / 120 / 150 / 150; preterm days 1–5: 60 / 80 / 100 / 120 / 140 mL/kg/day. Do not extrapolate this reference series beyond day 5. Day 1 generally D10; electrolytes individualised subsequently.</p>'+src("Local paediatric anaesthesia manual (Nov 2025), intraoperative fluid management; MOH Paediatric Protocols for Malaysian Hospitals, 5th ed. (2025), p. 99.")+'</details>'+
+ '<h3 class="irh" data-anchor="nf-gir">2. GIR / inputs</h3><p>Enter every ongoing infusion/feed. Enter 0 for an unused line. Unknown glucose concentration is not zero. Avoid double counting PN, carriers and feeds.</p>'+
+ NF_LINES.map(([k,label,iv])=>'<div class="pgbox"><b>'+label+'</b><div class="nfinputs">'+nfInput(k+"Rate","Rate","mL/h")+(iv?nfInput(k+"Glucose","Glucose","% w/v"):'<p class="sub">Counts towards total fluid only, not IV GIR.</p>')+'</div></div>').join("")+
+ '<p class="sub">GIR = sum(IV glucose % × mL/h) ÷ (6 × calculation weight). Total fluid = sum of rates × 24 ÷ calculation weight. For intermittent enteral feeds use average hourly volume. No automatic adjustment.</p>'+
+ (n.tfi!==null&&n.rx!==null?'<p>Planned intake minus prescription: <b>'+sig(Math.round((n.tfi-n.rx)*100)/100)+' mL/kg/day</b>. Reconcile with NICU team; not an instruction to alter fluids.</p>':"")+
+ '<h3 class="irh" data-anchor="nf-repl">3. Replacement / resuscitation</h3><p>Assess perfusion and hydration; record boluses and measured blood, gastric and other losses separately. Replace according to measured losses, electrolytes and the clinical plan; do not add them automatically to ongoing maintenance.</p>'+
+ '<h3 class="irh" data-anchor="nf-mon">4. Monitoring</h3><p>Glucose · electrolytes · urine output · fluid balance · perfusion / hydration. Reassess after changes and agree the plan with the neonatal team.</p><button class="linkbtn" data-nfreset="1">Reset neonatal fluid entries</button></div>';
+}
+
 function neoFluids(){ const neo = isNeo(), bw = bwKg(), r = bw < 0.8 ? 0 : bw <= 1 ? 1 : 2, d = S.pD <= 1 ? 0 : S.pD === 2 ? 1 : S.pD <= 4 ? 2 : 3, w = W();
   const cell = (v, i, j) => `<td${neo && i===r && j===d ? ' class="hl"' : ""}>${v[0]===v[1] ? v[0] : v[0]+"–"+v[1]}</td>`;
   const v = NEO_FL[r][1][d], lo = v[0]*w/24, hi = v[1]*w/24;
@@ -2200,7 +2246,7 @@ function neoFluids(){ const neo = isNeo(), bw = bwKg(), r = bw < 0.8 ? 0 : bw <=
 pCards.fluids = () => {
   const w = W();
   const m0 = w<=10 ? 4*w : w<=20 ? 40 + 2*(w-10) : 60 + (w-20), maint = Math.min(m0, 100), def = maint*S.fastH;
-  return `<div class="card"><h2>Maintenance (4/2/1)</h2><div class="big">${dz(maint,"mL/h")} mL/h</div>${m0>100?`<div class="sub">capped at 100 mL/h (formula ${sig(m0)})</div>`:""}
+  return `<div class="card"><h2>Maintenance (4/2/1)</h2>${isNeo()?neoFluidDesign():`<div class="big">${dz(maint,"mL/h")} mL/h</div>${m0>100?`<div class="sub">capped at 100 mL/h (formula ${sig(m0)})</div>`:""}
   ${step("fastH","Fasting","h",0,24,1)}
   <p class="sub">Deficit = maintenance × fasting hours = <b>${dz(def,"mL")} mL</b>; give ½ in hour 1, ¼ in hours 2 and 3.</p>
   <table><tr><th>Hour</th><th>Maintenance + deficit</th><th>Rate</th></tr>
@@ -2213,14 +2259,14 @@ pCards.fluids = () => {
   <h3>Insensible loss</h3><table><tr><td>Minor &lt; 1 h</td><td>none</td></tr><tr><td>Minor &gt; 1 h</td><td class="hl">2 mL/kg/h = ${dz(2*w,"mL/h")} mL/h</td></tr>
   <tr><td>Moderate</td><td class="hl">4 mL/kg/h = ${dz(4*w,"mL/h")} mL/h</td></tr><tr><td>Major</td><td class="hl">&gt; 10 mL/kg/h = &gt; ${dz(10*w,"mL/h")} mL/h</td></tr></table>
   <p><b>Exposed bowel:</b> insensible loss 10–20 mL/kg/h (${dz(10*w,"mL/h")}–${dz(20*w,"mL/h")} mL/h), up to 30 if losses high, until bowel back inside. Guide by HR, CRT, urine.</p>
-  <h3>Fluid choice</h3><ul><li>Neonate / neuro: Sterofundin maintenance (less sodium)</li><li>Replacement: Hartmann's (HM); paeds can use Hartmann's</li></ul>
-  <h3>Tips</h3><ul><li>Duhamel: replace deficit from start (7 kg ≈ 200 mL/h), then taper to losses</li><li>Crystalloid &gt; 20 mL/kg/h (${dz(20*w,"mL/h")} mL/h): consider albumin 5%</li><li>Max Gelofusine 25 mL/kg = <b>${dz(25*w,"mL")} mL</b>; albumin unlimited</li><li>FFP for coagulopathy / volume to replace loss</li><li>Major op: at least blue cannula — 1 deficit, 1 replacement, 1 inotrope</li></ul>${psrc()}</div>
+  <h3>Fluid choice</h3><ul><li>Neuro: Sterofundin maintenance (less sodium); neonatal fluid choice is individualised in neonatal mode.</li><li>Replacement: Hartmann's (HM); paeds can use Hartmann's</li></ul>
+  <h3>Tips</h3><ul><li>Duhamel: replace deficit from start (7 kg ≈ 200 mL/h), then taper to losses</li><li>Crystalloid &gt; 20 mL/kg/h (${dz(20*w,"mL/h")} mL/h): consider albumin 5%</li><li>Max Gelofusine 25 mL/kg = <b>${dz(25*w,"mL")} mL</b>; albumin unlimited</li><li>FFP for coagulopathy / volume to replace loss</li><li>Major op: at least blue cannula — 1 deficit, 1 replacement, 1 inotrope</li></ul>${psrc()}`}</div>
   <div class="card"><h2>Glucose (neonate / paeds)</h2>${pindDraft()}<p>Check glucose in neonates, infants, long fasts and long cases.</p>
   ${(()=>{ const g = AGEM()<1?0:1; const h=i=>i===g?' class="hl"':"";
     return `<table><tr${h(0)}><td>Neonate</td><td>keep &gt; 2.6 mmol/L</td></tr><tr${h(1)}><td>Infant and child</td><td>keep 4–10 mmol/L</td></tr></table>`; })()}
   <h3>Hypoglycaemia (any age)</h3>${f3Draft()}${T([
     R("D10","2.5 mL/kg · slow bolus (2 mL D50 in 10 mL NS)",`${dz(2.5*w,"mL")} mL`,`recheck in 5–10 min <span class="sub">(local manual; RCUK 2025: 2 mL/kg)</span>. No IV: glucagon IM (Post-op › IM doses).`,"IV")])}
-  <p${neoHl()}><b>Neonate:</b> maintenance <b>D10 in ½ saline</b> (local manual). Glucose need 4–6 mg/kg/min = D10 <b>${dz(2.4*w,"mL/h")}–${dz(3.6*w,"mL/h")} mL/h</b>.</p>
+  <p><b>Neonatal glucose delivery:</b> use the existing NICU prescription and assess total IV GIR across all ongoing infusions.</p><button class="homebtn" data-id="paeds-intra-maintenance-4-2-1" data-open="6. Maintenance & insensible loss" data-g="paeds" data-tab="intra">Neonatal maintenance and GIR ›</button>
   <h3>Glucose maintenance if high risk of hypoglycaemia</h3><p>HMD2 = 2 mL D50 + 48 mL Hartmann's (2%)</p>
   <p>SD5 = 5 mL D50 + 45 mL Sterofundin = 50 mL of 5%</p>${psrc()}</div>
   <div class="card"><h2>Blood products</h2><div class="jumprow navonly"><button class="chip" data-jump="blood-when">When to transfuse</button><button class="chip" data-jump="blood-amount">How much</button><button class="chip" data-jump="blood-volume">Allowable loss</button></div>${pTransfusionProtocol()}<h3>Local notes</h3>${pindDraft()}${neoDraft()}<p>Neonate: Hb &gt; 10–12 g/dL. Colostomy: GXM. Bowel resection = blood loss.</p>
@@ -6426,6 +6472,7 @@ VGROUPS.find(g => g[0]==="General")[1].push(["Neonatal cards & local manual", "2
   "Anaphylaxis: IV adrenaline moderate 1–2, life-threatening 4–10 mcg/kg; IM age bands 150 / 300 / 500 mcg; crystalloid 20 mL/kg (RCUK as note). Laryngospasm propofol 1–2 mg/kg; bronchospasm adrenaline 0.5–1 mcg/kg; emergence delirium adds propofol 0.5–1, midazolam 0.02–0.1, ketamine 0.5–1 mg/kg",
   "Manual's internal conflicts resolved to its drug table: D10 2.5 mL/kg, ondansetron 0.15 mg/kg",
   "Condition cards (international, not in local manual): OA / TOF, CDH (PIP ≤ 25, PaCO₂ 45–60, preductal SpO₂ 80–95%), gastroschisis / exomphalos (compartment: PIP > 25–30, bladder > 20 mmHg), NEC, PDA ligation (test clamp), malrotation / volvulus, myelomeningocele"]]);
+VGROUPS.find(g => g[0]==="General")[1].push(["Neonatal fluid management", "27 Nov 2026", ["Existing NICU prescription takes priority; confirmed patient values, elapsed hours and selected calculation weight required. Local birth-weight table and MOH 2025 neonatal day-specific references kept separate. No routine neonatal fasting deficit or universal fluid composition. GIR = sum(IV glucose % × mL/h)/(6 × selected kg); enteral intake excluded from IV GIR but included in total planned intake. Missing inputs suppress affected results."]]);
 VGROUPS.find(g => g[0]==="General")[1].push(["Neonatal age inputs", "22 Nov 2026", [
   "At age 0 y 0 m the patient box asks day of life (0–28), gestation at birth (22–42 wk, default 40) and birth weight (defaults to current weight)",
   "Weeks since birth = day / 7 for a neonate, months × 4.345 for an infant; PMA = gestation + weeks since birth; preterm = gestation < 37 wk",
@@ -6710,9 +6757,9 @@ function sampleWarn(keys){ const k = keys.filter(isSample); if (!k.length) retur
   const names = {k:"K⁺", hb:"Hb", height:"height", aw:"weight", pw:"weight", pY:"age", spHt:"height", morWt:"weight", sex:"sex", age:"age"};
   return `<div class="samplewarn"><b>Sample values</b> — ${(a => a.length > 1 ? a.slice(0,-1).join(", ") + " and " + a[a.length-1] : a[0])([...new Set(k.map(x=>names[x]))])} not entered. Enter the patient or tap a case.</div>`; }
 /* Each case keeps its own clinical entries, in memory only (never saved). */
-const CLIN = ["paDose","csDec","sc","asa","met","pnF","pnMP","pnNeck","pnPonv","pnUrg","pnLay","csNote","leNote","pnNote","csWho","csLang","csOut","csLen","leLen","csMode","crea","k","hb","todayWt","hdH","hbNow","hbLow","hbTarget","fastH","pBE","laA","txck","derm","abg","fbal","blIn","hbU","gz","tv","preg","oc","stc","indT","mxSel"];
+const CLIN = ["nf","paDose","csDec","sc","asa","met","pnF","pnMP","pnNeck","pnPonv","pnUrg","pnLay","csNote","leNote","pnNote","csWho","csLang","csOut","csLen","leLen","csMode","crea","k","hb","todayWt","hdH","hbNow","hbLow","hbTarget","fastH","pBE","laA","txck","derm","abg","fbal","blIn","hbU","gz","tv","preg","oc","stc","indT","mxSel"];
 const CLIN_T = ["crea","k","hb","todayWt","hdH"];
-const CLIN_OBJ = {sc:{}, pnF:{}, txck:{}, laA:[]};
+const CLIN_OBJ = {nf:{},sc:{}, pnF:{}, txck:{}, laA:[]};
 const clone = v => v === undefined ? undefined : JSON.parse(JSON.stringify(v));
 let CLIN0 = null;
 function clinSnap(){ const o = {__t:{}}; CLIN.forEach(k => o[k] = clone(S[k])); CLIN_T.forEach(k => o.__t[k] = !!S.touched[k]); return o; }
@@ -6751,6 +6798,7 @@ function vTicks(){
 }
 /* ---------- ABOUT ---------- */
 const CHANGES = [
+  ["2.178","Neonatal fluids: prescribed maintenance, total intake and IV glucose infusion rate at the top; no routine neonatal fasting deficit; separate replacement and monitoring (checked)"],
   ["2.177.9","Paediatric: place ketamine short cases in Procedures, merge T-tube into bronchoscopy, and provide an always-accessible neonatal quick view. Existing clinical calculations unchanged."],
   ["2.177.8","Paediatric: complete no-IV-access card under Induction, shared IM airway dose rows and direct shortcuts from other phases. Clearer bicarbonate calculator title. No dose changes."],
   ["2.177.7","Paediatric: group intra-op drugs by indication with A–Z jumps, consolidate Other drugs and remove duplicate Fallot scenario entry. Existing doses unchanged."],
@@ -7065,9 +7113,7 @@ function prPaeds(){
     prRow("Cefazolin", neo?"30 mg/kg (neonate: longer redose interval)":"30 mg/kg, max 2 g", pq(w,30,"mg",2000)),
     prRow("LA maximum", `bupi ${bmax} mg/kg${mo<4?" (&lt; 4 m)":""}`, `<b>${sig(dz(bmax*w/2.5,"mL")*2.5)} mg</b> = ${dz(bmax*w/2.5,"mL")} mL 0.25%`)])}
   <div class="pr-sec"><h3>Fluids &amp; blood</h3><table>
-    ${neo ? (() => { const bw = bwKg(), r = bw < 0.8 ? 0 : bw <= 1 ? 1 : 2, d = S.pD <= 1 ? 0 : S.pD === 2 ? 1 : S.pD <= 4 ? 2 : 3, v = NEO_FL[r][1][d];
-      return `<tr><td>Maintenance (neonate)</td><td class="pr-rule">day ${S.pD}, birth weight ${sig(bw)} kg: ${v[0]===v[1]?v[0]:v[0]+"–"+v[1]} mL/kg/day · D10 in ½ saline</td><td><b>${dz(v[0]*w/24,"mL/h")}${v[1]>v[0]?"–"+dz(v[1]*w/24,"mL/h"):""} mL/h</b></td></tr>
-      <tr><td>Glucose need</td><td class="pr-rule">4–6 mg/kg/min · keep &gt; 2.6 mmol/L</td><td>D10 <b>${dz(2.4*w,"mL/h")}–${dz(3.6*w,"mL/h")} mL/h</b></td></tr>`; })()
+    ${neo ? (() => { const n=nfCalc(); return `${NEO_FLUID_CHECKED?"":'<tr><td colspan="3"><b>DRAFT: neonatal fluid management. Awaiting clinical sign-off; not for patient care.</b></td></tr>'}<tr><td>NICU prescription</td><td class="pr-rule">${nfFmt(n.rx,"mL/kg/day")}</td><td>${nfFmt(n.rxRate,"mL/h")}</td></tr><tr><td>Planned intake</td><td>${nfFmt(n.tfi,"mL/kg/day")}</td><td>${nfFmt(n.total,"mL/h")}</td></tr><tr><td>IV GIR</td><td colspan="2">${nfFmt(n.gir,"mg/kg/min")} · individualise; no routine fasting deficit.</td></tr>`; })()
     : `<tr><td>Maintenance</td><td class="pr-rule">4/2/1, max 100</td><td><b>${dz(maint,"mL/h")} mL/h</b></td></tr>
     <tr><td>Deficit (${S.fastH} h fast)</td><td class="pr-rule">½ hour 1, ¼ hours 2–3</td><td><b>${dz(def,"mL")} mL</b> · h1 ${dz(maint+def/2,"mL/h")} · h2–3 ${dz(maint+def/4,"mL/h")} mL/h</td></tr>`}
     <tr><td>Bolus</td><td class="pr-rule">10 mL/kg, max 500</td><td>${pq(w,10,"mL",500)}</td></tr>
@@ -7932,11 +7978,13 @@ document.addEventListener("click", e => {
   if (d.open) collapseAcc(d); else expandAcc(d);
 }, true);
 document.addEventListener("change", e => { const el = e.target; if (!el.dataset) return;
+  if(el.dataset.nf){const f=S.nf=S.nf||{};f[el.dataset.nf]=el.value;if(el.dataset.nf==="rx")delete f.noRx;render();return;}
   if (el.hasAttribute("data-pa-ideal") && S.paDose){ S.paDose.ideal = Number(el.value); delete S.paDose.specialist; render(); return; }
   if (el.dataset.tmrremind){ const t = tmrState(); t.nm.remind = +el.value || 0; tmrSave(t); render(); }
   if (el.dataset.tmrwake){ store.set("wake", el.checked); tmrWake(); }
   if (el.dataset.tmrshow){ const v = store.get("timerShow", {}); v[el.dataset.tmrshow] = el.checked; store.set("timerShow", v); render(); }
   if (el.dataset.abxmin){ store.set("abxMin", +el.value); render(); } });
+document.addEventListener("click", e => {const b=e.target.closest&&e.target.closest("[data-nfconfirm],[data-nfreset],[data-nfnorx]");if(!b)return;if(b.dataset.nfreset)S.nf={};else if(b.dataset.nfnorx){const f=S.nf=S.nf||{};f.noRx=!f.noRx;if(f.noRx)delete f.rx;}else if(isNeo()&&!S.pwEst){(S.nf=S.nf||{}).confirm=nfFingerprint();}render();});
 document.addEventListener("click", e => { if (!S.tmrOpen) return; const t = e.target; if (t.closest && (t.closest("#tmrpanel") || t.closest("[data-tmr]"))) return; S.tmrOpen = false; S.tmrArm = null; render(); }, true);
 document.addEventListener("toggle", e => { const v = e.target; if (v.matches && v.matches("details.vg") && !(S.vq||"").trim()){ S.vOpen = S.vOpen||[]; const g = v.dataset.vg; S.vOpen = v.open ? [...new Set([...S.vOpen,g])] : S.vOpen.filter(x=>x!==g); } }, true);
 document.addEventListener("toggle", e => {
