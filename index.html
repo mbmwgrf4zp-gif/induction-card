@@ -1013,7 +1013,7 @@ if (window.top !== window.self && /\.github\.io$/.test(location.hostname)) {
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.181.0";
+const APP_VERSION = "2.181.1";
 const APP_DATE = "27 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
@@ -6943,6 +6943,7 @@ function vTicks(){
 }
 /* ---------- ABOUT ---------- */
 const CHANGES = [
+  ["2.181.1","About: Clinical foundations, How calculations work and the other sections no longer close by themselves while you are reading."],
   ["2.181","Paediatrics: the patient bar now matches the adult one — age · height · weight on one line with an APLS estimated-weight badge (1 month – 12 y); tap it to see actual vs APLS weight on a scale; ✎ to edit. Neonates: day · GA · weight."],
   ["2.180","Pre-op › Plan & notes: \"Premed note\" is now \"Pre-op note\"; the tab has Plan (plan & consent) and Notes (Pre-op note, Anaesthetic Notes) headings, with Anaesthetic Notes below the Pre-op note. Old links and favourites still work."],
   ["2.179","Anaesthetic Notes is now card 3 in Pre-op › Plan & note, with standard search, favourites and recents. Existing five checked technique templates and clinical content unchanged."],
@@ -7135,12 +7136,12 @@ screens.about = () => { const nBlk = Object.keys(BLKS).length, srcLi = ls => ls.
     <div class="auspi"><span class="ahi">${svg("capno")}</span><b>Offline</b><span>No account. Works in theatre without signal once opened; calculations happen on the phone.</span></div></div>
   <div class="card acard"><h2>What's inside</h2>${ABOUT_GROUPS.map(([g, items]) => `<h3>${g}</h3><div class="agrid">${items.map(([t, sub, ic, gg, at]) => `<button class="agi" style="--t:var(--g-${gg});--t-soft:var(--g-${gg}-soft)" ${at}><span class="ahi">${svg(ic)}</span><span><b>${t}</b><small>${sub}</small></span></button>`).join("")}</div>`).join("")}</div>
   <h2 class="adet">Clinical information</h2>
-  <details class="card adt"><summary>Clinical foundations</summary>
+  <details class="card adt" data-adt="found"${(S.adtOpen||[]).includes("found") ? " open" : ""}><summary>Clinical foundations</summary>
     <p>Content draws on Malaysian guidance and local practice references alongside international anaesthesia guidelines. Where Malaysian recommendations differ from international ones, the card says so. Every card shows its own source line.</p>
     ${SRC_LINKS.map(([g,ls])=>`<h3>${g}</h3><ul class="srcl">${srcLi(ls)}</ul>`).join("")}
     <h3>Local and personal sources</h3><ul>${LOCAL_SRC.map(t=>`<li>${t}</li>`).join("")}</ul>
     <p class="sub">Local documents are summarised, not reproduced, and are not linked. Links open online; this list reads offline. Sources reviewed Nov 2026; next review Nov 2027. All block cards and the nerve map were checked against NYSORA in Nov 2026; each card names the page it was read from.</p></details>
-  <details class="card adt"><summary>How calculations work</summary><ul>
+  <details class="card adt" data-adt="calc"${(S.adtOpen||[]).includes("calc") ? " open" : ""}><summary>How calculations work</summary><ul>
     <li>Doses come from the weight you enter, using the weight each drug is dosed on: <b>TBW</b> (actual), <b>IBW</b> (ideal, Devine), <b>LBW</b> (lean, Janmahasatian) or <b>AdjBW</b> (IBW + 0.4 × excess). Each row says which one it used. Different drugs need different weights — that's why it varies.</li>
     <li><b>BMI</b> = weight ÷ height² (m). From BMI ≥ 30, some cards switch to ideal or lean weight (e.g. IV fluid maintenance, LA maximums) and say so.</li>
     <li><b>PBW</b> (predicted body weight, ARDSNet): male 50, female 45.5 + 0.91 × (height − 152.4). Same formula as IBW but never capped at actual weight; used for tidal volume.</li>
@@ -7149,7 +7150,7 @@ screens.about = () => { const nBlk = Object.keys(BLKS).length, srcLi = ls => ls.
     <li>Maximum doses (adult caps, paediatric caps, local anaesthetic limits) are applied automatically and labelled.</li>
     <li>Values marked "sample" are placeholders until you enter the patient; emergency cards hide totals until then.</li>
     <li>The <b>3D body</b>, block-finder regions, nerve map and dermatome map are schematic: landmarks are measured on the model (nipple, xiphisternum, umbilicus, inguinal ligament) and real anatomy varies. 3D starts only when you ask; <b>Hide 3D</b> brings back the list or 2D chart.</li></ul></details>
-  <details class="card adt"><summary>Clinical governance</summary>
+  <details class="card adt" data-adt="gov"${(S.adtOpen||[]).includes("gov") ? " open" : ""}><summary>Clinical governance</summary>
     <table><tr><th>App version</th><td class="mono">v${APP_VERSION}</td></tr><tr><th>Last software update</th><td>${APP_DATE}</td></tr>
     <tr><th>Clinical sources</th><td>Reviewed Nov 2026; next review Nov 2027</td></tr>
     <tr><th>Review</th><td>Built and checked by one practising anaesthetist against the named guidelines. New content carries a yellow <b>DRAFT</b> banner until checked; the Values sheet records each check.</td></tr>
@@ -7157,14 +7158,14 @@ screens.about = () => { const nBlk = Object.keys(BLKS).length, srcLi = ls => ls.
     <p><b>Clinical use.</b> Induction Card is a reference and memory aid for trained healthcare professionals. It supports, but does not replace, clinical judgement, local protocols or independent checking of drug doses and equipment. Review calculated values for the individual patient; verify dose, concentration, route and contraindications before use.</p>
     <p class="sub">Software updates (layout, fixes) and clinical content changes are listed together in What's new; clinical changes are checked before release.</p></details>
   <h2 class="adet">Application</h2>
-  <details class="card adt"><summary>Privacy and data</summary><ul>
+  <details class="card adt" data-adt="priv"${(S.adtOpen||[]).includes("priv") ? " open" : ""}><summary>Privacy and data</summary><ul>
     <li><b>Patient values stay on this phone.</b> Calculations run on the device; the app has no accounts, no cookies, no analytics and no tracking, and its security settings allow it to load only its own files.</li>
     <li>Like any website, the pages themselves are downloaded from the host (GitHub Pages), which may keep ordinary access logs. Nothing you enter is sent.</li>
     <li>Saved in the browser's local storage on this phone only: anonymous cases (sex, age, height, weight — deleted after 36 hours), favourites, quick tiles, 3D on/off, theme and display settings, and Values-sheet ticks.</li>
     <li>Offline: a service worker keeps a copy of the app after the first visit. When a new version is published, the app downloads it and offers <b>tap to update</b>.</li>
     <li>To clear: delete cases on the <button class="linkish" data-go="cases">Cases</button> screen; reset settings in <button class="linkish" data-go="settings">Customise › Reset all</button>; or clear the site's data in your browser.</li></ul></details>
   ${installCard()}
-  <details class="card adt"><summary>What's new</summary><table>${CHANGES.slice(0, 3).map(([v,t])=>`<tr><td class="mono">${v}</td><td>${t}</td></tr>`).join("")}</table>
+  <details class="card adt" data-adt="new"${(S.adtOpen||[]).includes("new") ? " open" : ""}><summary>What's new</summary><table>${CHANGES.slice(0, 3).map(([v,t])=>`<tr><td class="mono">${v}</td><td>${t}</td></tr>`).join("")}</table>
   <details class="allch"><summary>Show all ›</summary><table>${CHANGES_ALL.map(([v,t])=>`<tr><td class="mono">${v}</td><td>${esc(t)}</td></tr>`).join("")}</table></details></details>
   ${faqCard()}
   <h2 class="adet">Community</h2>
@@ -7173,7 +7174,7 @@ screens.about = () => { const nBlk = Object.keys(BLKS).length, srcLi = ls => ls.
   <p>The aim is simple: less mental arithmetic and searching at the point of care, so attention stays on the patient.</p>
   <p class="asig">— a practising anaesthetist in Malaysia</p></div>
   ${shareCard()}
-  <details class="card adt"><summary>Licences</summary><p class="sub">IBM Plex Sans / Mono and DSEG7 (keshikan) fonts — SIL Open Font License 1.1.</p><p class="sub">3D body: MakeHuman base mesh and male targets — CC0 1.0 (makehumancommunity.org).</p><p class="sub">Association of Anaesthetists Quick Reference Handbook — CC BY-NC-SA 4.0, adapted wording.</p></details>
+  <details class="card adt" data-adt="lic"${(S.adtOpen||[]).includes("lic") ? " open" : ""}><summary>Licences</summary><p class="sub">IBM Plex Sans / Mono and DSEG7 (keshikan) fonts — SIL Open Font License 1.1.</p><p class="sub">3D body: MakeHuman base mesh and male targets — CC0 1.0 (makehumancommunity.org).</p><p class="sub">Association of Anaesthetists Quick Reference Handbook — CC BY-NC-SA 4.0, adapted wording.</p></details>
   <p class="aver mono">Induction Card v${APP_VERSION} · built ${APP_DATE} · offline copy: ${OFFLINE === "ready" ? "ready" : OFFLINE === "fail" ? `unavailable <button class="flink" data-offretry="1">Retry</button>` : OFFLINE === "na" ? "not available in this view" : "saving…"}<br>Developed in Malaysia · for healthcare professionals</p>` + disc; };
 function aboutFacts(){ let cards = 0; try { cards = Object.keys(cardSrc()).length; } catch (e){} return `${cards ? cards + " cards · " : ""}${Object.keys(BLKS).length} block cards · ${Object.keys(NERVES).length} nerves mapped · sources reviewed Nov 2026`; }
 screens.values = () => {
@@ -8173,6 +8174,8 @@ document.addEventListener("click", e => { const t = e.target.closest && e.target
 document.addEventListener("change", e => { const t = e.target; if (t.tagName !== "SELECT" || !t.dataset.stc) return; (S.stc = S.stc || {}).d = t.value; const r = document.getElementById("stcres"); if (r){ r.innerHTML = stcRes(); seg1(r); } });
 document.addEventListener("click", e => { const t = e.target.closest && e.target.closest("[data-ocreset]"); if (!t) return; S.oc = {}; render(); });
 document.addEventListener("toggle", e => { const d = e.target; if (d.matches && d.matches("details.ptx")) S.ptOpen = d.open; }, true);
+// v2.181.1: About sections remember being open, so a background re-render (e.g. offline cache ready after an update) no longer snaps them shut
+document.addEventListener("toggle", e => { const d = e.target; if (!d.matches || !d.matches("details[data-adt]")) return; const k = d.dataset.adt, o = S.adtOpen || []; S.adtOpen = d.open ? [...new Set([...o, k])] : o.filter(x => x !== k); }, true);
 document.addEventListener("click", e => { const t = e.target.closest && e.target.closest("[data-mx]"); if (!t) return; S.mxSel = S.mxSel === t.dataset.mx ? "" : t.dataset.mx; render(); });
 document.addEventListener("click", e => { const t = e.target.closest && e.target.closest("[data-tvb]"); if (!t) return; const [k, v] = t.getAttribute("data-tvb").split(":"); tvS()[k] = v; render(); });
 document.addEventListener("click", e => { const t = e.target.closest && e.target.closest("[data-dl]"); if (!t) return; S.dermAnim = {prev: dermState().top}; S.derm = t.getAttribute("data-dl"); render(); });
