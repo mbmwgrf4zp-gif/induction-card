@@ -55,14 +55,10 @@ If a request conflicts with this file, stop and ask the owner.
 
 ## 5. Tests — the safety net
 
-Run **all five** before any deploy (Playwright + Chromium):
+Run **every file in `tests/`** before any deploy (Playwright + Chromium) — new suites get added, so never use a fixed list:
 
 ```
-NODE_PATH=$(npm root -g) node tests/max-dose.test.js
-NODE_PATH=$(npm root -g) node tests/navigation.test.js
-NODE_PATH=$(npm root -g) node tests/neonate.test.js
-NODE_PATH=$(npm root -g) node tests/eligibility.test.js
-NODE_PATH=$(npm root -g) node tests/case-switch.test.js
+for t in tests/*.test.js; do NODE_PATH=$(npm root -g) node "$t"; done
 ```
 
 A suite fails if its exit code ≠ 0 **or any output line starts with `✗`** (count `grep -c '^✗'`, not every ✗ character).
@@ -73,7 +69,7 @@ A suite fails if its exit code ≠ 0 **or any output line starts with `✗`** (c
 
 ## 6. Release steps
 
-1. Work on a new feature branch from `claude/cool-cray-mdyw33` (the dev branch).
+1. **Pull the latest `claude/cool-cray-mdyw33` first** (other tools may have released since), then work on a new feature branch from it. Only one AI/developer edits at a time.
 2. Bump the version in **both** `APP_VERSION` (index.html) and `CACHE` (sw.js) — they must match.
 3. Add a `CHANGES` entry (plain-English, what the user sees).
 4. Run all tests; **stop on any failure** (check each step explicitly — do not rely on `set -e`).

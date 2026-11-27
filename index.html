@@ -1013,7 +1013,7 @@ if (window.top !== window.self && /\.github\.io$/.test(location.hostname)) {
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.179.1";
+const APP_VERSION = "2.180.0";
 const APP_DATE = "27 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
@@ -2074,7 +2074,7 @@ const irDraft = () => IR_CHECKED ? "" : `<div class="warn" style="margin-top:0">
 const IR_SECS = {anti:"Anticholinergic", opioid:"Opioid", hyp:"Hypnotic", relax:"Muscle relaxant", noiv:"No IV access"};
 const irJump = ids => `<div class="jumprow">${ids.map(k => `<button class="chip" data-jump="${k}">${IR_SECS[k]}</button>`).join("")}</div>`;
 const irHead = k => `<h3 class="irh" data-anchor="${k}">${IR_SECS[k]}</h3>`;
-const OLD_LABELS = {"ga|8. Vasopressors & inotropes":"ga-intra-vasopressors-and-inotropes", "ga|9. One-lung ventilation":"ga-intra-one-lung-ventilation",   // v2.145
+const OLD_LABELS = {"premed|2. Premed note":"premed-plan-premed-note", "ga|8. Vasopressors & inotropes":"ga-intra-vasopressors-and-inotropes", "ga|9. One-lung ventilation":"ga-intra-one-lung-ventilation",   // v2.145
   "ga|3. Tube & airway kit":"ga-ind-tube-and-airway-kit", "ga|1. Induction drugs & relaxants":"ga-ind-induction-drugs", "ga|2. RSI":"ga-ind-rsi", "ga|7. Antibiotic prophylaxis":"ga-intra-antibiotic-prophylaxis", "ga|8. Tranexamic acid":"ga-intra-tranexamic-acid", "ga|1. Ventilation strategies":"ga-intra-ventilation-strategies", "ga|3. TIVA":"ga-intra-tiva", "ga|4. Volatile: MAC by age":"ga-intra-volatile-mac-by-age", "ga|5. Intra-op analgesia":"ga-intra-analgesia", "ga|6. Vasopressors & inotropes":"ga-intra-vasopressors-and-inotropes", "ga|2. One-lung ventilation":"ga-intra-one-lung-ventilation", "ga|4. Analgesia ladder & PCA":"ga-post-analgesia-ladder-and-pca", "ga|7. IM doses (no IV access, or ward)":"ga-post-im-doses-no-iv-access-or-ward",   // v2.144 General reorder
   "ga|1. Induction drugs":"ga-ind-induction-drugs", "ga|3. Muscle relaxants":"ga-ind-muscle-relaxants", "ga|4. Tube & airway kit":"ga-ind-tube-and-airway-kit",
   "paeds|3. Induction drugs":"paeds-ind-induction-drugs", "paeds|4. Muscle relaxants":"paeds-ind-muscle-relaxants", "paeds|5. RSI (child)":"paeds-ind-rsi", "paeds|6. Ketamine induction (short cases)":"paeds-ind-ketamine-anaesthesia",
@@ -3731,7 +3731,7 @@ const pnField = f => { const [h, ticks, multi] = PN_F[f], v = esc((S.pnF || {})[
     ${multi ? `<textarea id="pnf-${f}" class="csnote" rows="2" maxlength="300" data-pnf="${f}">${v}</textarea>` : `<input id="pnf-${f}" class="search pnin" maxlength="160" autocomplete="off" data-pnf="${f}" value="${v}">`}</div>`; };
 const pnSmall = (k, l, ph) => `<label class="pned"><span>${l}</span><input class="search pnin" maxlength="24" autocomplete="off" inputmode="text" data-pnf="${k}" value="${esc((S.pnF||{})[k] || (k === "cr" && S.touched.crea ? String(S.crea) : ""))}" placeholder="${ph||""}"></label>`;
 gaCards.pnote = () => { const txt = premedText();
-  return `<div class="card"><h2>2. Premed note</h2>${pm2Draft()}
+  return `<div class="card"><h2>2. Pre-op note</h2>${pm2Draft()}
   <p class="sub">Name, IC and R/N copy out as blank labels — <b>never type them here</b>. Age, sex, weight, height, BMI, physical status, STOP-BANG, mode of anaesthesia and the consent explanation fill in from the rest of the app. Nothing is saved.</p>
   ${seg("pnLay",[["mine","My template"],["moh","MOH form order"]])}
   ${pnField("allergy")}${pnField("dent")}
@@ -3843,7 +3843,7 @@ gaCards.airway = () => { const e = awEval(), t = AW_TIER[e.tier];
   const auto = [e.bmiHi ? "BMI ≥ 35 (from Patient)" : "", e.old ? "Age &gt; 55 (from Patient)" : ""].filter(Boolean);
   const row = ([k,l,m]) => tog("awc", k, `${l} ${awTags(m)}`);
   return `<div class="card"><h2>1. Airway assessment &amp; plan</h2>${awopDraft()}
-  <p class="sub">Tick what you find. Tags show what each finding predicts. Mallampati, TMD and neck movement are shared with the Premed note.</p>
+  <p class="sub">Tick what you find. Tags show what each finding predicts. Mallampati, TMD and neck movement are shared with the Pre-op note.</p>
   <h3>History</h3><div class="txck">${AW_HX.map(row).join("")}</div>
   <h3>Examination</h3>
   <div class="pnf"><span class="sub">Mallampati</span>${seg("pnMP",[["1","MP 1"],["2","MP 2"],["3","MP 3"],["4","MP 4"]])}</div>
@@ -4169,11 +4169,11 @@ gaCards.consent = () => { const auto = csAuto(), txt = consentText(), tech = CS_
   const ind = S.csOut === "ind"; let n = 0; const h = t => `<h3>${++n}. ${t}</h3>`;
   S.csMode = csMode();
   if (S.csMode === "le") return `<div class="card"><h2>Anaesthetic plan &amp; consent</h2>
-  <p class="sub">Decide the plan, explain it, then copy. Nothing here is saved. The Premed note (card 2) picks this up.</p>
+  <p class="sub">Decide the plan, explain it, then copy. Nothing here is saved. The Pre-op note (card 2) picks this up.</p>
   ${seg("csMode",[["ga","Anaesthetic"],["le","Labour epidural"]])}<h3>Plan extras</h3><div class="txck">${plUI()}</div>
   <div class="planout"><span class="sub">Anaesthetic plan</span><b>${esc(planLine()) || "— tick a technique"}</b>${planLine() ? `<button class="iconbtn" data-copy="${esc(planLine())}">Copy plan</button>` : ""}</div>${lepBody()}</div>`;
   return `<div class="card"><h2>Anaesthetic plan &amp; consent</h2>${consDraft()}${cs2Draft()}${cs3Draft()}${napDraft()}
-  <p class="sub">Decide the plan, explain it, then copy. Not a consent form. Nothing here is saved. The Premed note (card 2) picks this up.</p>
+  <p class="sub">Decide the plan, explain it, then copy. Not a consent form. Nothing here is saved. The Pre-op note (card 2) picks this up.</p>
   ${seg("csMode",[["ga","Anaesthetic"],["le","Labour epidural"]])}
   ${seg("csOut",[["full","Notes block"],["ind","Individual risks only (form box)"]])}
   ${ind ? "" : h("Techniques explained") + `<div class="txck">${CS_TECH.map(([k,l]) => tg(k,l)).join("")}${csOn("pnb", {}) ? tog("cs","pnbchest","Nerve block near chest / neck (adds pneumothorax)") : ""}</div>`}
@@ -6903,10 +6903,10 @@ function anPreviewUpdate(){
  if(rev)rev.checked=!!s.review;
  const dep=document.querySelector(".an-depth b");if(dep&&["EA","CSE"].includes(s.tab)){const d=anDepth(s.tab);dep.textContent=d===null?"Enter valid depths":d+" cm";}
 }
-screens["anaesthetic-notes"]=()=>{
+gaCards.anotes=()=>{
  const s=anState(),ac=activeCase(),tab=s.tech.includes(s.tab)?s.tab:s.tech[0],f=tab?AN_SPEC[tab]:[];
  const technique=s.tech.length?(s.tech.length>1?'<div class="an-chips">'+s.tech.map(t=>anButton(t,'data-antab="'+t+'"',tab===t)).join("")+'</div>':'')+f.map(x=>anInput(tab,x)).join("")+(["EA","CSE"].includes(tab)?anDepthUI(tab):""):'<p class="sub">Select actual technique(s) above.</p>';
- return head("Anaesthetic Notes","g-premed")+ '<div class="an-note"><div class="an-quick"><span class="sub">'+esc(s.tech.length?s.tech.join(' + '):'Select technique')+'</span><button class="iconbtn" data-anquick="1">Review &amp; copy ›</button></div>'+
+ return '<div class="card"><h2>3. Anaesthetic Notes</h2><div class="an-note"><div class="an-quick"><span class="sub">'+esc(s.tech.length?s.tech.join(' + '):'Select technique')+'</span><button class="iconbtn" data-anquick="1">Review &amp; copy ›</button></div>'+
  (AN_NOTES_CHECKED?"":'<div class="warn">DRAFT — anaesthetic documentation prototype. Not clinically signed off; do not use for patient records.</div>')+
  '<div class="card"><p class="sub">'+(ac?'Active anonymous case: '+esc(ac.label):'No active case. Entries are session-only.')+' · No names, IC, MRN or other identifiers.</p><h3>Techniques actually performed</h3><div class="an-chips">'+Object.keys(AN_NAMES).map(t=>anButton(t,'data-antech="'+t+'"',s.tech.includes(t))).join("")+'</div><p class="sub">Select more than one for combined techniques or conversion. No findings or doses are preselected.</p></div>'+
  anSection("prep","Monitoring & preparation",anCount("common")+" fields entered",AN_COMMON.map(f=>anInput("common",f)).join(""))+
@@ -6914,7 +6914,7 @@ screens["anaesthetic-notes"]=()=>{
  anSection("end","Events & outcome",anCount("end")+" fields entered",AN_END.map(f=>anInput("end",f)).join(""))+
  anSection("preview","Note preview","Review and edit before copying",'<div class="an-chips">'+anButton("Brief",'data-anmode="brief"',s.mode==="brief")+anButton("Detailed",'data-anmode="detailed"',s.mode==="detailed")+'</div><textarea id="an-preview" class="csnote" rows="8" maxlength="12000" autocomplete="off" aria-label="Editable note preview">'+esc(anText())+'</textarea><button class="iconbtn" data-anregen="1">Restore generated text</button><p class="sub">Editing a structured field regenerates this note and discards manual edits. Unentered findings remain undocumented.</p>')+
  '<div class="card an-actions"><p id="an-issues" class="warn" aria-live="polite">'+esc(anIssues().join(" · "))+'</p><label class="an-review"><input type="checkbox" data-anreview="1"'+(s.review?' checked':'')+'> I reviewed the actual findings and doses, and checked the note for identifiers.</label><button class="homebtn primary" data-ancopy="1"'+(!s.tech.length||!anText().trim()||!s.review||anIssues().length?' disabled':'')+'>Copy note</button><button class="iconbtn" data-anclear="1">Clear all entries</button></div>'+
- '<details class="ndet"><summary>Reference and scope</summary><p>MOH Malaysia Anaesthesia Record PRP-BOR-38/A (2024), pages 2–3, and Appendix A. MAC-specific fields are a proposed extension. This is a narrative supplement, not a replacement for time-based observations, drug charts or the signed official record.</p></details></div>'+disc;
+ '<details class="ndet"><summary>Reference and scope</summary><p>MOH Malaysia Anaesthesia Record PRP-BOR-38/A (2024), pages 2–3, and Appendix A. MAC-specific fields are a proposed extension. This is a narrative supplement, not a replacement for time-based observations, drug charts or the signed official record.</p></details></div></div>';
 };
 document.addEventListener("input",e=>{
  const t=e.target;if(t.dataset?.anfield){const [scope,key]=t.dataset.anfield.split("|");anPut(scope,key,t.value);anPreviewUpdate();}
@@ -6942,7 +6942,8 @@ function vTicks(){
 }
 /* ---------- ABOUT ---------- */
 const CHANGES = [
-  ["2.179","Anaesthetic Notes: five technique templates, common observations, editable preview and case-isolated documentation (checked)"],
+  ["2.180","Pre-op › Plan & notes: \"Premed note\" is now \"Pre-op note\"; the tab has Plan (plan & consent) and Notes (Pre-op note, Anaesthetic Notes) headings, with Anaesthetic Notes below the Pre-op note. Old links and favourites still work."],
+  ["2.179","Anaesthetic Notes is now card 3 in Pre-op › Plan & note, with standard search, favourites and recents. Existing five checked technique templates and clinical content unchanged."],
   ["2.178","Neonatal fluids: prescribed maintenance, total intake and IV glucose infusion rate at the top; no routine neonatal fasting deficit; separate replacement and monitoring (checked)"],
   ["2.177.9","Paediatric: place ketamine short cases in Procedures, merge T-tube into bronchoscopy, and provide an always-accessible neonatal quick view. Existing clinical calculations unchanged."],
   ["2.177.8","Paediatric: complete no-IV-access card under Induction, shared IM airway dose rows and direct shortcuts from other phases. Clearer bicarbonate calculator title. No dose changes."],
@@ -7353,7 +7354,7 @@ const GROUPS = [
  {id:"emerg", name:"Emergencies", sub:"Adult & obstetric · Paeds — crisis steps with doses", tabKey:"emTab", tabs:[
    {id:"adult", label:"Adult / Obstetric", input:()=>ptiles([ptile("aw","Weight","kg",30,200,1)]), cards:EMERG_ADULT, see:[["ga-post-im-doses-no-iv-access-or-ward","No IV access: IM doses"]], seeLabel:"Also"},
    {id:"paeds", label:"Paeds", input:()=>pInputs(), cards:EMERG_PAEDS, see:[["paeds-post-im-doses-no-iv-access","No IV access: IM doses"]], seeLabel:"Also"}], cards:[]},
- {id:"premed", name:"Pre-op", sub:"Assess · Prepare · Plan & note", tabKey:"pmTab", tabs:[
+ {id:"premed", name:"Pre-op", sub:"Assess · Prepare · Plan & notes", tabKey:"pmTab", tabs:[
    {id:"assess", label:"Assess", input:()=>gaInputs(), top:()=>preSummary(), hint:"Examine → score → decide. The summary bar collects the scores to copy.",
     cards:["§Examine","1. Airway assessment & plan",["Echo report: what matters","2. Echo report: what matters"],
       "§Score",["Functional capacity (METs / DASI)","3. Functional capacity (METs / DASI)"],["Cardiac risk (RCRI)","4. Cardiac risk (RCRI)"],["Lung risk (ARISCAT)","5. Lung risk (ARISCAT)"],["OSA screen (STOP-BANG)","6. OSA screen (STOP-BANG)"],["Frailty (Clinical Frailty Scale)","7. Frailty (CFS)"],["ASA physical status","8. ASA physical status"],
@@ -7363,10 +7364,9 @@ const GROUPS = [
     see:[["regional-safety-anticoagulants","Neuraxial / deep-block anticoagulant timing"]],
     cards:["§Medications","1. Regular drugs: stop or continue","2. Anticoagulants & antiplatelets","3. Diabetes: day-of-surgery plan","4. Steroid cover",
       "§Before theatre","5. Fasting","6. Premedication drugs","7. Pacemaker / ICD"], links:[]},
-   {id:"consent", label:"Plan & note", input:()=>gaInputs(), hint:"Decide the plan and explain it, then copy the full premed note.",
-    top:()=>'<button class="homebtn" data-go="anaesthetic-notes">Anaesthetic Notes · GA / MAC / SAB / CSE / EA ›</button>',
+   {id:"consent", label:"Plan & notes", input:()=>gaInputs(), hint:"Decide the plan and explain it, then copy the pre-op note.",
     see:[["premed-assess-airway-assessment-and-plan","Airway assessment"],["premed-prepare-anticoagulants-and-antiplatelets","Anticoagulants"],["regional-safety-anticoagulants","Neuraxial anticoagulant timing"]],
-    cards:[["Anaesthetic plan & consent","1. Anaesthetic plan & consent"],"2. Premed note"], links:[["Failed intubation / CICO","adult","Failed intubation / CICO"]]}], cards:[]},
+    cards:["§Plan",["Anaesthetic plan & consent","1. Anaesthetic plan & consent"],"§Notes","2. Pre-op note","3. Anaesthetic Notes"], links:[["Failed intubation / CICO","adult","Failed intubation / CICO"]]}], cards:[]},
  {id:"ga", name:"General", sub:"Induction · Intra-op · Post-op", tabKey:"gaTab", tabs:[
    {id:"ind", label:"Induction", input:()=>gaInputs(), hint:"Tube & airway kit → drugs & relaxants → RSI.",
     cards:["1. Tube & airway kit","2. Induction drugs & relaxants","3. RSI"], see:[["ga-post-im-doses-no-iv-access-or-ward","No IV access: IM doses"]], seeLabel:"Also",
@@ -7438,7 +7438,7 @@ const GROUPS = [
     links:[["Cyanotic heart disease / Fallot spell","paeds","Fallot spell"],["Laryngospasm","paeds","Laryngospasm"]]}], cards:[]},
  {id:"obs", name:"Obstetric", sub:"Labour · Caesarean · After delivery", tabKey:"obTab", tabs:[
    {id:"labour", label:"Labour", hint:"Epidural, in the order you do it.",
-    top:()=>`<button class="homebtn" data-open="1. Anaesthetic plan & consent" data-g="premed" data-tab="consent">Consent note: labour epidural → Pre-op › Plan &amp; note ›</button>`,
+    top:()=>`<button class="homebtn" data-open="1. Anaesthetic plan & consent" data-g="premed" data-tab="consent">Consent note: labour epidural → Pre-op › Plan &amp; notes ›</button>`,
     cards:["1. Start: test, bolus & loading","2. Maintain: infusion recipes",["Maintain: pump settings","3. Maintain: pump settings"],["Top-up: breakthrough pain","4. Top-up: breakthrough pain"],["Problem: accidental dural puncture","5. Problem: accidental dural puncture"],["Problems: catheter troubleshooting","6. Problems: catheter troubleshooting"],["No epidural: IV PCA","7. No epidural: IV PCA"]],
     links:[["High / total spinal","adult","High block"],["LA toxicity (LAST)","adult","LA toxicity"]]},
    {id:"lscs", label:"Caesarean", hint:"Pick your route: A spinal · B epidural top-up · C dural puncture catheter · GA (below) · D uterotonics.", seeLabel:"If GA",
@@ -7464,6 +7464,7 @@ const GROUPS = [
    {id:"don", label:"Donor", input:()=>donInputs(), hint:"Living donor nephrectomy.",
     cards:["1. Donor pre-op","2. Donor intra-op","3. Donor post-op"], links:[]}], cards:[]}];
 const SEARCH_EXTRA = {
+  "premed-plan-anaesthetic-notes":"anaesthesia record documentation procedure note GA general anaesthesia MAC monitored anaesthesia care SAB spinal CSE combined spinal epidural EA epidural MOH",
   "paeds-intra-analgesia":"paediatric analgesia pain paracetamol ibuprofen parecoxib ketorolac fentanyl morphine remifentanil ketamine dexmedetomidine clonidine",
   "paeds-intra-drugs":"paediatric intraoperative drugs TXA tranexamic acid steroids calcium gluconate chloride omeprazole furosemide salbutamol albumin hypertonic saline mannitol potassium kcl insulin adenosine bicarbonate paeds",   // keyed by stable card id
   "regional-safety-la-dose-calculator":"combined total la mixture lignocaine plus ropivacaine levobupivacaine bupivacaine toxicity additive skin infiltration",
@@ -7485,7 +7486,7 @@ const SEARCH_EXTRA = {
   "premed-prepare-diabetes-day-of-surgery-plan":"diabetes insulin glargine detemir degludec premixed basal bolus pump vrii vriii sliding scale sulfonylurea gliclazide sglt2 metformin glucose ketones",
   "premed-prepare-pacemaker-icd":"pacemaker icd cied crt defibrillator magnet diathermy asynchronous voo doo pacing dependent",
   "premed-prepare-premedication-drugs":"premedication premed anxiolysis midazolam temazepam omeprazole famotidine sodium citrate metoclopramide paracetamol glycopyrrolate",
-  "premed-plan-premed-note":"premed note preoperative assessment template documentation copy allergy dentition diagnosis underlying physical status airway back examination investigations consent plan",
+  "premed-plan-premed-note":"pre-op note preop note premed note preoperative assessment template documentation copy allergy dentition diagnosis underlying physical status airway back examination investigations consent plan",
   "paeds-intra-blood-products":"paeds paediatric neonate transfusion blood red cells prbc packed cells platelets ffp cryo cryoprecipitate trigger threshold hb irradiated cmv negative paedipack taco trali hyperkalaemia jehovah blood volume allowable blood loss EBV ABL",
   "premed-assess-echo-report-what-matters":"echo echocardiogram tte report ejection fraction ef lvef diastolic e/e aortic stenosis mitral stenosis regurgitation ava mva pulmonary hypertension pasp trv tapse hocm lvot sam rwma pericardial effusion tamponade pfo asd thrombus prosthetic valve ivc valve",
   "ga-post-reversal":"reversal sugammadex neostigmine glycopyrrolate re-paralysis reparalysis re-administration redose rocuronium vecuronium waiting time after sugammadex tof train-of-four train of four adult",
@@ -7673,7 +7674,8 @@ const CARD_IDS = {
   "6. Premedication drugs":"premed-prepare-premedication-drugs",
   "7. Pacemaker / ICD":"premed-prepare-pacemaker-icd",
   "Anaesthetic plan & consent":"premed-plan-anaesthetic-plan-and-consent",
-  "2. Premed note":"premed-plan-premed-note",
+  "2. Pre-op note":"premed-plan-premed-note",
+  "3. Anaesthetic Notes":"premed-plan-anaesthetic-notes",
   "2. Induction drugs & relaxants":"ga-ind-induction-drugs",
   "3. RSI":"ga-ind-rsi",
   "1. Tube & airway kit":"ga-ind-tube-and-airway-kit",
@@ -7897,7 +7899,7 @@ const isWide = () => window.matchMedia("(min-width: 1100px)").matches;
    Text is unchanged (only <span> wrappers). Not touched: per-kg rules (mg/kg…), lab thresholds (≥ / ≤ / < / >, x/L, g/dL…),
    small notes, placeholders, ventilation and echo values. */
 const DOSE_RX = /\d[\d.,]*(?:\s?[–-]\s?\d[\d.,]*)?\s?(?:mL\/h|mg\/h|mcg\/h|mmol\/h|units?\/h|IU\/h|mg|mcg|mL|g|units?|IU|mmol|J)(?![\w\/⁰¹²³⁴⁵⁶⁷⁸⁹])/g;
-const DOSE_SKIP = "table.dt tr[data-dr], .ftn, .ftv, .ftax, .acd, .acx, .acax, .result, .big, .sub, small, button, .rt, .nw, .dzb, svg, textarea, select, label, .ptile, .chip, .jumprow";
+const DOSE_SKIP = ".an-note, table.dt tr[data-dr], .ftn, .ftv, .ftax, .acd, .acx, .acax, .result, .big, .sub, small, button, .rt, .nw, .dzb, svg, textarea, select, label, .ptile, .chip, .jumprow";
 /* recipes (v2.78): amounts in a make-up / dilution line stay normal size; a line that says what to give keeps its doses large */
 const RECIPE_RX = /\bin\s+\d+(?:\.\d+)?\s*mL\b|made up|make up|\bdilut|reconstitut|\bdraw\b|\d\s*mL\s+(?:NS|saline|D5|D50|Hartmann|Sterofundin)/i,
   GIVE_RX = /\b(?:give|dose|bolus|run|loading|stat)\b/i, ROUTE_RX = /\b(?:IV|IM|PO|PR|SC|SL|IO)\b/;
@@ -8000,7 +8002,7 @@ function searchIndex(){
   for (const g of order) for (const t of (g.tabs||[])) for (const it of t.cards){ if (isHead(it)) continue;
     const [o,l] = Array.isArray(it) ? it : [it,it], id = CARD_IDS[o], key = `${id}@${g.id}/${t.id}`; if (!id || seen[key] || !m[o]) continue; seen[key] = 1;
     const ctx = ctxOf(g.id, t.id);
-    idx.push({key, id, t:l, g:g.id, tab:t.id, ctx, title:(l+" "+o).toLowerCase(), terms:((SEARCH_EXTRA[id]||"")+(g.id==="emerg"?" emergency crisis":"")+(GKW[g.id]||"")+(ctx==="child"?" paeds paediatric child":"")+" "+(t.label||"")).toLowerCase(), body:m[o].textContent.toLowerCase()}); }
+    idx.push({key, id, t:l, g:g.id, tab:t.id, ctx, title:(l+" "+o).toLowerCase(), terms:((SEARCH_EXTRA[id]||"")+(g.id==="emerg"?" emergency crisis":"")+(GKW[g.id]||"")+(ctx==="child"?" paeds paediatric child":"")+" "+(t.label||"")).toLowerCase(), body:id==="premed-plan-anaesthetic-notes"?"anaesthetic notes documentation actual observations doses review copy":m[o].textContent.toLowerCase()}); }
   return (searchIndex.cache = idx);
 }
 function searchHits(q, here){
@@ -8043,6 +8045,8 @@ let LASTEL = null, LASTHASH = location.hash;
 addEventListener("pointerdown", e => { LASTEL = e.target; }, true); addEventListener("focusin", e => { LASTEL = e.target; }, true);
 function renderNow(){
   let h = (location.hash||"#home").slice(1);
+  // Preserve old standalone links while using the registered card and standard navigation.
+  if(h==="anaesthetic-notes"){history.replaceState(null,"","#g-premed");h="g-premed";S.pmTab="consent";S.open="3. Anaesthetic Notes";S.scrollTo=true;}
   if (h==="ett"||h==="g-airway") h="g-ga"; if (h==="spinal"||h==="g-spinal") h="g-regional";
   let html;
   if (h.startsWith("g-")){ const g = GROUPS.find(x=>x.id===h.slice(2)); html = g ? groupScreen(g) : screens.home(); }
