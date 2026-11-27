@@ -996,6 +996,9 @@ details.ptx .pbs{margin-top:2px}
 @media (min-width:700px) and (pointer:fine){ .gside .ptile .pm{display:none} }
 @media (min-width:1100px){ .gside.innav .ptile{flex-wrap:nowrap;padding:3px 4px 3px 8px;gap:4px} .gside.innav .ptile .pm{width:auto} .gside.innav .ptile .pm button{width:32px;height:34px} .gside.innav .ptile input{width:3.2em;font-size:17px} }
 .nfcard .nfsum{display:grid;gap:var(--s2);grid-template-columns:repeat(2,minmax(0,1fr));margin:var(--s2) 0}.nfcard .nfsum>div{border:1px solid var(--line);border-radius:var(--r-sm);background:var(--field);padding:var(--s2);min-width:0}.nfcard .nfsum>div:last-child{grid-column:1/-1;background:var(--field);border-color:var(--gc)}.nfcard .nfsum b{font-size:var(--fs-lg);display:block;overflow-wrap:anywhere}.nfcard .nfsum small{display:block;font-size:var(--fs-xs);color:var(--muted)}.nfcard .nfinputs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--s2);min-width:0}.nfcard .nfinputs input{width:100%;min-width:0;box-sizing:border-box}.nfcard .nfinputs label{min-width:0}.nfcard table{font-size:var(--fs-xs)}
+
+.an-note{max-width:760px;margin:0 auto;min-width:0}.an-note .an-chips{display:flex;flex-wrap:wrap;gap:6px;margin:5px 0 10px}.an-note .chip{min-height:44px;white-space:normal;text-align:left}.an-note .chip[aria-pressed=true]{background:var(--gc);color:var(--bg);border-color:var(--gc)}.an-note .an-field{margin:0 0 12px;min-width:0}.an-note .an-field label{display:block;margin-bottom:4px}.an-note textarea,.an-note input:not([type=checkbox]){width:100%;box-sizing:border-box;min-width:0;max-width:100%;padding:9px 12px}.an-note .an-section-head{width:100%;background:none;border:0;color:inherit;text-align:left;display:grid;grid-template-columns:1fr auto;gap:2px 8px;padding:7px 0;min-height:44px}.an-section-head small{grid-column:1;grid-row:2;color:var(--muted)}.an-section-head span{grid-column:2;grid-row:1 / 3;align-self:center}.an-body{margin-top:10px;border-top:1px solid var(--line);padding-top:12px}.an-actions #an-issues:empty{display:none}.an-review{display:flex;gap:8px;align-items:center;min-height:44px}.an-review input{flex-shrink:0}.an-actions button:disabled{opacity:.5;cursor:not-allowed}.an-depthbar{display:flex;justify-content:space-between;border-bottom:4px solid var(--gc);margin:8px 0}.an-note .an-actions{position:static;scroll-margin-top:64px}.an-quick{position:sticky;top:0;z-index:2;display:flex;align-items:center;gap:8px;justify-content:space-between;background:var(--bg);border-bottom:1px solid var(--line);padding:6px 0;margin:0 0 8px}.an-quick .iconbtn{min-height:44px;white-space:nowrap}.an-note .an-field{scroll-margin-top:64px}.an-note #an-preview{scroll-margin-top:64px}.an-note .an-actions .homebtn{margin:6px 0}
+
 </style>
 </head>
 <body>
@@ -1010,7 +1013,7 @@ if (window.top !== window.self && /\.github\.io$/.test(location.hostname)) {
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.178.1";
+const APP_VERSION = "2.179.1";
 const APP_DATE = "27 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
@@ -6472,6 +6475,7 @@ VGROUPS.find(g => g[0]==="General")[1].push(["Neonatal cards & local manual", "2
   "Anaphylaxis: IV adrenaline moderate 1–2, life-threatening 4–10 mcg/kg; IM age bands 150 / 300 / 500 mcg; crystalloid 20 mL/kg (RCUK as note). Laryngospasm propofol 1–2 mg/kg; bronchospasm adrenaline 0.5–1 mcg/kg; emergence delirium adds propofol 0.5–1, midazolam 0.02–0.1, ketamine 0.5–1 mg/kg",
   "Manual's internal conflicts resolved to its drug table: D10 2.5 mL/kg, ondansetron 0.15 mg/kg",
   "Condition cards (international, not in local manual): OA / TOF, CDH (PIP ≤ 25, PaCO₂ 45–60, preductal SpO₂ 80–95%), gastroschisis / exomphalos (compartment: PIP > 25–30, bladder > 20 mmHg), NEC, PDA ligation (test clamp), malrotation / volvulus, myelomeningocele"]]);
+VGROUPS.find(g => g[0]==="General")[1].push(["Anaesthetic Notes", "27 Nov 2026", ["Narrative documentation of actual observations and doses; MOH Malaysia PRP-BOR-38/A (2024), pages 2–3 and Appendix A; MAC-specific fields are proposed extensions. No dose recommendations."]]);
 VGROUPS.find(g => g[0]==="General")[1].push(["Neonatal fluid management", "27 Nov 2026", ["Existing NICU prescription takes priority; confirmed patient values, elapsed hours and selected calculation weight required. Local birth-weight table and MOH 2025 neonatal day-specific references kept separate. No routine neonatal fasting deficit or universal fluid composition. GIR = sum(IV glucose % × mL/h)/(6 × selected kg); enteral intake excluded from IV GIR but included in total planned intake. Missing inputs suppress affected results."]]);
 VGROUPS.find(g => g[0]==="General")[1].push(["Neonatal age inputs", "22 Nov 2026", [
   "At age 0 y 0 m the patient box asks day of life (0–28), gestation at birth (22–42 wk, default 40) and birth weight (defaults to current weight)",
@@ -6757,16 +6761,16 @@ function sampleWarn(keys){ const k = keys.filter(isSample); if (!k.length) retur
   const names = {k:"K⁺", hb:"Hb", height:"height", aw:"weight", pw:"weight", pY:"age", spHt:"height", morWt:"weight", sex:"sex", age:"age"};
   return `<div class="samplewarn"><b>Sample values</b> — ${(a => a.length > 1 ? a.slice(0,-1).join(", ") + " and " + a[a.length-1] : a[0])([...new Set(k.map(x=>names[x]))])} not entered. Enter the patient or tap a case.</div>`; }
 /* Each case keeps its own clinical entries, in memory only (never saved). */
-const CLIN = ["nf","paDose","csDec","sc","asa","met","pnF","pnMP","pnNeck","pnPonv","pnUrg","pnLay","csNote","leNote","pnNote","csWho","csLang","csOut","csLen","leLen","csMode","crea","k","hb","todayWt","hdH","hbNow","hbLow","hbTarget","fastH","pBE","laA","txck","derm","abg","fbal","blIn","hbU","gz","tv","preg","oc","stc","indT","mxSel"];
+const CLIN = ["an","nf","paDose","csDec","sc","asa","met","pnF","pnMP","pnNeck","pnPonv","pnUrg","pnLay","csNote","leNote","pnNote","csWho","csLang","csOut","csLen","leLen","csMode","crea","k","hb","todayWt","hdH","hbNow","hbLow","hbTarget","fastH","pBE","laA","txck","derm","abg","fbal","blIn","hbU","gz","tv","preg","oc","stc","indT","mxSel"];
 const CLIN_T = ["crea","k","hb","todayWt","hdH"];
-const CLIN_OBJ = {nf:{},sc:{}, pnF:{}, txck:{}, laA:[]};
+const CLIN_OBJ = {an:null,nf:{},sc:{}, pnF:{}, txck:{}, laA:[]};
 const clone = v => v === undefined ? undefined : JSON.parse(JSON.stringify(v));
 let CLIN0 = null;
 function clinSnap(){ const o = {__t:{}}; CLIN.forEach(k => o[k] = clone(S[k])); CLIN_T.forEach(k => o.__t[k] = !!S.touched[k]); return o; }
 function clinLoad(o){ CLIN.forEach(k => { let v = (k in o) ? clone(o[k]) : clone(CLIN0[k]); if (v === undefined || v === null) v = k in CLIN_OBJ ? clone(CLIN_OBJ[k]) : v; S[k] = v; });
   CLIN_T.forEach(k => { if (o.__t && o.__t[k]) S.touched[k] = true; else delete S.touched[k]; }); }
 const CASE_CLIN = {};
-function switchClin(fromId, toId){ if (!CLIN0) return; if ((fromId||"none") === (toId||"none")) return; CASE_CLIN[fromId||"none"] = clinSnap(); clinLoad(CASE_CLIN[toId||"none"] || CLIN0); }
+function switchClin(fromId, toId){ if (!CLIN0) return; if ((fromId||"none") === (toId||"none")) return; CASE_CLIN[fromId||"none"] = clinSnap(); clinLoad(CASE_CLIN[toId||"none"] || CLIN0); S.an=null; if(CASE_CLIN[fromId||"none"]) delete CASE_CLIN[fromId||"none"].an; }
 function caseAgeTxt(c){ if (!c) return ""; if (c.y < 1 && c.m === 0 && Number.isFinite(c.d)) return `day ${c.d} of life${c.ga < 37 ? `, born at ${c.ga} weeks` : ""}`; if (c.y < 1) return `${c.m} month${c.m===1?"":"s"}`; if (c.y < 2 && c.m) return `1 year ${c.m} month${c.m===1?"":"s"}`; return `${c.y} years`; }
 function activeBar(){ const c = activeCase(); return c ? `<button class="activebar" data-go="cases"><span>Active: <b>${caseName(c)}</b> · ${caseLine(c)}</span><span class="sub">change ›</span></button>` : ""; }
 ICONS.list = '<path d="M9 6h11M9 12h11M9 18h11"/><circle cx="4.5" cy="6" r="1" fill="currentColor"/><circle cx="4.5" cy="12" r="1" fill="currentColor"/><circle cx="4.5" cy="18" r="1" fill="currentColor"/>';
@@ -6790,6 +6794,146 @@ screens.cases = () => {
     <button class="homebtn primary" data-savecase="1">Save case</button></div>`;
   return head("Today's list","home") + `<p class="sub">Saved on this phone only. Each case deletes itself 36 h after it is added.</p>` + list + form + disc;
 };
+
+/* Anaesthetic Notes: structured observations only, no clinical recommendations or calculated drug doses. */
+const AN_NOTES_CHECKED = true; // checked by author 27 Nov 2026
+const AN_NAMES={GA:"General anaesthesia",MAC:"Monitored anaesthesia care",SAB:"Spinal anaesthesia",CSE:"Combined spinal–epidural",EA:"Epidural anaesthesia"};
+const anF=(key,label,choices=null,kind="text")=>({key,label,choices,kind});
+const AN_COMMON=[
+ anF("monitor","Monitoring actually used",["ECG","NIBP","IABP","SpO₂","Capnography","O₂ analyser","ETAG","Temperature","TOF","BIS","Other"],"multi"),
+ anF("ecg","ECG configuration",["3-lead","5-lead","Other"]),
+ anF("access","IV / invasive vascular access: site, type, gauge, length",null,"area"),
+ anF("position","Surgical position",["Supine","Lithotomy","Trendelenburg","Left lateral","Right lateral","Prone","Other"]),
+ anF("accessories","Accessories actually used",["HME","Warming mattress","Warming blanket","Fluid warmer","Mechanical DVT prophylaxis","Other"],"multi"),
+ anF("care","Eye / peripheral nerve care observations and times",null,"area"),
+ anF("balance","Fluids, blood loss and urine output (actual)",null,"area")];
+const AN_END=[anF("condition","Condition on transfer",null,"area"),anF("destination","Destination",["PACU","Ward","HDU","ICU","Other"]),anF("events","Complications / intraoperative events",["None observed","Present","Not assessed"]),anF("eventDetails","Event details / interventions",null,"area"),anF("comments","Additional comments",null,"area")];
+const AN_NEUR=[anF("position","Position",["Sitting","Left lateral","Right lateral","Other"]),anF("asepsis","Aseptic technique",["Performed","Not performed","Not documented"]),anF("identification","Identification / monitoring",["Landmarks","Ultrasound","Other"],"multi"),anF("approach","Approach",["Midline","Paramedian","Other"]),anF("level","Interspace / site"),anF("attempts","Attempts",null,"integer")];
+const AN_SP=[anF("spNeedle","Spinal needle type and gauge"),anF("csf","CSF finding",["Free flow confirmed","Other finding","Not confirmed"]),anF("spDrugs","Intrathecal agents: concentration, volume / dose and time",null,"area")];
+const AN_EPI=[anF("tuohy","Epidural needle / catheter type and gauge"),anF("lor","Loss of resistance",["Saline","Air","Other","Not performed"]),anF("space","Skin to space (cm)",null,"positive"),anF("catheter","Catheter at skin (cm)",null,"positive"),anF("aspiration","Aspiration finding",["Negative","Blood","CSF","Not performed"]),anF("testDose","Test dose: agent, amount, time and response, or not performed",null,"area"),anF("epiDrugs","Epidural loading / infusion: agent, concentration, dose, rate and time",null,"area")];
+const AN_BLOCK=[anF("sensoryLeft","Measured sensory level, left"),anF("sensoryRight","Measured sensory level, right"),anF("modality","Sensory assessment method",["Cold","Pinprick","Light touch","Other"],"multi"),anF("motor","Motor findings / score"),anF("assessmentTime","Assessment time"),anF("adequacy","Block adequacy before incision",["Adequate","Inadequate","Not assessed"]),anF("blockEvents","Block difficulties / complications",["None observed","Present","Not assessed"]),anF("blockDetails","Block findings, difficulties or interventions",null,"area")];
+const AN_SPEC={
+ GA:[anF("induction","Induction",["IV","Inhalational","RSI","Awake airway","Other"]),anF("preox","Preoxygenation (actual)"),anF("airway","Airway device",["ETT","SGA","Face mask","Tracheostomy","Other"]),
+ anF("route","Airway route",["Oral","Nasal","Other"]),anF("tubeType","Tube type",["Standard","RAE","Armoured","Other"]),anF("cuff","Cuff type",["Cuffed","Uncuffed"]),anF("tubeSize","Tube ID (mm)",null,"positive"),anF("tubeDepth","Tube marking at reference point (cm)",null,"positive"),anF("cuffPressure","Measured initial cuff pressure (cmH₂O)",null,"nonnegative"),anF("sgatype","SGA type and size"),
+ anF("laryngoscopy","Airway technique",["Direct laryngoscopy","Video laryngoscopy","Flexible scope awake","Flexible scope asleep","Other"]),anF("cl","Observed CL grade",["1","2A","2B","3A","3B","4","Not assessed"]),anF("pogo","POGO (%)",null,"percent"),anF("attempts","Airway attempts",null,"integer"),anF("difficult","Difficult intubation",["Yes","No","Not assessed"]),anF("airwayComments","Airway findings / interventions",null,"area"),anF("capno","Waveform capnography",["Confirmed","Not confirmed","Not assessed"]),
+ anF("packIn","Throat pack in (time)"),anF("packOut","Throat pack out (time)"),anF("vent","Ventilation",["Spontaneous","Controlled","Assisted","Manual"]),anF("ventSettings","Ventilator mode, VT / IP / PS, RR, PEEP, I:E / Ti",null,"area"),anF("circuit","Breathing system",["Circle","Ayre T-piece / Jackson Rees","Co-axial / Bain","Other"]),anF("maintenance","Maintenance",["Volatile","TIVA","Combined","Other"]),anF("maintDetails","Agent and actual maintenance details",null,"area"),anF("drugs","Actual GA agents, doses, routes and times",null,"area"),anF("reversal","Reversal / TOF and response",null,"area"),anF("emergence","Airway outcome",["Extubated","Remained intubated","SGA removed","Other"])],
+ MAC:[anF("oxygen","Oxygen delivery",["Room air","Nasal cannula","Face mask","HFNO","Other"]),anF("oxygenFlow","Oxygen flow (L/min)",null,"nonnegative"),anF("sedation","Observed sedation depth",["Minimal","Moderate","Deep","No sedation","Not assessed"]),anF("ventilation","Ventilation",["Spontaneous","Assisted","Other"]),anF("airwayIntervention","Airway interventions",null,"area"),anF("drugs","Actual sedatives / analgesics, doses, rates, routes and times",null,"area"),anF("tolerance","Tolerance / conversion details",null,"area")],
+ SAB:[...AN_NEUR,...AN_SP,...AN_BLOCK],
+ CSE:[...AN_NEUR,anF("method","CSE technique",["Needle-through-needle","Separate spaces","Other"]),anF("spLevel","Spinal level (if separate)"),anF("epiLevel","Epidural level (if separate)"),...AN_SP,...AN_EPI,...AN_BLOCK],
+ EA:[...AN_NEUR,...AN_EPI,...AN_BLOCK]};
+function anState(){return S.an||(S.an={tech:[],tab:"",mode:"brief",fields:{},open:{prep:false,tech:true,end:false,preview:true},review:false,edit:null});}
+function anFields(scope){return scope==="common"?AN_COMMON:scope==="end"?AN_END:AN_SPEC[scope]||[];}
+function anVal(scope,key){return anState().fields[scope]?.[key]??"";}
+function anVisible(scope,f){
+ if(scope==="GA"){
+  const a=anVal(scope,"airway"), l=anVal(scope,"laryngoscopy");
+  if(["tubeType","route","tubeDepth","laryngoscopy","difficult"].includes(f.key))return a==="ETT";
+  if(["tubeSize","cuff"].includes(f.key))return a==="ETT"||a==="Tracheostomy";
+  if(f.key==="cuffPressure")return (a==="ETT"||a==="Tracheostomy")&&anVal(scope,"cuff")==="Cuffed";
+  if(f.key==="sgatype")return a==="SGA";
+  if(["cl","pogo"].includes(f.key))return a==="ETT"&&["Direct laryngoscopy","Video laryngoscopy"].includes(l);
+  if(f.key==="ventSettings")return ["Controlled","Assisted","Manual"].includes(anVal(scope,"vent"));
+ }
+ if(scope==="MAC"&&f.key==="oxygenFlow")return !!anVal(scope,"oxygen")&&anVal(scope,"oxygen")!=="Room air";
+ if(scope==="CSE"&&["spLevel","epiLevel"].includes(f.key))return anVal(scope,"method")==="Separate spaces";
+ return true;
+}
+function anValid(f,v){
+ if(v===""||v==null||(Array.isArray(v)&&!v.length))return true;
+ if(f.choices)return f.kind==="multi"?Array.isArray(v)&&v.every(x=>f.choices.includes(x)):f.choices.includes(v);
+ if(["integer","positive","nonnegative","percent"].includes(f.kind)){
+  if(!/^(?:\d+(?:\.\d+)?|\.\d+)$/.test(String(v)))return false;
+  const n=Number(v);return Number.isFinite(n)&&(f.kind==="integer"?n>0&&Number.isInteger(n):f.kind==="positive"?n>0:f.kind==="percent"?n>=0&&n<=100:n>=0);
+ }return typeof v==="string";
+}
+function anDepth(scope){const a=anVal(scope,"space"),b=anVal(scope,"catheter");if(!a||!b||!anValid(anF("","",null,"positive"),a)||!anValid(anF("","",null,"positive"),b))return null;return Number(b)>=Number(a)?Math.round((Number(b)-Number(a))*100)/100:null;}
+function anResetReview(){const s=anState();s.review=false;s.edit=null;}
+function anPut(scope,key,value){
+ const f=anFields(scope).find(x=>x.key===key);if(!f||!anVisible(scope,f))return;
+ const s=anState(),obj=s.fields[scope]||(s.fields[scope]={});obj[key]=value;
+ for(const fld of anFields(scope))if(!anVisible(scope,fld))delete obj[fld.key];
+ anResetReview();
+}
+function anIssues(){const s=anState(),a=[];
+ for(const scope of ["common",...s.tech,"end"]){
+  for(const f of anFields(scope)){const v=anVal(scope,f.key);if(anVisible(scope,f)&&!anValid(f,v))a.push(f.label+": invalid entry");}
+  if(["EA","CSE"].includes(scope)&&anVal(scope,"space")&&anVal(scope,"catheter")&&anDepth(scope)===null)a.push(AN_NAMES[scope]+": check catheter and space depths");
+  if(scope==="GA"&&anVal(scope,"cuff")==="Cuffed"&&!anVal(scope,"cuffPressure"))a.push("Measured initial cuff pressure not entered");
+  if(scope==="end"&&anVal(scope,"events")==="Present"&&!anVal(scope,"eventDetails").trim())a.push("Enter complication details");
+  if(["SAB","EA","CSE"].includes(scope)&&anVal(scope,"blockEvents")==="Present"&&!anVal(scope,"blockDetails").trim())a.push(AN_NAMES[scope]+": enter block difficulty details");
+ }return a;
+}
+function anGenerated(){
+ const s=anState();if(!s.tech.length)return "";
+ const blocks=[];
+ for(const scope of ["common",...s.tech,"end"]){
+  const lines=[];
+  for(const f of anFields(scope)){
+   const v=anVal(scope,f.key);if(!anVisible(scope,f)||!anValid(f,v)||!v||Array.isArray(v)&&!v.length)continue;
+   lines.push(f.label+": "+(Array.isArray(v)?v.join(", "):String(v).trim()));
+  }
+  if(["EA","CSE"].includes(scope)&&anDepth(scope)!==null)lines.push("Calculated catheter length in epidural space: "+anDepth(scope)+" cm (same skin reference)");
+  if(lines.length||AN_NAMES[scope])blocks.push((AN_NAMES[scope]|| (scope==="common"?"Preparation / monitoring":"Outcome"))+(lines.length?":\n"+lines.join(s.mode==="brief"?"; ":"\n"):" (details not entered)"));
+ }
+ return "Anaesthetic note\nTechniques: "+s.tech.map(x=>AN_NAMES[x]).join(" + ")+"\n"+blocks.join("\n\n");
+}
+function anText(){const s=anState();return s.edit===null?anGenerated():s.edit;}
+function anButton(label,attrs,on=false){return '<button type="button" class="chip'+(on?' on':'')+'" aria-pressed="'+on+'" '+attrs+'>'+esc(label)+'</button>';}
+function anInput(scope,f){
+ if(!anVisible(scope,f))return "";
+ const v=anVal(scope,f.key),id="an-"+scope+"-"+f.key,at=' data-anfield="'+scope+'|'+f.key+'"';
+ let ui;
+ if(f.choices)ui='<div class="an-chips">'+f.choices.map(o=>anButton(o,'data-anpick="'+scope+'|'+f.key+'|'+esc(o)+'"',Array.isArray(v)?v.includes(o):v===o)).join("")+'</div>';
+ else if(f.kind==="area")ui='<textarea class="csnote" id="'+id+'" rows="2" maxlength="600" autocomplete="off"'+at+'>'+esc(v)+'</textarea>';
+ else ui='<input class="search pnin" id="'+id+'" maxlength="120" autocomplete="off"'+(f.kind==="text"?'':' inputmode="decimal"')+at+' value="'+esc(v)+'">';
+ return '<div class="an-field"><label class="sub"'+(!f.choices?' for="'+id+'"':'')+'>'+esc(f.label)+'</label>'+ui+'</div>';
+}
+function anSection(key,title,summary,body){
+ const o=!!anState().open[key];return '<div class="card an-section"><button class="an-section-head" data-ansection="'+key+'" aria-expanded="'+o+'"><b>'+esc(title)+'</b><small>'+esc(summary)+'</small><span aria-hidden="true">'+(o?"⌃":"›")+'</span></button>'+(o?'<div class="an-body">'+body+'</div>':'')+'</div>';
+}
+function anCount(scope){return anFields(scope).filter(f=>anVisible(scope,f)&&String(anVal(scope,f.key)).trim()).length;}
+function anDepthUI(scope){
+ const d=anDepth(scope);return '<div class="pgbox an-depth"><div class="sub">Calculated catheter length in space (same skin reference)</div><div class="an-depthbar"><span>Skin</span><span>Epidural space</span></div><b>'+ (d===null?"Enter valid depths":esc(d+" cm"))+'</b></div>';
+}
+function anPreviewUpdate(){
+ const s=anState(),el=document.getElementById("an-preview"),issues=document.getElementById("an-issues"),btn=document.querySelector("[data-ancopy]"),rev=document.querySelector("[data-anreview]");
+ if(el&&document.activeElement!==el)el.value=anText();
+ if(issues)issues.textContent=anIssues().join(" · ");
+ if(btn)btn.disabled=!s.tech.length||!anText().trim()||!s.review||anIssues().length>0;
+ if(rev)rev.checked=!!s.review;
+ const dep=document.querySelector(".an-depth b");if(dep&&["EA","CSE"].includes(s.tab)){const d=anDepth(s.tab);dep.textContent=d===null?"Enter valid depths":d+" cm";}
+}
+screens["anaesthetic-notes"]=()=>{
+ const s=anState(),ac=activeCase(),tab=s.tech.includes(s.tab)?s.tab:s.tech[0],f=tab?AN_SPEC[tab]:[];
+ const technique=s.tech.length?(s.tech.length>1?'<div class="an-chips">'+s.tech.map(t=>anButton(t,'data-antab="'+t+'"',tab===t)).join("")+'</div>':'')+f.map(x=>anInput(tab,x)).join("")+(["EA","CSE"].includes(tab)?anDepthUI(tab):""):'<p class="sub">Select actual technique(s) above.</p>';
+ return head("Anaesthetic Notes","g-premed")+ '<div class="an-note"><div class="an-quick"><span class="sub">'+esc(s.tech.length?s.tech.join(' + '):'Select technique')+'</span><button class="iconbtn" data-anquick="1">Review &amp; copy ›</button></div>'+
+ (AN_NOTES_CHECKED?"":'<div class="warn">DRAFT — anaesthetic documentation prototype. Not clinically signed off; do not use for patient records.</div>')+
+ '<div class="card"><p class="sub">'+(ac?'Active anonymous case: '+esc(ac.label):'No active case. Entries are session-only.')+' · No names, IC, MRN or other identifiers.</p><h3>Techniques actually performed</h3><div class="an-chips">'+Object.keys(AN_NAMES).map(t=>anButton(t,'data-antech="'+t+'"',s.tech.includes(t))).join("")+'</div><p class="sub">Select more than one for combined techniques or conversion. No findings or doses are preselected.</p></div>'+
+ anSection("prep","Monitoring & preparation",anCount("common")+" fields entered",AN_COMMON.map(f=>anInput("common",f)).join(""))+
+ anSection("tech","Technique details",s.tech.length?s.tech.join(" + "):"Select technique",technique)+
+ anSection("end","Events & outcome",anCount("end")+" fields entered",AN_END.map(f=>anInput("end",f)).join(""))+
+ anSection("preview","Note preview","Review and edit before copying",'<div class="an-chips">'+anButton("Brief",'data-anmode="brief"',s.mode==="brief")+anButton("Detailed",'data-anmode="detailed"',s.mode==="detailed")+'</div><textarea id="an-preview" class="csnote" rows="8" maxlength="12000" autocomplete="off" aria-label="Editable note preview">'+esc(anText())+'</textarea><button class="iconbtn" data-anregen="1">Restore generated text</button><p class="sub">Editing a structured field regenerates this note and discards manual edits. Unentered findings remain undocumented.</p>')+
+ '<div class="card an-actions"><p id="an-issues" class="warn" aria-live="polite">'+esc(anIssues().join(" · "))+'</p><label class="an-review"><input type="checkbox" data-anreview="1"'+(s.review?' checked':'')+'> I reviewed the actual findings and doses, and checked the note for identifiers.</label><button class="homebtn primary" data-ancopy="1"'+(!s.tech.length||!anText().trim()||!s.review||anIssues().length?' disabled':'')+'>Copy note</button><button class="iconbtn" data-anclear="1">Clear all entries</button></div>'+
+ '<details class="ndet"><summary>Reference and scope</summary><p>MOH Malaysia Anaesthesia Record PRP-BOR-38/A (2024), pages 2–3, and Appendix A. MAC-specific fields are a proposed extension. This is a narrative supplement, not a replacement for time-based observations, drug charts or the signed official record.</p></details></div>'+disc;
+};
+document.addEventListener("input",e=>{
+ const t=e.target;if(t.dataset?.anfield){const [scope,key]=t.dataset.anfield.split("|");anPut(scope,key,t.value);anPreviewUpdate();}
+ if(t.id==="an-preview"){const s=anState();s.edit=t.value.slice(0,12000);s.review=false;anPreviewUpdate();}
+});
+document.addEventListener("change",e=>{if(e.target.dataset?.anreview){anState().review=e.target.checked;anPreviewUpdate();}});
+document.addEventListener("click",e=>{
+ const b=e.target.closest("button");if(!b)return;const d=b.dataset;if(!Object.keys(d).some(k=>k.startsWith("an")))return;const s=anState();
+ if(d.antech){const t=d.antech;if(s.tech.includes(t)){if(!window.confirm("Remove "+t+" and its entered details?"))return;s.tech=s.tech.filter(x=>x!==t);delete s.fields[t];s.tab=s.tech[0]||"";}else{s.tech.push(t);s.tab=t;}anResetReview();render();return;}
+ if(d.antab){s.tab=d.antab;render();return;}
+ if(d.ansection){s.open[d.ansection]=!s.open[d.ansection];render();return;}
+ if(d.anquick){s.open.preview=true;renderNow();document.getElementById('an-preview')?.scrollIntoView({block:'start'});return;}
+ if(d.anpick){const [scope,key,value]=d.anpick.split("|"),f=anFields(scope).find(x=>x.key===key),v=anVal(scope,key);if(!f)return;anPut(scope,key,f.kind==="multi"?(Array.isArray(v)?v.includes(value)?v.filter(x=>x!==value):[...v,value]:[value]):v===value?"":value);render();return;}
+ if(d.anmode){s.mode=d.anmode;anResetReview();render();return;}
+ if(d.anregen){anResetReview();render();return;}
+ if(d.anclear){if(window.confirm("Clear all anaesthetic note entries?")){S.an=null;render();}return;}
+ if(d.ancopy){if(!s.review||!s.tech.length||!anText().trim()||anIssues().length)return;const done=()=>{b.textContent="Copied ✓";};if(navigator.clipboard?.writeText)navigator.clipboard.writeText(anText()).then(done,()=>{b.textContent="Copy failed; select text manually";});else{const t=document.getElementById("an-preview");if(t){t.focus();t.select();if(document.execCommand("copy"))done();}}return;}
+});
+
 const vkey = t => { let h = 5381; for (const c of t) h = ((h<<5) + h + c.charCodeAt(0)) | 0; return "t" + (h>>>0).toString(36); };
 function vTicks(){
   let t = store.get("ticks",{});
@@ -6798,6 +6942,7 @@ function vTicks(){
 }
 /* ---------- ABOUT ---------- */
 const CHANGES = [
+  ["2.179","Anaesthetic Notes: five technique templates, common observations, editable preview and case-isolated documentation (checked)"],
   ["2.178","Neonatal fluids: prescribed maintenance, total intake and IV glucose infusion rate at the top; no routine neonatal fasting deficit; separate replacement and monitoring (checked)"],
   ["2.177.9","Paediatric: place ketamine short cases in Procedures, merge T-tube into bronchoscopy, and provide an always-accessible neonatal quick view. Existing clinical calculations unchanged."],
   ["2.177.8","Paediatric: complete no-IV-access card under Induction, shared IM airway dose rows and direct shortcuts from other phases. Clearer bicarbonate calculator title. No dose changes."],
@@ -7219,6 +7364,7 @@ const GROUPS = [
     cards:["§Medications","1. Regular drugs: stop or continue","2. Anticoagulants & antiplatelets","3. Diabetes: day-of-surgery plan","4. Steroid cover",
       "§Before theatre","5. Fasting","6. Premedication drugs","7. Pacemaker / ICD"], links:[]},
    {id:"consent", label:"Plan & note", input:()=>gaInputs(), hint:"Decide the plan and explain it, then copy the full premed note.",
+    top:()=>'<button class="homebtn" data-go="anaesthetic-notes">Anaesthetic Notes · GA / MAC / SAB / CSE / EA ›</button>',
     see:[["premed-assess-airway-assessment-and-plan","Airway assessment"],["premed-prepare-anticoagulants-and-antiplatelets","Anticoagulants"],["regional-safety-anticoagulants","Neuraxial anticoagulant timing"]],
     cards:[["Anaesthetic plan & consent","1. Anaesthetic plan & consent"],"2. Premed note"], links:[["Failed intubation / CICO","adult","Failed intubation / CICO"]]}], cards:[]},
  {id:"ga", name:"General", sub:"Induction · Intra-op · Post-op", tabKey:"gaTab", tabs:[
