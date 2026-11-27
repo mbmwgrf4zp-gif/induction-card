@@ -300,6 +300,12 @@ ol.crisis li::marker{font-weight:800;color:var(--g-emerg)}
 /* Anaphylaxis only: phase layout, same clinical steps and numbering. */
 .anaph-phase{border:1px solid var(--line);border-radius:var(--r);padding:10px;margin:8px 0;min-width:0}
 .anaph-phase:first-child{background:var(--danger-bg);border-color:var(--danger-line)}
+.em-custom .anaph-phase{padding:12px;overflow-wrap:anywhere;min-width:0;box-sizing:border-box}
+.em-custom:not(.em-urgent) .anaph-phase:first-child{background:var(--card);border-color:var(--line)}
+.em-custom:not(.em-urgent) .anaph-phase:first-child h3{color:var(--gc,var(--g-emerg))}
+.em-custom .anaph-phase>div,.em-custom .anaph-phase>table{max-width:100%;min-width:0}
+.em-custom .anaph-phase .dt td,.em-custom .anaph-phase .dt th{overflow-wrap:anywhere}
+.em-custom .anaph-phase ul{padding-inline-start:20px}
 .anaph-phase h3{font-size:14px;line-height:1.3;color:var(--gc,var(--g-emerg));margin:0 0 6px;font-weight:700}
 .anaph-phase:first-child h3{color:var(--danger-ink)}
 .anaph-phase ol.crisis{list-style:none;padding:0;margin:0}
@@ -1003,7 +1009,7 @@ if (window.top !== window.self && /\.github\.io$/.test(location.hostname)) {
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.175";
+const APP_VERSION = "2.177.1";
 const APP_DATE = "27 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
@@ -2269,7 +2275,7 @@ pCards.procs = () => {
     DR("Suxamethonium (no IV access)","4","mg","onset 2–4 min · give atropine IM with it",150,"IM"), DR("Atropine (no IV access)","0.02","mg","onset 5–15 min",0.6,"IM"),
     R("Prevention: lignocaine before extubation","1–2 mg/kg",pk([1,2],"mg"),"also dexmedetomidine, clonidine","IV")])}
   <ul><li>Remove airway device</li><li>Jaw thrust, Larson manoeuvre</li><li>Flutter the bag</li><li>Gentle thoracic pressure 20–25 compressions/min</li></ul>`;
-  return `<div class="card"><h2>Laryngospasm</h2>${lsBody}${psrc()}</div>
+  return `<div class="card"><h2>Laryngospasm</h2>${(()=>{const i=lsBody.indexOf("<ul>");return i<0?lsBody:`<div class="em-custom">${emPanel("Drug doses and prevention",lsBody.slice(0,i))}${emPanel("Airway manoeuvres",lsBody.slice(i))}</div>`;})()}${psrc()}</div>
   <div class="card"><h2>Laryngospasm & extubation</h2><h3>Deep extubation (MAC 1)</h3><div class="danger"><b>DO NOT TRY IF NOT FAMILIAR</b></div>
   <ul><li>Choose the correct patient</li><li>Rule out airway / aspiration risk / difficult mask ventilation</li><li>Consider lateral position</li></ul>
   <h3>Laryngospasm: prevent &amp; treat</h3>${lsBody}${psrc()}</div>
@@ -2297,9 +2303,9 @@ pCards.special = () => {
     R("Levobupivacaine 0.25%","0.75–1 mL/kg, max 20 mL",pk([0.75,1],"mL",20),null,"caudal"), DR("± clonidine","1","mcg",null,null,"caudal"),
     ageRow("diclofenac (voren suppository)", DR("Diclofenac (Voren suppository)","1","mg",null,50,"PR"), "Diclofenac (Voren suppository)", "PR"), ageRow("paracetamol (suppository)", DR("Paracetamol (suppository)","40","mg",null,1000,"PR"), "Paracetamol (suppository)", "PR"), DR("Morphine","0.1","mg",null,10,"IV")])}
   <h3>Post-op</h3>${T([R("Morphine (syrup)","0.3 mg/kg up to 4-hourly × 2 days (max 10 mg)",pk(0.3,"mg",10),null,"PO"), ageRow("ibuprofen", DR("Ibuprofen (syrup)","10","mg",null,400,"PO"), "Ibuprofen (syrup)", "PO"), DR("Paracetamol (syrup)","15","mg",null,1000,"PO")])}${psrc()}</div>
-  <div class="card"><h2>Cyanotic heart disease / Fallot spell</h2><p>Aim: increased FiO₂, normal pH, normal EtCO₂, normal SVR (normal BP).</p>
-  <h3>Fallot spell</h3>${T([R("Fluids","10–20 mL/kg (max 500 mL per bolus)",pk([10,20],"mL",500),null,"IV"), DR("Phenylephrine",[1,5],"mcg","spell: up to 5 mcg/kg, higher than a routine bolus; titrate",null,"IV"), R("Esmolol","500 mcg/kg over 1 min, then 50–300 mcg/kg/min",`${pk(0.5,"mg")} bolus`,`then ${dz(50*W(),"mcg/min")}–${dz(300*W(),"mcg/min")} mcg/min`,"IV")])}
-  <p>Oxygen; direct aortic compression.</p>${psrc()}</div>
+  <div class="card"><h2>Cyanotic heart disease / Fallot spell</h2><div class="em-custom"><section class="anaph-phase"><h3 class="em-layout-heading">Clinical goals</h3><p>Aim: increased FiO₂, normal pH, normal EtCO₂, normal SVR (normal BP).</p>
+  </section><section class="anaph-phase"><h3>Fallot spell</h3>${T([R("Fluids","10–20 mL/kg (max 500 mL per bolus)",pk([10,20],"mL",500),null,"IV"), DR("Phenylephrine",[1,5],"mcg","spell: up to 5 mcg/kg, higher than a routine bolus; titrate",null,"IV"), R("Esmolol","500 mcg/kg over 1 min, then 50–300 mcg/kg/min",`${pk(0.5,"mg")} bolus`,`then ${dz(50*W(),"mcg/min")}–${dz(300*W(),"mcg/min")} mcg/min`,"IV")])}
+  </section><section class="anaph-phase"><h3 class="em-layout-heading">Additional measures</h3><p>Oxygen; direct aortic compression.</p></section></div>${psrc()}</div>
   <div class="card"><h2>Pyloric stenosis</h2>${pindDraft()}<p>3–5 weeks, projectile non-bilious vomiting, "olive". A medical emergency, not a surgical one — correct first.</p>
   <h3>Go when corrected</h3><table><tr><th>Chloride</th><td>≥ 100 mmol/L</td></tr><tr><th>Bicarbonate</th><td>≤ 28 mmol/L (base excess ≤ +2)</td></tr><tr><th>Potassium</th><td>≥ 3.5 mmol/L</td></tr><tr><th>Sodium</th><td>≥ 132 mmol/L</td></tr><tr><th>Glucose</th><td>normal; urine output ≥ 1 mL/kg/h</td></tr></table>
   <ul><li>Resuscitate with 0.9% saline 10–20 mL/kg boluses; maintenance 0.45% saline + 5% glucose with KCl once passing urine</li>
@@ -2533,22 +2539,23 @@ pCards.pinf = () => { const w = W(), mo = AGEM(), big = w >= 50 || S.pY >= 12;
 
 /* Emergencies — paeds */
 pCards.mtp = () => { WKS = isSample("pw"); const w = W(), pk2 = w<20 ? "1 unit adult PC + 1 unit adult FFP" : w<=40 ? "2 units adult PC + 2 units adult FFP" : "4 units adult PC + 4 units adult FFP";
-  return `<div class="card"><h2>Paeds massive transfusion</h2>${p3Draft()}<ol class="crisis">
-  <li><b>Activate</b> if haemorrhagic shock not responding to 20 mL/kg: blood loss &gt; 10% blood volume/min, ≥ 20 mL/kg PRBC in 2 h, or anticipated &gt; 50% blood volume in 3 h. Specialist activates; call blood bank.</li>
-  <li><b>Tranexamic acid</b> ${B("15 mg/kg = "+wk(w,15,"mg",1000))} IV/IO (within 3 h of injury), then ${B("2 mg/kg/h = "+wk(w,2,"mg"))}/h.</li>
-  <li>Send crossmatch, FBC, coag, RP, ABG, lactate, ionised Ca.</li>
-  <li>Pack for ${sig(w)} kg: <b>${pk2}</b> (1st pack group O Rh+ / AB plasma; then group-specific + cryo + platelets).</li>
-  <li>Give warmed PC and plasma in ${B("10 mL/kg = "+wk(w,10,"mL"))} aliquots, ratio 1 : 1. Platelets ${B("10 mL/kg")} (max 4 random units); cryo 1 unit / 10 kg or 10 mL/kg (max 10 units).</li>
-  <li><b>Calcium:</b> CaCl 10% ${B("0.2 mL/kg = "+wk(w,0.2,"mL",10))} or Ca gluconate 10% ${B("0.5 mL/kg = "+wk(w,0.5,"mL",20))}.</li>
-  <li>Control source · warm · correct acidosis · fibrinogen concentrate ${B("40 mg/kg = "+wk(w,40,"mg"))} if fibrinogen &lt; 1.5–2 g/L.</li>
-  <li>Still bleeding after all corrected (pH &gt; 7.2, T &gt; 35 °C, Ca normal, platelets &gt; 50–100, fibrinogen fixed): rFVIIa ${B("90 mcg/kg = "+wk(w,90,"mcg"))} (120 in severe cardiac). Haematology advice.</li></ol>
+  return `<div class="card"><h2>Paeds massive transfusion</h2>${p3Draft()}${emergencyPhases("Paeds massive transfusion", [
+  `<b>Activate</b> if haemorrhagic shock not responding to 20 mL/kg: blood loss &gt; 10% blood volume/min, ≥ 20 mL/kg PRBC in 2 h, or anticipated &gt; 50% blood volume in 3 h. Specialist activates; call blood bank.`,
+  `<b>Tranexamic acid</b> ${B("15 mg/kg = "+wk(w,15,"mg",1000))} IV/IO (within 3 h of injury), then ${B("2 mg/kg/h = "+wk(w,2,"mg"))}/h.`,
+  `Send crossmatch, FBC, coag, RP, ABG, lactate, ionised Ca.`,
+  `Pack for ${sig(w)} kg: <b>${pk2}</b> (1st pack group O Rh+ / AB plasma; then group-specific + cryo + platelets).`,
+  `Give warmed PC and plasma in ${B("10 mL/kg = "+wk(w,10,"mL"))} aliquots, ratio 1 : 1. Platelets ${B("10 mL/kg")} (max 4 random units); cryo 1 unit / 10 kg or 10 mL/kg (max 10 units).`,
+  `<b>Calcium:</b> CaCl 10% ${B("0.2 mL/kg = "+wk(w,0.2,"mL",10))} or Ca gluconate 10% ${B("0.5 mL/kg = "+wk(w,0.5,"mL",20))}.`,
+  `Control source · warm · correct acidosis · fibrinogen concentrate ${B("40 mg/kg = "+wk(w,40,"mg"))} if fibrinogen &lt; 1.5–2 g/L.`,
+  `Still bleeding after all corrected (pH &gt; 7.2, T &gt; 35 °C, Ca normal, platelets &gt; 50–100, fibrinogen fixed): rFVIIa ${B("90 mcg/kg = "+wk(w,90,"mcg"))} (120 in severe cardiac). Haematology advice.`
+])}
   <table><tr><th>Target</th><td>Hb ≥ 8 g/dL · platelets ≥ 75 (≥ 100 head injury) · PT/APTT &lt; 1.5 × normal · fibrinogen &gt; 1.5 g/L · iCa &gt; 1.0 · pH &gt; 7.35 · T &gt; 36 °C</td></tr>
   <tr><th>SBP goal</th><td>&lt; 1 month 60 · 1 month–1 y 70 · 1–10 y 70 + 2 × age = ${sig(70+2*S.pY)} · &gt; 10 y 90 mmHg (head injury: keep CPP)</td></tr></table>
   ${src(PLOC+"; APLS 7th ed. 2023.")}</div>`; };
 { const _m = pCards.mtp; pCards.mtp = () => { const h = _m(); WKS = false; return h; }; }
 pCards.pacuX = () => { const w = W();
-  return `<div class="card"><h2>Paeds PACU crises</h2>${p3Draft()}
-  <p class="sub">First 60 s: airway · breathing · SpO₂ ≥ 94% · perfusion · conscious level · pain.</p>${T([
+  return `<div class="card"><h2>Paeds PACU crises</h2>${p3Draft()}<div class="em-custom em-urgent"><section class="anaph-phase"><h3 class="em-layout-heading">Initial assessment</h3>
+  <p class="sub">First 60 s: airway · breathing · SpO₂ ≥ 94% · perfusion · conscious level · pain.</p></section><section class="anaph-phase"><h3 class="em-layout-heading">Problem-specific management</h3>${T([
   R("Croup / airway oedema","Adrenaline 1:1000 neb 0.5 mL/kg (max 5 mL) + dexamethasone 0.15–0.6 mg/kg",`${pk(0.5,"mL",5)}${RT("neb")} · dex ${pk([0.15,0.6],"mg")}${RT("IV / PO")}`,null,"inline"),
   R("Negative-pressure pulmonary oedema","Relieve obstruction, CPAP, furosemide 0.5–1 mg/kg",pk([0.5,1],"mg"),null,"IV"),
   R("Opioid apnoea","Naloxone 0.01 mg/kg",pk(0.01,"mg",0.4),null,"IV"),
@@ -2560,21 +2567,21 @@ pCards.pacuX = () => { const w = W();
   R("Severe pain","Paracetamol 15 mg/kg; morphine 0.05–0.1; fentanyl 0.5–1 mcg/kg; ketamine 0.25 mg/kg",`fent ${pk([0.5,1],"mcg")}${RT("IV")} · ket ${pk(0.25,"mg")}${RT("IV")}`,null,"inline"),
   R("Emergence delirium","Dexmedetomidine 0.3–0.5 mcg/kg or clonidine 1–2 mcg/kg; propofol 0.5–1 mg/kg",`dex ${pk([0.3,0.5],"mcg")}${RT("IV")} · prop ${pk([0.5,1],"mg")}${RT("IV")}`,null,"inline"),
   R("PONV","Ondansetron 0.15 mg/kg (max 4 mg); dexamethasone 0.15 mg/kg",pk(0.15,"mg",4),null,"IV")])}
-  <ul><li><b>Post-tonsillectomy bleed:</b> sit up, suction, call ENT + anaesthetist, RSI, activate MTP, back to OT</li>
+  </section><section class="anaph-phase"><h3 class="em-layout-heading">Additional measures and discharge</h3><ul><li><b>Post-tonsillectomy bleed:</b> sit up, suction, call ENT + anaesthetist, RSI, activate MTP, back to OT</li>
   <li><b>Delayed emergence:</b> vitals, glucose, ABG; reverse opioid / benzo / NMB; imaging if focal signs</li>
   <li>Agitation: rule out hypoxia, hypotension, hypoglycaemia, full bladder (catheter if &gt; 15 mL/kg), pain</li>
   <li>Compartment syndrome: remove cast, elevate, call ortho · Extravasation: stop, elevate, aspirate</li>
   <li>Discharge: airway patent, RR normal, SpO₂ ≥ 94%, stable 30 min, awake, pain controlled; <b>infant &lt; 1 y ≥ 2 h in PACU</b>; OSA extended</li></ul>
-  ${src(PLOC+".")}</div>`; };
-pCards.latex = () => `<div class="card"><h2>Latex allergy</h2>${p3Draft()}
+  </section></div>${src(PLOC+".")}</div>`; };
+pCards.latex = () => `<div class="card"><h2>Latex allergy</h2>${p3Draft()}<div class="em-custom"><section class="anaph-phase">
   <h3>At risk</h3><ul><li>Rash, itch, swelling or wheeze with latex</li><li>&gt; 5 previous GAs; spina bifida; urology anomalies with repeated catheters</li><li>Avocado, banana, kiwi, chestnut, strawberry, pineapple allergy</li></ul>
-  <h3>Prepare</h3><ul><li>Label LATEX ALLERGY (patient, notes, consent, chart, bed); tell OT team</li><li><b>First case of the day</b>, or an OT free of powdered latex gloves ≥ 3 h; signage on doors; restrict traffic</li>
+  </section><section class="anaph-phase"><h3>Prepare</h3><ul><li>Label LATEX ALLERGY (patient, notes, consent, chart, bed); tell OT team</li><li><b>First case of the day</b>, or an OT free of powdered latex gloves ≥ 3 h; signage on doors; restrict traffic</li>
   <li>Remove all latex items; wipe surfaces with non-latex gloves; cover table and arm boards with linen</li><li>Nitrile / neoprene gloves; latex-free airway, circuits, IV sets, 3-way taps, ECG leads, cuffs</li>
   <li><b>Drug vials with rubber stoppers: remove the stopper</b> (don't pierce) — e.g. ketamine, thiopentone, rocuronium, sugammadex, remifentanil, parecoxib, bupivacaine, many antibiotics, heparin, hydrocortisone, methylprednisolone</li>
   <li>Go straight to OT (skip holding bay); recover in OT if severe, or a latex-safe PACU</li></ul>
-  <div class="danger">Unexplained hypotension, bronchospasm, urticaria or collapse → <b>think latex anaphylaxis</b>.</div>
+  </section><section class="anaph-phase"><h3 class="em-layout-heading">Recognition and escalation</h3><div class="danger">Unexplained hypotension, bronchospasm, urticaria or collapse → <b>think latex anaphylaxis</b>.</div>
   <button class="emlink" data-ctx="anaph" data-open="Paeds anaphylaxis" data-g="emerg" data-tab="paeds">⚠ Paeds anaphylaxis → Emergencies</button>
-  ${src(PLOC+".")}</div>`;
+  </section></div>${src(PLOC+".")}</div>`;
 /* PONV by risk (replaces old paeds PONV card) */
 const PPF = [["hx","Previous PONV / POV, motion sickness, or relative with PONV"],["surg","Strabismus, tonsillectomy, ENT, middle ear, dental, laparoscopic, GU"],["dur","Surgery ≥ 30 min"],["pub","Post-pubertal girl"]];
 pCards.ponv = () => { const w = W(), y = S.pY, n = cnt("pponv", PPF.map(x=>x[0]));
@@ -2621,6 +2628,7 @@ const anaphPhases = steps => {
   return `<div class="anaph-phases">${phases.map(([label,from,to]) => `<section class="anaph-phase"><h3>${label}</h3><ol class="crisis" role="list" start="${from+1}">${steps.slice(from,to).map((s,i)=>`<li data-step="${from+i+1}"><div>${s}</div></li>`).join("")}</ol></section>`).join("")}</div>`;
 };
 // Approved emergency phase layouts: each range is a consecutive slice of the original steps.
+const emPanel = (label,body) => `<section class="anaph-phase">${label?`<h3 class="em-layout-heading">${label}</h3>`:""}${body}</section>`;
 const EM_PHASES = {
   "Failed intubation / CICO": {count:7,phases:[["Plans A–C",0,3],["Plan D / CICO",3,6,true],["Obstetric considerations",6,7]]},
   "Laryngospasm & stridor": {count:7,qrh:true,phases:[["Recognition and immediate response",0,3],["Persistent laryngospasm",3,5],["Mimics and recovery",5,7]]},
@@ -2646,7 +2654,20 @@ const EM_PHASES = {
   "High / total spinal": {count:9,phases:[["Immediate response and airway support",0,4],["Circulation and induction",4,7],["Obstetric considerations and arrest",7,9]]},
   "Hypotension after spinal": {count:5,phases:[["Immediate measures",0,1],["Vasopressors and blood pressure target",1,3],["Bradycardia and reassessment",3,5]]},
   "Massive obstetric haemorrhage": {count:9,phases:[["Immediate response",0,2],["Uterotonics and tranexamic acid",2,7],["Blood products and ongoing management",7,9]]},
-  "Eclampsia": {count:8,phases:[["Immediate response and seizure treatment",0,4],["Monitoring and magnesium toxicity",4,6],["Blood pressure and delivery",6,8]]}
+  "Eclampsia": {count:8,phases:[["Immediate response and seizure treatment",0,4],["Monitoring and magnesium toxicity",4,6],["Blood pressure and delivery",6,8]]},
+  "Patient fire": {count:6,qrh:true,phases:[["Recognition and immediate response",0,2],["Airway and non-airway fire",2,4],["Assessment and incident response",4,6]]},
+  "Mains oxygen failure": {count:7,qrh:true,phases:[["Recognition and immediate response",0,2],["Conserving oxygen and ongoing care",2,5],["Cylinder reserves and coordination",5,7]]},
+  "Mains electricity failure": {count:7,qrh:true,phases:[["Recognition and immediate response",0,3],["Ventilation, monitoring and power",3,5],["Surgical plan and recovery",5,7]]},
+  "Emergency evacuation": {count:7,qrh:true,phases:[["Recognition and initial decisions",0,3],["Airway, breathing and circulation",3,5],["Equipment and safe destination",5,7]]},
+  "Paeds bronchospasm": {count:7,phases:[["Immediate response",0,2],["Bronchodilators and other treatment",2,6],["Severe bronchospasm",6,7]]},
+  "Paeds hypoxia / desaturation": {count:6,phases:[["Oxygen, airway and breathing",0,3],["Airway pressure and circulation",3,5],["Escalation",5,6]]},
+  "Paeds difficult airway / CICO": {count:7,phases:[["Mask ventilation and intubation",0,3],["Failed oxygenation",3,5],["Emergency airway",5,7,true]]},
+  "Post-tonsillectomy bleed": {count:6,phases:[["Immediate response and resuscitation",0,2],["Antifibrinolytic and induction",2,4],["Extubation and massive bleeding",4,6]]},
+  "Paeds cardiac arrest": {count:6,phases:[["Immediate resuscitation",0,2],["Shockable rhythm and bradycardia",2,4],["Fluids and reversible causes",4,6]]},
+  "Paeds LA toxicity (LAST)": {count:7,phases:[["Immediate response and seizures",0,2],["Lipid rescue",2,6],["Cardiac arrest",6,7]]},
+  "Paeds anaphylaxis": {count:6,phases:[["Immediate response and adrenaline",0,3],["Fluids and escalation",3,5],["After stabilisation",5,6]]},
+  "Paeds malignant hyperthermia": {count:5,phases:[["Immediate response",0,1],["Dantrolene and cooling",1,4],["Hyperkalaemia",4,5]]},
+  "Paeds massive transfusion": {count:8,phases:[["Activation and initial management",0,3],["Blood products and calcium",3,6],["Ongoing bleeding and escalation",6,8]]}
 };
 function emergencyPhases(title, steps){
   const cfg=EM_PHASES[title];
@@ -6588,6 +6609,9 @@ function vTicks(){
 }
 /* ---------- ABOUT ---------- */
 const CHANGES = [
+  ["2.177.1","Emergency layout verification: check visible panel elements on every screen size, respecting the existing mobile-only dose label."],
+  ["2.177","Emergencies: consistent layouts for paediatric crisis cards, transfusion, shared tables and recovery reference cards; original clinical instructions, order and dose calculations retained."],
+  ["2.176","Emergencies: consistent phase layout for patient fire, mains oxygen failure, mains electricity failure and emergency evacuation; original QRH numbers and instructions retained."],
   ["2.175","Emergencies: consistent phase layout for high spinal, hypotension after spinal, massive obstetric haemorrhage and eclampsia; original clinical instructions retained."],
   ["2.174.2","Emergency card regression checks distinguish layout headings from clinical text while preserving the original instruction comparison."],
   ["2.174.1","Emergency cards: consistent inset for QRH rows and headings; extra room at dose-highlight line ends on every screen size. Clinical content unchanged."],
