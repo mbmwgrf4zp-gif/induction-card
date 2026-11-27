@@ -311,15 +311,16 @@ ol.crisis li::marker{font-weight:800;color:var(--g-emerg)}
 .content details.acc .anaph-phase ol.crisis>li,.content details.acc .anaph-phase b.dose{font-size:17px}
 .content details.acc .anaph-phase .dzb{font-size:20px}
 .content details.acc .anaph-phase h3{font-size:14px}
-/* Bronchospasm: allow room for cloned inline dose decoration at desktop line ends. */
-@media (min-width:1100px){.content details.acc[data-id="emerg-adult-bronchospasm"] .em-phases .anaph-phase ol.crisis>li{box-sizing:border-box;min-width:0;padding-inline-end:8px}}
+/* All emergency phase grids: reserve space for inline dose-decoration at line ends. */
+.content details.acc .em-phases .anaph-phase ol.crisis>li{box-sizing:border-box;min-width:0;padding-inline-end:8px}
+.content details.acc .em-phases .anaph-phase ol.crisis>li>div{min-width:0;max-width:100%;overflow-wrap:anywhere}
 /* QRH: one list, original numbering, presentation-only headings, full card width. */
 .em-phases ol.em-qrh{padding:0;margin:8px 0;min-width:0}
-.em-phases ol.em-qrh>li{box-sizing:border-box;min-width:0;max-width:100%;margin:0;padding:8px 4px;overflow-wrap:anywhere}
-.em-phases ol.em-qrh>li.qs{padding:8px 4px;border-bottom:1px solid var(--line)}
-.em-phases ol.em-qrh>li.qn{padding:8px 4px 8px 8px}
+.content details.acc .em-phases ol.crisis.em-qrh>li{box-sizing:border-box;min-width:0;max-width:100%;margin:0;padding:8px 12px;overflow-wrap:anywhere}
+.content details.acc .em-phases ol.crisis.em-qrh>li.qs{padding:8px 12px;border-bottom:1px solid var(--line)}
+.content details.acc .em-phases ol.crisis.em-qrh>li.qn{padding:8px 12px}
 .em-phases ol.em-qrh>li[data-phase="0"]{background:var(--danger-bg)}
-.em-phases ol.em-qrh>li.em-phase-heading{margin-top:8px;padding:8px 4px 4px;border-top:1px solid var(--line);border-radius:var(--r-sm) var(--r-sm) 0 0}
+.content details.acc .em-phases ol.crisis.em-qrh>li.em-phase-heading{margin-top:8px;padding:10px 12px 6px;border-top:1px solid var(--line);border-radius:var(--r-sm) var(--r-sm) 0 0}
 .em-phases ol.em-qrh>li.em-phase-heading:first-child{margin-top:0;border-color:var(--danger-line)}
 .content details.acc .em-phases ol.em-qrh>li,.content details.acc .em-qrh b.dose{font-size:17px}
 .content details.acc .em-qrh .dzb{font-size:20px}
@@ -1002,7 +1003,7 @@ if (window.top !== window.self && /\.github\.io$/.test(location.hostname)) {
 /* ================= CONFIG ================= */
 // Set to e.g. "2026-11-20" after the values sheet has been signed off.
 const VALUES_CHECKED = "14 Nov 2026";
-const APP_VERSION = "2.173";
+const APP_VERSION = "2.174.2";
 const APP_DATE = "27 Nov 2026";
 const PROTO = {name:"Departmental obstetric anaesthesia protocol", review:"2026-09-01"};
 
@@ -2638,7 +2639,10 @@ const EM_PHASES = {
   "Cardiac ischaemia": {count:6,qrh:true,phases:[["Recognition and immediate response",0,2],["Monitoring and treatment",2,5],["Escalation and ongoing care",5,6]]},
   "After cardiac arrest: neuroprotection": {count:5,qrh:true,phases:[["Recognition and ventilation",0,2],["Circulation and temperature",2,4],["Seizures and critical care",4,5]]},
   "Sepsis": {count:7,qrh:true,phases:[["Recognition and initial response",0,3],["Investigations, antibiotics and circulatory support",3,5],["Monitoring, source control and ongoing care",5,7]]},
-  "Cardiac arrest": {count:8,phases:[["Recognition and immediate response",0,2],["Shockable and non-shockable rhythms",2,4],["Special circumstances and after ROSC",4,8]]}
+  "Cardiac arrest": {count:8,phases:[["Recognition and immediate response",0,2],["Shockable and non-shockable rhythms",2,4],["Special circumstances and after ROSC",4,8]]},
+  "LA toxicity (LAST)": {count:9,phases:[["Immediate response",0,2],["Lipid rescue",2,6],["Cardiac arrest, seizures and aftercare",6,9]]},
+  "Malignant hyperthermia": {count:8,phases:[["Immediate response",0,2],["Dantrolene and cooling",2,5],["Complications and monitoring",5,8]]},
+  "Hyperkalaemia": {count:8,phases:[["Recognition and cardiac protection",0,2],["Potassium shifting and removal",2,6],["Special circumstances and cardiac arrest",6,8]]}
 };
 function emergencyPhases(title, steps){
   const cfg=EM_PHASES[title];
@@ -2659,15 +2663,16 @@ function emergencyPhases(title, steps){
 const crisis = (title, steps, srcTxt, extra="", top="") =>
   `<div class="card"><h2>${title}</h2>${top}${crisisDraft()}${CRISIS_W === null ? "" : WKS ? `<p class="cwt">Enter the weight above to see doses.</p>` : `<p class="cwt">Doses for <b>${sig(CRISIS_W)} kg</b></p>`}${title === "Anaphylaxis" ? anaphPhases(steps) : emergencyPhases(title, steps)}${extra}${src(srcTxt)}</div>`;
 
-const HK_CARD = () => `<div class="card"><h2>Hyperkalaemia</h2>${TX_CHECKED ? "" : `<div class="warn" style="margin-top:0">DRAFT — UK Kidney Association hyperkalaemia guideline, checked against two sources. Not yet ticked by you.</div>`}<ol class="crisis">
-  <li>Severity (UKKA): mild 5.5–5.9 · moderate 6.0–6.4 · <b>severe ≥ 6.5</b> mmol/L. Stop K⁺-containing fluids; 12-lead ECG / monitor.</li>
-  <li><b>ECG changes or K⁺ ≥ 6.5:</b> ${B("calcium chloride 10% 10 mL")} IV over 5 min, or ${B("calcium gluconate 10% 30 mL")} over 10 min. Repeat if ECG still abnormal.</li>
-  <li>${B("Insulin 10 units soluble + glucose 25 g")} IV (e.g. 50% glucose 50 mL) over 15 min. If pre-treatment glucose &lt; 7 mmol/L: 10% glucose 50 mL/h for 5 h. Glucose hourly for 6 h.</li>
-  <li>${B("Salbutamol 10–20 mg nebulised")} as an add-on (not alone). Under GA: hyperventilate as a temporary bridge.</li>
-  <li>Sodium bicarbonate only if metabolic acidosis (not routine).</li>
-  <li>Remove K⁺: <b>urgent dialysis</b> (call nephrology); K⁺ binder if available.</li>
-  <li>Transplant: K⁺ rises at reperfusion; use saline rather than K⁺-containing balanced fluid when K⁺ is high. Avoid suxamethonium.</li>
-  <li>Cardiac arrest: ALS + calcium, insulin–glucose; consider dialysis during CPR.</li></ol>
+const HK_CARD = () => `<div class="card"><h2>Hyperkalaemia</h2>${TX_CHECKED ? "" : `<div class="warn" style="margin-top:0">DRAFT — UK Kidney Association hyperkalaemia guideline, checked against two sources. Not yet ticked by you.</div>`}${emergencyPhases("Hyperkalaemia", [
+  `Severity (UKKA): mild 5.5–5.9 · moderate 6.0–6.4 · <b>severe ≥ 6.5</b> mmol/L. Stop K⁺-containing fluids; 12-lead ECG / monitor.`,
+  `<b>ECG changes or K⁺ ≥ 6.5:</b> ${B("calcium chloride 10% 10 mL")} IV over 5 min, or ${B("calcium gluconate 10% 30 mL")} over 10 min. Repeat if ECG still abnormal.`,
+  `${B("Insulin 10 units soluble + glucose 25 g")} IV (e.g. 50% glucose 50 mL) over 15 min. If pre-treatment glucose &lt; 7 mmol/L: 10% glucose 50 mL/h for 5 h. Glucose hourly for 6 h.`,
+  `${B("Salbutamol 10–20 mg nebulised")} as an add-on (not alone). Under GA: hyperventilate as a temporary bridge.`,
+  `Sodium bicarbonate only if metabolic acidosis (not routine).`,
+  `Remove K⁺: <b>urgent dialysis</b> (call nephrology); K⁺ binder if available.`,
+  `Transplant: K⁺ rises at reperfusion; use saline rather than K⁺-containing balanced fluid when K⁺ is high. Avoid suxamethonium.`,
+  `Cardiac arrest: ALS + calcium, insulin–glucose; consider dialysis during CPR.`
+])}
   ${src("UK Kidney Association hyperkalaemia guideline 2023 (updated 2026); RCUK ALS 2025.")}</div>`;
 const eCards = {};
 eCards.adult = () => {
@@ -6579,6 +6584,9 @@ function vTicks(){
 }
 /* ---------- ABOUT ---------- */
 const CHANGES = [
+  ["2.174.2","Emergency card regression checks distinguish layout headings from clinical text while preserving the original instruction comparison."],
+  ["2.174.1","Emergency cards: consistent inset for QRH rows and headings; extra room at dose-highlight line ends on every screen size. Clinical content unchanged."],
+  ["2.174","Emergencies: phase headings for local anaesthetic toxicity, malignant hyperthermia and hyperkalaemia; original instructions and doses retained."],
   ["2.173","Emergencies: phase headings for cardiac arrest, circulatory crises and post-arrest care; original steps, QRH numbers and doses retained."],
   ["2.172","Emergencies: phase headings for eight common adult intraoperative problems and the key basic plan; original QRH numbers, text and doses retained."],
   ["2.171.2","Bronchospasm: reserve a little space at the end of desktop crisis rows to avoid dose-highlight overflow; no clinical changes."],
